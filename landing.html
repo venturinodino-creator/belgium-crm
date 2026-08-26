@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Research CRM · Research Intelligence Platform</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #060d1a;
+    --bg2:       #0b1628;
+    --bg3:       #0f1e35;
+    --border:    rgba(255,255,255,.08);
+    --accent:    #00f5c4;
+    --accent2:   #7c6dfa;
+    --accent3:   #38bdf8;
+    --text:      #f1f5f9;
+    --muted:     #64748b;
+    --panel-bg:  rgba(11,22,40,.85);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: -apple-system, 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Canvas ── */
+  #bg-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ── Layout ── */
+  .hero {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr auto;
+  }
+
+  /* ── Top bar ── */
+  .topbar {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    padding: 22px 40px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(6,13,26,.6);
+    backdrop-filter: blur(12px);
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -.3px;
+  }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .logo span { color: var(--accent); }
+  .topbar-right {
+    margin-left: auto;
+    display: flex; gap: 12px; align-items: center;
+  }
+  .btn-ghost {
+    padding: 7px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all .2s;
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-primary {
+    padding: 8px 20px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent3));
+    border: none; border-radius: 8px;
+    color: #fff; font-size: 13px; font-weight: 600;
+    cursor: pointer; text-decoration: none;
+    transition: opacity .2s;
+  }
+  .btn-primary:hover { opacity: .85; }
+
+  /* ── Left hero ── */
+  .hero-left {
+    grid-row: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 56px 60px 56px;
+    border-right: 1px solid var(--border);
+  }
+  .label {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 28px;
+  }
+  .label::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+    display: inline-block;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: .5; transform: scale(.8); }
+  }
+  .hero-h1 {
+    font-size: clamp(42px, 5vw, 64px);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -1.5px;
+    margin-bottom: 24px;
+  }
+  .hero-h1 .grad {
+    background: linear-gradient(120deg, var(--accent), var(--accent3), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-sub {
+    font-size: 16px;
+    line-height: 1.7;
+    color: #94a3b8;
+    max-width: 440px;
+    margin-bottom: 48px;
+  }
+
+  /* ── Stats row ── */
+  .stats-row {
+    display: flex;
+    gap: 36px;
+  }
+  .stat { }
+  .stat-val {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+  .stat-val .unit { font-size: 13px; font-weight: 500; color: var(--muted); margin-left: 3px; }
+  .stat-lbl {
+    font-family: 'SF Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 5px;
+  }
+
+  /* ── Right panel ── */
+  .hero-right {
+    grid-row: 2;
+    display: flex;
+    flex-direction: column;
+    padding: 56px 40px 40px 48px;
+    background: rgba(11,22,40,.4);
+  }
+  .panel-label {
+    font-family: 'SF Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 16px;
+  }
+  .panel-label .dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 8px var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .panel-h2 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -.5px;
+    margin-bottom: 20px;
+  }
+
+  /* Search box */
+  .search-wrap {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .search-input {
+    flex: 1;
+    background: rgba(255,255,255,.05);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 16px 11px 40px;
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+    transition: border-color .2s;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 13px center;
+  }
+  .search-input:focus { border-color: var(--accent3); }
+  .search-input::placeholder { color: var(--muted); }
+  .search-btn {
+    padding: 0 22px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent3));
+    border: none; border-radius: 10px;
+    color: #fff; font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    transition: opacity .2s;
+  }
+  .search-btn:hover { opacity: .85; }
+  .search-hint {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+  .search-hint a {
+    color: var(--accent3);
+    text-decoration: none;
+  }
+  .search-hint a:hover { text-decoration: underline; }
+
+  /* Live institutions list */
+  .live-label {
+    font-family: 'SF Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .live-label .live-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: #22c55e; box-shadow: 0 0 8px #22c55e;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  .inst-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 340px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .inst-list::-webkit-scrollbar { width: 4px; }
+  .inst-list::-webkit-scrollbar-track { background: transparent; }
+  .inst-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .inst-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: rgba(255,255,255,.03);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all .18s;
+    text-decoration: none;
+    color: inherit;
+  }
+  .inst-row:hover {
+    background: rgba(0,245,196,.05);
+    border-color: rgba(0,245,196,.25);
+  }
+
+  /* Score circle */
+  .score-ring {
+    position: relative;
+    width: 38px; height: 38px; flex-shrink: 0;
+  }
+  .score-ring svg {
+    transform: rotate(-90deg);
+  }
+  .score-ring .score-val {
+    position: absolute;
+    inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    color: var(--text);
+  }
+
+  .inst-info { flex: 1; min-width: 0; }
+  .inst-name {
+    font-size: 13px; font-weight: 600;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .inst-meta {
+    font-size: 11px; color: var(--muted); margin-top: 2px;
+  }
+  .inst-badge {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 7px;
+    border-radius: 5px;
+    flex-shrink: 0;
+  }
+  .badge-university { background: rgba(124,109,250,.2); color: #a78bfa; }
+  .badge-medical    { background: rgba(239,68,68,.15);  color: #f87171; }
+  .badge-research   { background: rgba(56,189,248,.15); color: #38bdf8; }
+  .badge-ngo        { background: rgba(34,197,94,.15);  color: #4ade80; }
+
+  /* Commission-like callout */
+  .cta-callout {
+    margin-top: 16px;
+    padding: 14px 18px;
+    background: rgba(0,245,196,.06);
+    border: 1px solid rgba(0,245,196,.2);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .cta-callout-text { font-size: 12px; color: #94a3b8; }
+  .cta-callout-text strong { color: var(--accent); font-size: 15px; display: block; }
+  .btn-enter {
+    padding: 9px 20px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent3));
+    border: none; border-radius: 9px;
+    color: #fff; font-size: 13px; font-weight: 700;
+    cursor: pointer; text-decoration: none;
+    white-space: nowrap; transition: opacity .2s;
+  }
+  .btn-enter:hover { opacity: .85; }
+
+  /* ── Bottom footer of hero ── */
+  .hero-footer {
+    grid-column: 1 / -1;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 40px;
+    border-top: 1px solid var(--border);
+    background: rgba(6,13,26,.7);
+    backdrop-filter: blur(12px);
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .hero-footer .sep { margin: 0 8px; opacity: .4; }
+  .status-dot {
+    display: inline-block;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #22c55e; box-shadow: 0 0 6px #22c55e;
+    margin-right: 5px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .scroll-hint {
+    font-family: 'SF Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    opacity: .6;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .scroll-hint::after {
+    content: '↓';
+    animation: bounce 1.6s ease-in-out infinite;
+  }
+  @keyframes bounce {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(4px); }
+  }
+
+  /* ── SECTIONS ── */
+  .section {
+    position: relative; z-index: 1;
+    padding: 100px 56px;
+    border-top: 1px solid var(--border);
+  }
+  .section-inner { max-width: 1200px; margin: 0 auto; }
+
+  .section-tag {
+    font-family: 'SF Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+  .section-h2 {
+    font-size: clamp(30px, 4vw, 48px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .section-sub {
+    font-size: 16px;
+    color: #94a3b8;
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 60px;
+  }
+  .section-sub .hl { color: var(--text); font-weight: 600; }
+
+  /* 3-col grid */
+  .feat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .feat-card {
+    padding: 28px;
+    background: rgba(255,255,255,.025);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    transition: border-color .2s, background .2s;
+  }
+  .feat-card:hover {
+    border-color: rgba(0,245,196,.25);
+    background: rgba(0,245,196,.03);
+  }
+  .feat-num {
+    font-family: 'SF Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+  .feat-icon {
+    font-size: 28px;
+    margin-bottom: 14px;
+    display: block;
+  }
+  .feat-title {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: -.3px;
+  }
+  .feat-desc {
+    font-size: 13px;
+    color: #94a3b8;
+    line-height: 1.7;
+  }
+
+  /* ── Section 2: Network ── */
+  .split-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .split-vis {
+    background: rgba(255,255,255,.025);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .flow-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .flow-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 7px;
+    white-space: nowrap;
+  }
+  .flow-arrow {
+    font-family: 'SF Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    flex: 1;
+    text-align: center;
+    letter-spacing: 2px;
+  }
+  .flow-status {
+    font-family: 'SF Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .flow-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 4px 0;
+  }
+  .flow-engine {
+    text-align: center;
+    font-family: 'SF Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-top: 4px;
+  }
+  .flow-engine::before { content: '⚡ '; }
+
+  .feat-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-top: 16px;
+  }
+  .feat-item {
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+  }
+  .feat-item-num {
+    font-family: 'SF Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    min-width: 24px;
+    margin-top: 2px;
+  }
+  .feat-item-text { font-size: 14px; line-height: 1.7; }
+  .feat-item-title { font-weight: 700; margin-bottom: 4px; }
+  .feat-item-desc { color: #94a3b8; }
+
+  /* ── Final CTA ── */
+  .cta-section {
+    position: relative; z-index: 1;
+    text-align: center;
+    padding: 120px 40px;
+    border-top: 1px solid var(--border);
+    background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(124,109,250,.08), transparent);
+  }
+  .cta-section .section-tag { justify-content: center; }
+  .cta-h2 {
+    font-size: clamp(36px, 5vw, 58px);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    margin-bottom: 20px;
+  }
+  .cta-sub {
+    font-size: 16px;
+    color: #94a3b8;
+    margin-bottom: 48px;
+    line-height: 1.7;
+  }
+  .cta-sub em { color: var(--text); font-style: normal; font-weight: 600; }
+  .btn-big {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 40px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent3));
+    border: none; border-radius: 14px;
+    color: #fff; font-size: 16px; font-weight: 700;
+    cursor: pointer; text-decoration: none;
+    letter-spacing: -.3px;
+    transition: opacity .2s, transform .2s;
+    box-shadow: 0 0 40px rgba(124,109,250,.3);
+  }
+  .btn-big:hover { opacity: .9; transform: translateY(-2px); }
+  .cta-note {
+    margin-top: 20px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* ── Bottom bar ── */
+  .bottom-bar {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 40px;
+    border-top: 1px solid var(--border);
+    background: rgba(6,13,26,.8);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* ── Notification toast ── */
+  .toast {
+    position: fixed;
+    bottom: 28px; right: 28px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    display: flex; align-items: flex-start; gap: 12px;
+    max-width: 280px;
+    z-index: 100;
+    box-shadow: 0 8px 32px rgba(0,0,0,.4);
+    animation: toast-in .4s ease both;
+  }
+  @keyframes toast-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .toast-icon { font-size: 16px; }
+  .toast-body { }
+  .toast-title { font-size: 12px; font-weight: 700; margin-bottom: 3px; }
+  .toast-msg { font-size: 11px; color: var(--muted); line-height: 1.5; }
+  .toast-link {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- ── HERO ── -->
+<div class="hero">
+
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="logo">
+      <div style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 22" width="22" height="13"><defs><linearGradient id="inf-lg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a855f7"/><stop offset="100%" stop-color="#3b82f6"/></linearGradient></defs><path d="M20 11C20 5 25 2 30 2C35 2 38 6 38 11C38 16 35 20 30 20C25 20 22 17 20 11C18 5 15 2 10 2C5 2 2 6 2 11C2 16 5 20 10 20C15 20 18 17 20 11Z" fill="none" stroke="url(#inf-lg)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      Research<span>CRM</span>
+    </div>
+    <div id="region-switcher" style="display:flex;gap:6px;margin-left:28px;padding:3px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:9px"></div>
+    <nav class="topbar-right">
+      <a href="index.html" class="btn-primary">Sign in</a>
+    </nav>
+  </header>
+
+  <!-- Left hero -->
+  <div class="hero-left">
+    <div class="label">Research Intelligence · Belgium</div>
+    <h1 class="hero-h1">
+      Stop guessing.<br>
+      <span class="grad">Start knowing.</span>
+    </h1>
+    <p class="hero-sub">
+      Institutions, contacts, and competitor subscriptions —
+      consolidated, scored, and tracked across the Belgium
+      research landscape. In one place.
+    </p>
+    <div class="stats-row">
+      <div class="stat">
+        <div class="stat-val">38<span class="unit">+</span></div>
+        <div class="stat-lbl">Institutions tracked</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">7</div>
+        <div class="stat-lbl">Competitor products</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" id="stat-contacts">300<span class="unit">+</span></div>
+        <div class="stat-lbl">Verified contacts</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right panel -->
+  <div class="hero-right">
+    <div class="panel-label">
+      <span class="dot"></span>
+      Live institution intelligence
+    </div>
+    <h2 class="panel-h2">Which institution<br>are you researching?</h2>
+
+    <div class="search-wrap">
+      <input id="search-input" class="search-input" type="text" placeholder="Search by name, city, or type…" oninput="filterList(this.value)">
+      <button class="search-btn" onclick="document.getElementById('search-input').dispatchEvent(new Event('focus'))">Search</button>
+    </div>
+    <p class="search-hint">
+      Try <a href="#" onclick="setSearch('KU Leuven'); return false">KU Leuven</a>,
+      <a href="#" onclick="setSearch('Brussels'); return false">Brussels</a>, or
+      <a href="#" onclick="setSearch('Medical'); return false">Medical centres</a> —
+      or browse all 38 institutions below.
+    </p>
+
+    <div class="live-label"><span class="live-dot"></span> Live coverage</div>
+
+    <div class="inst-list" id="inst-list">
+      <!-- populated by JS -->
+    </div>
+
+    <div class="cta-callout">
+      <div class="cta-callout-text">
+        <strong id="expiry-count">Loading…</strong>
+        contracts flagged for review this quarter
+      </div>
+      <a href="index.html" class="btn-enter">Sign in →</a>
+    </div>
+  </div>
+
+  <!-- Footer bar -->
+  <footer class="hero-footer">
+    <div>
+      Research CRM · v2
+      <span class="sep">/</span>
+      Data current 2026-07-29
+      <span class="sep">/</span>
+      <span class="status-dot"></span>All systems operational
+    </div>
+    <div class="scroll-hint">Scroll</div>
+  </footer>
+
+</div><!-- /hero -->
+
+
+<!-- ── SECTION 1: Track everything ── -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-tag">The platform</div>
+    <h2 class="section-h2">One desk for the whole<br>Belgium research market.</h2>
+    <p class="section-sub">
+      Research CRM is the <span class="hl">private intelligence layer</span> for managing relationships
+      with Belgian universities, medical centres, and research institutes —
+      across contacts, competitor products, and deal pipelines.
+    </p>
+
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-num">01</div>
+        <span class="feat-icon">🏛️</span>
+        <div class="feat-title">Track once, see everything</div>
+        <p class="feat-desc">
+          Add an institution once. The platform keeps it updated with contacts,
+          subscriptions, competitor products, and deal status — no re-entering,
+          no switching tools.
+        </p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-num">02</div>
+        <span class="feat-icon">🔍</span>
+        <div class="feat-title">Monitor competitor subscriptions</div>
+        <p class="feat-desc">
+          See which competitor products each institution is actively subscribed to —
+          Springer Nature, Wiley, Clarivate, IEEE, and more — with status
+          scoring and expiry tracking.
+        </p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-num">03</div>
+        <span class="feat-icon">🎯</span>
+        <div class="feat-title">Prioritise intelligently</div>
+        <p class="feat-desc">
+          Contacts are scored by priority and engagement quality. Contracts
+          are flagged by expiry proximity. The platform surfaces what needs
+          your attention, before you have to look.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ── SECTION 2: How it works ── -->
+<section class="section" style="background: rgba(11,22,40,.5);">
+  <div class="section-inner">
+    <div class="split-section">
+
+      <!-- Visual -->
+      <div class="split-vis">
+        <div class="flow-row">
+          <span class="flow-badge badge-university">KU Leuven · Subscription</span>
+          <span class="flow-arrow">→→→</span>
+          <span class="flow-status">scored</span>
+        </div>
+        <hr class="flow-divider">
+        <div class="flow-row">
+          <span class="flow-badge badge-medical">UZ Leuven · Contract</span>
+          <span class="flow-arrow">→→→</span>
+          <span class="flow-status" style="color:#f87171">⏳ expiring</span>
+        </div>
+        <hr class="flow-divider">
+        <div class="flow-row">
+          <span class="flow-badge badge-research">imec · Contact</span>
+          <span class="flow-arrow">→→→</span>
+          <span class="flow-status" style="color:#4ade80">✓ verified</span>
+        </div>
+        <hr class="flow-divider">
+        <div class="flow-row">
+          <span class="flow-badge badge-ngo">FWO · Deal</span>
+          <span class="flow-arrow">→→→</span>
+          <span class="flow-status" style="color:#fbbf24">◎ pipeline</span>
+        </div>
+        <hr class="flow-divider">
+        <div class="flow-engine">Intelligence engine · live · real time</div>
+      </div>
+
+      <!-- Text -->
+      <div>
+        <div class="section-tag">How it works</div>
+        <h2 class="section-h2" style="margin-bottom:12px">Signals,<br>not spreadsheets.</h2>
+        <p class="section-sub" style="margin-bottom:0">
+          The platform processes your institution data as <span class="hl">live intelligence signals</span>
+          — not static records. Every contact, contract, and competitor product
+          is scored and surfaced automatically.
+        </p>
+
+        <div class="feat-list">
+          <div class="feat-item">
+            <div class="feat-item-num">01</div>
+            <div class="feat-item-text">
+              <div class="feat-item-title">Subscriptions as signals</div>
+              <div class="feat-item-desc">Every competitor subscription is tracked with status, notes, and confidence level — so you know exactly who has what and when it expires.</div>
+            </div>
+          </div>
+          <div class="feat-item">
+            <div class="feat-item-num">02</div>
+            <div class="feat-item-text">
+              <div class="feat-item-title">Contacts stay current</div>
+              <div class="feat-item-desc">Library directors, research directors, and procurement contacts are stored with priority scores, quality flags, and engagement history.</div>
+            </div>
+          </div>
+          <div class="feat-item">
+            <div class="feat-item-num">03</div>
+            <div class="feat-item-text">
+              <div class="feat-item-title">Deals tracked end-to-end</div>
+              <div class="feat-item-desc">From initial outreach to close, every deal is visible in the pipeline — with institution context always one click away.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ── SECTION 3: Coverage ── -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-tag">Coverage</div>
+    <h2 class="section-h2">The full Belgium<br>research landscape.</h2>
+    <p class="section-sub">
+      From the leading universities of both language communities to specialist
+      hospitals and federal research institutes — every significant institution
+      in the Belgian research ecosystem, in one platform.
+    </p>
+
+    <div class="feat-grid">
+      <div class="feat-card">
+        <span class="feat-icon">🎓</span>
+        <div class="feat-title">10 Universities</div>
+        <p class="feat-desc">
+          All major Belgian universities across both language communities —
+          KU Leuven, Ghent University, University of Antwerp, VUB, Hasselt
+          University, UCLouvain, ULiège, ULB, University of Namur, and UMons.
+        </p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">🏥</span>
+        <div class="feat-title">9 Hospitals & Medical Centres</div>
+        <p class="feat-desc">
+          UZ Leuven, UZ Gent, UZA, UZ Brussel, CHU de Liège, Cliniques
+          universitaires Saint-Luc, and Hôpital Erasme, plus specialist
+          centres including Institut Jules Bordet.
+        </p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">🔬</span>
+        <div class="feat-title">19 Research Institutes & Foundations</div>
+        <p class="feat-desc">
+          imec, VIB, Sciensano, the Royal Belgian Institute of Natural
+          Sciences, and other federal research institutes, plus major
+          funders including FWO, F.R.S.-FNRS, and the King Baudouin
+          Foundation.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ── FINAL CTA ── -->
+<section class="cta-section">
+  <div class="section-tag">Join the platform</div>
+  <h2 class="cta-h2">Enter the CRM.</h2>
+  <p class="cta-sub">
+    All <em>38 institutions</em>, <em id="cta-contacts">300+ contacts</em>, and <em>7 competitor product tracks</em><br>
+    — ready and waiting.
+  </p>
+  <a href="index.html" class="btn-big">
+    Sign in
+    <span>→</span>
+  </a>
+  <p class="cta-note">Internal platform · Sign-in required</p>
+</section>
+
+<!-- Bottom bar -->
+<div class="bottom-bar">
+  <div>Research CRM <span style="margin:0 8px;opacity:.3">/</span> Belgium <span style="margin:0 8px;opacity:.3">/</span> <span class="status-dot"></span> All systems operational</div>
+  <div>🎯 38 institutions tracked</div>
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast">
+  <div class="toast-icon">🔔</div>
+  <div class="toast-body">
+    <div class="toast-title">New on your radar</div>
+    <div class="toast-msg" id="toast-msg">Loading…</div>
+    <a href="index.html" class="toast-link">Sign in →</a>
+  </div>
+</div>
+
+<!-- LOGIN MODAL -->
+<div id="login-modal" style="display:none;position:fixed;inset:0;z-index:2000;align-items:center;justify-content:center;background:rgba(6,13,26,.75);backdrop-filter:blur(4px)">
+  <div style="background:var(--panel-bg);border:1px solid var(--border);border-radius:14px;padding:28px;width:100%;max-width:320px;display:flex;flex-direction:column;align-items:center;gap:10px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.5)">
+    <button onclick="closeLoginModal()" style="position:absolute;top:12px;right:12px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;line-height:1">✕</button>
+    <div style="font-size:28px">🔒</div>
+    <div style="font-size:16px;font-weight:700;color:var(--text)">Sign in to Research CRM</div>
+    <div style="font-size:12px;color:var(--muted);text-align:center;line-height:1.5">Enter the email and password you were given to access the CRM.</div>
+    <div style="display:flex;flex-direction:column;gap:8px;width:100%;margin-top:6px">
+      <input id="lm-email" type="email" placeholder="you@example.com" autocomplete="username" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:13px" onkeydown="if(event.key==='Enter')doLogin()">
+      <input id="lm-password" type="password" placeholder="Password" autocomplete="current-password" style="padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:13px" onkeydown="if(event.key==='Enter')doLogin()">
+      <button id="lm-btn" onclick="doLogin()" style="width:100%;padding:10px;border-radius:8px;border:none;cursor:pointer;font-weight:700;font-size:13px;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#04141f">Sign in</button>
+    </div>
+    <div id="lm-msg" style="font-size:11.5px;color:var(--muted);text-align:center;min-height:14px;line-height:1.5"></div>
+  </div>
+</div>
+
+<script>
+// ── Auth gate: sign-in lives here on the landing page. A successful sign-in
+// establishes a Supabase session in localStorage, which index.html (same
+// origin) picks up automatically on load, so no token needs to be passed.
+(function(){
+  var SUPA_URL = 'https://cfhljbexesdrabmadpcc.supabase.co';
+  var SUPA_KEY = 'sb_publishable_PE2Yc0ivOT4F4fE80CXJUw_kbch9TpZ';
+  var supabaseClient = null;
+  async function initSupabase() {
+    if (supabaseClient) return supabaseClient;
+    var mod = await import('https://esm.sh/@supabase/supabase-js@2');
+    supabaseClient = mod.createClient(SUPA_URL, SUPA_KEY);
+    return supabaseClient;
+  }
+  window.showLoginModal = function(){ document.getElementById('login-modal').style.display = 'flex'; };
+  window.closeLoginModal = function(){ document.getElementById('login-modal').style.display = 'none'; };
+  window.enterCRM = async function(){
+    await initSupabase();
+    var res = await supabaseClient.auth.getSession();
+    if (res.data && res.data.session) {
+      window.location.href = 'index.html';
+    } else {
+      window.showLoginModal();
+    }
+  };
+  window.doLogin = async function(){
+    var email = (document.getElementById('lm-email').value || '').trim();
+    var password = document.getElementById('lm-password').value || '';
+    var msg = document.getElementById('lm-msg');
+    if (!email || !password) { msg.textContent = 'Enter both email and password.'; return; }
+    await initSupabase();
+    var btn = document.getElementById('lm-btn');
+    btn.disabled = true; btn.textContent = 'Signing in…';
+    var res = await supabaseClient.auth.signInWithPassword({ email: email, password: password });
+    btn.disabled = false; btn.textContent = 'Sign in';
+    if (res.error) { msg.textContent = 'Error: ' + res.error.message; }
+    else { window.location.href = 'index.html'; }
+  };
+  // Every "enter the CRM" link on this page points to index.html — intercept
+  // all of them so signed-out visitors get the modal instead of a dead page.
+  document.addEventListener('click', function(e){
+    var a = e.target.closest && e.target.closest('a[href="index.html"]');
+    if (!a) return;
+    e.preventDefault();
+    window.enterCRM();
+  });
+})();
+</script>
+
+<script>
+// ── Constellation canvas ────────────────────────────────────────────────────
+(function(){
+  const canvas = document.getElementById('bg-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, dots = [];
+  const PALETTE = [
+    [0,245,196], [56,189,248], [124,109,250], [34,197,94], [251,191,36]
+  ];
+  const N = 55, LINK_DIST = 160;
+
+  function resize(){
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  function init(){
+    resize();
+    dots = Array.from({length:N}, ()=>{
+      const [r,g,b] = PALETTE[Math.floor(Math.random()*PALETTE.length)];
+      return {
+        x: Math.random()*W, y: Math.random()*H,
+        vx: (Math.random()-.5)*.22, vy: (Math.random()-.5)*.22,
+        core: 1.4 + Math.random()*2, pulse: Math.random()*Math.PI*2,
+        r, g, b
+      };
+    });
+  }
+
+  let t = 0;
+  function draw(){
+    t += .008;
+    ctx.clearRect(0,0,W,H);
+
+    // Links
+    for(let i=0;i<dots.length;i++){
+      for(let j=i+1;j<dots.length;j++){
+        const dx=dots[i].x-dots[j].x, dy=dots[i].y-dots[j].y;
+        const d=Math.sqrt(dx*dx+dy*dy);
+        if(d<LINK_DIST){
+          const a=(.6*(1-d/LINK_DIST))*.35;
+          ctx.beginPath();
+          ctx.moveTo(dots[i].x,dots[i].y);
+          ctx.lineTo(dots[j].x,dots[j].y);
+          ctx.strokeStyle=`rgba(56,189,248,${a})`;
+          ctx.lineWidth=.6;
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Nodes with shadowBlur glow
+    dots.forEach(d=>{
+      const pulse = 1 + .12*Math.sin(t*1.4 + d.pulse);
+      const cr = d.core * pulse;
+      ctx.shadowBlur = cr * 8;
+      ctx.shadowColor = `rgba(${d.r},${d.g},${d.b},0.65)`;
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, cr, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(${d.r},${d.g},${d.b},0.92)`;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      d.x += d.vx; d.y += d.vy;
+      if(d.x < -30) d.x = W+30; else if(d.x > W+30) d.x = -30;
+      if(d.y < -30) d.y = H+30; else if(d.y > H+30) d.y = -30;
+    });
+
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', ()=>{ resize(); });
+  init(); draw();
+})();
+
+// ── Regions ──────────────────────────────────────────────────────────────
+// Single source of truth for which regions exist and whether each is live
+// yet. Any future region follows the same pattern: add it here with
+// status:'live' and its cross-repo landing.html URL once that build is
+// ready — nothing else on this page needs to change when that happens.
+const REGIONS = [
+  { id: 'netherlands', label: 'Netherlands', status: 'live', url: 'https://venturinodino-creator.github.io/netherlands-crm/landing.html' },
+  { id: 'denmark',     label: 'Denmark',     status: 'live', url: 'https://venturinodino-creator.github.io/denmark-crm/landing.html' },
+  { id: 'belgium',     label: 'Belgium',     status: 'live', url: 'landing.html' },
+];
+
+function renderRegionSwitcher() {
+  const el = document.getElementById('region-switcher');
+  if (!el) return;
+  el.innerHTML = REGIONS.map(r => {
+    const active = r.id === 'belgium'; // this page is currently rendering the BE view
+    const live = r.status === 'live';
+    const style = `padding:6px 13px;border-radius:6px;font-size:12px;font-weight:600;cursor:${live ? 'pointer' : 'default'};` +
+      (active ? 'background:linear-gradient(135deg,var(--accent2),var(--accent3));color:#04141f;'
+              : live ? 'color:var(--text);' : 'color:var(--muted);opacity:.55;');
+    const badge = !live ? ' <span style="font-size:8px;letter-spacing:.5px;text-transform:uppercase;opacity:.8">· soon</span>' : '';
+    return live
+      ? `<a href="${r.url}" style="text-decoration:none;display:inline-block;${style}">${r.label}${badge}</a>`
+      : `<span onclick="notifyComingSoon('${r.label}')" style="display:inline-block;${style}">${r.label}${badge}</span>`;
+  }).join('');
+}
+window.notifyComingSoon = function(label) {
+  try { toast(label + ' is in development — check back soon.'); } catch(e) { alert(label + ' is in development — check back soon.'); }
+};
+function toast(msg) {
+  const el = document.getElementById('toast');
+  const m = document.getElementById('toast-msg');
+  if (!el || !m) return;
+  m.textContent = msg;
+  el.style.opacity = '1';
+  el.style.display = 'flex';
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => { el.style.transition = 'opacity .5s'; el.style.opacity = '0'; }, 5000);
+}
+renderRegionSwitcher();
+
+// Live contact count, straight from Supabase, region-scoped — replaces the
+// previously hardcoded "300+ contacts" placeholder figure.
+(async function loadLiveStats() {
+  try {
+    const SUPA_URL = 'https://cfhljbexesdrabmadpcc.supabase.co';
+    const SUPA_KEY = 'sb_publishable_PE2Yc0ivOT4F4fE80CXJUw_kbch9TpZ';
+    const res = await fetch(`${SUPA_URL}/rest/v1/crm_contacts?select=id&region=eq.belgium`, {
+      headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`, Prefer: 'count=exact', Range: '0-0' },
+    });
+    const range = res.headers.get('content-range'); // "0-0/<total>"
+    const total = range ? parseInt(range.split('/')[1], 10) : null;
+    if (total != null && !isNaN(total)) {
+      const statEl = document.getElementById('stat-contacts');
+      const ctaEl  = document.getElementById('cta-contacts');
+      if (statEl) statEl.innerHTML = total + '<span class="unit">+</span>';
+      if (ctaEl)  ctaEl.textContent = total + '+ contacts';
+    }
+  } catch (e) { /* keep the static fallback figure already in the markup */ }
+})();
+
+// ── Institution data ────────────────────────────────────────────────────────
+const INSTITUTIONS = [
+  {id:'kuleuven',  name:'KU Leuven', short:'KU Leuven', type:'university', city:'Leuven'},
+  {id:'ugent',  name:'Ghent University', short:'UGent', type:'university', city:'Ghent'},
+  {id:'uantwerpen',  name:'University of Antwerp', short:'UAntwerpen', type:'university', city:'Antwerp'},
+  {id:'vub',  name:'Vrije Universiteit Brussel', short:'VUB', type:'university', city:'Brussels'},
+  {id:'uhasselt',  name:'Hasselt University', short:'UHasselt', type:'university', city:'Hasselt'},
+  {id:'uclouvain',  name:'UCLouvain', short:'UCLouvain', type:'university', city:'Louvain-la-Neuve'},
+  {id:'uliege',  name:'Université de Liège', short:'ULiège', type:'university', city:'Liège'},
+  {id:'ulb',  name:'Université libre de Bruxelles', short:'ULB', type:'university', city:'Brussels'},
+  {id:'unamur',  name:'University of Namur', short:'UNamur', type:'university', city:'Namur'},
+  {id:'umons',  name:'Université de Mons', short:'UMons', type:'university', city:'Mons'},
+  {id:'uzleuven',  name:'UZ Leuven (University Hospitals Leuven)', short:'UZ Leuven', type:'medical', city:'Leuven'},
+  {id:'uzgent',  name:'Ghent University Hospital', short:'UZ Gent', type:'medical', city:'Ghent'},
+  {id:'uza',  name:'Antwerp University Hospital', short:'UZA', type:'medical', city:'Edegem'},
+  {id:'uzbrussel',  name:'UZ Brussel', short:'UZ Brussel', type:'medical', city:'Jette'},
+  {id:'chuliege',  name:'CHU de Liège', short:'CHU Liège', type:'medical', city:'Liège'},
+  {id:'saintluc',  name:'Cliniques universitaires Saint-Luc', short:'Saint-Luc', type:'medical', city:'Woluwe-Saint-Lambert'},
+  {id:'erasme',  name:'Hôpital Erasme', short:'Erasme', type:'medical', city:'Anderlecht'},
+  {id:'bordet',  name:'Institut Jules Bordet', short:'Bordet', type:'medical', city:'Brussels'},
+  {id:'chunamur',  name:'CHU UCL Namur (Godinne)', short:'CHU UCL Namur', type:'medical', city:'Yvoir'},
+  {id:'imec',  name:'imec', short:'imec', type:'research', city:'Leuven'},
+  {id:'vib',  name:'VIB (Vlaams Instituut voor Biotechnologie)', short:'VIB', type:'research', city:'Ghent'},
+  {id:'flandersmake',  name:'Flanders Make', short:'Flanders Make', type:'research', city:'Lommel'},
+  {id:'sciensano',  name:'Sciensano', short:'Sciensano', type:'research', city:'Brussels'},
+  {id:'rbins',  name:'Royal Belgian Institute of Natural Sciences', short:'RBINS', type:'research', city:'Brussels'},
+  {id:'rmi',  name:'Royal Meteorological Institute of Belgium', short:'RMI', type:'research', city:'Brussels'},
+  {id:'rob',  name:'Royal Observatory of Belgium', short:'ROB', type:'research', city:'Brussels'},
+  {id:'solvay',  name:'International Solvay Institutes for Physics and Chemistry', short:'Solvay Institutes', type:'research', city:'Brussels'},
+  {id:'vito',  name:'VITO (Flemish Institute for Technological Research)', short:'VITO', type:'research', city:'Mol'},
+  {id:'royalacademiesbelgium',  name:'Royal Academies for Science and the Arts of Belgium', short:'RASAB', type:'research', city:'Brussels'},
+  {id:'bira',  name:'Royal Belgian Institute for Space Aeronomy', short:'BIRA-IASB', type:'research', city:'Brussels'},
+  {id:'egmont',  name:'Egmont Institute (Royal Institute for International Relations)', short:'Egmont Institute', type:'research', city:'Brussels'},
+  {id:'bruegel',  name:'Bruegel', short:'Bruegel', type:'research', city:'Brussels'},
+  {id:'itinera',  name:'Itinera Institute', short:'Itinera', type:'research', city:'Brussels'},
+  {id:'fwo',  name:'Research Foundation – Flanders', short:'FWO', type:'ngo', city:'Brussels'},
+  {id:'fnrs',  name:'F.R.S.-FNRS', short:'F.R.S.-FNRS', type:'ngo', city:'Brussels'},
+  {id:'kbf',  name:'King Baudouin Foundation', short:'King Baudouin Fdn', type:'ngo', city:'Brussels'},
+  {id:'kotk',  name:'Kom op tegen Kanker', short:'Kom op tegen Kanker', type:'ngo', city:'Brussels'},
+  {id:'fondationcontrelecancer',  name:'Fondation contre le Cancer / Stichting tegen Kanker', short:'Fondation contre le Cancer', type:'ngo', city:'Brussels'},
+];
+
+// Relevance scores (simulated — higher = more relevant to pitch)
+const SCORES = {kuleuven:98,ugent:94,uantwerpen:87,vub:85,uhasselt:72,uclouvain:93,uliege:88,ulb:91,unamur:76,umons:74,uzleuven:90,uzgent:84,uza:78,uzbrussel:77,chuliege:79,saintluc:82,erasme:80,bordet:73,chunamur:66,imec:96,vib:89,flandersmake:70,sciensano:83,rbins:71,rmi:68,rob:64,solvay:75,vito:81,royalacademiesbelgium:67,bira:65,egmont:69,bruegel:72,itinera:63,fwo:86,fnrs:85,kbf:79,kotk:70,fondationcontrelecancer:68};
+
+const BADGE_CLASS = {university:'badge-university', medical:'badge-medical', research:'badge-research', ngo:'badge-ngo'};
+const BADGE_LABEL = {university:'University', medical:'Medical', research:'Research', ngo:'NGO'};
+
+function scoreRing(score, r, g, b){
+  const R = 16, stroke = 3;
+  const c = 2*Math.PI*R;
+  const dash = (score/100)*c;
+  const color = score >= 90 ? '#00f5c4' : score >= 75 ? '#38bdf8' : '#7c6dfa';
+  return `<svg width="38" height="38" viewBox="0 0 38 38">
+    <circle cx="19" cy="19" r="${R}" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="${stroke}"/>
+    <circle cx="19" cy="19" r="${R}" fill="none" stroke="${color}" stroke-width="${stroke}"
+      stroke-dasharray="${dash.toFixed(1)} ${c.toFixed(1)}" stroke-linecap="round"/>
+  </svg><span class="score-val">${score}</span>`;
+}
+
+function renderList(list){
+  const el = document.getElementById('inst-list');
+  if(!list.length){
+    el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">No institutions match</div>';
+    return;
+  }
+  el.innerHTML = list.map(inst => {
+    const score = SCORES[inst.id] || 70;
+    const badge = BADGE_CLASS[inst.type] || 'badge-research';
+    const label = BADGE_LABEL[inst.type] || inst.type;
+    return `<a class="inst-row" href="index.html?view=detail&inst=${encodeURIComponent(inst.id)}" title="View ${inst.name} in CRM">
+      <div class="score-ring">${scoreRing(score)}</div>
+      <div class="inst-info">
+        <div class="inst-name">${inst.name}</div>
+        <div class="inst-meta">${inst.short} · ${inst.city}</div>
+      </div>
+      <span class="inst-badge ${badge}">${label}</span>
+    </a>`;
+  }).join('');
+}
+
+// Sort by score descending
+const sorted = [...INSTITUTIONS].sort((a,b)=>(SCORES[b.id]||70)-(SCORES[a.id]||70));
+renderList(sorted);
+
+function filterList(q){
+  q = q.trim().toLowerCase();
+  if(!q){ renderList(sorted); return; }
+  const filtered = sorted.filter(i =>
+    i.name.toLowerCase().includes(q) ||
+    i.short.toLowerCase().includes(q) ||
+    i.city.toLowerCase().includes(q) ||
+    i.type.toLowerCase().includes(q)
+  );
+  renderList(filtered);
+}
+
+function setSearch(val){
+  document.getElementById('search-input').value = val;
+  filterList(val);
+}
+
+// Expiry count
+document.getElementById('expiry-count').textContent = '8';
+
+// Live contact count from CRM localStorage
+(function(){
+  try {
+    var raw = localStorage.getItem('be_crm_contacts');
+    if (raw) {
+      var contacts = JSON.parse(raw);
+      var count = Array.isArray(contacts) ? contacts.length : 0;
+      if (count > 0) {
+        var statEl = document.getElementById('stat-contacts');
+        var ctaEl  = document.getElementById('cta-contacts');
+        if (statEl) statEl.innerHTML = count + '<span class="unit">+</span>';
+        if (ctaEl)  ctaEl.textContent = count + '+ contacts';
+      }
+    }
+  } catch(e) {}
+})();
+
+// Toast
+(function(){
+  const toasts = [
+    'KU Leuven · Competitor product subscription updated',
+    'UZ Leuven · 2 contracts expiring within 90 days',
+    'imec · New contact verified',
+    'UGent · Deal moved to pipeline',
+    'ULB · SciFinder-N subscription: active',
+  ];
+  const msg = toasts[Math.floor(Math.random()*toasts.length)];
+  setTimeout(()=>{
+    const el = document.getElementById('toast');
+    if(el){ document.getElementById('toast-msg').textContent = msg; }
+  }, 2800);
+  // hide after 8s
+  setTimeout(()=>{
+    const el = document.getElementById('toast');
+    if(el){ el.style.transition='opacity .5s'; el.style.opacity='0'; setTimeout(()=>el.remove(),600); }
+  }, 8000);
+})();
+</script>
+
+<canvas id="star-net" style="position:fixed;inset:0;z-index:0;opacity:0.9;pointer-events:none"></canvas>
+<script>
+(function(){
+  var c=document.getElementById('star-net'),x=c.getContext('2d'),W,H,N=[],COUNT=90,DIST=180,COL='rgba(0,210,220,';
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}
+  function mk(){return{x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.45,vy:(Math.random()-.5)*.45,r:Math.random()*1.5+.8};}
+  function init(){resize();N=[];for(var i=0;i<COUNT;i++)N.push(mk());}
+  function draw(){
+    x.clearRect(0,0,W,H);
+    for(var i=0;i<N.length;i++){
+      var a=N[i];
+      a.x+=a.vx;a.y+=a.vy;
+      if(a.x<0||a.x>W)a.vx*=-1;
+      if(a.y<0||a.y>H)a.vy*=-1;
+      x.beginPath();x.arc(a.x,a.y,a.r,0,6.28);
+      x.fillStyle=COL+'0.85)';x.fill();
+      for(var j=i+1;j<N.length;j++){
+        var b=N[j],dx=a.x-b.x,dy=a.y-b.y,d=Math.sqrt(dx*dx+dy*dy);
+        if(d<DIST){x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);
+          x.strokeStyle=COL+(1-d/DIST)*.45+')';x.lineWidth=.8;x.stroke();}
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',function(){resize();});
+  init();draw();
+})();
+</script></body>
+</html>
