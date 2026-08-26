@@ -4938,6 +4938,239 @@ function renderCompetitorInsights() {
 }
 
 const COMPETITOR_PRODUCTS = {
+  kuleuven: [
+    {
+      vendor: 'Springer Nature', product: 'SpringerLink', category: 'Journal & Book Platform',
+      competesWith: 'ScienceDirect', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — KU Leuven Library\'s Psychology/Educational Sciences database page lists "Springerlink (Journals, E-books, Series, Reference Works)" and the Social Sciences Library\'s E-journals page separately lists "SpringerNature Complete Journals" among core full-text platforms. Directly verified 2026-08-26. Source: bib.kuleuven.be/pbib/collectie/databanken; bib.kuleuven.be/english/sbib/collection/ejournals.'
+    },
+    {
+      vendor: 'Wiley', product: 'Wiley Online Library', category: 'Journal Content Platform',
+      competesWith: 'ScienceDirect', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — KU Leuven Library\'s Social Sciences E-journals page lists "Wiley Online Library All Journals," and the Criminology E-sources page separately lists "Wiley Online Library" alongside ScienceDirect. Directly verified 2026-08-26. Source: bib.kuleuven.be/english/sbib/collection/ejournals; bib.kuleuven.be/english/rbib/collection/e-sources.'
+    },
+    {
+      vendor: 'Taylor & Francis', product: 'Taylor & Francis Online', category: 'Journal Content Platform',
+      competesWith: 'ScienceDirect', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — KU Leuven Library\'s Social Sciences E-journals page lists "Taylor & Francis Online Journals," and the Psychology/Educational Sciences database page separately lists "Taylor & Francis (Journals)" and "Taylor & Francis (E-books)." Directly verified 2026-08-26. Source: bib.kuleuven.be/english/sbib/collection/ejournals; bib.kuleuven.be/pbib/collectie/databanken.'
+    },
+    {
+      vendor: 'CAS / ACS', product: 'SciFinder-n', category: 'Chemistry & Life Sciences DB',
+      competesWith: 'Reaxys', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — KU Leuven has a dedicated "CAS SciFinder Discovery Platform" registration page ("Om SciFinder te gebruiken moet u zich eerst registreren bij CAS... u kan enkel registreren met uw officieel KU Leuven e-mailadres"), and the Chemistry/Physics/Astronomy database page lists it as a core resource. Directly verified 2026-08-26. Source: bib.kuleuven.be/2bergen/cba/collectie/registratie-sci-finder; bib.kuleuven.be/english/2bergen/cba/collection/databases.'
+    },
+    {
+      vendor: 'Clarivate', product: 'Web of Science', category: 'Citation & Abstract Database',
+      competesWith: 'Scopus', subscriptionStart: '', contractExpiry: '',
+      notes: 'Reused from the Competitor Matrix pass (wos:\'yes\'), which cites KU Leuven Library\'s database guidelines page as proof. Not independently re-fetched this pass. Source: bib.kuleuven.be/english/sbib/collection/guidelines.'
+    }
+  ],
+  ugent: [
+    {
+      vendor: 'Clarivate', product: 'Web of Science', category: 'Citation & Abstract Database',
+      competesWith: 'Scopus', subscriptionStart: '', contractExpiry: '',
+      notes: 'Reused from the Competitor Matrix pass (wos:\'yes\'), which cites UGent\'s own (re)search tips page as proof. Not independently re-fetched this pass. Source: onderzoektips.ugent.be/en/tips/00001601/.'
+    },
+    {
+      vendor: 'IEEE', product: 'IEEE Xplore', category: 'Engineering & Standards Content',
+      competesWith: 'ScienceDirect (Engineering)', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — UGent\'s dedicated (re)search tip page states "Everyone can search IEEE Xplore... With a UGent account you also have access to full-text documents" and gives the exact catalogue steps (search "IEEE Xplore," click \'bekijk online\'). Directly verified 2026-08-26. Source: onderzoektips.ugent.be/nl/tips/00001732/.'
+    },
+    {
+      vendor: 'ACM', product: 'ACM Digital Library', category: 'Computer Science Platform',
+      competesWith: 'ScienceDirect (CS)', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — UGent\'s dedicated (re)search tip page describes the ACM Digital Library and its full-text access terms, tagged "FEA - engineering," and it is also cross-listed on the Faculty of Engineering and Architecture\'s Engineering Databases page. Directly verified 2026-08-26. Source: onderzoektips.ugent.be/en/tips/00001720/; ugent.be/ea/en/faculty/library/collection/databases-1/databases-engineering.'
+    },
+    {
+      vendor: 'CAS / ACS', product: 'SciFinder-n', category: 'Chemistry & Life Sciences DB',
+      competesWith: 'Reaxys', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — UGent\'s dedicated (re)search tip page states "This database is accessible within the Ghent University network," gives the lib.ugent.be catalogue steps, and links the CAS registration form (UGent e-mail required). Directly verified 2026-08-26. Source: onderzoektips.ugent.be/en/tips/00001836/.'
+    },
+    {
+      vendor: 'Taylor & Francis', product: 'Taylor & Francis Online', category: 'Journal Content Platform',
+      competesWith: 'ScienceDirect', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed for at least the Criminology & Criminal Law subject area — the Faculty of Law and Criminology\'s online-sources page explicitly lists "Criminology — Taylor & Francis Online: Various international journals on criminology published by Taylor & Francis." Directly verified 2026-08-26; broader university-wide subscription scope not separately confirmed. Source: ugent.be/re/en/services/library/collection/online-sources/online-sources-per-theme/criminology-criminal-law.'
+    },
+    {
+      vendor: 'Wiley', product: 'Wiley Online Library', category: 'Journal Content Platform',
+      competesWith: 'ScienceDirect', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — a UGent (re)search tip page states Ullmann\'s Encyclopedia of Industrial Chemistry "is part of Wiley Online Library" and gives lib.ugent.be access steps; independently, two UGent faculty library pages (Veterinary Medicine, Bioscience Engineering) separately list "Wiley Online Library" among their e-book platforms. Directly verified 2026-08-26. Source: onderzoektips.ugent.be/en/tips/00001729/; ugent.be/di/en/services/library/ebooksen.htm; ugent.be/bw/nl/diensten/faculteitsbibliotheek/collectie/ebooks.'
+    },
+    {
+      vendor: 'Springer Nature', product: 'SpringerLink', category: 'Journal & Book Platform',
+      competesWith: 'ScienceDirect', subscriptionStart: '', contractExpiry: '',
+      notes: 'PARTIALLY CONFIRMED — no dedicated UGent subject-guide page naming SpringerLink was found this pass; the evidence is indirect: numerous individual e-book records in the UGent library catalogue (lib.ugent.be) list "SpringerLink (Online service)" as corporate author/host platform, e.g. lib.ugent.be/catalog/ebk01:4100000007204930. This confirms UGent licenses content on the SpringerLink platform but not a dedicated subject-page endorsement. Directly verified 2026-08-26. Source: lib.ugent.be/catalog/ebk01:4100000007204930.'
+    }
+  ],
+  uantwerpen: [
+    {
+      vendor: 'Springer Nature', product: 'SpringerLink', category: 'Journal & Book Platform',
+      competesWith: 'ScienceDirect', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — University of Antwerp Library\'s "e-journals" page (list by platform) explicitly lists "Springer — Several subject disciplines. Access from 1997." Directly verified 2026-08-26. Source: uantwerpen.be/en/library/search-help/e-journals/.'
+    },
+    {
+      vendor: 'Wiley', product: 'Wiley Online Library', category: 'Journal Content Platform',
+      competesWith: 'ScienceDirect', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — same University of Antwerp Library e-journals-by-platform page explicitly lists "Wiley Online Library — Several subject disciplines. Access from 1997." Directly verified 2026-08-26. Source: uantwerpen.be/en/library/search-help/e-journals/.'
+    },
+    {
+      vendor: 'Taylor & Francis', product: 'Taylor & Francis Online', category: 'Journal Content Platform',
+      competesWith: 'ScienceDirect', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — same page lists "Taylor & Francis HSS Collection — Humanities & Social Sciences Collection" as a subscribed e-journal platform. Directly verified 2026-08-26. Source: uantwerpen.be/en/library/search-help/e-journals/.'
+    },
+    {
+      vendor: 'ACM', product: 'ACM Digital Library', category: 'Computer Science Platform',
+      competesWith: 'ScienceDirect (CS)', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — same page lists "ACM — Computer sciences — Full text access to all publications from the Digital Library published by ACM," and ACM Digital Library is also included in the library\'s Discovery Service database list. Directly verified 2026-08-26. Source: uantwerpen.be/en/library/search-help/e-journals/; uantwerpen.be/en/library/search-help/search-the-collectio/.'
+    },
+    {
+      vendor: 'CAS / ACS', product: 'SciFinder-n', category: 'Chemistry & Life Sciences DB',
+      competesWith: 'Reaxys', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — the library\'s e-resource licensing page names SciFinder among resources requiring a personal account ("Dat is bijvoorbeeld het geval voor Lexis 360, European Pharmacopoeia Online, SciFinder..."), and a library news item confirms migration to the "SciFinder-n" standard interface. Directly verified 2026-08-26. Source: uantwerpen.be/nl/bibliotheek/over-ons/beleid/spelregels/licenties/.'
+    },
+    {
+      vendor: 'Clarivate', product: 'Web of Science', category: 'Citation & Abstract Database',
+      competesWith: 'Scopus', subscriptionStart: '', contractExpiry: '',
+      notes: 'Reused from the Competitor Matrix pass (wos:\'yes\'), which cites a University of Antwerp Library PDF as proof; also independently listed in the library\'s Discovery Service database list. Not independently re-fetched this pass. Source: medialibrary.uantwerpen.be/files/52756/1d443c42-7c32-421c-9418-7193745024ba.pdf.'
+    },
+    {
+      vendor: 'IEEE', product: 'IEEE Xplore', category: 'Engineering & Standards Content',
+      competesWith: 'ScienceDirect (Engineering)', subscriptionStart: '', contractExpiry: '',
+      notes: 'PARTIALLY CONFIRMED — IEEE Xplore is not named on the library\'s main "e-journals by platform" A-Z list (which was fetched and checked directly), but the Engineering/Applied Engineering subject-resource pages state full text "can come through scientific publishers as Elsevier, Nature, Wiley but also form specific journal packages like IEEEXplore and ACM digital library" — a real but passing institutional mention rather than a dedicated platform listing. Directly verified 2026-08-26. Source: uantwerpen.be/nl/bibliotheek/zoekhulp/ingenieurswetenschappen/.'
+    }
+  ],
+  uhasselt: [
+    {
+      vendor: 'Springer Nature', product: 'SpringerLink', category: 'Journal & Book Platform',
+      competesWith: 'ScienceDirect', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — UHasselt\'s "Remote access" page lists "Springer Nature Link" as a directly clickable publisher platform with institutional (SSO) login, and the library\'s e-resource acquisition page separately lists "Springer Nature" under E-journal collections. Directly verified 2026-08-26. Source: uhasselt.be/en/university-library/collection/remote-access; uhasselt.be/nl/universiteitsbibliotheek/collectie/aankoop-van-e-bronnen.'
+    },
+    {
+      vendor: 'Wiley', product: 'Wiley Online Library', category: 'Journal Content Platform',
+      competesWith: 'ScienceDirect', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — UHasselt\'s "Remote access" page lists "Wiley" as a directly clickable publisher platform with institutional login, corroborated by the acquisition page\'s "Databanken en pakketten van Elsevier, Wiley, Springer, Nature, Clarivate..." statement. Directly verified 2026-08-26. Source: uhasselt.be/en/university-library/collection/remote-access.'
+    },
+    {
+      vendor: 'Taylor & Francis', product: 'Taylor & Francis Online', category: 'Journal Content Platform',
+      competesWith: 'ScienceDirect', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — UHasselt\'s "Remote access" page lists "Taylor & Francis" as a directly clickable publisher platform with institutional login. Directly verified 2026-08-26. Source: uhasselt.be/en/university-library/collection/remote-access.'
+    },
+    {
+      vendor: 'IEEE', product: 'IEEE Xplore', category: 'Engineering & Standards Content',
+      competesWith: 'ScienceDirect (Engineering)', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — UHasselt\'s "Remote access" page lists "IEEE" as a directly clickable platform, and the e-resource acquisition page separately names "IEEE Xplore" under Databanken. Directly verified 2026-08-26. Source: uhasselt.be/en/university-library/collection/remote-access; uhasselt.be/nl/universiteitsbibliotheek/collectie/aankoop-van-e-bronnen.'
+    },
+    {
+      vendor: 'ACM', product: 'ACM Digital Library', category: 'Computer Science Platform',
+      competesWith: 'ScienceDirect (CS)', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — ACM Digital Library has its own entry in UHasselt\'s "E-sources list" ("full-text database related to computer and information technology... complete collection of ACM publications") and is separately listed as a clickable platform on the Remote access page. Directly verified 2026-08-26. Source: uhasselt.be/en/university-library/e-sources-list; uhasselt.be/en/university-library/collection/remote-access.'
+    },
+    {
+      vendor: 'CAS / ACS', product: 'SciFinder-n', category: 'Chemistry & Life Sciences DB',
+      competesWith: 'Reaxys', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — "CAS SciFinder Discovery Platform" appears as a directly clickable platform on UHasselt\'s Remote access page and is separately named under Databanken on the e-resource acquisition page. Directly verified 2026-08-26. Source: uhasselt.be/en/university-library/collection/remote-access; uhasselt.be/nl/universiteitsbibliotheek/collectie/aankoop-van-e-bronnen.'
+    },
+    {
+      vendor: 'Clarivate', product: 'Web of Science', category: 'Citation & Abstract Database',
+      competesWith: 'Scopus', subscriptionStart: '', contractExpiry: '',
+      notes: 'Reused from the Competitor Matrix pass (wos:\'yes\'), which cites the same e-resource acquisition page as proof; also independently listed on the Remote access page. Not independently re-fetched this pass. Source: uhasselt.be/nl/universiteitsbibliotheek/collectie/aankoop-van-e-bronnen.'
+    }
+  ],
+  uclouvain: [
+    {
+      vendor: 'Springer Nature', product: 'SpringerLink', category: 'Journal & Book Platform',
+      competesWith: 'ScienceDirect', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — UCLouvain\'s general/multidisciplinary library-resources page lists "Springer Nature Link (articles de revues: 1832-, reste: variable): accès UCLouvain," and the law library\'s databases page separately carries a full "Springer Link" database record ("Domaine: Multidisciplinaire... Conditions d\'accès: Accès depuis le réseau UCLouvain et à distance via le proxy"). Directly verified 2026-08-26. Source: uclouvain.be/fr/bibliotheques/btec/generalites; uclouvain.be/fr/bibliotheques/bdrt/bases-de-donnees.'
+    },
+    {
+      vendor: 'Wiley', product: 'Wiley Online Library', category: 'Journal Content Platform',
+      competesWith: 'ScienceDirect', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — same general-resources page lists "Wiley Online Library (1997-, certains articles: 1790-): accès UCLouvain," and it is independently listed as "accès UCLouvain" on the Saint-Louis Bruxelles site\'s general-resources page. Directly verified 2026-08-26. Source: uclouvain.be/fr/bibliotheques/btec/generalites; uclouvain.be/fr/bibliotheques/bflt/ressources-generales-ou-multidisciplinaires.'
+    },
+    {
+      vendor: 'Taylor & Francis', product: 'Taylor & Francis Online', category: 'Journal Content Platform',
+      competesWith: 'ScienceDirect', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — UCLouvain has a dedicated news page announcing "Les membres de l\'UCLouvain ont désormais accès à la base SSH Library de Taylor & Francis... accès full-text à plus de 1.450 revues dans le domaine des sciences humaines et sociales," and it is also listed as "SSH Library (Taylor & Francis): accès UCLouvain" on the general-resources page. Directly verified 2026-08-26. Source: uclouvain.be/fr/bibliotheques/news/ssh-library-taylor-et-francis; uclouvain.be/fr/bibliotheques/btec/generalites.'
+    }
+  ],
+  uliege: [
+    {
+      vendor: 'Wiley', product: 'Wiley Online Library', category: 'Journal Content Platform',
+      competesWith: 'ScienceDirect', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — a ULiège Faculty of Philosophy and Letters research-methods guide explicitly lists "Wiley Online Library — Accès en ligne via l\'ULiège — Portail pluridisciplinaire des revues" among the electronic-resource platforms subscribed to by the university. Directly verified 2026-08-26. Source: bibliohist.uliege.be/cms/c_7779939/fr/bibliohist-etapes-3-4-localiser-les-travaux-et-y-acceder.'
+    },
+    {
+      vendor: 'IEEE', product: 'IEEE Xplore', category: 'Engineering & Standards Content',
+      competesWith: 'ScienceDirect (Engineering)', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — ULiège Library\'s 2024 new-electronic-resources announcement states "La collection d\'ebooks Packt est accessible à partir de la plateforme IEEE Xplore" (850+ titles, 2021-2023), confirming an active institutional subscription to the IEEE Xplore platform. Directly verified 2026-08-26. Source: lib.uliege.be/fr/news/decouvrez-les-ressources-electroniques-acquises-en-2024.'
+    },
+    {
+      vendor: 'Springer Nature', product: 'SpringerLink', category: 'Journal & Book Platform',
+      competesWith: 'ScienceDirect', subscriptionStart: '', contractExpiry: '',
+      notes: 'PARTIALLY CONFIRMED — ULiège Library\'s internal cataloguing documentation describes a standing central contract for "Springer eBooks" on link.springer.com ("plus de 100.000 ouvrages achetés" cumulatively), confirming SpringerLink e-book access. Full SpringerLink journals-platform access was not independently found on a subject-guide page this pass — downgraded accordingly. Directly verified 2026-08-26. Source: services.lib.uliege.be/alma/ebooks/4-2-les-packages-centraux-debooks/.'
+    },
+    {
+      vendor: 'CAS / ACS', product: 'SciFinder-n', category: 'Chemistry & Life Sciences DB',
+      competesWith: 'Reaxys', subscriptionStart: '', contractExpiry: '',
+      notes: 'PARTIALLY CONFIRMED — official ULiège library-orientation brochures for new researchers list "Tutorials on using online tools and databases (EndNote, VPN, SciFinder, etc.)" among services offered, confirming SciFinder access, but no dedicated ULiège subject-guide page for SciFinder was found this pass to give fuller detail. Directly verified 2026-08-26. Source: recherche.uliege.be/cms/c_9314366/fr/depliant-bibliotheque-v1-en.'
+    },
+    {
+      vendor: 'Taylor & Francis', product: 'Taylor & Francis Online', category: 'Journal Content Platform',
+      competesWith: 'ScienceDirect', subscriptionStart: '', contractExpiry: '',
+      notes: 'PARTIALLY CONFIRMED — ULiège Library\'s "Treasure Chest" (LibKey Nomad) service page states the tool "connects our collections" with, among others, "Taylor & Francis" as a compatible publisher site, implying institutional subscription content on that platform, but no dedicated Taylor & Francis subject-guide page was found this pass. Directly verified 2026-08-26. Source: lib.uliege.be/en/using-library/tools/treasure-chest.'
+    }
+  ],
+  ulb: [
+    {
+      vendor: 'Wiley', product: 'Wiley Online Library', category: 'Journal Content Platform',
+      competesWith: 'ScienceDirect', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — ULB Libraries have a dedicated resource page: "Wiley Online Library est une plateforme de périodiques et de livres électroniques dans laquelle les bibliothèques de l\'ULB ont acquis un ensemble de près d\'un millier de titres de périodiques." Directly verified 2026-08-26. Source: bib.ulb.be/fr/bibliotheques/bst/ressources-documentaires/wiley-online-library.'
+    },
+    {
+      vendor: 'Springer Nature', product: 'SpringerLink', category: 'Journal & Book Platform',
+      competesWith: 'ScienceDirect', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — ULB Libraries have a dedicated "SpringerLink Journals" resource page: "les bibliothèques de l\'ULB ont acquis un ensemble de plusieurs milliers de titres sur cette plateforme, principalement en sciences et techniques ainsi qu\'en médecine," plus a separate "SpringerLink E-books" page. Directly verified 2026-08-26. Source: bib.ulb.be/fr/bibliotheques/bst/ressources-documentaires/springerlink-journals.'
+    },
+    {
+      vendor: 'CAS / ACS', product: 'SciFinder-n', category: 'Chemistry & Life Sciences DB',
+      competesWith: 'Reaxys', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — ULB Libraries have a dedicated "CAS SciFinder Discovery Platform" resource page describing registration and campus/off-campus access, also cross-listed on the alphabetical sciences e-resources list. Directly verified 2026-08-26. Source: bib.ulb.be/fr/bibliotheques/bst/ressources-documentaires/scifinder.'
+    }
+  ],
+  unamur: [
+    {
+      vendor: 'Springer Nature', product: 'SpringerLink', category: 'Journal & Book Platform',
+      competesWith: 'ScienceDirect', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed, but source is somewhat dated — the BUMP (UNamur central library) 2022 activity report lists "SpringerLink" among its Sciences-domain databases (alongside Wiley Online Library and SciFinder-n). No more recent per-discipline database page was found this pass to re-confirm current status. Directly verified 2026-08-26. Source: unamur.be/sites/default/files/2024-06/BUMP-rapport-activite-2022.pdf.'
+    },
+    {
+      vendor: 'Wiley', product: 'Wiley Online Library', category: 'Journal Content Platform',
+      competesWith: 'ScienceDirect', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed, but source is somewhat dated — same BUMP 2022 activity report lists "Wiley Online Library" among its Sciences-domain databases. No more recent per-discipline database page was found this pass to re-confirm current status. Directly verified 2026-08-26. Source: unamur.be/sites/default/files/2024-06/BUMP-rapport-activite-2022.pdf.'
+    },
+    {
+      vendor: 'CAS / ACS', product: 'SciFinder-n', category: 'Chemistry & Life Sciences DB',
+      competesWith: 'Reaxys', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed, but source is somewhat dated — same BUMP 2022 activity report lists "SciFinder-n" among its Sciences-domain databases. No more recent per-discipline database page was found this pass to re-confirm current status. Directly verified 2026-08-26. Source: unamur.be/sites/default/files/2024-06/BUMP-rapport-activite-2022.pdf.'
+    }
+  ],
+  umons: [
+    {
+      vendor: 'Wiley', product: 'Wiley Online Library', category: 'Journal Content Platform',
+      competesWith: 'ScienceDirect', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — UMONS Libraries have a dedicated resource entry: "Wiley Online Library — Base de données donnant accès à plus de 1200 titres en texte intégral couvrant de nombreux domaines," accessible via OpenAthens. Directly verified 2026-08-26. Source: web.umons.ac.be/bibliotheques/journal/wiley-online-library/; web.umons.ac.be/bibliotheques/ressources/.'
+    },
+    {
+      vendor: 'Springer Nature', product: 'SpringerLink', category: 'Journal & Book Platform',
+      competesWith: 'ScienceDirect', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — UMONS Libraries\' Ressources page carries separate entries for "Springer ejournals" ("plus de 1445 périodiques électroniques en texte intégral") and "Springer ebooks" ("plus de 103 000 livres électroniques"), both accessible via OpenAthens. Directly verified 2026-08-26. Source: web.umons.ac.be/bibliotheques/ressources/.'
+    },
+    {
+      vendor: 'CAS / ACS', product: 'SciFinder-n', category: 'Chemistry & Life Sciences DB',
+      competesWith: 'Reaxys', subscriptionStart: '', contractExpiry: '',
+      notes: 'Access confirmed — "CAS SciFinder" appears as a named entry on UMONS Libraries\' Ressources page (Domaine: Chimie et Sciences des Matériaux). Directly verified 2026-08-26. Source: web.umons.ac.be/bibliotheques/ressources/.'
+    }
+  ],
 };
 
 // (stale NL_MATRIX_OV block removed — replaced by window.matrixOverrides above)
