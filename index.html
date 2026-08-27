@@ -2525,8 +2525,11 @@ function renderMap() {
   setTimeout(() => {
     const map = L.map('map-container', { center:[50.6,4.6], zoom:8, zoomControl:true });
     _fullMap = map;
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      maxZoom:19, subdomains:'abcd', attribution:'&copy; CartoDB'
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom:16, attribution:'Tiles &copy; Esri'
+    }).addTo(map);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom:16
     }).addTo(map);
 
     state.institutions.forEach(inst => {
@@ -2620,7 +2623,8 @@ function initDashMiniMap() {
   setTimeout(() => {
     const map = L.map(el, { center:[50.6,4.6], zoom:7, zoomControl:false, attributionControl:false });
     _dashMiniMap = map;
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom:19, subdomains:'abcd' }).addTo(map);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', { maxZoom:16 }).addTo(map);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', { maxZoom:16 }).addTo(map);
     state.institutions.forEach(inst => {
       const coords = getInstCoords(inst);
       if (!coords) return;
