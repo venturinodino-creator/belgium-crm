@@ -1,5 +1,980 @@
 {
-  "generatedAt": null,
+  "generatedAt": "2026-08-27T17:42:45.899Z",
   "source": "OpenAlex API (institution.topic_share)",
-  "institutions": {}
+  "institutions": {
+    "kuleuven": {
+      "openalexId": "I99464096",
+      "openalexName": "KU Leuven",
+      "ror": "05f950310",
+      "worksCount": 315805,
+      "fields": [
+        {
+          "name": "Social Sciences",
+          "pct": 52.3
+        },
+        {
+          "name": "Economics, Econometrics and Finance",
+          "pct": 10.5
+        },
+        {
+          "name": "Computer Science",
+          "pct": 6.2
+        },
+        {
+          "name": "Physics and Astronomy",
+          "pct": 4.6
+        },
+        {
+          "name": "Medicine",
+          "pct": 4.4
+        },
+        {
+          "name": "Engineering",
+          "pct": 3.9
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I99464096",
+      "apiUrl": "https://api.openalex.org/institutions/I99464096"
+    },
+    "ugent": {
+      "openalexId": "I32597200",
+      "openalexName": "Ghent University",
+      "ror": "00cv9y106",
+      "worksCount": 174326,
+      "fields": [
+        {
+          "name": "Agricultural and Biological Sciences",
+          "pct": 17.9
+        },
+        {
+          "name": "Veterinary",
+          "pct": 13.4
+        },
+        {
+          "name": "Environmental Science",
+          "pct": 13
+        },
+        {
+          "name": "Mathematics",
+          "pct": 12.7
+        },
+        {
+          "name": "Social Sciences",
+          "pct": 9.2
+        },
+        {
+          "name": "Earth and Planetary Sciences",
+          "pct": 6.6
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I32597200",
+      "apiUrl": "https://api.openalex.org/institutions/I32597200"
+    },
+    "uantwerpen": {
+      "openalexId": "I149213910",
+      "openalexName": "University of Antwerp",
+      "ror": "008x57b05",
+      "worksCount": 97432,
+      "fields": [
+        {
+          "name": "Environmental Science",
+          "pct": 20.6
+        },
+        {
+          "name": "Medicine",
+          "pct": 16.1
+        },
+        {
+          "name": "Social Sciences",
+          "pct": 13.5
+        },
+        {
+          "name": "Neuroscience",
+          "pct": 12.4
+        },
+        {
+          "name": "Arts and Humanities",
+          "pct": 7.4
+        },
+        {
+          "name": "Physics and Astronomy",
+          "pct": 7.2
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I149213910",
+      "apiUrl": "https://api.openalex.org/institutions/I149213910"
+    },
+    "vub": {
+      "openalexId": "I13469542",
+      "openalexName": "Vrije Universiteit Brussel",
+      "ror": "006e5kg04",
+      "worksCount": 93739,
+      "fields": [
+        {
+          "name": "Social Sciences",
+          "pct": 70
+        },
+        {
+          "name": "Economics, Econometrics and Finance",
+          "pct": 6
+        },
+        {
+          "name": "Physics and Astronomy",
+          "pct": 5.8
+        },
+        {
+          "name": "Arts and Humanities",
+          "pct": 5
+        },
+        {
+          "name": "Engineering",
+          "pct": 4.1
+        },
+        {
+          "name": "Medicine",
+          "pct": 3.9
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I13469542",
+      "apiUrl": "https://api.openalex.org/institutions/I13469542"
+    },
+    "uhasselt": {
+      "openalexId": "I878454856",
+      "openalexName": "Hasselt University",
+      "ror": "04nbhqj75",
+      "worksCount": 25058,
+      "fields": [
+        {
+          "name": "Mathematics",
+          "pct": 22.2
+        },
+        {
+          "name": "Computer Science",
+          "pct": 17
+        },
+        {
+          "name": "Medicine",
+          "pct": 12.9
+        },
+        {
+          "name": "Engineering",
+          "pct": 12.7
+        },
+        {
+          "name": "Social Sciences",
+          "pct": 8
+        },
+        {
+          "name": "Health Professions",
+          "pct": 6.6
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I878454856",
+      "apiUrl": "https://api.openalex.org/institutions/I878454856"
+    },
+    "uclouvain": {
+      "openalexId": "I95674353",
+      "openalexName": "UCLouvain",
+      "ror": "02495e989",
+      "worksCount": 105906,
+      "fields": [
+        {
+          "name": "Economics, Econometrics and Finance",
+          "pct": 35.1
+        },
+        {
+          "name": "Social Sciences",
+          "pct": 30.1
+        },
+        {
+          "name": "Physics and Astronomy",
+          "pct": 11
+        },
+        {
+          "name": "Computer Science",
+          "pct": 9.3
+        },
+        {
+          "name": "Neuroscience",
+          "pct": 4.4
+        },
+        {
+          "name": "Psychology",
+          "pct": 3.7
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I95674353",
+      "apiUrl": "https://api.openalex.org/institutions/I95674353"
+    },
+    "uliege": {
+      "openalexId": "I157674565",
+      "openalexName": "University of Liège",
+      "ror": "00afp2z80",
+      "worksCount": 270804,
+      "fields": [
+        {
+          "name": "Social Sciences",
+          "pct": 51.9
+        },
+        {
+          "name": "Arts and Humanities",
+          "pct": 17.3
+        },
+        {
+          "name": "Health Professions",
+          "pct": 11
+        },
+        {
+          "name": "Psychology",
+          "pct": 7.7
+        },
+        {
+          "name": "Agricultural and Biological Sciences",
+          "pct": 4.6
+        },
+        {
+          "name": "Computer Science",
+          "pct": 3.9
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I157674565",
+      "apiUrl": "https://api.openalex.org/institutions/I157674565"
+    },
+    "ulb": {
+      "openalexId": "I132053463",
+      "openalexName": "Université Libre de Bruxelles",
+      "ror": "01r9htc13",
+      "worksCount": 105070,
+      "fields": [
+        {
+          "name": "Physics and Astronomy",
+          "pct": 46
+        },
+        {
+          "name": "Social Sciences",
+          "pct": 21.6
+        },
+        {
+          "name": "Agricultural and Biological Sciences",
+          "pct": 8
+        },
+        {
+          "name": "Engineering",
+          "pct": 7.7
+        },
+        {
+          "name": "Computer Science",
+          "pct": 5.3
+        },
+        {
+          "name": "Medicine",
+          "pct": 4.7
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I132053463",
+      "apiUrl": "https://api.openalex.org/institutions/I132053463"
+    },
+    "unamur": {
+      "openalexId": "I149768937",
+      "openalexName": "University of Namur",
+      "ror": "03d1maw17",
+      "worksCount": 20546,
+      "fields": [
+        {
+          "name": "Chemistry",
+          "pct": 23.2
+        },
+        {
+          "name": "Materials Science",
+          "pct": 18.5
+        },
+        {
+          "name": "Pharmacology, Toxicology and Pharmaceutics",
+          "pct": 10.6
+        },
+        {
+          "name": "Computer Science",
+          "pct": 10.3
+        },
+        {
+          "name": "Veterinary",
+          "pct": 9.1
+        },
+        {
+          "name": "Engineering",
+          "pct": 7.9
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I149768937",
+      "apiUrl": "https://api.openalex.org/institutions/I149768937"
+    },
+    "umons": {
+      "openalexId": "I130929987",
+      "openalexName": "University of Mons",
+      "ror": "02qnnz951",
+      "worksCount": 44815,
+      "fields": [
+        {
+          "name": "Social Sciences",
+          "pct": 50.2
+        },
+        {
+          "name": "Agricultural and Biological Sciences",
+          "pct": 28
+        },
+        {
+          "name": "Psychology",
+          "pct": 6.8
+        },
+        {
+          "name": "Computer Science",
+          "pct": 4.6
+        },
+        {
+          "name": "Engineering",
+          "pct": 2.8
+        },
+        {
+          "name": "Health Professions",
+          "pct": 2.7
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I130929987",
+      "apiUrl": "https://api.openalex.org/institutions/I130929987"
+    },
+    "uzleuven": {
+      "notFound": true,
+      "reason": "No OpenAlex institution matched this name in Belgium",
+      "searchUrl": "https://openalex.org/institutions?search=UZ%20Leuven%20(University%20Hospitals%20Leuven)"
+    },
+    "uzgent": {
+      "openalexId": "I2801227569",
+      "openalexName": "Ghent University Hospital",
+      "ror": "00xmkp704",
+      "worksCount": 82256,
+      "fields": [
+        {
+          "name": "Medicine",
+          "pct": 48.3
+        },
+        {
+          "name": "Biochemistry, Genetics and Molecular Biology",
+          "pct": 13.1
+        },
+        {
+          "name": "Neuroscience",
+          "pct": 10.2
+        },
+        {
+          "name": "Social Sciences",
+          "pct": 10.1
+        },
+        {
+          "name": "Psychology",
+          "pct": 7.8
+        },
+        {
+          "name": "Immunology and Microbiology",
+          "pct": 3.5
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I2801227569",
+      "apiUrl": "https://api.openalex.org/institutions/I2801227569"
+    },
+    "uza": {
+      "openalexId": "I4210102047",
+      "openalexName": "Antwerp University Hospital",
+      "ror": "01hwamj44",
+      "worksCount": 20453,
+      "fields": [
+        {
+          "name": "Medicine",
+          "pct": 63.4
+        },
+        {
+          "name": "Neuroscience",
+          "pct": 23.5
+        },
+        {
+          "name": "Biochemistry, Genetics and Molecular Biology",
+          "pct": 7.3
+        },
+        {
+          "name": "Immunology and Microbiology",
+          "pct": 3
+        },
+        {
+          "name": "Health Professions",
+          "pct": 2.8
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I4210102047",
+      "apiUrl": "https://api.openalex.org/institutions/I4210102047"
+    },
+    "uzbrussel": {
+      "openalexId": "I4210126764",
+      "openalexName": "Universitair Ziekenhuis Brussel",
+      "ror": "038f7y939",
+      "worksCount": 11618,
+      "fields": [
+        {
+          "name": "Medicine",
+          "pct": 90.1
+        },
+        {
+          "name": "Biochemistry, Genetics and Molecular Biology",
+          "pct": 3.9
+        },
+        {
+          "name": "Neuroscience",
+          "pct": 3.1
+        },
+        {
+          "name": "Physics and Astronomy",
+          "pct": 3
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I4210126764",
+      "apiUrl": "https://api.openalex.org/institutions/I4210126764"
+    },
+    "chuliege": {
+      "openalexId": "I4210134544",
+      "openalexName": "Centre Hospitalier Universitaire de Liège",
+      "ror": "044s61914",
+      "worksCount": 22148,
+      "fields": [
+        {
+          "name": "Medicine",
+          "pct": 63.1
+        },
+        {
+          "name": "Health Professions",
+          "pct": 14.9
+        },
+        {
+          "name": "Biochemistry, Genetics and Molecular Biology",
+          "pct": 7.3
+        },
+        {
+          "name": "Psychology",
+          "pct": 4
+        },
+        {
+          "name": "Neuroscience",
+          "pct": 4
+        },
+        {
+          "name": "Immunology and Microbiology",
+          "pct": 3.5
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I4210134544",
+      "apiUrl": "https://api.openalex.org/institutions/I4210134544"
+    },
+    "saintluc": {
+      "openalexId": "I1315288073",
+      "openalexName": "Cliniques Universitaires Saint-Luc",
+      "ror": "03s4khd80",
+      "worksCount": 21690,
+      "fields": [
+        {
+          "name": "Medicine",
+          "pct": 96.4
+        },
+        {
+          "name": "Biochemistry, Genetics and Molecular Biology",
+          "pct": 3.6
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I1315288073",
+      "apiUrl": "https://api.openalex.org/institutions/I1315288073"
+    },
+    "erasme": {
+      "notFound": true,
+      "reason": "No OpenAlex institution matched this name in Belgium",
+      "searchUrl": "https://openalex.org/institutions?search=H%C3%B4pital%20Erasme"
+    },
+    "bordet": {
+      "openalexId": "I2801838318",
+      "openalexName": "Institut Jules Bordet",
+      "ror": "05e8s8534",
+      "worksCount": 9915,
+      "fields": [
+        {
+          "name": "Medicine",
+          "pct": 80.9
+        },
+        {
+          "name": "Biochemistry, Genetics and Molecular Biology",
+          "pct": 17
+        },
+        {
+          "name": "Economics, Econometrics and Finance",
+          "pct": 2.1
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I2801838318",
+      "apiUrl": "https://api.openalex.org/institutions/I2801838318"
+    },
+    "chunamur": {
+      "openalexId": "I4210093617",
+      "openalexName": "CHU Dinant Godinne UCL Namur",
+      "ror": "00ntbvq76",
+      "worksCount": 3630,
+      "fields": [
+        {
+          "name": "Medicine",
+          "pct": 74.2
+        },
+        {
+          "name": "Health Professions",
+          "pct": 15.6
+        },
+        {
+          "name": "Biochemistry, Genetics and Molecular Biology",
+          "pct": 5.7
+        },
+        {
+          "name": "Engineering",
+          "pct": 4.4
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I4210093617",
+      "apiUrl": "https://api.openalex.org/institutions/I4210093617"
+    },
+    "imec": {
+      "openalexId": "I4210114974",
+      "openalexName": "IMEC",
+      "ror": "02kcbn207",
+      "worksCount": 25943,
+      "fields": [
+        {
+          "name": "Engineering",
+          "pct": 83.4
+        },
+        {
+          "name": "Materials Science",
+          "pct": 8.9
+        },
+        {
+          "name": "Physics and Astronomy",
+          "pct": 5.2
+        },
+        {
+          "name": "Computer Science",
+          "pct": 2.6
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I4210114974",
+      "apiUrl": "https://api.openalex.org/institutions/I4210114974"
+    },
+    "vib": {
+      "notFound": true,
+      "reason": "No OpenAlex institution matched this name in Belgium",
+      "searchUrl": "https://openalex.org/institutions?search=VIB%20(Vlaams%20Instituut%20voor%20Biotechnologie)"
+    },
+    "flandersmake": {
+      "openalexId": "I4210116480",
+      "openalexName": "Flanders Make (Belgium)",
+      "ror": "02ndjfz59",
+      "worksCount": 5351,
+      "fields": [
+        {
+          "name": "Engineering",
+          "pct": 82.8
+        },
+        {
+          "name": "Computer Science",
+          "pct": 7.3
+        },
+        {
+          "name": "Physics and Astronomy",
+          "pct": 3.6
+        },
+        {
+          "name": "Decision Sciences",
+          "pct": 3.3
+        },
+        {
+          "name": "Social Sciences",
+          "pct": 3
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I4210116480",
+      "apiUrl": "https://api.openalex.org/institutions/I4210116480"
+    },
+    "sciensano": {
+      "openalexId": "I4210145009",
+      "openalexName": "Sciensano (Belgium)",
+      "ror": "04ejags36",
+      "worksCount": 4659,
+      "fields": [
+        {
+          "name": "Medicine",
+          "pct": 41.3
+        },
+        {
+          "name": "Agricultural and Biological Sciences",
+          "pct": 21.6
+        },
+        {
+          "name": "Social Sciences",
+          "pct": 12.1
+        },
+        {
+          "name": "Business, Management and Accounting",
+          "pct": 6.1
+        },
+        {
+          "name": "Computer Science",
+          "pct": 5
+        },
+        {
+          "name": "Immunology and Microbiology",
+          "pct": 3.9
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I4210145009",
+      "apiUrl": "https://api.openalex.org/institutions/I4210145009"
+    },
+    "rbins": {
+      "openalexId": "I2801223450",
+      "openalexName": "Institute of Natural Sciences",
+      "ror": "02y22ws83",
+      "worksCount": 25403,
+      "fields": [
+        {
+          "name": "Agricultural and Biological Sciences",
+          "pct": 67
+        },
+        {
+          "name": "Environmental Science",
+          "pct": 12.9
+        },
+        {
+          "name": "Biochemistry, Genetics and Molecular Biology",
+          "pct": 10.4
+        },
+        {
+          "name": "Earth and Planetary Sciences",
+          "pct": 7.6
+        },
+        {
+          "name": "Medicine",
+          "pct": 2.1
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I2801223450",
+      "apiUrl": "https://api.openalex.org/institutions/I2801223450"
+    },
+    "rmi": {
+      "openalexId": "I108839631",
+      "openalexName": "Royal Meteorological Institute of Belgium",
+      "ror": "058qm9p63",
+      "worksCount": 2958,
+      "fields": [
+        {
+          "name": "Environmental Science",
+          "pct": 46.2
+        },
+        {
+          "name": "Earth and Planetary Sciences",
+          "pct": 33.4
+        },
+        {
+          "name": "Engineering",
+          "pct": 8.8
+        },
+        {
+          "name": "Computer Science",
+          "pct": 5.6
+        },
+        {
+          "name": "Physics and Astronomy",
+          "pct": 2.4
+        },
+        {
+          "name": "Economics, Econometrics and Finance",
+          "pct": 1.8
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I108839631",
+      "apiUrl": "https://api.openalex.org/institutions/I108839631"
+    },
+    "rob": {
+      "openalexId": "I2799502024",
+      "openalexName": "Royal Observatory of Belgium",
+      "ror": "00hjks330",
+      "worksCount": 5118,
+      "fields": [
+        {
+          "name": "Physics and Astronomy",
+          "pct": 62.6
+        },
+        {
+          "name": "Engineering",
+          "pct": 17.8
+        },
+        {
+          "name": "Biochemistry, Genetics and Molecular Biology",
+          "pct": 5.8
+        },
+        {
+          "name": "Computer Science",
+          "pct": 5
+        },
+        {
+          "name": "Earth and Planetary Sciences",
+          "pct": 4
+        },
+        {
+          "name": "Mathematics",
+          "pct": 1.7
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I2799502024",
+      "apiUrl": "https://api.openalex.org/institutions/I2799502024"
+    },
+    "solvay": {
+      "notFound": true,
+      "reason": "No OpenAlex institution matched this name in Belgium",
+      "searchUrl": "https://openalex.org/institutions?search=International%20Solvay%20Institutes%20for%20Physics%20and%20Chemistry"
+    },
+    "vito": {
+      "notFound": true,
+      "reason": "No OpenAlex institution matched this name in Belgium",
+      "searchUrl": "https://openalex.org/institutions?search=VITO%20(Flemish%20Institute%20for%20Technological%20Research)"
+    },
+    "royalacademiesbelgium": {
+      "notFound": true,
+      "reason": "No OpenAlex institution matched this name in Belgium",
+      "searchUrl": "https://openalex.org/institutions?search=Royal%20Academies%20for%20Science%20and%20the%20Arts%20of%20Belgium"
+    },
+    "bira": {
+      "openalexId": "I198448160",
+      "openalexName": "Royal Belgian Institute for Space Aeronomy",
+      "ror": "03vfw8w96",
+      "worksCount": 5377,
+      "fields": [
+        {
+          "name": "Earth and Planetary Sciences",
+          "pct": 30.3
+        },
+        {
+          "name": "Environmental Science",
+          "pct": 27.3
+        },
+        {
+          "name": "Physics and Astronomy",
+          "pct": 20.8
+        },
+        {
+          "name": "Engineering",
+          "pct": 10.9
+        },
+        {
+          "name": "Chemistry",
+          "pct": 3.1
+        },
+        {
+          "name": "Biochemistry, Genetics and Molecular Biology",
+          "pct": 2.5
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I198448160",
+      "apiUrl": "https://api.openalex.org/institutions/I198448160"
+    },
+    "egmont": {
+      "openalexId": "I2803097538",
+      "openalexName": "EGMONT – The Royal Institute for International Relations",
+      "ror": "04y6cx804",
+      "worksCount": 170,
+      "fields": [
+        {
+          "name": "Social Sciences",
+          "pct": 77.1
+        },
+        {
+          "name": "Economics, Econometrics and Finance",
+          "pct": 18
+        },
+        {
+          "name": "Mathematics",
+          "pct": 4.9
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I2803097538",
+      "apiUrl": "https://api.openalex.org/institutions/I2803097538"
+    },
+    "bruegel": {
+      "openalexId": "I21450314",
+      "openalexName": "Bruegel",
+      "ror": "03e6bna46",
+      "worksCount": 1672,
+      "fields": [
+        {
+          "name": "Economics, Econometrics and Finance",
+          "pct": 57.2
+        },
+        {
+          "name": "Social Sciences",
+          "pct": 35.9
+        },
+        {
+          "name": "Business, Management and Accounting",
+          "pct": 4.6
+        },
+        {
+          "name": "Energy",
+          "pct": 2.2
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I21450314",
+      "apiUrl": "https://api.openalex.org/institutions/I21450314"
+    },
+    "itinera": {
+      "notFound": true,
+      "reason": "No OpenAlex institution matched this name in Belgium",
+      "searchUrl": "https://openalex.org/institutions?search=Itinera%20Institute"
+    },
+    "fwo": {
+      "openalexId": "I2802067006",
+      "openalexName": "Research Foundation - Flanders",
+      "ror": "03qtxy027",
+      "worksCount": 4103,
+      "fields": [
+        {
+          "name": "Medicine",
+          "pct": 41.1
+        },
+        {
+          "name": "Social Sciences",
+          "pct": 28
+        },
+        {
+          "name": "Arts and Humanities",
+          "pct": 23.1
+        },
+        {
+          "name": "Health Professions",
+          "pct": 4.7
+        },
+        {
+          "name": "Agricultural and Biological Sciences",
+          "pct": 3.1
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I2802067006",
+      "apiUrl": "https://api.openalex.org/institutions/I2802067006"
+    },
+    "fnrs": {
+      "notFound": true,
+      "reason": "No OpenAlex institution matched this name in Belgium",
+      "searchUrl": "https://openalex.org/institutions?search=F.R.S.-FNRS"
+    },
+    "kbf": {
+      "openalexId": "I4210116553",
+      "openalexName": "Koning Boudewijnstichting",
+      "ror": "02am44w88",
+      "worksCount": 3,
+      "fields": [
+        {
+          "name": "Arts and Humanities",
+          "pct": 58.5
+        },
+        {
+          "name": "Social Sciences",
+          "pct": 41.5
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I4210116553",
+      "apiUrl": "https://api.openalex.org/institutions/I4210116553"
+    },
+    "kotk": {
+      "openalexId": "I4210146845",
+      "openalexName": "Kom op tegen Kanker",
+      "ror": "05fsa3j22",
+      "worksCount": 6,
+      "fields": [
+        {
+          "name": "Medicine",
+          "pct": 88.1
+        },
+        {
+          "name": "Health Professions",
+          "pct": 8.9
+        },
+        {
+          "name": "Economics, Econometrics and Finance",
+          "pct": 3
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I4210146845",
+      "apiUrl": "https://api.openalex.org/institutions/I4210146845"
+    },
+    "fondationcontrelecancer": {
+      "openalexId": "I4210108366",
+      "openalexName": "Stichting tegen Kanker",
+      "ror": "01h3dr788",
+      "worksCount": 59,
+      "fields": [
+        {
+          "name": "Medicine",
+          "pct": 56.3
+        },
+        {
+          "name": "Health Professions",
+          "pct": 20.1
+        },
+        {
+          "name": "Social Sciences",
+          "pct": 7.9
+        },
+        {
+          "name": "Biochemistry, Genetics and Molecular Biology",
+          "pct": 6.5
+        },
+        {
+          "name": "Agricultural and Biological Sciences",
+          "pct": 4.2
+        },
+        {
+          "name": "Nursing",
+          "pct": 3.4
+        }
+      ],
+      "ambiguous": false,
+      "sourceUrl": "https://openalex.org/institutions/I4210108366",
+      "apiUrl": "https://api.openalex.org/institutions/I4210108366"
+    }
+  }
 }
