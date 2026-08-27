@@ -1,0 +1,39 @@
+name: Daily CRM Summary Report
+
+on:
+  schedule:
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  summary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install PDF dependencies
+        run: pip install --quiet reportlab
+      - name: Extract CRM data
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/extract-crm-data.js > /tmp/crm-data.json
+      - name: Build report
+        run: |
+          mkdir -p data/reports
+          python3 scripts/daily_summary.py /tmp/crm-data.json "data/reports/summary-$(date -u +%Y-%m-%d-%H%M%S).pdf"
+      - name: Commit report
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add data/reports data/summary-reports.json
+          git diff --staged --quiet || git commit -m "summary: report $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git pull --rebase origin main
+          git push

@@ -1,0 +1,28 @@
+name: Weekly Research Focus Scan
+
+on:
+  schedule:
+    - cron: '0 5 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run research focus scan
+        run: node scripts/research-focus-scan.js
+      - name: Commit updated research focus data
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add data/research-focus.json
+          git diff --staged --quiet || git commit -m "research-focus: auto-scan $(date +%Y-%m-%d)"
+          git pull --rebase origin main
+          git push
