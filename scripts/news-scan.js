@@ -190,15 +190,20 @@ ${batch.map((c, i) => `${i + 1}. [${c.categoryLabel}] "${c.title}" — ${c.descr
 Respond with ONLY a JSON array, one object per article in the same order, each exactly: {"relevant": true|false, "reason": "one short sentence explaining why it matters to Elsevier, only if relevant — omit or empty string if not relevant"}`;
 
   let res;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 60000);
   try {
     res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'x-api-key': ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
       body: JSON.stringify({ model: RELEVANCE_MODEL, max_tokens: 2048, messages: [{ role: 'user', content: prompt }] }),
+      signal: ctrl.signal,
     });
   } catch (e) {
     console.warn(`[news-scan] Relevance filter request failed (${e.message}) — keeping all keyword matches unfiltered.`);
     return candidates;
+  } finally {
+    clearTimeout(timer);
   }
   if (!res.ok) {
     console.warn(`[news-scan] Relevance filter API call failed (HTTP ${res.status}) — keeping all keyword matches unfiltered.`);
