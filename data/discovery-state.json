@@ -1,1 +1,44 @@
-{}
+{
+  "scraped": {
+    "imec_oa_id": "https://openalex.org/I4210114974",
+    "imec": [
+      "p1"
+    ],
+    "imec_page": 2,
+    "flandersmake_oa_id": "https://openalex.org/I4210116480",
+    "flandersmake": [
+      "p1"
+    ],
+    "flandersmake_page": 2,
+    "sciensano_oa_id": "https://openalex.org/I4210145009",
+    "sciensano": [
+      "p1"
+    ],
+    "sciensano_page": 2,
+    "rbins_oa_id": "https://openalex.org/I2801223450",
+    "rbins": [
+      "p1"
+    ],
+    "rbins_page": 2,
+    "rmi_oa_id": "https://openalex.org/I108839631",
+    "rmi": [
+      "p1"
+    ],
+    "rmi_page": 2,
+    "rob_oa_id": "https://openalex.org/I2799502024",
+    "rob": [
+      "p1"
+    ],
+    "rob_page": 2,
+    "bira_oa_id": "https://openalex.org/I198448160",
+    "bira": [
+      "p1"
+    ],
+    "bira_page": 2
+  },
+  "lastRun": "2026-08-27T17:38:20.250Z",
+  "lastTypes": [
+    "research"
+  ],
+  "lastAddedCount": 21
+}
