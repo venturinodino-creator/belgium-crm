@@ -108,20 +108,28 @@ For each genuinely new or updated finding, respond with one JSON object per line
 
 Use status "active" only for an institution publicly and substantially engaging with OpenAlex (e.g. built a library guide on it, cancelled Scopus/WoS explicitly citing OpenAlex as the replacement) without a confirmed paid subscription. Only report what your search actually surfaces with a verifiable source URL — never invent a subscription, a price, or a source. If you find nothing genuinely new, output nothing at all.`;
 
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'x-api-key': API_KEY,
-      'anthropic-version': '2023-06-01',
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      max_tokens: 4096,
-      tools: [{ type: 'web_search_20260209', name: 'web_search', max_uses: 12 }],
-      messages: [{ role: 'user', content: prompt }],
-    }),
-  });
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 180000);
+  let res;
+  try {
+    res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': API_KEY,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 4096,
+        tools: [{ type: 'web_search_20260209', name: 'web_search', max_uses: 12 }],
+        messages: [{ role: 'user', content: prompt }],
+      }),
+      signal: ctrl.signal,
+    });
+  } finally {
+    clearTimeout(timer);
+  }
 
   if (!res.ok) {
     const body = await res.text();
