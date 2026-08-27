@@ -79,41 +79,48 @@
     "bira_page": 8,
     "kuleuven_oa_id": "https://openalex.org/I99464096",
     "kuleuven": [
-      "p1"
+      "p1",
+      "p2"
     ],
-    "kuleuven_page": 2,
+    "kuleuven_page": 3,
     "ugent_oa_id": "https://openalex.org/I32597200",
     "ugent": [
-      "p1"
+      "p1",
+      "p2"
     ],
-    "ugent_page": 2,
+    "ugent_page": 3,
     "uantwerpen_oa_id": "https://openalex.org/I149213910",
     "uantwerpen": [
-      "p1"
+      "p1",
+      "p2"
     ],
-    "uantwerpen_page": 2,
+    "uantwerpen_page": 3,
     "vub_oa_id": "https://openalex.org/I13469542",
     "vub": [
-      "p1"
+      "p1",
+      "p2"
     ],
-    "vub_page": 2,
+    "vub_page": 3,
     "uhasselt_oa_id": "https://openalex.org/I878454856",
     "uhasselt": [
-      "p1"
+      "p1",
+      "p2"
     ],
-    "uhasselt_page": 2,
+    "uhasselt_page": 3,
     "uclouvain_oa_id": "https://openalex.org/I95674353",
     "uclouvain": [
-      "p1"
+      "p1",
+      "p2"
     ],
-    "uclouvain_page": 2,
+    "uclouvain_page": 3,
     "uliege_oa_id": "https://openalex.org/I157674565",
     "uliege": [
-      "p1"
+      "p1",
+      "p2"
     ],
-    "uliege_page": 2
+    "uliege_page": 3
   },
-  "lastRun": "2026-08-27T18:37:12.527Z",
+  "lastRun": "2026-08-27T18:39:32.506Z",
   "lastTypes": [
     "university"
   ],
