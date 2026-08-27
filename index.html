@@ -5816,9 +5816,13 @@ async function acceptOnePendingContact(c) {
     notes: 'Added via contact discovery agent. Source: ' + (c.source_url || ''),
     lastContact: null
   };
+  // Write to Supabase first — only add to local state (and mark the pending
+  // row accepted) once the DB write actually succeeds, so a failed insert
+  // (e.g. a foreign-key violation) can never look like a success locally
+  // and then silently vanish on the next reload.
+  await supaUpsertContact(newContact);
   state.contacts.push(newContact);
   save();
-  try { await supaUpsertContact(newContact); } catch(e) { console.error(e); }
 
   await supaFetch('pending_contacts?id=eq.' + c.id, {
     method: 'PATCH',
@@ -5828,12 +5832,20 @@ async function acceptOnePendingContact(c) {
 }
 
 async function acceptPendingContact(id, btn) {
+  const original = btn.textContent;
   btn.disabled = true; btn.textContent = 'Saving...';
   const rows = await supaFetch('pending_contacts?id=eq.' + id);
   const [c] = rows || [];
-  if (!c) { toast('Contact not found', 'err'); return; }
+  if (!c) { toast('Contact not found', 'err'); btn.disabled = false; btn.textContent = original; return; }
 
-  await acceptOnePendingContact(c);
+  try {
+    await acceptOnePendingContact(c);
+  } catch (e) {
+    console.error(e);
+    toast(`Failed to add ${c.first} ${c.last}: ${e.message}`, 'err');
+    btn.disabled = false; btn.textContent = original;
+    return;
+  }
 
   btn.closest('tr').style.opacity = '0.4';
   btn.closest('tr').style.pointerEvents = 'none';
