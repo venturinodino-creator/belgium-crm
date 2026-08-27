@@ -6,67 +6,74 @@
       "p2",
       "p3",
       "p4",
-      "p5"
+      "p5",
+      "p6"
     ],
-    "imec_page": 6,
+    "imec_page": 7,
     "flandersmake_oa_id": "https://openalex.org/I4210116480",
     "flandersmake": [
       "p1",
       "p2",
       "p3",
       "p4",
-      "p5"
+      "p5",
+      "p6"
     ],
-    "flandersmake_page": 6,
+    "flandersmake_page": 7,
     "sciensano_oa_id": "https://openalex.org/I4210145009",
     "sciensano": [
       "p1",
       "p2",
       "p3",
       "p4",
-      "p5"
+      "p5",
+      "p6"
     ],
-    "sciensano_page": 6,
+    "sciensano_page": 7,
     "rbins_oa_id": "https://openalex.org/I2801223450",
     "rbins": [
       "p1",
       "p2",
       "p3",
       "p4",
-      "p5"
+      "p5",
+      "p6"
     ],
-    "rbins_page": 6,
+    "rbins_page": 7,
     "rmi_oa_id": "https://openalex.org/I108839631",
     "rmi": [
       "p1",
       "p2",
       "p3",
       "p4",
-      "p5"
+      "p5",
+      "p6"
     ],
-    "rmi_page": 6,
+    "rmi_page": 7,
     "rob_oa_id": "https://openalex.org/I2799502024",
     "rob": [
       "p1",
       "p2",
       "p3",
       "p4",
-      "p5"
+      "p5",
+      "p6"
     ],
-    "rob_page": 6,
+    "rob_page": 7,
     "bira_oa_id": "https://openalex.org/I198448160",
     "bira": [
       "p1",
       "p2",
       "p3",
       "p4",
-      "p5"
+      "p5",
+      "p6"
     ],
-    "bira_page": 6
+    "bira_page": 7
   },
-  "lastRun": "2026-08-27T18:24:55.144Z",
+  "lastRun": "2026-08-27T18:27:09.556Z",
   "lastTypes": [
     "research"
   ],
-  "lastAddedCount": 20
+  "lastAddedCount": 21
 }
