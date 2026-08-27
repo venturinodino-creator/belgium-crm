@@ -83,7 +83,7 @@ async function fetchLivePending() {
 async function fetchLiveContacts() {
   if (!SUPA_SERVICE_KEY) return null;
   try {
-    const res = await fetch(`${SUPA_URL}/rest/v1/crm_contacts?select=id,status,priority,inst_id&region=eq.belgium`, {
+    const res = await fetch(`${SUPA_URL}/rest/v1/crm_contacts?select=id,status,priority,quality,inst_id&region=eq.belgium`, {
       headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}` }
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -94,9 +94,69 @@ async function fetchLiveContacts() {
   }
 }
 
+// crm_institutions in Supabase only ever holds admin edits/overrides (warmth,
+// renewal date, contract value, products, ...) keyed by id — the master list
+// lives in SEED_INSTITUTIONS. Same merge the app itself does client-side in
+// load(), needed here so the report's warmth/renewals/pipeline sections
+// reflect real data instead of always reading blank seed defaults.
+async function fetchInstitutionOverrides() {
+  if (!SUPA_SERVICE_KEY) return {};
+  try {
+    const res = await fetch(`${SUPA_URL}/rest/v1/crm_institutions?select=id,warmth,contract_value,renewal_date,products&region=eq.belgium`, {
+      headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}` }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const rows = await res.json();
+    return Object.fromEntries(rows.map(r => [r.id, r]));
+  } catch (e) {
+    console.error('Could not fetch crm_institutions overrides:', e.message);
+    return {};
+  }
+}
+
+async function fetchOpportunities() {
+  if (!SUPA_SERVICE_KEY) return [];
+  try {
+    const res = await fetch(`${SUPA_URL}/rest/v1/crm_opportunities?select=id,inst_id,name,stage,value,close_date&region=eq.belgium`, {
+      headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}` }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (e) {
+    console.error('Could not fetch crm_opportunities:', e.message);
+    return [];
+  }
+}
+
+async function fetchInteractions() {
+  if (!SUPA_SERVICE_KEY) return [];
+  try {
+    const res = await fetch(`${SUPA_URL}/rest/v1/crm_interactions?select=id,inst_id,contact_id,date,type&region=eq.belgium`, {
+      headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}` }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (e) {
+    console.error('Could not fetch crm_interactions:', e.message);
+    return [];
+  }
+}
+
 async function main() {
   const html = readFileSync('index.html', 'utf8');
-  const institutions = extractArrayLiteral(html, 'SEED_INSTITUTIONS');
+  const seedInstitutions = extractArrayLiteral(html, 'SEED_INSTITUTIONS');
+  const instOverrides = await fetchInstitutionOverrides();
+  const institutions = seedInstitutions.map(seed => {
+    const o = instOverrides[seed.id];
+    if (!o) return seed;
+    return {
+      ...seed,
+      warmth: o.warmth || '',
+      contractValue: o.contract_value != null ? o.contract_value : null,
+      renewalDate: o.renewal_date || '',
+      products: o.products || '',
+    };
+  });
   const seedContacts = extractArrayLiteral(html, 'SEED_CONTACTS').filter(c => c.quality === 'verified');
   // Per-institution Elsevier (Scopus/SciVal/Pure) vs Clarivate (Web of
   // Science) subscription status — same object the Competitor Matrix page
@@ -109,6 +169,20 @@ async function main() {
   const contacts = (liveContacts || seedContacts).map(c => ({
     id: c.id, instId: c.inst_id || c.instId || '',
     status: c.status || 'active', priority: c.priority || 'medium',
+    quality: c.quality || 'verified',
+  }));
+
+  const opportunitiesRaw = await fetchOpportunities();
+  const opportunities = opportunitiesRaw.map(o => ({
+    id: o.id, instId: o.inst_id, name: o.name || '',
+    stage: o.stage || 'prospect', value: o.value != null ? Number(o.value) : 0,
+    closeDate: o.close_date || '',
+  }));
+
+  const interactionsRaw = await fetchInteractions();
+  const interactions = interactionsRaw.map(n => ({
+    id: n.id, instId: n.inst_id, contactId: n.contact_id || '',
+    date: n.date || '', type: n.type || 'other',
   }));
 
   const livePending = await fetchLivePending();
@@ -140,6 +214,8 @@ async function main() {
     competitorMatrix,
     contacts,
     contactsSource,
+    opportunities,
+    interactions,
     pending,
     pendingSource,
     news,

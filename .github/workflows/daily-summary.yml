@@ -20,7 +20,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install PDF dependencies
-        run: pip install --quiet reportlab
+        run: pip install --quiet matplotlib
       - name: Extract CRM data
         env:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
