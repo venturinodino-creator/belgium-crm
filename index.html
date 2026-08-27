@@ -5921,6 +5921,12 @@ async function runContactDiscovery() {
       },
       body: JSON.stringify({ ref: 'main' }),
     });
+    if (res.status === 401 || res.status === 403) {
+      toast('GitHub rejected the token — check it has "Actions: write" access to this repo', 'err');
+      _pendingAgentRun = { resume: 'discovery' };
+      manageGhToken();
+      return;
+    }
     if (res.status !== 204) throw new Error('GitHub rejected the trigger (HTTP ' + res.status + ')');
     const ok = await _pollWorkflowRun('discover.yml', token, since);
     if (!ok) { toast('Scrape timed out or failed — check the Actions tab', 'err'); return; }
