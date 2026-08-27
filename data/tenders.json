@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "id": "elektron_elsevier_scopus_sciencedirect_2023",
+    "title": "Elektron vzw National Consortium Agreements — Elsevier ScienceDirect & Scopus (2023–2026)",
+    "institution": "Elektron vzw (Flemish University & College Library Consortium)",
+    "publishedDate": "",
+    "deadline": "",
+    "status": "inprogress",
+    "value": "",
+    "product": "Scopus",
+    "competitor": "—",
+    "url": "https://www.ittenders.com/tender-detail/purchase-elsevier-package-deal-journals-an-98400012",
+    "notes": "Elektron vzw (the Flemish university and college library consortium, hosted at KU Leuven) has two separate four-year agreements with Elsevier running 2023–2026: one for ScienceDirect (package deal covering electronic journals and e-books) and one for Scopus (bibliographic database). Confirmed via a Belgian public-procurement sole-supplier justification notice filed by Vrije Universiteit Brussel (published 26 Nov 2024), which states Elsevier is the unique/only supplier for both. No pricing or exact contract value publicly disclosed. This is a consortium-level deal, separate from any individual institution's own subscriptions already tracked in the Competitor Matrix. Web of Science / other Clarivate products not covered by this specific notice.",
+    "source": "Belgian public procurement notice (VUB sole-supplier justification, 26 Nov 2024, via IT Tenders aggregator)",
+    "createdAt": "2026-08-27T00:00:00Z",
+    "updatedAt": "2026-08-27T00:00:00Z"
+  }
+]
