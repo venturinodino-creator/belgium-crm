@@ -4,14 +4,14 @@ daily_summary.py — builds the 3-page analytics PDF (crm_summary.pdf) from the
 JSON blob produced by scripts/extract-crm-data.js, using matplotlib's
 PdfPages. A4 portrait.
 
-Page 1 — KPI Summary: institution count, contact count, open deals, open
-  pipeline value; institutions by type; contacts by status; contacts by
+Page 1 — KPI Summary: institution count, contact count, pending contacts,
+  renewals due; institutions by type; contacts by status; contacts by
   priority; contact data quality.
 Page 2 — Competitive Position: Scopus/SciVal/Pure/WoS status as a stacked
   bar across institutions; relationship warmth breakdown; upcoming renewals
   (next 90 days); OpenAlex tier distribution.
-Page 3 — Pipeline & Activity: deal pipeline by stage (count and value);
-  interactions by type; interaction activity trend over the last 12 weeks.
+Page 3 — Activity: interactions by type; interaction activity trend over
+  the last 12 weeks.
 
 Usage: python3 scripts/daily_summary.py <input.json> <output.pdf>
 
@@ -67,22 +67,7 @@ WARMTH_LABELS = {'hot': 'Hot', 'warm': 'Warm', 'cold': 'Cold', '': 'Not Set'}
 TIER_ORDER = ['Partner', 'Member+', 'Member', 'None']
 TIER_COLORS = {'Partner': '#fbbf24', 'Member+': '#60a5fa', 'Member': '#34d399', 'None': '#94a3b8'}
 
-STAGE_ORDER = ['prospect', 'engaged', 'proposal', 'negotiation', 'closed-won', 'closed-lost']
-STAGE_LABELS = {'prospect': 'Prospect', 'engaged': 'Engaged', 'proposal': 'Proposal',
-                 'negotiation': 'Negotiation', 'closed-won': 'Closed\nWon', 'closed-lost': 'Closed\nLost'}
-STAGE_COLORS = {'prospect': '#94a3b8', 'engaged': '#60a5fa', 'proposal': '#a78bfa',
-                 'negotiation': '#f59e0b', 'closed-won': '#10b981', 'closed-lost': '#ef4444'}
-OPEN_STAGES = {'prospect', 'engaged', 'proposal', 'negotiation'}
-
 INTERACTION_TYPE_COLORS = {'call': '#0891b2', 'email': '#6366f1', 'meeting': '#10b981', 'demo': '#a855f7', 'other': '#94a3b8'}
-
-
-def fmt_eur(v):
-    if v >= 1_000_000:
-        return f'€{v/1_000_000:.1f}M'
-    if v >= 1_000:
-        return f'€{v/1_000:.0f}K'
-    return f'€{v:.0f}'
 
 
 def draw_header(fig, title, subtitle, page_num):
@@ -225,8 +210,6 @@ def compose_summary(stats):
         f"{stats['inst_research']} research institutes, {stats['inst_ngo']} NGOs/foundations) "
         f"and {stats['contacts_total']} verified contacts ({stats['contacts_high_priority']} high priority)."
     )
-    if stats['deals_open']:
-        parts.append(f"{stats['deals_open']} open deals in the pipeline worth {fmt_eur(stats['pipeline_value'])}.")
     if stats['pending_total']:
         if stats['pending_is_live']:
             parts.append(f"{stats['pending_total']} candidate contacts are awaiting review right now.")
@@ -246,7 +229,6 @@ def build_report(data, out_path):
     institutions = data['institutions']
     contacts = data['contacts']
     pending = data.get('pending', [])
-    opportunities = data.get('opportunities', [])
     interactions = data.get('interactions', [])
     comp_matrix = data.get('competitorMatrix') or {}
 
@@ -256,13 +238,6 @@ def build_report(data, out_path):
     contact_quality_counts = Counter(c.get('quality', 'verified') for c in contacts)
 
     inst_by_id = {i['id']: i for i in institutions}
-
-    open_deals = [o for o in opportunities if o.get('stage') in OPEN_STAGES]
-    pipeline_value = sum(o.get('value') or 0 for o in open_deals)
-    stage_counts = Counter(o.get('stage', 'prospect') for o in opportunities)
-    stage_values = {}
-    for o in opportunities:
-        stage_values[o.get('stage', 'prospect')] = stage_values.get(o.get('stage', 'prospect'), 0) + (o.get('value') or 0)
 
     warmth_counts = Counter((i.get('warmth') or '') for i in institutions)
 
@@ -316,8 +291,6 @@ def build_report(data, out_path):
         'inst_ngo': inst_type_counts.get('ngo', 0),
         'contacts_total': len(contacts),
         'contacts_high_priority': contact_priority_counts.get('high', 0),
-        'deals_open': len(open_deals),
-        'pipeline_value': pipeline_value,
         'pending_total': len(pending),
         'pending_is_live': data.get('pendingSource') == 'supabase',
         'renewals_90d': len(renewals),
@@ -338,11 +311,12 @@ def build_report(data, out_path):
 
         tile_y, tile_h, gap = 0.845, 0.075, 0.015
         tile_w = (0.94 - 0.06 - 3 * gap) / 4
+        pending_tile_sub = 'awaiting review' if stats['pending_is_live'] else 'discovered to date'
         tiles = [
             ('Institutions', stats['inst_total'], f"{stats['inst_medical']} medical · {stats['inst_university']} university", TYPE_COLORS['university']),
             ('Contacts', stats['contacts_total'], f"{stats['contacts_high_priority']} high priority", ACCENT),
-            ('Open Deals', stats['deals_open'], f"{len(opportunities)} total tracked", STAGE_COLORS['negotiation']),
-            ('Open Pipeline Value', fmt_eur(stats['pipeline_value']), 'across open-stage deals', TYPE_COLORS['research']),
+            ('Pending Contacts', stats['pending_total'], pending_tile_sub, TYPE_COLORS['ngo']),
+            ('Renewals Due', stats['renewals_90d'], 'in the next 90 days', WARMTH_COLORS['warm']),
         ]
         for i, (label, val, sub, col) in enumerate(tiles):
             x = 0.06 + i * (tile_w + gap)
@@ -392,29 +366,15 @@ def build_report(data, out_path):
         pdf.savefig(fig)
         plt.close(fig)
 
-        # ── PAGE 3 — PIPELINE & ACTIVITY ───────────────────────────────────
+        # ── PAGE 3 — ACTIVITY ───────────────────────────────────────────────
         fig = plt.figure(figsize=PAGE_SIZE)
-        draw_header(fig, 'Pipeline & Activity',
-                    'Deal pipeline by stage, interaction mix, and recent engagement trend', 3)
+        draw_header(fig, 'Activity',
+                    'Interaction mix and recent engagement trend', 3)
 
-        ax_stage_count = fig.add_axes([0.06, 0.62, col_w, 0.26])
-        bar_chart(ax_stage_count, 'Deal Pipeline — Count by Stage', stage_counts, STAGE_COLORS, STAGE_LABELS, order=STAGE_ORDER)
-
-        ax_stage_val = fig.add_axes([0.06 + col_w + 0.06, 0.62, col_w, 0.26])
-        stage_val_fmt = {k: fmt_eur(v) for k, v in stage_values.items() if v}
-        bar_chart(ax_stage_val, 'Deal Pipeline — Value by Stage', stage_values, STAGE_COLORS, STAGE_LABELS, order=STAGE_ORDER)
-        # Overwrite the auto count labels on the value chart with currency
-        for txt in ax_stage_val.texts:
-            try:
-                v = float(txt.get_text())
-            except ValueError:
-                continue
-            txt.set_text(fmt_eur(v))
-
-        ax_inter = fig.add_axes([0.06, 0.34, col_w, 0.20])
+        ax_inter = fig.add_axes([0.06, 0.36, col_w, 0.42])
         bar_chart(ax_inter, 'Interactions by Type', interaction_type_counts, INTERACTION_TYPE_COLORS, {k: k.title() for k in interaction_type_counts})
 
-        ax_trend = fig.add_axes([0.06 + col_w + 0.06, 0.30, col_w, 0.24])
+        ax_trend = fig.add_axes([0.06 + col_w + 0.06, 0.36, col_w, 0.42])
         trend_chart(ax_trend, 'Interaction Activity — Last 12 Weeks', weekly_counts, week_labels)
 
         draw_footer(fig, generated_at)
@@ -446,8 +406,6 @@ def update_manifest(report_path, stats, summary_text, generated_dt):
             'contacts': stats['contacts_total'],
             'pending': stats['pending_total'],
             'pendingIsLive': stats['pending_is_live'],
-            'openDeals': stats['deals_open'],
-            'pipelineValue': stats['pipeline_value'],
         },
     }
     manifest.insert(0, entry)
@@ -480,7 +438,7 @@ def main():
     stats, summary_text, generated_dt = build_report(data, out_path)
     update_manifest(out_path, stats, summary_text, generated_dt)
     print(f'Wrote {out_path}')
-    print(f'Institutions: {stats["inst_total"]} · Contacts: {stats["contacts_total"]} · Open deals: {stats["deals_open"]}')
+    print(f'Institutions: {stats["inst_total"]} · Contacts: {stats["contacts_total"]} · Pending: {stats["pending_total"]}')
 
 
 if __name__ == '__main__':
