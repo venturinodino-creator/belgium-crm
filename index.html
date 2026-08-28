@@ -1726,8 +1726,8 @@ function previewCSV(input) {
 
     const preview = document.getElementById('csync-preview');
     preview.style.display = 'block';
-    preview.innerHTML = `<strong style="color:var(--text)">${_csvRows.length} row${_csvRows.length!==1?'s':''} detected</strong> in <em>${file.name}</em>. ` +
-      (_csvRows.length > 0 ? `First row: <span style="font-family:monospace">${_csvRows[0].slice(0,4).join(', ')}…</span>` : '');
+    preview.innerHTML = `<strong style="color:var(--text)">${_csvRows.length} row${_csvRows.length!==1?'s':''} detected</strong> in <em>${esc(file.name)}</em>. ` +
+      (_csvRows.length > 0 ? `First row: <span style="font-family:monospace">${esc(_csvRows[0].slice(0,4).join(', '))}…</span>` : '');
 
     const btn = document.getElementById('csync-import-btn');
     if (_csvRows.length > 0) {
