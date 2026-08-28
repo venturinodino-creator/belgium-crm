@@ -955,6 +955,9 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
     <div class="nav-item" data-view="subscriptions" onclick="nav('subscriptions')">
       <div class="nav-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div> Competitor Matrix
     </div>
+    <div class="nav-item" data-view="ai-insights" onclick="nav('ai-insights')">
+      <div class="nav-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 0 0-5 5c0 1.7.7 2.6 1.5 3.5.6.6 1 1.2 1.2 2.1M12 2a5 5 0 0 1 5 5c0 1.7-.7 2.6-1.5 3.5-.6.6-1 1.2-1.2 2.1M9.7 12.6h4.6M9.9 16h4.2M10.5 19h3"/></svg></div> LeapSpace Insights
+    </div>
     <div class="nav-item" data-view="rfp" onclick="nav('rfp')">
       <div class="nav-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div> RFP Opps
     </div>
@@ -2684,6 +2687,7 @@ function render() {
     digest: renderDailyDigest,
     pipeline: renderPipeline,
     subscriptions: renderSubscriptionMatrix,
+    'ai-insights': renderCompetitorInsights,
     openalex: renderOpenAlex,
     barcelona: renderBarcelonaDecl,
     '4gu': render4GU,
@@ -5516,12 +5520,98 @@ function getAIInsights() {
 }
 function saveAIInsights(list) { localStorage.setItem('be_crm_ai_insights', JSON.stringify(list)); }
 
+/* ── LeapSpace Insights: battle-card copy (server-generated) ────────────── */
+// data/leapspace-battlecard.json holds { entries, executiveSummary,
+// executiveSummaryDate }: entries is a { whatTheyDid, counter } write-up
+// per competitor id, executiveSummary is a single board-ready paragraph
+// over the whole tracked set — both generated server-side by
+// competitor-scan.js from each entry's howItCompetes text (see that
+// script's header comment for why generation happens there but ranking
+// happens here).
+function getBattleCard() {
+  try { return JSON.parse(localStorage.getItem('be_crm_battlecard') || '{}'); } catch(e) { return {}; }
+}
+function saveBattleCard(obj) { localStorage.setItem('be_crm_battlecard', JSON.stringify(obj)); }
+function getBattleCardCopy() { return getBattleCard().entries || {}; }
+function copyExecutiveSummary() {
+  const summary = getBattleCard().executiveSummary;
+  if (!summary) return;
+  navigator.clipboard.writeText(summary).then(function(){
+    try { toast('Executive summary copied — paste it anywhere', 'ok'); } catch(e){}
+  }).catch(function(){
+    try { toast('Could not copy — select the text manually', 'warn'); } catch(e){}
+  });
+}
+
+/* ── LeapSpace Insights: threat scoring ──────────────────────────────────
+   Auto score = how broadly + how recently a solution overlaps LeapSpace's
+   tabs, with a bump for touching Trust Cards & Claim Radar specifically
+   (LeapSpace's named differentiator, so any overlap there is worth flagging
+   even at low breadth). A manual override always wins — set via the
+   dropdown on each Threat Leaderboard row — for cases the formula can't
+   see, like a free/mass-reach tool that's a volume threat rather than a
+   feature one.
+
+   Recency uses eventDate (the actual launch/update date, backfilled
+   server-side by competitor-scan.js) when known, falling back to
+   addedDate only for entries no date could be extracted for — addedDate
+   alone is "when we started tracking this," not "when it happened," and
+   using it as a recency signal is exactly how an 8-month-old update
+   (e.g. NotebookLM's Dec 2025 release, tracked here since Aug 2026) ended
+   up reading as breaking news. RECENCY_CUTOFF goes further: anything
+   dated before it is excluded outright from the fast-read layers (This
+   Week's Read, the leaderboard, the executive summary's input facts) —
+   see isCurrent() — not just scored lower. */
+const THREAT_STRATEGIC_ELEMENTS = ['trustClaimRadar'];
+const THREAT_RECENT_DAYS = 45;
+const THREAT_ORDER = { high: 0, medium: 1, low: 2 };
+const THREAT_LABEL = { high: 'High', medium: 'Medium', low: 'Low' };
+const RECENCY_CUTOFF = '2026-07-01'; // keep in sync with scripts/competitor-scan.js
+
+function eventOrAddedDate(x) { return x.eventDate || x.addedDate || null; }
+function isCurrent(x) { return (eventOrAddedDate(x) || '0000-00-00') >= RECENCY_CUTOFF; }
+
+function computeAutoThreat(x) {
+  const breadth = (x.elements || []).length;
+  const d = eventOrAddedDate(x);
+  const daysSince = d ? (Date.now() - new Date(d).getTime()) / 86400000 : Infinity;
+  const recent = daysSince <= THREAT_RECENT_DAYS;
+  const strategic = (x.elements || []).some(function(e){ return THREAT_STRATEGIC_ELEMENTS.includes(e); });
+  if (breadth >= 3 && recent) return 'high';
+  if (strategic || breadth >= 2 || recent) return 'medium';
+  return 'low';
+}
+function getThreatOverrides() {
+  try { return JSON.parse(localStorage.getItem('be_crm_threat_overrides') || '{}'); } catch(e) { return {}; }
+}
+function effectiveThreat(x) {
+  const overrides = getThreatOverrides();
+  return overrides[x.id] || computeAutoThreat(x);
+}
+function isThreatOverridden(x) {
+  return !!getThreatOverrides()[x.id];
+}
+function setThreatOverride(id, level) {
+  const overrides = getThreatOverrides();
+  if (!level || level === 'auto') delete overrides[id]; else overrides[id] = level;
+  localStorage.setItem('be_crm_threat_overrides', JSON.stringify(overrides));
+  renderCompetitorInsights();
+}
+function isDetailOpen() { return localStorage.getItem('be_crm_leapspace_detail_open') === '1'; }
+function toggleDetailOpen() {
+  localStorage.setItem('be_crm_leapspace_detail_open', isDetailOpen() ? '0' : '1');
+  renderCompetitorInsights();
+}
+
 function refreshAIInsights(silent) {
   const btn = document.getElementById('refresh-insights-btn');
   if (btn) { btn.textContent = '↻ Scanning...'; btn.disabled = true; }
-  fetch('/belgium-crm/data/leapspace-competitors.json?t=' + Date.now())
-    .then(function(r){ return r.ok ? r.json() : []; })
-    .then(function(remote) {
+  Promise.all([
+    fetch('/netherlands-crm/data/leapspace-competitors.json?t=' + Date.now()).then(function(r){ return r.ok ? r.json() : []; }),
+    fetch('/netherlands-crm/data/leapspace-battlecard.json?t=' + Date.now()).then(function(r){ return r.ok ? r.json() : null; }),
+  ])
+    .then(function(results) {
+      var remote = results[0], battleCard = results[1];
       if (!Array.isArray(remote)) remote = [];
       const existing = getAIInsights();
       const existingMap = {};
@@ -5532,6 +5622,14 @@ function refreshAIInsights(silent) {
         else { Object.assign(existingMap[x.id], x); } // keep manually-tracked entries current with the seed feed
       });
       saveAIInsights(existing);
+      if (battleCard) {
+        const currentCard = getBattleCard();
+        saveBattleCard({
+          entries: Object.assign(currentCard.entries || {}, battleCard.entries || {}),
+          executiveSummary: battleCard.executiveSummary || currentCard.executiveSummary || null,
+          executiveSummaryDate: battleCard.executiveSummaryDate || currentCard.executiveSummaryDate || null,
+        });
+      }
       if (!silent) {
         var msg = added > 0 ? added+' new competitor solution'+(added>1?'s':'')+' found!' : 'Up to date — no new solutions found';
         try { if (typeof toast==='function') toast(msg, added>0?'ok':'warn'); } catch(e){}
@@ -5589,8 +5687,8 @@ function saveAIInsight() {
 }
 
 function renderCompetitorInsights() {
-  document.getElementById('page-title').textContent = 'Competitor Insights';
-  document.getElementById('page-sub').textContent = 'Every solution below is benchmarked against Elsevier LeapSpace, tab by tab';
+  document.getElementById('page-title').textContent = 'LeapSpace Insights';
+  document.getElementById('page-sub').textContent = 'What competitors are shipping, and how LeapSpace beats it — updated with every scan';
   document.getElementById('topbar-actions').innerHTML = `<div style="display:flex;gap:8px;align-items:center">
     <button class="btn btn-outline" onclick="openAddAIInsight()" style="font-size:12px;padding:6px 14px">+ Add Insight</button>
     <button id="refresh-insights-btn" class="btn btn-accent" onclick="refreshAIInsights()" style="display:flex;align-items:center;gap:6px">
@@ -5602,22 +5700,10 @@ function renderCompetitorInsights() {
   const content = document.getElementById('content');
   let list = getAIInsights();
   if (!list.length) {
-    if (!window._aiInsightsEmptyChecked) {
-      // First time we've seen an empty list this session — try once to pull
-      // from the feed, then stop. Without this guard, an empty feed (e.g. the
-      // daily scan hasn't found anything yet) causes refreshAIInsights to keep
-      // calling back into this render function forever.
-      window._aiInsightsEmptyChecked = true;
-      refreshAIInsights(true);
-      content.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 24px;gap:16px">
-        <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <p style="color:#475569;font-size:14px;margin:0">Loading known LeapSpace competitors...</p>
-      </div>`;
-      return;
-    }
+    refreshAIInsights(true);
     content.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 24px;gap:16px">
       <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <p style="color:#475569;font-size:14px;margin:0">No competitor solutions found yet. The daily scan agent hasn't surfaced any yet — check back later or add one manually.</p>
+      <p style="color:#475569;font-size:14px;margin:0">Loading known LeapSpace competitors...</p>
     </div>`;
     return;
   }
@@ -5642,6 +5728,120 @@ function renderCompetitorInsights() {
   const elementCounts = {};
   Object.keys(LEAPSPACE_ELEMENTS).forEach(function(k){ elementCounts[k] = list.filter(function(x){ return (x.elements||[]).includes(k); }).length; });
 
+  /* ── Executive Summary + This Week's Read + Threat Leaderboard ──────── */
+  // Anything older than RECENCY_CUTOFF is excluded from these three
+  // sections entirely — not just scored lower — so a months-old update
+  // never reads as a current threat. It's still visible in Full Detail
+  // (the matrix + every card), which is the complete historical record.
+  const THREAT_COLOR = { high: '#ef4444', medium: '#f59e0b', low: '#7a90a8' };
+  const battleCard = getBattleCard();
+  const battleCardCopy = battleCard.entries || {};
+  const currentList = list.filter(isCurrent);
+  const staleCount = list.length - currentList.length;
+  const ranked = currentList.slice().sort(function(a,b){
+    const ta = THREAT_ORDER[effectiveThreat(a)], tb = THREAT_ORDER[effectiveThreat(b)];
+    if (ta !== tb) return ta - tb;
+    return (eventOrAddedDate(b)||'').localeCompare(eventOrAddedDate(a)||'');
+  });
+  const topMoves = ranked.filter(function(x){ return battleCardCopy[x.id]; }).slice(0, 3);
+  const highCount = currentList.filter(function(x){ return effectiveThreat(x) === 'high'; }).length;
+
+  const execSummaryHtml = `<div style="margin-bottom:16px;background:rgba(26,40,62,0.95);border:1px solid rgba(0,245,196,.25);border-radius:14px;padding:18px 22px;box-shadow:0 4px 24px rgba(0,0,0,.3)">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:${battleCard.executiveSummary?'10px':'0'};flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:8px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00f5c4" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span style="font-size:13px;font-weight:800;color:#f8fafc">Executive Summary</span>
+        ${battleCard.executiveSummaryDate ? `<span style="font-size:10.5px;color:rgba(255,255,255,.35)">· ${esc(new Date(battleCard.executiveSummaryDate).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}))}</span>` : ''}
+      </div>
+      ${battleCard.executiveSummary ? `<button onclick="copyExecutiveSummary()" class="btn btn-outline" style="font-size:11px;padding:5px 12px;display:flex;align-items:center;gap:6px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy for board</button>` : ''}
+    </div>
+    ${battleCard.executiveSummary
+      ? `<p style="font-size:12.5px;line-height:1.7;color:rgba(255,255,255,.65);margin:0;max-width:900px">${esc(battleCard.executiveSummary)}</p>`
+      : `<p style="font-size:12px;color:rgba(255,255,255,.4);margin:0;line-height:1.6">A board-ready summary of the whole competitive landscape is written by the nightly scan agent — check back after the next run, or click <b style="color:rgba(255,255,255,.6)">Scan for New Solutions</b> to pull in one already generated.</p>`}
+  </div>`;
+
+  const moveHtml = topMoves.map(function(x){
+    const t = effectiveThreat(x);
+    const card = battleCardCopy[x.id];
+    return `<div style="display:grid;grid-template-columns:4px 1fr 1fr;gap:0 18px;padding:16px 0;border-top:1px solid rgba(255,255,255,.07)">
+      <div style="border-radius:3px;background:${THREAT_COLOR[t]}"></div>
+      <div>
+        <span style="display:inline-flex;align-items:center;font-size:9.5px;font-weight:800;color:${THREAT_COLOR[t]};background:${THREAT_COLOR[t]}1a;border:1px solid ${THREAT_COLOR[t]}4d;padding:2px 9px;border-radius:10px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">${THREAT_LABEL[t]} threat</span>
+        <div style="font-size:9.5px;font-weight:800;color:#f87171;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">What they did</div>
+        <p style="font-size:13px;font-weight:700;color:#f8fafc;margin:0 0 2px">${esc(x.product||'—')}</p>
+        <p style="font-size:10.5px;color:rgba(255,255,255,.4);font-weight:600;margin:0 0 6px">${esc(x.company||'')}</p>
+        <p style="font-size:12px;line-height:1.6;color:rgba(255,255,255,.6);margin:0">${esc(card.whatTheyDid)}</p>
+      </div>
+      <div>
+        <div style="font-size:9.5px;font-weight:800;color:#00f5c4;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">How LeapSpace wins</div>
+        <p style="font-size:12px;line-height:1.6;color:rgba(255,255,255,.6);margin:0">${esc(card.counter)}</p>
+      </div>
+    </div>`;
+  }).join('');
+
+  const battleCardHtml = `<div style="margin-bottom:16px;background:linear-gradient(135deg,rgba(251,146,60,.07) 0%,rgba(26,40,62,0.95) 40%);border:1px solid rgba(251,146,60,.25);border-radius:14px;padding:20px 22px ${topMoves.length?'6px':'20px'};box-shadow:0 4px 24px rgba(0,0,0,.3)">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:8px;height:8px;border-radius:50%;background:#fb923c;box-shadow:0 0 8px rgba(251,146,60,.7)"></div>
+        <span style="font-size:15px;font-weight:800;color:#f8fafc">This Week's Read</span>
+      </div>
+      <span style="font-size:11px;color:rgba(255,255,255,.4)">${list.length} solutions tracked · ${order.length} competitor${order.length!==1?'s':''}</span>
+    </div>
+    ${topMoves.length ? moveHtml : `<p style="font-size:12px;color:rgba(255,255,255,.4);margin:14px 0 0;line-height:1.6">Battle card copy is written by the nightly scan agent from each solution's "how it competes" notes — check back after the next run, or click <b style="color:rgba(255,255,255,.6)">Scan for New Solutions</b> to pull in anything already generated.</p>`}
+  </div>`;
+
+  const leaderboardEntries = ranked.slice(0, 6);
+  const leaderboardHtml = `<div style="margin-bottom:16px;background:rgba(26,40,62,0.95);border:1px solid rgba(255,255,255,.07);border-radius:14px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.3)">
+    <div style="padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <span style="font-size:11px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.06em">Competitor threat level — why, and the source behind it</span>
+      <span style="font-size:10.5px;color:rgba(255,255,255,.35)">Showing moves since ${esc(new Date(RECENCY_CUTOFF).toLocaleDateString('en-GB',{month:'long',year:'numeric'}))}${staleCount?` · ${staleCount} older entr${staleCount!==1?'ies':'y'} excluded, still in Full Detail below`:''}</span>
+    </div>
+    ${!leaderboardEntries.length ? `<p style="padding:16px 18px;font-size:12px;color:rgba(255,255,255,.4);margin:0;line-height:1.6">Nothing tracked has a confirmed move since ${esc(new Date(RECENCY_CUTOFF).toLocaleDateString('en-GB',{month:'long',year:'numeric'}))} yet.${staleCount?` ${staleCount} older entr${staleCount!==1?'ies are':'y is'} still in Full Detail below.`:''}</p>` : leaderboardEntries.map(function(x, i){
+      const t = effectiveThreat(x);
+      const overrideVal = getThreatOverrides()[x.id] || 'auto';
+      const why = battleCardCopy[x.id] ? battleCardCopy[x.id].whatTheyDid : (x.howItCompetes || '');
+      const breadth = (x.elements||[]).length;
+      const factLine = `Overlaps ${breadth}/${Object.keys(LEAPSPACE_TABS).length} LeapSpace tab${breadth!==1?'s':''}${x.eventDate?' · dated '+esc(x.eventDate):(x.addedDate?' · tracked since '+esc(x.addedDate)+' (exact event date unknown)':'')}`;
+      return `<div style="padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.05)">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="font-size:13px;font-weight:800;color:rgba(255,255,255,.3);width:16px;flex-shrink:0">${i+1}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12.5px;font-weight:700;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(x.product||'—')}</div>
+            <div style="font-size:10px;color:#f87171;font-weight:600;margin-top:1px">${esc(x.company||'')}</div>
+          </div>
+          <span style="display:inline-flex;align-items:center;font-size:10px;font-weight:800;padding:3px 10px;border-radius:10px;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;flex-shrink:0;color:${THREAT_COLOR[t]};background:${THREAT_COLOR[t]}1f;border:1px solid ${THREAT_COLOR[t]}59">${THREAT_LABEL[t]}${overrideVal!=='auto'?' •':''}</span>
+          <select onchange="setThreatOverride(${jsStr(x.id)}, this.value)" title="${overrideVal!=='auto'?'Manually overridden — pick Auto to use the computed score':'Override the computed threat score'}" style="font-size:10.5px;background:rgba(255,255,255,.04);color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:3px 6px;flex-shrink:0">
+            <option value="auto"${overrideVal==='auto'?' selected':''}>Auto (${THREAT_LABEL[computeAutoThreat(x)]})</option>
+            <option value="high"${overrideVal==='high'?' selected':''}>High</option>
+            <option value="medium"${overrideVal==='medium'?' selected':''}>Medium</option>
+            <option value="low"${overrideVal==='low'?' selected':''}>Low</option>
+          </select>
+        </div>
+        <div style="padding-left:30px;margin-top:6px;display:flex;align-items:flex-start;gap:10px">
+          <p style="flex:1;min-width:0;font-size:11.5px;line-height:1.55;color:rgba(255,255,255,.5);margin:0">
+            ${why ? esc(why) : '<span style="color:rgba(255,255,255,.3);font-style:italic">No write-up yet — check back after the next scan.</span>'}
+            <span style="color:rgba(255,255,255,.3)"> — ${factLine}</span>
+          </p>
+          ${x.sourceUrl ? `<a href="${esc(safeHref(x.sourceUrl))}" target="_blank" rel="noopener" title="${esc(x.sourceName||'Source')}" style="flex-shrink:0;display:inline-flex;align-items:center;gap:4px;font-size:10.5px;color:#00f5c4;text-decoration:none;font-weight:600;white-space:nowrap;margin-top:1px">Source<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>` : ''}
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+
+  const topTabEntry = Object.entries(elementCounts).sort(function(a,b){ return b[1]-a[1]; })[0];
+  const topTabLabel = topTabEntry ? LEAPSPACE_ELEMENTS[topTabEntry[0]].label : '—';
+  const topTabCount = topTabEntry ? topTabEntry[1] : 0;
+  const kpiHtml = `<div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-bottom:16px;padding:14px 22px;background:rgba(26,40,62,0.95);border:1px solid rgba(255,255,255,.07);border-radius:14px;box-shadow:0 4px 24px rgba(0,0,0,.3)">
+    <div><div style="font-size:20px;font-weight:800;color:#f8fafc;line-height:1">${list.length}</div><div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">Solutions tracked</div></div>
+    <div style="width:1px;height:34px;background:rgba(255,255,255,.08)"></div>
+    <div><div style="font-size:20px;font-weight:800;color:#f8fafc;line-height:1">${order.length}</div><div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">Competitors</div></div>
+    <div style="width:1px;height:34px;background:rgba(255,255,255,.08)"></div>
+    <div><div style="font-size:20px;font-weight:800;color:#ef4444;line-height:1">${highCount}</div><div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">High threat right now</div></div>
+    <div style="width:1px;height:34px;background:rgba(255,255,255,.08)"></div>
+    <div><div style="font-size:20px;font-weight:800;color:#f8fafc;line-height:1">${topTabCount}</div><div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px">Cover ${esc(topTabLabel)}</div></div>
+  </div>`;
+
+  /* ── Full detail (matrix + per-solution cards), collapsed by default ── */
   const leapspaceHtml = `<div style="margin-bottom:16px;padding:18px 24px;background:linear-gradient(135deg,rgba(251,146,60,.1) 0%,rgba(26,40,62,0.95) 45%);border:1px solid rgba(251,146,60,.3);border-radius:14px;box-shadow:0 4px 24px rgba(0,0,0,.3)">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
       <div style="width:8px;height:8px;border-radius:50%;background:#fb923c;box-shadow:0 0 8px rgba(251,146,60,.7)"></div>
@@ -5658,30 +5858,6 @@ function renderCompetitorInsights() {
           <span style="font-size:10.5px;line-height:1.4;color:rgba(255,255,255,.4)">${v.desc}</span>
         </div>`;
       }).join('')}
-    </div>
-  </div>`;
-
-  const summaryHtml = `<div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-bottom:16px;padding:16px 24px;background:rgba(26,40,62,0.95);border:1px solid rgba(255,255,255,.07);border-radius:14px;box-shadow:0 4px 24px rgba(0,0,0,.3)">
-    <div style="display:flex;align-items:center;gap:12px">
-      <div style="width:40px;height:40px;border-radius:10px;background:rgba(0,245,196,.1);border:1px solid rgba(0,245,196,.25);display:flex;align-items:center;justify-content:center">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#00f5c4" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v6M12 17v6M4.2 4.2l4.2 4.2M15.5 15.5l4.3 4.3M1 12h6M17 12h6M4.2 19.8l4.2-4.2M15.5 8.5l4.3-4.3"/></svg>
-      </div>
-      <div>
-        <div style="font-size:22px;font-weight:800;color:#f8fafc;line-height:1">${list.length}</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.4);font-weight:500;margin-top:1px">AI solutions tracked · ${order.length} competitor${order.length!==1?'s':''}</div>
-      </div>
-    </div>
-    <div style="width:1px;height:40px;background:rgba(255,255,255,.08)"></div>
-    <div style="display:flex;flex-direction:column;gap:6px">
-      <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.06em">Totals across all tracked solutions</div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        ${Object.entries(LEAPSPACE_ELEMENTS).map(function(pair){
-          const k = pair[0], v = pair[1];
-          return `<span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,.55);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);padding:4px 10px;border-radius:20px">
-            <span style="width:7px;height:7px;border-radius:50%;background:${v.color};box-shadow:0 0 6px ${v.color}88"></span>${v.label} <b style="color:${v.color}">${elementCounts[k]}</b>
-          </span>`;
-        }).join('')}
-      </div>
     </div>
   </div>`;
 
@@ -5765,8 +5941,30 @@ function renderCompetitorInsights() {
     }).join('');
   }).join('');
 
-  content.innerHTML = `<div style="padding:20px 24px 24px">${leapspaceHtml}${summaryHtml}${matrixHtml}
-    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px">${cardsHtml}</div>
+  const detailOpen = isDetailOpen();
+  const fullDetailHtml = `<div style="background:rgba(26,40,62,0.95);border:1px solid rgba(255,255,255,.07);border-radius:14px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.3)">
+    <div onclick="toggleDetailOpen()" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 22px;cursor:pointer">
+      <div style="display:flex;align-items:center;gap:10px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#f8fafc">Tab-coverage matrix &amp; every tracked solution</div>
+          <div style="font-size:11.5px;color:rgba(255,255,255,.4);margin-top:2px">${list.length} solutions across ${Object.keys(LEAPSPACE_TABS).length} LeapSpace tabs — full detail</div>
+        </div>
+      </div>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="2" style="transform:rotate(${detailOpen?'180':'0'}deg);transition:transform .18s;flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    ${detailOpen ? `<div style="border-top:1px solid rgba(255,255,255,.07);padding:18px 22px 22px">
+      ${leapspaceHtml}${matrixHtml}
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:16px">${cardsHtml}</div>
+    </div>` : ''}
+  </div>`;
+
+  content.innerHTML = `<div style="padding:20px 24px 24px">
+    ${execSummaryHtml}
+    ${battleCardHtml}
+    ${leaderboardHtml}
+    ${kpiHtml}
+    ${fullDetailHtml}
     <p style="color:#334155;font-size:11px;margin:12px 0 0;text-align:right">Watching for new solutions that compete with LeapSpace · last scan ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</p>
   </div>`;
 }
