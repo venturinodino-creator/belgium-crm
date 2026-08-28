@@ -1,0 +1,3 @@
+{
+  "_comment": "Manual OpenAlex-id overrides for Belgian institutions, keyed by SEED_INSTITUTIONS id. Set an id to null and add an '<id>_reason' key to mark an institution as confirmed absent from OpenAlex. Empty until verified by hand against openalex.org, same process netherlands-crm used."
+}
