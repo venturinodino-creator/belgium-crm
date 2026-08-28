@@ -604,6 +604,14 @@ async function main() {
     console.log(`[news-scan] Backfilled ${backfilledCount} article(s).`);
   }
 
+  // TEMP DIAGNOSTIC: after the dual-edition fix, raw hit counts look healthy
+  // (90/27/6/116) but only competitor_announcements (not institution-scoped)
+  // produced any matched candidates — 0/90 for ai_adoption is suspicious.
+  // Counting rejection reasons to see whether it's isRecent, dedup, or
+  // institutionMatches killing the per-institution categories. Remove once
+  // diagnosed.
+  const rejectReasons = { notRecent: 0, dup: 0, noMatch: 0 };
+
   for (const category of CATEGORIES) {
     console.log(`[news-scan] Searching: ${category.label}...`);
     let categoryCandidates = 0;
@@ -627,12 +635,13 @@ async function main() {
       categoryCandidates += items.length;
 
       for (const item of items) {
-        if (!isRecent(item.pubDate)) continue;
-        if (existingUrls.has(item.link)) continue;
+        if (!isRecent(item.pubDate)) { rejectReasons.notRecent++; continue; }
+        if (existingUrls.has(item.link)) { rejectReasons.dup++; continue; }
         // For per-institution queries, require the institution name (or one of
         // its aliases — see institutionMatches) to actually appear in the
         // title/description — Google News RSS relevance ranking is loose.
         if (job.inst && !institutionMatches(job.inst, item.title + ' ' + item.description)) {
+          rejectReasons.noMatch++;
           continue;
         }
 
@@ -656,6 +665,7 @@ async function main() {
     candidateCounts[category.key] = categoryCandidates;
   }
 
+  console.log(`[news-scan] TEMP DIAGNOSTIC reject reasons: notRecent=${rejectReasons.notRecent} dup=${rejectReasons.dup} noMatch=${rejectReasons.noMatch}`);
   console.log(`[news-scan] ${freshCandidates.length} keyword-matched candidate(s) found — running Elsevier-relevance filter...`);
   const relevant = await filterRelevance(freshCandidates);
   for (const article of relevant) articles.unshift(article);
