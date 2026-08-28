@@ -1,16 +1,34 @@
 {
-  "generatedAt": "2026-08-28T22:49:48.247Z",
-  "articleCount": 0,
-  "headline": "",
-  "bottomLine": "No live stories to summarize yet.",
-  "keyFindings": [],
-  "whyItMatters": "",
+  "generatedAt": "2026-08-28T22:59:11.366Z",
+  "articleCount": 1,
+  "headline": "AI Search Evolution Reshapes Research Discovery Landscape Across Europe",
+  "bottomLine": "Competitors are rapidly advancing AI-powered search and discovery capabilities, signaling that institutions across Belgium must modernize their research infrastructure now or risk falling behind on efficiency, discovery quality, and…",
+  "keyFindings": [
+    "AI-assisted search strategies are becoming table stakes for research platforms; competitors like Creed Digital are launching new capabilities that help organizations adapt faster to changing digital…",
+    "The competitive pressure is intensifying across all tiers—from citation databases to full-text platforms to emerging AI research assistants—forcing institutions to evaluate not just content, but the…",
+    "Belgian institutions face a critical window to upgrade: early adopters of integrated AI-powered discovery (search + writing + funding + claim-checking) will gain measurable advantages in researcher…"
+  ],
+  "whyItMatters": "The competitive moat around traditional research platforms is eroding as AI commoditizes basic search. Elsevier's integrated LeapSpace ecosystem—combining ScienceDirect, Scopus, and AI-native capabilities—must be positioned not just as a content play, but as an operational efficiency and discovery advantage.",
   "impact": {
     "novelty": 3,
-    "commercial": 3,
-    "threat": 3,
-    "urgency": 3
+    "commercial": 4,
+    "threat": 4,
+    "urgency": 4
   },
-  "entities": [],
-  "actionItems": []
+  "entities": [
+    "Creed Digital",
+    "Elsevier",
+    "ScienceDirect",
+    "Scopus",
+    "LeapSpace",
+    "Clarivate/Web of Science",
+    "Digital Science/Dimensions",
+    "Semantic Scholar"
+  ],
+  "actionItems": [
+    "Map current Scopus/ScienceDirect adoption and usage metrics across top 10 Belgian research institutions; identify churn risk and upgrade opportunities before competitors consolidate relationships.",
+    "Develop a 30-day competitive win story emphasizing LeapSpace's integrated AI-native stack (discovery + writing coach + funding + claim-checking) vs.",
+    "Schedule discovery calls with research directors and librarians at Flemish research hubs (KU Leuven, Ghent, Antwerp) to understand pain points with current search/discovery workflows and map them…",
+    "Prepare ROI case study showing time savings and publication/grant-success lift from AI-assisted discovery vs."
+  ]
 }
