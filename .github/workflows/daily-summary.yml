@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: daily-summary-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   summary:
     runs-on: ubuntu-latest

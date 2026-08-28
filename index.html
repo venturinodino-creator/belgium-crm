@@ -989,7 +989,7 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
     <div class="mh"><h3 id="mi-title">Add Institution</h3><button class="modal-close" onclick="closeModal('modal-inst')"></button></div>
     <div class="mc">
       <div class="fgrid">
-        <div class="fg full"><label>Institution Name *</label><input id="mi-name" placeholder="e.g. University of Amsterdam"></div>
+        <div class="fg full"><label>Institution Name *</label><input id="mi-name" placeholder="e.g. Ghent University"></div>
         <div class="fg"><label>Short Name / Acronym</label><input id="mi-short" placeholder="e.g. UvA"></div>
         <div class="fg"><label>Type *</label>
           <select id="mi-type">
@@ -999,7 +999,7 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
             <option value="ngo">NGO / Foundation</option>
           </select>
         </div>
-        <div class="fg"><label>City *</label><input id="mi-city" placeholder="Amsterdam"></div>
+        <div class="fg"><label>City *</label><input id="mi-city" placeholder="Ghent"></div>
         <div class="fg"><label>Founded (Year)</label><input id="mi-founded" type="text" placeholder="1632"></div>
         <div class="fg full"><label>Website</label><input id="mi-website" placeholder="https://www.kuleuven.be"></div>
         <div class="fg full"><label>Description</label><textarea id="mi-desc" placeholder="Brief description..."></textarea></div>
@@ -1718,9 +1718,17 @@ function runContactsSync() {
   });
   save();
   if (newContacts.length) {
-    Promise.all(newContacts.map(c => supaUpsertContact(c).catch(e=>console.error(e))))
-      .then(()=>syncBadge(true))
-      .catch(()=>syncBadge(true,'err'));
+    Promise.allSettled(newContacts.map(c => supaUpsertContact(c)))
+      .then(results => {
+        const failed = results.filter(r => r.status === 'rejected');
+        if (failed.length) {
+          failed.forEach(r => console.error(r.reason));
+          syncBadge(true, 'err');
+          toast(`${failed.length} of ${newContacts.length} imported contact${newContacts.length!==1?'s':''} failed to save to Supabase — check console`, 'err');
+        } else {
+          syncBadge(true);
+        }
+      });
   }
   const res = document.getElementById('csync-result');
   res.style.display = 'block';
@@ -3039,13 +3047,21 @@ function confirmDeleteInst(id) {
   document.getElementById('del-confirm-btn').onclick = ()=>{ deleteInst(id); closeModal('modal-del'); };
   openModal('modal-del');
 }
-function deleteInst(id) {
+async function deleteInst(id) {
+  try {
+    await supaDelete('crm_institutions', id);
+  } catch(e) {
+    console.error(e);
+    toast('Could not delete institution: ' + e.message, 'err');
+    return;
+  }
   const removedContacts = state.contacts.filter(c=>c.instId===id);
   state.institutions = state.institutions.filter(i=>i.id!==id);
   state.contacts = state.contacts.filter(c=>c.instId!==id);
   save(); if(state.view==='detail'&&state.detailInstId===id) nav('institutions'); else render();
   toast('Institution deleted');
-  supaDelete('crm_institutions', id).catch(e=>console.error(e));
+  // crm_contacts.inst_id has ON DELETE CASCADE, so the DB already removed
+  // these — this is just belt-and-suspenders in case that ever changes.
   removedContacts.forEach(c => supaDelete('crm_contacts', c.id).catch(e=>console.error(e)));
 }
 
@@ -3121,11 +3137,17 @@ function confirmDeleteContact(id) {
   document.getElementById('del-confirm-btn').onclick = ()=>{ deleteContact(id); closeModal('modal-del'); };
   openModal('modal-del');
 }
-function deleteContact(id) {
+async function deleteContact(id) {
+  try {
+    await supaDelete('crm_contacts', id);
+  } catch(e) {
+    console.error(e);
+    toast('Could not delete contact: ' + e.message, 'err');
+    return;
+  }
   state.contacts = state.contacts.filter(c=>c.id!==id);
   save(); render();
   toast('Contact deleted');
-  supaDelete('crm_contacts', id).catch(e=>console.error(e));
 }
 
 //  EXPORT 
@@ -3272,7 +3294,11 @@ function renderNewsArticles() {
   if (!feed) return;
 
   const dismissed = getDismissedNewsIds();
-  const visible = _newsAllArticles.filter(a => !dismissed.includes(a.id));
+  // news.json can carry duplicate ids if an overlapping scan run added the
+  // same article twice before the first commit landed — dedupe defensively.
+  const seenIds = new Set();
+  const deduped = _newsAllArticles.filter(a => !seenIds.has(a.id) && seenIds.add(a.id));
+  const visible = deduped.filter(a => !dismissed.includes(a.id));
   const filtered = _newsActiveCategory === 'all'
     ? visible
     : visible.filter(a => a.category === _newsActiveCategory);
@@ -3512,10 +3538,17 @@ async function saveOpp() {
   }
   save(); try { await supaUpsertOpp(opp); syncBadge(true); } catch(e){ console.error(e); syncBadge(true,'err'); } closeModal('modal-opp'); toast(id ? 'Deal updated' : 'Deal added'); render();
 }
-function deleteOpp(oppId) {
+async function deleteOpp(oppId) {
   if(!confirm('Delete this deal?')) return;
+  try {
+    await supaDelete('crm_opportunities', oppId);
+  } catch(e) {
+    console.error(e);
+    toast('Could not delete deal: ' + e.message, 'err');
+    return;
+  }
   state.opportunities = state.opportunities.filter(x=>x.id!==oppId);
-  save(); supaDelete('crm_opportunities', oppId).catch(e=>console.error(e)); toast('Deal deleted'); render();
+  save(); toast('Deal deleted'); render();
 }
 function openAddOppInStage(stage) {
   openAddOpp('');
@@ -3527,7 +3560,7 @@ function openLogInteraction(instId) {
   document.getElementById('mi-inst-id').value = instId;
   document.getElementById('mi-date').value = new Date().toISOString().slice(0,10);
   document.getElementById('mi-summary').value = '';
-  document.getElementById('mi-type').value = 'email';
+  document.getElementById('li-type').value = 'email';
   const sel = document.getElementById('mi-contact');
   sel.innerHTML = '<option value="">— none —</option>';
   contactsForInst(instId).forEach(cx=>{
@@ -3545,7 +3578,7 @@ async function saveInteraction() {
     id: 'int_'+Date.now(),
     instId: document.getElementById('mi-inst-id').value,
     date: document.getElementById('mi-date').value,
-    type: document.getElementById('mi-type').value,
+    type: document.getElementById('li-type').value,
     summary,
     contactId: document.getElementById('mi-contact').value
   };
@@ -3556,9 +3589,16 @@ async function saveInteraction() {
   }
   save(); try { await supaUpsertInteraction(log); syncBadge(true); } catch(e){ console.error(e); syncBadge(true,'err'); } closeModal('modal-int'); toast('Interaction logged'); render();
 }
-function deleteInteraction(intId) {
+async function deleteInteraction(intId) {
+  try {
+    await supaDelete('crm_interactions', intId);
+  } catch(e) {
+    console.error(e);
+    toast('Could not remove interaction: ' + e.message, 'err');
+    return;
+  }
   state.interactions = state.interactions.filter(x=>x.id!==intId);
-  save(); supaDelete('crm_interactions', intId).catch(e=>console.error(e)); toast('Removed'); render();
+  save(); toast('Removed'); render();
 }
 
 //  ACCOUNT INFO HELPERS 
@@ -3753,10 +3793,16 @@ function renderRFPOpps() {
   </div>`;
 }
 
-function deleteRFP(id) {
+async function deleteRFP(id) {
   if (!confirm('Delete this RFP opportunity?')) return;
+  try {
+    await supaDelete('crm_tenders', id);
+  } catch(e) {
+    console.error(e);
+    toast('Could not delete RFP: ' + e.message, 'err');
+    return;
+  }
   saveRFPs(getRFPs().filter(r => r.id !== id));
-  supaDelete('crm_tenders', id).catch(e => console.error(e));
   renderRFPOpps();
 }
 
@@ -4156,10 +4202,10 @@ function renderOpenAlex() {
     },
   ];
 
-  /* ── CONFIRMED DANISH SUBSCRIBERS (detail cards) ──────────────────────── */
+  /* ── CONFIRMED BELGIAN SUBSCRIBERS (detail cards) ──────────────────────── */
   const NL_CONFIRMED = [];
 
-  /* ── ALL DANISH INSTITUTIONS — OPENALEX STATUS ───────────────────────── */
+  /* ── ALL BELGIAN INSTITUTIONS — OPENALEX STATUS ───────────────────────── */
   // status: 'subscriber' | 'active' | 'none'
   const NL_ALL = [
     { inst: 'KU Leuven', type: 'University', status: 'active', tier: null, signal: 'KU Leuven Libraries\' 2Bergen (Campus Arenberg) 2025 annual report states that the Information Retrieval and Open Access team investigated the free database "OpenAlex" in detail during 2025, assessing whether it could add value to their services and be used for systematic literature searching. This is a real but weak signal — an internal evaluation, not (yet) a public recommendation or adopted service.', sources: [{ label: 'KU Leuven Bibliotheken — 2Bergen Jaarverslag 2025, Onderzoeksondersteuning', url: 'https://bib.kuleuven.be/2bergen/cba/over/2bergen-jaarverslagen/2025/onderzoeksondersteuning' }] },
@@ -4317,7 +4363,7 @@ function renderOpenAlex() {
       ${linkBtn(t.source)}
     </div>`).join('');
 
-  /* ── SECTION: Full NL institution table ─────────────────────────────── */
+  /* ── SECTION: Full BE institution table ─────────────────────────────── */
   const STATUS_CFG = {
     subscriber: { label: 'Paying',               color: '#f59e0b', bg: 'rgba(245,158,11,0.08)',  border: 'rgba(245,158,11,0.3)' },
     active:     { label: 'Free tier (active)',  color: '#60a5fa', bg: 'rgba(96,165,250,0.06)',  border: 'rgba(96,165,250,0.2)' },
@@ -4374,8 +4420,8 @@ function renderOpenAlex() {
       Pricing confirmed via: <a href="https://blog.openalex.org/openalex-2026-roadmap/" target="_blank" style="color:#60a5fa">2026 Roadmap (Jan 16, 2026)</a> · <a href="https://blog.openalex.org/q2-2026-town-hall-what-we-shipped-and-whats-next/" target="_blank" style="color:#60a5fa">Q2 Town Hall (Apr 25, 2026)</a> · <a href="https://developers.openalex.org/guides/authentication" target="_blank" style="color:#60a5fa">API pricing docs</a>
     </div>
 
-    <!-- Full NL institution table -->
-    <h2 style="color:#e2e8f0;font-size:14px;font-weight:700;margin:28px 0 12px;text-transform:uppercase;letter-spacing:.6px">🇩🇰 All Belgian Institutions — OpenAlex Status</h2>
+    <!-- Full BE institution table -->
+    <h2 style="color:#e2e8f0;font-size:14px;font-weight:700;margin:28px 0 12px;text-transform:uppercase;letter-spacing:.6px">🇧🇪 All Belgian Institutions — OpenAlex Status</h2>
     <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:12px;overflow:hidden;margin-bottom:10px">
       <table style="width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed">
         <colgroup>
@@ -5573,7 +5619,7 @@ document.addEventListener('keydown', e => { if (e.key==='Escape') closeGlobalSea
     <div class="mh"><h3>Log Interaction</h3><button class="modal-close" onclick="closeModal('modal-int')">&#10005;</button></div>
     <div class="mb">
       <input type="hidden" id="mi-inst-id">
-      <div class="field"><label>Type</label><select id="mi-type">
+      <div class="field"><label>Type</label><select id="li-type">
         <option value="email">&#128231; Email</option>
         <option value="call">&#128222; Call</option>
         <option value="meeting">&#129309; Meeting</option>
@@ -5864,7 +5910,12 @@ async function acceptAllPendingContacts(btn, selType) {
   try {
     const rows = await supaFetch('pending_contacts?status=eq.pending&order=created_at.desc');
     pending = rows || [];
-  } catch(e) { console.error(e); }
+  } catch(e) {
+    console.error(e);
+    toast('Could not load pending contacts: ' + e.message, 'err');
+    if (btn) btn.disabled = false;
+    return;
+  }
   if (selType && selType !== 'all') pending = pending.filter(c => getInstType(c.institution_id) === selType);
   if (!pending.length) { if (btn) btn.disabled = false; return; }
 
@@ -5887,7 +5938,14 @@ async function acceptAllPendingContacts(btn, selType) {
 
 async function deletePendingContact(id, btn) {
   btn.disabled = true;
-  await supaFetch('pending_contacts?id=eq.' + id, { method: 'DELETE' });
+  try {
+    await supaFetch('pending_contacts?id=eq.' + id, { method: 'DELETE' });
+  } catch(e) {
+    console.error(e);
+    toast('Could not discard contact: ' + e.message, 'err');
+    btn.disabled = false;
+    return;
+  }
   btn.closest('tr').remove();
   toast('Contact discarded');
   loadPendingCount();
@@ -6139,7 +6197,7 @@ function renderBarcelonaDecl() {
   const fmtDate = iso => iso ? new Date(iso).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—';
 
   const signedUnis = SIGNED.filter(s=>s.type==='university');
-  const totalDanishUnis = signedUnis.length + NOT_SIGNED.filter(s=>s.type==='university').length;
+  const totalBelgianUnis = signedUnis.length + NOT_SIGNED.filter(s=>s.type==='university').length;
   const criticalCount = SIGNED.filter(s=>s.scopusRisk==='Critical').length;
   const highCount = SIGNED.filter(s=>s.scopusRisk==='High').length;
 
@@ -6201,8 +6259,8 @@ function renderBarcelonaDecl() {
       </div>
       <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.25);border-radius:12px;padding:16px 22px;flex:1;min-width:130px">
         <div style="font-size:11px;color:#f97316;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Universities signed</div>
-        <div style="font-size:30px;font-weight:800;color:#e2e8f0">${signedUnis.length}<span style="font-size:16px;color:#64748b"> / ${totalDanishUnis}</span></div>
-        <div style="font-size:11px;color:#94a3b8;margin-top:2px">of tracked DK unis</div>
+        <div style="font-size:30px;font-weight:800;color:#e2e8f0">${signedUnis.length}<span style="font-size:16px;color:#64748b"> / ${totalBelgianUnis}</span></div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:2px">of tracked BE unis</div>
       </div>
       <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:16px 22px;flex:1;min-width:130px">
         <div style="font-size:11px;color:#ef4444;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Critical Scopus risk</div>
@@ -6440,11 +6498,13 @@ function render4GU() {
 
   modal.querySelector('#alog-date').value = new Date().toISOString().slice(0,10);
 
+  // Activities are interactions logged against a contact — persisted to
+  // Supabase's crm_interactions (same table the daily summary report reads),
+  // not localStorage, so they're visible across devices/teammates and show
+  // up in reporting. state.interactions is already loaded from Supabase by
+  // the app's own load().
   function getActivities(contactId) {
-    try { return JSON.parse(localStorage.getItem('be_crm_activities_'+contactId)||'[]'); } catch(e) { return []; }
-  }
-  function saveActivities(contactId, acts) {
-    localStorage.setItem('be_crm_activities_'+contactId, JSON.stringify(acts));
+    return ((typeof state !== 'undefined' && state.interactions) || []).filter(a => a.contactId === contactId);
   }
 
   function renderHistory(contactId) {
@@ -6452,8 +6512,9 @@ function render4GU() {
     const el = document.getElementById('alog-history');
     if (!acts.length) { el.innerHTML = '<div style="color:#475569;font-size:13px;text-align:center;padding:8px">No activity logged yet.</div>'; return; }
     const icons = { call:'📞', email:'✉', meeting:'🤝', note:'📝' };
+    const sorted = acts.slice().sort((a,b) => (a.date||'').localeCompare(b.date||'') || (a.id||'').localeCompare(b.id||''));
     el.innerHTML = '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#475569;margin-bottom:10px">Recent activity</div>' +
-      acts.slice().reverse().slice(0,8).map(a => `
+      sorted.reverse().slice(0,8).map(a => `
         <div class="alog-entry">
           <div class="alog-entry-icon">${icons[a.type]||'•'}</div>
           <div style="flex:1;min-width:0">
@@ -6461,7 +6522,7 @@ function render4GU() {
               <span style="color:#e2e8f0;font-size:13px;font-weight:500;text-transform:capitalize">${a.type}</span>
               <span style="color:#475569;font-size:11px">${a.date}</span>
             </div>
-            ${a.notes ? `<div style="color:#94a3b8;font-size:12px;margin-top:3px;white-space:pre-wrap">${a.notes}</div>` : ''}
+            ${a.summary ? `<div style="color:#94a3b8;font-size:12px;margin-top:3px;white-space:pre-wrap">${a.summary}</div>` : ''}
           </div>
         </div>`).join('');
   }
@@ -6480,13 +6541,28 @@ function render4GU() {
 
   window.closeActivityLog = function() { modal.classList.remove('open'); };
 
-  window.saveActivity = function() {
-    const notes = document.getElementById('alog-notes').value.trim();
+  window.saveActivity = async function() {
+    const summary = document.getElementById('alog-notes').value.trim();
     const date  = document.getElementById('alog-date').value;
     if (!_currentContactId) return;
-    const acts = getActivities(_currentContactId);
-    acts.push({ type: _selectedType, date, notes, savedAt: new Date().toISOString() });
-    saveActivities(_currentContactId, acts);
+    const cx = (state.contacts||[]).find(c => c.id === _currentContactId);
+    const log = {
+      id: 'int_' + Date.now(),
+      instId: cx ? cx.instId : '',
+      contactId: _currentContactId,
+      date, type: _selectedType, summary
+    };
+    try {
+      await supaUpsertInteraction(log);
+    } catch(e) {
+      console.error(e);
+      if (typeof toast === 'function') toast('Could not save activity: ' + e.message, 'err');
+      return;
+    }
+    state.interactions = state.interactions || [];
+    state.interactions.push(log);
+    if (cx && (!cx.lastContact || date > cx.lastContact)) cx.lastContact = date;
+    if (typeof save === 'function') save();
     renderHistory(_currentContactId);
     if (typeof toast === 'function') toast('Activity saved', 'ok');
     document.getElementById('alog-notes').value = '';

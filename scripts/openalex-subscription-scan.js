@@ -97,7 +97,7 @@ OpenAlex has four tiers: Free/API ($1/day rate-limited), Member ($5,000/yr — a
 Institutions this CRM tracks, with what we currently know:
 ${known}
 
-Search the web (institution library pages and news sections, press releases, procurement/tender notices, OpenAlex's own blog and Community Advisory Board notes on GitHub, LinkedIn posts from library staff, relevant EU/NL open-science coverage) for CURRENT, VERIFIABLE evidence of:
+Search the web (institution library pages and news sections, press releases, procurement/tender notices, OpenAlex's own blog and Community Advisory Board notes on GitHub, LinkedIn posts from library staff, relevant EU/BE open-science coverage) for CURRENT, VERIFIABLE evidence of:
 1. Any of the above institutions confirming an OpenAlex Member/Member+/Partner subscription that we don't already have correctly recorded above (a new subscriber, a status upgrade, or a previously-unconfirmed price now disclosed).
 2. Any Belgian university, medical centre, or research institute NOT in the list above that has confirmed an OpenAlex subscription.
 
