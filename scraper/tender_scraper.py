@@ -18,6 +18,7 @@ Run: python scraper/tender_scraper.py
 import json
 import os
 import re
+import secrets
 import sys
 import time
 import urllib.request
@@ -128,11 +129,19 @@ def write_notification(new_tenders: list) -> None:
             f"- {t.get('url', '')}\n"
         )
     body = "\n".join(lines)
+    # `body` is built from scraped tender titles/descriptions (TED Europa) —
+    # external, not fully trusted content. A fixed heredoc delimiter would
+    # let a tender listing crafted to contain that exact line prematurely
+    # close the block and inject arbitrary key=value pairs into
+    # $GITHUB_OUTPUT (a known GitHub Actions workflow-command-injection
+    # pattern). A random per-run delimiter closes that off, per GitHub's own
+    # recommended mitigation.
+    delimiter = f"TENDER_SUMMARY_{secrets.token_hex(16)}"
     with open(output_path, "a", encoding="utf-8") as f:
         f.write(f"new_count={len(new_tenders)}\n")
-        f.write("summary<<TENDER_SUMMARY_EOF\n")
+        f.write(f"summary<<{delimiter}\n")
         f.write(body + "\n")
-        f.write("TENDER_SUMMARY_EOF\n")
+        f.write(f"{delimiter}\n")
 
 def existing_ids(tenders: list) -> set:
     return {t["id"] for t in tenders}
