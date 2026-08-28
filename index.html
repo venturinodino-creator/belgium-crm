@@ -3952,7 +3952,7 @@ function renderNews() {
 //  DAILY SUMMARY REPORTS
 async function renderSummaryReports(preloadedReports) {
   document.getElementById('page-title').textContent = 'Summary';
-  document.getElementById('page-sub').textContent = 'Daily 3-page executive PDF of institutions, contacts, news, tenders, and competitor activity';
+  document.getElementById('page-sub').textContent = 'Daily 3-page executive PDF — new additions, the Competitor Matrix, the Daily Digest, and OpenAlex subscriptions, every citation linked';
   document.getElementById('topbar-actions').innerHTML = `
     <button class="btn btn-outline" data-admin-only id="run-btn-summary" onclick="runSummaryReportNow('run-btn-summary')" style="font-size:12px" title="Triggers today's report generation right now via GitHub Actions">
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px"><polygon points="5 3 19 12 5 21 5 3"/></svg>
@@ -4013,7 +4013,7 @@ async function renderSummaryReports(preloadedReports) {
             <span>${s.contacts ?? '—'} contacts</span>
             <span>${s.pending ?? '—'} new contacts${esc(pendingNote)}</span>
             <span>${s.news ?? '—'} news items</span>
-            <span>${s.tendersOpen ?? '—'} open tenders</span>
+            <span>${s.hiring ?? '—'} open competitor roles</span>
           </div>
         </div>
         <a class="btn btn-primary" style="font-size:12px;white-space:nowrap" href="/belgium-crm/data/${esc(r.file)}" target="_blank">View PDF</a>
@@ -4026,7 +4026,7 @@ async function renderSummaryReports(preloadedReports) {
     return `<div style="display:flex;justify-content:space-between;align-items:center;gap:14px;padding:11px 16px;border-bottom:1px solid var(--border)">
       <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
         <span style="font-size:12.5px;font-weight:600;color:var(--text)">${esc(fullTimestamp(r))}</span>
-        <span style="font-size:11px;color:var(--muted)">${s.institutions ?? '—'} institutions · ${s.contacts ?? '—'} contacts · ${s.pending ?? '—'} new · ${s.news ?? '—'} news</span>
+        <span style="font-size:11px;color:var(--muted)">${s.institutions ?? '—'} institutions · ${s.contacts ?? '—'} contacts · ${s.pending ?? '—'} new · ${s.news ?? '—'} news · ${s.hiring ?? '—'} open roles</span>
       </div>
       <a class="btn btn-outline" style="font-size:11px;white-space:nowrap;flex-shrink:0" href="/belgium-crm/data/${esc(r.file)}" target="_blank">View PDF</a>
     </div>`;

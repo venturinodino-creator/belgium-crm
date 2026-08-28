@@ -199,9 +199,15 @@ async function main() {
     instName: c.institution_name || c.instName || '',
     dept: c.department || c.dept || '',
     createdAt: c.created_at || null,
+    // Present on the local audit-trail fallback (the page each contact was
+    // scraped from); not selected from the live Supabase query since the
+    // column's presence there isn't guaranteed — comes through empty rather
+    // than risking the whole fetch on an unknown column.
+    source: c.source || '',
   }));
 
   const news = readJSON('data/news.json', []);
+  const hiring = readJSON('data/competitor-jobs.json', []);
   const tenders = readJSON('data/tenders.json', []);
   const competitors = readJSON('data/leapspace-competitors.json', []);
   const openalexSubs = readJSON('data/openalex-subscriptions.json', []);
@@ -219,6 +225,7 @@ async function main() {
     pending,
     pendingSource,
     news,
+    hiring,
     tenders,
     competitors,
     openalexSubs,
