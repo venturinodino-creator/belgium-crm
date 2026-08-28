@@ -567,6 +567,7 @@ async function main() {
   const candidateCounts = {};
   const freshCandidates = [];
   let rejectedSampleCount = 0; // TEMP DIAGNOSTIC — see below
+  const rawSampledCategories = new Set(); // TEMP DIAGNOSTIC — see below
 
   const needsBackfill = articles.filter(a => !a.bottomLine || !a.keyFindings || !a.keyFindings.length);
   let backfilledCount = 0;
@@ -600,6 +601,18 @@ async function main() {
       const items = await fetchGoogleNewsRss(job.query);
       await sleep(REQUEST_DELAY_MS);
       categoryCandidates += items.length;
+
+      // TEMP DIAGNOSTIC — remove once diagnosed. Logs raw RSS results BEFORE
+      // any filtering (isRecent/dedup/institution-match) for the first query
+      // of each category, to see whether Google News is returning nothing
+      // at all vs. returning results that get filtered downstream.
+      if (!rawSampledCategories.has(category.key)) {
+        rawSampledCategories.add(category.key);
+        console.log(`  RAW QUERY [${category.key}] "${job.query.slice(0, 90)}" -> ${items.length} item(s)`);
+        for (const it of items.slice(0, 4)) {
+          console.log(`    - "${it.title}" (pubDate=${it.pubDate})`);
+        }
+      }
 
       for (const item of items) {
         if (!isRecent(item.pubDate)) continue;
