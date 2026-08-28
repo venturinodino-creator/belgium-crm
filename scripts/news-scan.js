@@ -96,6 +96,29 @@ const TRACKED_COMPETITORS = [
   'Google', 'OpenAI', 'Anthropic',
 ];
 
+// Extra alias/acronym forms per canonical institution name, for cases the
+// mechanical splitting in institutionMatchAliases() can't derive — mainly a
+// non-English institution commonly referred to by its English name or a
+// well-known acronym (e.g. "Université libre de Bruxelles" is almost always
+// just "ULB" in press). institutionSearchName()/institutionMatchAliases()
+// already handle a parenthetical/en-dash/slash gloss; this covers the
+// remaining French/Dutch-named institutions and their common acronyms.
+const INSTITUTION_ALIASES = {
+  'Université de Liège': ['University of Liège', 'University of Liege', 'ULiège', 'ULiege'],
+  'Université libre de Bruxelles': ['ULB', 'Free University of Brussels'],
+  'Université de Mons': ['University of Mons', 'UMONS'],
+  'UCLouvain': ['Université catholique de Louvain', 'Catholic University of Louvain'],
+  'CHU de Liège': ['CHU Liège', 'CHU Liege', 'University Hospital of Liège', 'University Hospital of Liege'],
+  'Cliniques universitaires Saint-Luc': ['Saint-Luc', 'Cliniques Saint-Luc'],
+  'Hôpital Erasme': ['Erasme Hospital', 'Hopital Erasme'],
+  'Royal Belgian Institute of Natural Sciences': ['RBINS'],
+  'Royal Meteorological Institute of Belgium': ['RMI', 'KMI', 'IRM'],
+  'Royal Observatory of Belgium': ['ROB'],
+  'International Solvay Institutes for Physics and Chemistry': ['Solvay Institutes'],
+  'Royal Belgian Institute for Space Aeronomy': ['BIRA-IASB', 'IASB', 'BIRA'],
+  'F.R.S.-FNRS': ['FNRS'],
+};
+
 const CATEGORIES = [
   {
     key: 'ai_adoption',
@@ -276,6 +299,43 @@ async function callHaiku(prompt, context, maxTokens = ANALYSIS_MAX_TOKENS) {
   }
   const data = await res.json();
   return (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n');
+}
+
+// Some institution names (mainly Belgium's) bundle a descriptive gloss in
+// parentheses, after an en-dash, or as a "French / Dutch" dual name — e.g.
+// "VIB (Vlaams Instituut voor Biotechnologie)" or "Fondation contre le
+// Cancer / Stichting tegen Kanker". Querying or matching against the full
+// literal string (gloss included) essentially never succeeds against real
+// news text, which uses one short form or the other but not both stitched
+// together. institutionSearchName() extracts just the primary short form
+// for building the Google News query; institutionMatches() accepts any
+// standalone form (primary + gloss + each side of a "/" split) in the
+// post-query relevance filter, since an article may use any of them. Also
+// diacritic-insensitive (e.g. "Liège"/"Liege") since English-language
+// coverage often drops accents.
+function stripDiacritics(s) {
+  return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+function institutionSearchName(inst) {
+  return inst.split(' (')[0].split(' – ')[0].split(' / ')[0].trim();
+}
+function institutionMatchAliases(inst) {
+  const aliases = new Set([institutionSearchName(inst)]);
+  const parenMatch = inst.match(/\(([^)]+)\)/);
+  if (parenMatch) aliases.add(parenMatch[1].trim());
+  for (const part of inst.split(' / ')) {
+    const cleaned = part.replace(/\([^)]*\)/g, '').trim();
+    if (cleaned) aliases.add(cleaned);
+  }
+  if (inst.includes(' – ')) for (const part of inst.split(' – ')) aliases.add(part.trim());
+  for (const a of INSTITUTION_ALIASES[inst] || []) aliases.add(a);
+  return Array.from(aliases).filter(Boolean);
+}
+function institutionMatches(inst, text) {
+  const normalizedText = stripDiacritics(text);
+  return institutionMatchAliases(inst).some(alias =>
+    new RegExp(stripDiacritics(alias).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(normalizedText)
+  );
 }
 
 // Minimal RSS 2.0 <item> parser via regex — Google News RSS is well-formed
@@ -524,7 +584,13 @@ async function main() {
 
     const jobs = category.perInstitution
       ? (category.entities || ALL_INSTITUTIONS).flatMap(inst => {
-          const q = category.queryFor(inst);
+          // Query with the cleaned short name (see institutionSearchName) —
+          // querying Google News for the full literal name, gloss included,
+          // returns almost nothing for a name like "VIB (Vlaams Instituut
+          // voor Biotechnologie)". `inst` itself is kept for the job tuple
+          // so the post-filter match and the stored article still use/accept
+          // the full canonical name.
+          const q = category.queryFor(institutionSearchName(inst));
           return (Array.isArray(q) ? q : [q]).map(query => ({ inst, query }));
         })
       : category.queries.map(q => ({ inst: null, query: q }));
@@ -537,9 +603,10 @@ async function main() {
       for (const item of items) {
         if (!isRecent(item.pubDate)) continue;
         if (existingUrls.has(item.link)) continue;
-        // For per-institution queries, require the institution name to actually
-        // appear in the title/description — Google News RSS relevance ranking is loose.
-        if (job.inst && !new RegExp(job.inst.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(item.title + ' ' + item.description)) {
+        // For per-institution queries, require the institution name (or one of
+        // its aliases — see institutionMatches) to actually appear in the
+        // title/description — Google News RSS relevance ranking is loose.
+        if (job.inst && !institutionMatches(job.inst, item.title + ' ' + item.description)) {
           continue;
         }
 
