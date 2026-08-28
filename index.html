@@ -939,6 +939,9 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
     <div class="nav-item" data-view="news" onclick="nav('news')">
       <div class="nav-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg></div> News
     </div>
+    <div class="nav-item" data-view="digest" onclick="nav('digest')">
+      <div class="nav-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div> Daily Digest
+    </div>
     <div class="nav-item" data-view="barcelona" onclick="nav('barcelona')">
       <div class="nav-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div> Barcelona Decl.
     </div>
@@ -2053,6 +2056,7 @@ function render() {
     rfp: renderRFPOpps,
     map: renderMap,
     news: renderNews,
+    digest: renderDailyDigest,
     pipeline: renderPipeline,
     subscriptions: renderSubscriptionMatrix,
     openalex: renderOpenAlex,
@@ -5125,6 +5129,118 @@ function renderCompetitorInsights() {
     <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px">${cardsHtml}</div>
     <p style="color:#334155;font-size:11px;margin:12px 0 0;text-align:right">Watching for new solutions that compete with LeapSpace · last scan ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</p>
   </div>`;
+}
+
+//  DAILY DIGEST
+// Condensed daily view of the same News feed data — a 2-3 line summary per
+// article instead of a full card, so the whole day's scan can be scanned
+// for relevance at a glance — plus the currently open Competitor Hiring
+// roles beneath it, with the fields an account manager actually wants
+// (position, location, salary, application deadline) without opening every
+// posting individually. Reads the same data/news.json and
+// data/competitor-jobs.json the News page uses; this is a different view
+// of the same live data, not a separate scan.
+async function renderDailyDigest() {
+  document.getElementById('page-title').textContent = 'Daily Digest';
+  document.getElementById('page-sub').textContent = 'Condensed daily summary of scanned news and open competitor roles';
+  document.getElementById('topbar-actions').innerHTML = '';
+
+  document.getElementById('content').innerHTML = `
+    <div style="max-width:900px">
+      <div class="card" style="padding:0;overflow:hidden;margin-bottom:20px">
+        <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+          <h3 style="font-size:14px;margin:0">News Summary</h3>
+          <span id="digest-news-count" style="font-size:11px;color:var(--muted)"></span>
+        </div>
+        <div id="digest-news-list"><div class="news-loading"><div class="news-spinner"></div>Loading…</div></div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+          <h3 style="font-size:14px;margin:0">Competitor Hiring — Open Roles</h3>
+          <span id="digest-hiring-count" style="font-size:11px;color:var(--muted)"></span>
+        </div>
+        <div id="digest-hiring-list"><div class="news-loading"><div class="news-spinner"></div>Loading…</div></div>
+      </div>
+    </div>`;
+
+  loadDigestNews();
+  loadDigestHiring();
+}
+
+async function loadDigestNews() {
+  const listEl = document.getElementById('digest-news-list');
+  const countEl = document.getElementById('digest-news-count');
+  try {
+    const res = await fetch('/belgium-crm/data/news.json?t=' + Date.now());
+    const data = res.ok ? await res.json() : [];
+    const dismissed = getDismissedNewsIds();
+    const seenIds = new Set();
+    const articles = (Array.isArray(data) ? data : [])
+      .filter(a => !seenIds.has(a.id) && seenIds.add(a.id))
+      .filter(a => !dismissed.includes(a.id));
+
+    if (countEl) countEl.textContent = `${articles.length} article${articles.length === 1 ? '' : 's'} in live feed`;
+    if (!articles.length) {
+      listEl.innerHTML = `<div style="padding:20px;text-align:center;font-size:12px;color:var(--muted)">No articles in the live feed yet.</div>`;
+      return;
+    }
+
+    listEl.innerHTML = articles.slice(0, 100).map(a => {
+      const cat = NEWS_CATEGORIES[a.category] || { label: a.categoryLabel || 'News', color: '#64748b' };
+      const summaryText = a.summary || a.elsevierRelevance || a.description || 'No summary available.';
+      const safeUrl = (a.url || '').replace(/'/g, '%27');
+      return `<div style="padding:12px 18px;border-bottom:1px solid var(--border);cursor:pointer" onclick="window.open('${safeUrl}','_blank')">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+          <span class="news-topic-tag" style="background:${cat.color}22;color:${cat.color}">${esc(cat.label)}</span>
+          ${a.institution ? `<span style="font-size:11px;color:var(--muted)">${esc(a.institution)}</span>` : ''}
+          <span style="font-size:11px;color:var(--muted);margin-left:auto">${esc(a.publishedDate || a.foundDate || '')}</span>
+        </div>
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">${esc(a.title || '')}</div>
+        <p style="font-size:12px;color:var(--text2);line-height:1.4;margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${esc(summaryText)}</p>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    listEl.innerHTML = `<div style="padding:20px;text-align:center;font-size:12px;color:var(--muted)">Could not load news feed.</div>`;
+  }
+}
+
+async function loadDigestHiring() {
+  const listEl = document.getElementById('digest-hiring-list');
+  const countEl = document.getElementById('digest-hiring-count');
+  try {
+    const res = await fetch('/belgium-crm/data/competitor-jobs.json?t=' + Date.now());
+    const data = res.ok ? await res.json() : [];
+    const jobs = Array.isArray(data) ? data : [];
+
+    if (countEl) countEl.textContent = `${jobs.length} open role${jobs.length === 1 ? '' : 's'}`;
+    if (!jobs.length) {
+      listEl.innerHTML = `<div style="padding:20px;text-align:center;font-size:12px;color:var(--muted)">No open SAM/CSM/Channel roles tracked right now.</div>`;
+      return;
+    }
+
+    const sorted = jobs.slice().sort((a, b) => (b.postedDate || b.foundDate || '').localeCompare(a.postedDate || a.foundDate || ''));
+    listEl.innerHTML = `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead><tr style="text-align:left;color:var(--muted);font-size:11px;border-bottom:1px solid var(--border)">
+        <th style="padding:8px 18px;font-weight:600">Position</th>
+        <th style="padding:8px 10px;font-weight:600">Company</th>
+        <th style="padding:8px 10px;font-weight:600">Location</th>
+        <th style="padding:8px 10px;font-weight:600">Salary</th>
+        <th style="padding:8px 18px;font-weight:600">Apply by</th>
+      </tr></thead>
+      <tbody>${sorted.map(j => {
+        const safeUrl = (j.url || '').replace(/'/g, '%27');
+        return `<tr style="border-bottom:1px solid var(--border);cursor:pointer" onclick="window.open('${safeUrl}','_blank')">
+          <td style="padding:9px 18px;color:var(--text);font-weight:600">${esc(j.title || '')}</td>
+          <td style="padding:9px 10px;color:var(--text2)">${esc(j.company || '')}</td>
+          <td style="padding:9px 10px;color:var(--text2)">${esc(j.location || '—')}</td>
+          <td style="padding:9px 10px;color:var(--text2)">${esc(j.salary || 'Not stated')}</td>
+          <td style="padding:9px 18px;color:var(--text2)">${esc(j.applicationDeadline || 'Open until filled')}</td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table></div>`;
+  } catch(e) {
+    listEl.innerHTML = `<div style="padding:20px;text-align:center;font-size:12px;color:var(--muted)">Could not load hiring data.</div>`;
+  }
 }
 
 const COMPETITOR_PRODUCTS = {

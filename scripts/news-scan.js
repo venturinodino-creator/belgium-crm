@@ -251,7 +251,7 @@ Mark irrelevant anything that's just general research findings or medical/scient
 
 ${batch.map((c, i) => `${i + 1}. [${c.categoryLabel}] "${c.title}" — ${c.description || '(no description)'}`).join('\n')}
 
-Respond with ONLY a JSON array, one object per article in the same order, each exactly: {"relevant": true|false, "reason": "one short, specific sentence on why it matters to an Elsevier sales agent here — name the institution/company and the angle — only if relevant, omit or empty string if not relevant"}`;
+Respond with ONLY a JSON array, one object per article in the same order, each exactly: {"relevant": true|false, "summary": "a neutral 2-3 sentence summary of what the article actually reports (max ~3 lines) — written so a reader can judge relevance from the summary alone without opening the article — only if relevant, omit or empty string if not relevant", "reason": "one short, specific sentence on why it matters to an Elsevier sales agent here — name the institution/company and the angle — only if relevant, omit or empty string if not relevant"}`;
 
   let res;
   const ctrl = new AbortController();
@@ -289,7 +289,7 @@ Respond with ONLY a JSON array, one object per article in the same order, each e
   batch.forEach((c, i) => {
     const v = verdicts[i];
     if (v && v.relevant) {
-      kept.push({ ...c, elsevierRelevance: String(v.reason || '').slice(0, 200) });
+      kept.push({ ...c, summary: String(v.summary || '').slice(0, 400), elsevierRelevance: String(v.reason || '').slice(0, 200) });
     } else {
       console.log(`  - filtered out (not Elsevier-relevant): ${c.title}`);
     }

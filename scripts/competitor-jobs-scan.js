@@ -44,6 +44,14 @@
  * preserved across runs for a role that's still open, so "open since" is
  * still visible.
  *
+ * salary/applicationDeadline are best-effort text extraction (see
+ * extractSalary/extractDeadline) from whatever description text is
+ * available for a role that already passed the location/role filters —
+ * most postings don't have a hard application deadline at all (rolling/
+ * open-until-filled is the norm), and salary disclosure depends on the
+ * company and jurisdiction, so both are frequently null. That's an honest
+ * "not stated," not a bug.
+ *
  * No ANTHROPIC_API_KEY needed — ATS results are already precise structured
  * data, no relevance judgement call required, just deterministic
  * location/title filtering.
@@ -112,6 +120,31 @@ function toISODate(d) {
   return isNaN(dt) ? null : dt.toISOString().slice(0, 10);
 }
 
+// Best-effort text extraction — most ATS postings simply don't carry
+// structured salary/deadline fields, so this looks for common phrasing in
+// whatever description text is available and returns null rather than
+// guessing when nothing matches. Salary catches currency-amount ranges and
+// "OTE" (on-target earnings — the standard way sales-role total comp,
+// including commission, is quoted). Deadline catches explicit
+// apply-by/closing-date phrasing; most tech-sales roles are "open until
+// filled" with no deadline at all, so null here is the common, correct case.
+function stripHtml(html) {
+  return String(html || '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+}
+function extractSalary(html) {
+  const text = stripHtml(html);
+  if (!text) return null;
+  const m = text.match(/(?:salary|compensation|base pay|OTE|on-target earnings)[^.\n]{0,40}?([€£$]\s?\d[\d.,]*\s?[kK]?(?:\s?(?:-|–|to)\s?[€£$]?\s?\d[\d.,]*\s?[kK]?)?(?:\s?(?:per|\/)\s?(?:year|annum|yr))?)/i)
+    || text.match(/([€£$]\s?\d{2,3}[,.]\d{3}(?:\s?(?:-|–)\s?[€£$]?\s?\d{2,3}[,.]\d{3})?)/);
+  return m ? m[1].replace(/\s+/g, ' ').trim().slice(0, 80) : null;
+}
+function extractDeadline(html) {
+  const text = stripHtml(html);
+  if (!text) return null;
+  const m = text.match(/(?:apply by|application deadline|applications close|closing date|deadline for applications)[:\s]{0,10}(?:on |of )?([A-Za-z0-9,./ -]{4,30})/i);
+  return m ? m[1].trim().replace(/[.,]$/, '').slice(0, 60) : null;
+}
+
 async function fetchJSON(url, options = {}) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), REQUEST_TIMEOUT_MS);
@@ -135,6 +168,7 @@ async function fetchGreenhouse(company, boardToken) {
     url: j.absolute_url || '',
     postedDate: toISODate(j.updated_at || j.first_published),
     source: 'Greenhouse',
+    descriptionHtml: j.content || '',
   }));
 }
 
@@ -178,6 +212,10 @@ async function fetchPinpoint(company, slug) {
     url: p.url || p.absolute_url || '',
     postedDate: toISODate(p.published_at || p.created_at),
     source: 'Pinpoint',
+    // Pinpoint's list endpoint doesn't document a guaranteed description
+    // field — take whatever's present defensively rather than a second
+    // per-posting fetch to an unconfirmed detail endpoint.
+    descriptionHtml: p.description || p.content || p.description_html || '',
   }));
 }
 
@@ -208,12 +246,29 @@ async function fetchWorkday(company, host, tenant, site) {
         url: j.externalPath ? `${base}/${site}${j.externalPath}` : '',
         postedDate: null,
         source: 'Workday',
+        // No description in the list response — fetchWorkdayJobDescription()
+        // fills this in later, but only for jobs that survive the
+        // location/role filter, to avoid a detail fetch per posting.
+        workdayDetail: j.externalPath ? { base, tenant, site, externalPath: j.externalPath } : null,
       });
     }
     if (postings.length < limit) break;
     offset += limit;
   }
   return jobs;
+}
+
+// Workday CXS job-detail endpoint — GET (not POST, unlike the list search)
+// returns the full posting including its description HTML. Only called for
+// jobs that already passed the location/role filter (typically 0-a handful
+// per run), never for the full unfiltered list, since Workday's list
+// response doesn't include description text. Wrapped defensively (like
+// fetchWorkday itself) since this exact response shape wasn't confirmed
+// against live data before shipping — a shape mismatch just leaves
+// salary/deadline null for that job instead of breaking the run.
+async function fetchWorkdayJobDescription({ base, tenant, site, externalPath }) {
+  const data = await fetchJSON(`${base}/wday/cxs/${tenant}/${site}/job${externalPath}`);
+  return (data.jobPostingInfo && data.jobPostingInfo.jobDescription) || '';
 }
 
 // Only companies that actually sell a product directly competing with one
@@ -278,6 +333,21 @@ async function main() {
         perCompanyCounts[src.company].nl++;
         const key = j.company + '|' + j.url;
         const prior = existingByKey.get(key);
+
+        // Salary/deadline extraction only runs for jobs that already passed
+        // the filters above (typically 0-a handful per run) — Greenhouse
+        // and Pinpoint already carry description text from the list fetch;
+        // Workday needs one extra per-job detail fetch since its list
+        // response has no description at all.
+        let descriptionHtml = j.descriptionHtml || '';
+        if (!descriptionHtml && j.workdayDetail) {
+          try {
+            descriptionHtml = await fetchWorkdayJobDescription(j.workdayDetail);
+          } catch (e) {
+            console.warn(`[competitor-jobs] Could not fetch job description for "${j.title}" (${j.company}): ${e.message} — salary/deadline will be unavailable for this role.`);
+          }
+        }
+
         allJobs.push({
           id: makeId(j.company, j.url),
           company: j.company,
@@ -289,6 +359,8 @@ async function main() {
           postedDate: j.postedDate,
           foundDate: (prior && prior.foundDate) || new Date().toISOString().slice(0, 10),
           source: j.source,
+          salary: extractSalary(descriptionHtml),
+          applicationDeadline: extractDeadline(descriptionHtml),
         });
       }
       console.log(`[competitor-jobs] ${src.company}: ${jobs.length} open role(s), ${perCompanyCounts[src.company].nl} Netherlands SAM/CSM/Channel matches`);
