@@ -3283,7 +3283,11 @@ async function renderNewsScanStatus() {
 function renderNews() {
   document.getElementById('page-title').textContent = 'Belgium Research News';
   document.getElementById('page-sub').textContent = 'AI, funding, policy, and competitor news relevant to Elsevier\'s business — scanned daily, filtered for relevance';
-  document.getElementById('topbar-actions').innerHTML = '';
+  document.getElementById('topbar-actions').innerHTML = `
+    <button class="btn btn-outline" data-admin-only id="run-btn-news" onclick="runAgentNow('news-scan.yml','run-btn-news','News Scan')" style="font-size:12px" title="Triggers a fresh scan for the latest AI/funding/policy/competitor news right now via GitHub Actions">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Run news scan now
+    </button>`;
 
   const allCats = ['all', ...Object.keys(NEWS_CATEGORIES)];
   const catBtns = allCats.map(c => {

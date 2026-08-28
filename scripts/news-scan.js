@@ -30,6 +30,8 @@ import { readFileSync, writeFileSync, mkdirSync } from 'fs';
 
 const DATA_FILE = 'data/news.json';
 const STATE_FILE = 'data/news-scan-state.json';
+const ARCHIVE_FILE = 'data/archive/news.json';
+const ARCHIVE_AGE_DAYS = 7;
 const MAX_STORED_ARTICLES = 300;
 const MAX_AGE_DAYS = 14;
 const REQUEST_DELAY_MS = 350;
@@ -189,6 +191,13 @@ function toISODate(pubDate) {
   return isNaN(d) ? null : d.toISOString().slice(0, 10);
 }
 
+function isOlderThanDays(dateStr, days) {
+  if (!dateStr) return false; // no date info — keep it in the live feed rather than guess
+  const d = new Date(dateStr);
+  if (isNaN(d)) return false;
+  return (Date.now() - d.getTime()) / 86400000 > days;
+}
+
 async function filterRelevance(candidates) {
   if (!candidates.length) return candidates;
   if (!ANTHROPIC_API_KEY) {
@@ -307,19 +316,39 @@ async function main() {
   for (const article of relevant) articles.unshift(article);
   const totalAdded = relevant.length;
 
-  const trimmed = articles.slice(0, MAX_STORED_ARTICLES);
-  if (totalAdded > 0) saveJSON(DATA_FILE, trimmed);
+  // Move anything older than ARCHIVE_AGE_DAYS out of the live feed into a
+  // standing archive file instead of just discarding it past
+  // MAX_STORED_ARTICLES — keeps the News page recent while still preserving
+  // history for later reference.
+  const live = [];
+  const toArchive = [];
+  for (const a of articles) {
+    (isOlderThanDays(a.publishedDate || a.foundDate, ARCHIVE_AGE_DAYS) ? toArchive : live).push(a);
+  }
+  let archivedCount = 0;
+  if (toArchive.length) {
+    const archive = readJSON(ARCHIVE_FILE, []);
+    const archivedIds = new Set(archive.map(a => a.id));
+    for (const a of toArchive) {
+      if (!archivedIds.has(a.id)) { archive.unshift(a); archivedIds.add(a.id); archivedCount++; }
+    }
+    if (archivedCount > 0) saveJSON(ARCHIVE_FILE, archive);
+  }
+
+  const trimmed = live.slice(0, MAX_STORED_ARTICLES);
+  if (totalAdded > 0 || archivedCount > 0) saveJSON(DATA_FILE, trimmed);
 
   saveJSON(STATE_FILE, {
     lastRun: new Date().toISOString(),
     lastAddedCount: totalAdded,
     lastCandidateCount: freshCandidates.length,
+    lastArchivedCount: archivedCount,
     candidateCounts,
     source: ANTHROPIC_API_KEY
       ? 'Google News RSS (discovery) + Claude Haiku (Elsevier-relevance filter)'
       : 'Google News RSS (free, no API key — relevance filter skipped)',
   });
-  console.log(`[news-scan] Done — ${totalAdded} new article(s) added (${freshCandidates.length} candidates found).`);
+  console.log(`[news-scan] Done — ${totalAdded} new article(s) added, ${archivedCount} archived (${freshCandidates.length} candidates found).`);
 }
 
 main().catch(e => {
