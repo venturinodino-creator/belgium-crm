@@ -5545,6 +5545,11 @@ document.addEventListener('keydown', e => { if (e.key==='Escape') closeGlobalSea
 
 <!-- SIGNED-IN USER BADGE -->
 <div id="user-badge" style="display:none;position:fixed;top:4px;right:20px;z-index:500;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:11px;color:var(--muted)">
+  <div style="display:flex;gap:3px;padding-right:8px;margin-right:2px;border-right:1px solid var(--border)">
+    <a href="https://venturinodino-creator.github.io/netherlands-crm/index.html" title="Switch to Netherlands" style="padding:3px 8px;border-radius:10px;font-size:10px;font-weight:600;text-decoration:none;color:var(--muted)">NL</a>
+    <a href="https://venturinodino-creator.github.io/denmark-crm/index.html" title="Switch to Denmark" style="padding:3px 8px;border-radius:10px;font-size:10px;font-weight:600;text-decoration:none;color:var(--muted)">DK</a>
+    <span style="padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#04141f">BE</span>
+  </div>
   <span id="user-email-badge"></span>
   <span id="user-role-badge" style="font-weight:700;color:var(--primary)"></span>
   <button onclick="logout()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;text-decoration:underline;padding:0">Log out</button>
