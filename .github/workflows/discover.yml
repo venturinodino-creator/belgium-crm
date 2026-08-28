@@ -29,6 +29,19 @@ jobs:
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
           git add data/pending-contacts.json data/discovery-state.json
-          git diff --staged --quiet || git commit -m "contacts: auto-discover $(date +%Y-%m-%d)"
-          git pull --rebase origin main
-          git push
+          if git diff --staged --quiet; then
+            echo "Nothing to commit"
+            exit 0
+          fi
+          git commit -m "contacts: auto-discover $(date +%Y-%m-%d)"
+          for attempt in 1 2 3; do
+            if git pull --rebase origin main && git push; then
+              echo "Pushed successfully"
+              exit 0
+            fi
+            echo "Push attempt $attempt failed (likely a concurrent run of this workflow) — retrying"
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 5))
+          done
+          echo "::warning::Could not push discover results after 3 attempts, likely racing a concurrent run of this same workflow (e.g. the manual button and a scheduled/API trigger firing close together). This run's findings were not saved, but the concurrency guard means it won't happen from overlapping scheduled runs alone, and any real update will likely resurface in the next scan."
+
