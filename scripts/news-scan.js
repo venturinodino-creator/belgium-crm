@@ -6,7 +6,10 @@
  * 1. Free discovery: queries Google News RSS per institution/category,
  *    keyword-filtered against tracked SEED_INSTITUTIONS, with query terms
  *    scoped to research-information/scholarly-publishing/AI-for-research
- *    topics rather than any AI or funding mention. Runs server-side
+ *    topics rather than any AI or funding mention. A fourth category runs
+ *    the same discovery per named LeapSpace competitor (TRACKED_COMPETITORS)
+ *    instead of per institution, surfacing competitor product launches,
+ *    partnerships, and rollouts. Runs server-side
  *    (GitHub Actions) since a browser can't fetch news.google.com directly
  *    (CORS) without a proxy.
  * 2. Relevance filter: keyword matching alone still lets through stories
@@ -64,6 +67,15 @@ const BE_RESEARCH = [
 ];
 const ALL_INSTITUTIONS = [...BE_UNIVERSITIES, ...BE_MEDICAL, ...BE_RESEARCH];
 
+// Named LeapSpace competitors tracked on the Competitor Insights page —
+// kept in sync manually with data/leapspace-competitors.json's company names.
+const TRACKED_COMPETITORS = [
+  'Clarivate', 'Digital Science', 'Springer Nature', 'Wiley', 'Elicit',
+  'scite', 'Consensus', 'SciSpace', 'Paperguide',
+  'IGI Global Scientific Publishing', 'IEEE', 'Allen Institute for AI',
+  'Google', 'OpenAI', 'Anthropic',
+];
+
 const CATEGORIES = [
   {
     key: 'ai_adoption',
@@ -93,6 +105,15 @@ const CATEGORIES = [
       'Belgium research assessment reform',
       'Belgium library Scopus OR "Web of Science" OR subscription cancellation',
     ],
+  },
+  {
+    key: 'competitor_announcements',
+    label: 'Competitor Announcements',
+    perInstitution: true,
+    entities: TRACKED_COMPETITORS,
+    // Company-level news from named LeapSpace competitors — new products,
+    // partnerships, rollouts, expansions — not general company news.
+    queryFor: (co) => `"${co}" (launches OR unveils OR announces OR partnership OR collaborat* OR "rolls out" OR expands OR acquisition OR "new tool" OR "new feature") (research OR publishing OR AI OR "scientific literature" OR database OR scholarly OR "research assistant")`,
   },
 ];
 
@@ -244,7 +265,7 @@ async function main() {
     let categoryCandidates = 0;
 
     const jobs = category.perInstitution
-      ? ALL_INSTITUTIONS.map(inst => ({ inst, query: category.queryFor(inst) }))
+      ? (category.entities || ALL_INSTITUTIONS).map(inst => ({ inst, query: category.queryFor(inst) }))
       : category.queries.map(q => ({ inst: null, query: q }));
 
     for (const job of jobs) {

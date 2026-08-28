@@ -3178,9 +3178,10 @@ function exportCSV() {
 function todayStr() { return new Date().toISOString().slice(0,10); }
 
 const NEWS_CATEGORIES = {
-  ai_adoption: { label: 'AI Development & Adoption', color: '#1d4ed8' },
-  funding:     { label: 'Funding Received',           color: '#059669' },
-  policy:      { label: 'Belgium Research Policy', color: '#991b1b' },
+  ai_adoption:              { label: 'AI Development & Adoption', color: '#1d4ed8' },
+  funding:                  { label: 'Funding Received',           color: '#059669' },
+  policy:                   { label: 'Belgium Research Policy',    color: '#991b1b' },
+  competitor_announcements: { label: 'Competitor Announcements',   color: '#7c3aed' },
 };
 
 let _newsAllArticles    = [];
@@ -3349,7 +3350,7 @@ async function renderNewsScanStatus() {
 
 function renderNews() {
   document.getElementById('page-title').textContent = 'Belgium Research News';
-  document.getElementById('page-sub').textContent = 'AI, funding, and policy news relevant to Elsevier\'s business — scanned daily, filtered for relevance';
+  document.getElementById('page-sub').textContent = 'AI, funding, policy, and competitor news relevant to Elsevier\'s business — scanned daily, filtered for relevance';
   document.getElementById('topbar-actions').innerHTML = '';
 
   const allCats = ['all', ...Object.keys(NEWS_CATEGORIES)];
