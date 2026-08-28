@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -169,6 +170,7 @@ tbody td{padding:9px 14px;vertical-align:middle;color:var(--text)}
 .mf{padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:7px}
 .modal-close{background:rgba(255,255,255,.05);border:none;font-size:13px;cursor:pointer;color:var(--muted);width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;transition:all .15s}
 .modal-close:hover{background:rgba(255,255,255,.09);color:var(--text)}
+.news-summary-clamp3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 /*  FORM  */
 .fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
 .fg label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
@@ -331,6 +333,8 @@ a.ext-link:hover{color:var(--text)}
 .news-filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
 .news-filter-btn{font-size:11px;padding:4px 11px;border-radius:14px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);cursor:pointer;transition:all .15s}
 .news-filter-btn.active{background:var(--accent);border-color:var(--accent);color:#060a12}
+.news-summary-btn{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;padding:4px 13px 4px 10px;border-radius:14px;border:1px solid var(--accent2);background:var(--accent2);color:#fff;cursor:pointer;transition:all .15s}
+.news-summary-btn:hover{filter:brightness(1.08)}
 .news-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px}
 .news-loading{display:flex;align-items:center;gap:10px;padding:20px;color:var(--muted);font-size:13px}
 .news-spinner{width:18px;height:18px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
@@ -1135,6 +1139,18 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
     <div class="mf">
       <button class="btn btn-outline" onclick="clearGhToken()">Remove saved token</button>
       <button class="btn btn-primary" onclick="saveGhToken()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: NEWS SUMMARY -->
+<div class="overlay" id="modal-news-summary">
+  <div class="modal" style="max-width:640px">
+    <div class="mh"><h3>News Executive Summary</h3><button class="modal-close" onclick="closeModal('modal-news-summary')"></button></div>
+    <div class="mc" id="news-summary-modal-body"></div>
+    <div class="mf">
+      <button class="btn btn-outline" onclick="downloadNewsSummaryPdf()">Download PDF</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-news-summary')">Close</button>
     </div>
   </div>
 </div>
@@ -2029,6 +2045,403 @@ async function runSummaryReportNow(btnId) {
   }
   if (document.getElementById('page-title')?.textContent === 'Summary') renderSummaryReports(freshData);
 }
+
+// News page's "Summary" button — renders an instant in-app executive
+// summary from the already-scanned live feed (no GitHub Actions round trip,
+// no popup: a PDF-generate-then-window.open() flow was tried first but got
+// blocked by browsers as an untrusted popup once the open() call landed
+// after an async poll, well after the click's user-gesture context expired).
+async function showNewsSummaryModal() {
+  const body = document.getElementById('news-summary-modal-body');
+  if (body) body.innerHTML = `<div class="news-loading"><div class="news-spinner"></div>Loading…</div>`;
+  openModal('modal-news-summary');
+
+  let articles, jobs;
+  try {
+    const [newsRes, jobsRes] = await Promise.all([
+      fetch('/belgium-crm/data/news.json?t=' + Date.now()),
+      fetch('/belgium-crm/data/competitor-jobs.json?t=' + Date.now()),
+    ]);
+    const newsData = newsRes.ok ? await newsRes.json() : [];
+    const jobsData = jobsRes.ok ? await jobsRes.json() : [];
+    const dismissed = getDismissedNewsIds();
+    const seenIds = new Set();
+    articles = (Array.isArray(newsData) ? newsData : [])
+      .filter(a => !seenIds.has(a.id) && seenIds.add(a.id))
+      .filter(a => !dismissed.includes(a.id));
+    jobs = Array.isArray(jobsData) ? jobsData : [];
+  } catch (e) {
+    if (body) body.innerHTML = `<div class="news-empty">Could not load news data.</div>`;
+    return;
+  }
+
+  const catOrder = Object.keys(NEWS_CATEGORIES);
+  const counts = {};
+  articles.forEach(a => { if (a.category) counts[a.category] = (counts[a.category] || 0) + 1; });
+  const total = articles.length;
+  const maxCount = Math.max(1, ...catOrder.map(k => counts[k] || 0));
+
+  const overviewParts = [];
+  if (total === 0) {
+    overviewParts.push('No stories are currently live in the feed. The daily scan runs every morning at 07:00 UTC — check back after that, or run it manually.');
+  } else {
+    overviewParts.push(`${total} stor${total === 1 ? 'y is' : 'ies are'} currently live in the feed.`);
+    const breakdown = catOrder.filter(k => counts[k]).map(k => `${counts[k]} ${NEWS_CATEGORIES[k].label.toLowerCase()}`).join(', ');
+    if (breakdown) overviewParts.push(`Breakdown: ${breakdown}.`);
+    const comp = articles.find(a => a.category === 'competitor_announcements');
+    if (comp) overviewParts.push(`Most recent competitor signal: ${esc(comp.institution || 'a competitor')} — "${esc(comp.title || '')}".`);
+  }
+
+  const hiringCatOrder = Object.keys(HIRING_CATEGORIES);
+  const hiringCounts = {};
+  jobs.forEach(j => { if (j.roleCategory) hiringCounts[j.roleCategory] = (hiringCounts[j.roleCategory] || 0) + 1; });
+  const hiringTotal = jobs.length;
+  const hiringCompanyCount = new Set(jobs.map(j => j.company).filter(Boolean)).size;
+  const hiringSorted = jobs.slice().sort((a, b) => (b.postedDate || b.foundDate || '').localeCompare(a.postedDate || a.foundDate || ''));
+  if (hiringTotal > 0) {
+    overviewParts.push(`${hiringTotal} competitor role${hiringTotal === 1 ? ' is' : 's are'} currently open across ${hiringCompanyCount} tracked compan${hiringCompanyCount === 1 ? 'y' : 'ies'}.`);
+  }
+
+  const tilesHtml = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin:14px 0">
+    <div style="background:var(--bg3);border-radius:10px;padding:12px;border-left:3px solid var(--accent2)">
+      <div style="font-size:22px;font-weight:800;color:var(--text)">${total}</div>
+      <div style="font-size:10px;color:var(--muted);font-weight:600;margin-top:2px">LIVE STORIES</div>
+    </div>
+    ${catOrder.map(k => `<div style="background:var(--bg3);border-radius:10px;padding:12px;border-left:3px solid ${NEWS_CATEGORIES[k].color}">
+      <div style="font-size:22px;font-weight:800;color:var(--text)">${counts[k] || 0}</div>
+      <div style="font-size:10px;color:var(--muted);font-weight:600;margin-top:2px">${esc(NEWS_CATEGORIES[k].label.toUpperCase())}</div>
+    </div>`).join('')}
+  </div>`;
+
+  const barsHtml = `<div style="margin:14px 0">${catOrder.map(k => {
+    const v = counts[k] || 0;
+    const pct = Math.round((v / maxCount) * 100);
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <span style="width:160px;font-size:11px;color:var(--muted);flex-shrink:0">${esc(NEWS_CATEGORIES[k].label)}</span>
+      <div style="flex:1;background:var(--bg3);border-radius:6px;height:14px;overflow:hidden">
+        <div style="width:${pct}%;height:100%;background:${NEWS_CATEGORIES[k].color}"></div>
+      </div>
+      <span style="width:20px;text-align:right;font-size:11px;font-weight:700;color:var(--text)">${v}</span>
+    </div>`;
+  }).join('')}</div>`;
+
+  const sorted = articles.slice().sort((a, b) => (b.publishedDate || b.foundDate || '').localeCompare(a.publishedDate || a.foundDate || ''));
+
+  // One-line-per-category rollup — the most recent story in each active
+  // category, condensed to a single clause — so the whole day's news can be
+  // read in a few seconds without scrolling through every story.
+  const combinedItems = catOrder.filter(k => counts[k] > 0).map(k => {
+    const catArticles = sorted.filter(a => a.category === k);
+    const top = catArticles[0];
+    const text = top.summary || top.elsevierRelevance || top.description || '';
+    return {
+      label: NEWS_CATEGORIES[k].label,
+      color: NEWS_CATEGORIES[k].color,
+      countNote: catArticles.length > 1 ? ` (+${catArticles.length - 1} more)` : '',
+      snippet: firstClause(text, 170),
+    };
+  });
+  if (hiringTotal > 0) {
+    const topJob = hiringSorted[0];
+    const jobCat = HIRING_CATEGORIES[topJob.roleCategory] || { label: 'Role' };
+    const snippet = `${topJob.title || 'Open role'} at ${topJob.company || 'a tracked competitor'} (${jobCat.label}${topJob.location ? ', ' + topJob.location : ''}).`;
+    combinedItems.push({ label: 'Competitor Hiring', color: '#f87171', countNote: ` (${hiringTotal} open)`, snippet: firstClause(snippet, 170) });
+  }
+  const combinedSummaryHtml = combinedItems.length ? `
+    <div style="background:var(--bg3);border:1px solid var(--border2);border-left:3px solid var(--accent2);border-radius:10px;padding:12px 14px;margin:14px 0">
+      <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:8px;letter-spacing:.3px">COMBINED SUMMARY</div>
+      ${combinedItems.map(it => `<div style="display:flex;gap:8px;margin-bottom:7px;align-items:flex-start">
+        <span style="width:8px;height:8px;border-radius:50%;background:${it.color};margin-top:5px;flex-shrink:0"></span>
+        <div style="font-size:11.5px;color:var(--text2);line-height:1.5"><strong style="color:var(--text)">${esc(it.label)}${it.countNote}:</strong> ${esc(it.snippet)}</div>
+      </div>`).join('')}
+    </div>` : '';
+
+  const storiesHtml = sorted.length ? sorted.slice(0, 40).map(a => {
+    const cat = NEWS_CATEGORIES[a.category] || { label: a.categoryLabel || 'News', color: '#64748b' };
+    const summaryText = a.summary || a.elsevierRelevance || a.description || 'No summary available.';
+    const sourceLink = a.url ? `<a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer" style="font-size:10.5px;color:var(--accent2);text-decoration:none;font-weight:600">${esc(a.sourceName || 'Source')} ↗</a>` : '';
+    return `<div style="padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+        <span class="news-topic-tag" style="background:${cat.color}22;color:${cat.color}">${esc(cat.label)}</span>
+        <span style="font-size:10.5px;color:var(--muted);margin-left:auto">${esc(a.publishedDate || a.foundDate || '')}</span>
+      </div>
+      <div style="font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:2px">${esc(a.title || '')}</div>
+      <p class="news-summary-clamp3" style="font-size:11.5px;color:var(--muted);line-height:1.45;margin:0 0 4px">${esc(summaryText)}</p>
+      ${sourceLink}
+    </div>`;
+  }).join('') : `<div class="news-empty">No live stories to summarize yet.</div>`;
+
+  const hiringTilesHtml = hiringTotal > 0 ? `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin:14px 0">
+    <div style="background:var(--bg3);border-radius:10px;padding:12px;border-left:3px solid #f87171">
+      <div style="font-size:22px;font-weight:800;color:var(--text)">${hiringTotal}</div>
+      <div style="font-size:10px;color:var(--muted);font-weight:600;margin-top:2px">OPEN ROLES</div>
+    </div>
+    ${hiringCatOrder.map(k => `<div style="background:var(--bg3);border-radius:10px;padding:12px;border-left:3px solid ${HIRING_CATEGORIES[k].color}">
+      <div style="font-size:22px;font-weight:800;color:var(--text)">${hiringCounts[k] || 0}</div>
+      <div style="font-size:10px;color:var(--muted);font-weight:600;margin-top:2px">${esc(HIRING_CATEGORIES[k].label.toUpperCase())}</div>
+    </div>`).join('')}
+  </div>` : '';
+
+  const hiringListHtml = hiringSorted.length ? hiringSorted.slice(0, 20).map(j => {
+    const cat = HIRING_CATEGORIES[j.roleCategory] || { label: 'Other', color: '#64748b' };
+    const link = j.url ? `<a href="${esc(j.url)}" target="_blank" rel="noopener noreferrer" style="font-size:10.5px;color:var(--accent2);text-decoration:none;font-weight:600">View posting ↗</a>` : '';
+    return `<div style="padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+        <span class="news-topic-tag" style="background:#f8717122;color:#f87171">${esc(j.company || '')}</span>
+        <span class="news-topic-tag" style="background:${cat.color}22;color:${cat.color}">${esc(cat.label)}</span>
+        <span style="font-size:10.5px;color:var(--muted);margin-left:auto">${esc(j.postedDate || j.foundDate || '')}</span>
+      </div>
+      <div style="font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:2px">${esc(j.title || '')}</div>
+      <p style="font-size:11.5px;color:var(--muted);line-height:1.45;margin:0 0 4px">${esc(j.location || 'Location not listed')}${j.department ? ' · ' + esc(j.department) : ''}</p>
+      ${link}
+    </div>`;
+  }).join('') : `<div class="news-empty">No open competitor roles tracked right now.</div>`;
+
+  if (body) body.innerHTML = `
+    <p style="font-size:12.5px;color:var(--text2);line-height:1.6;margin:0">${overviewParts.join(' ')}</p>
+    ${combinedSummaryHtml}
+    ${tilesHtml}
+    ${barsHtml}
+    <h4 style="font-size:12px;color:var(--text);margin:16px 0 4px">Today's Stories</h4>
+    <div>${storiesHtml}</div>
+    <h4 style="font-size:12px;color:var(--text);margin:20px 0 4px">Competitor Hiring — Open Roles</h4>
+    ${hiringTilesHtml}
+    <div>${hiringListHtml}</div>`;
+
+  // Cache the computed summary so the "Download PDF" button can render an
+  // identical, source-linked report instantly via print-to-PDF, with no
+  // re-fetch and no async gap that could detach it from the click gesture.
+  _newsSummaryPrintData = { total, catOrder, counts, overviewParts, combinedItems, sorted, hiringTotal, hiringCatOrder, hiringCounts, hiringSorted };
+}
+
+// Truncates at a word boundary (never mid-word) and marks the cut with an
+// ellipsis — used for the Combined Summary card's per-category snippet.
+function firstClause(text, maxLen) {
+  const t = String(text || '').trim();
+  if (!t) return '';
+  if (t.length <= maxLen) return t;
+  const cut = t.slice(0, maxLen);
+  const lastSpace = cut.lastIndexOf(' ');
+  return (lastSpace > maxLen * 0.6 ? cut.slice(0, lastSpace) : cut).trim() + '…';
+}
+
+let _newsSummaryPrintData = null;
+
+function _hexToRgb(hex) {
+  const h = String(hex || '#64748b').replace('#', '');
+  const full = h.length === 3 ? h.split('').map(c => c + c).join('') : h;
+  const n = parseInt(full, 16) || 0x64748b;
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+// Builds the News Executive Summary as a real PDF document (jsPDF) with
+// genuine clickable link annotations (doc.link()) on every source/posting
+// link. An earlier version rendered a hidden print area and called
+// window.print(), relying on the browser's "Save as PDF" to carry the <a>
+// tags over as links — that only works in some browsers, and not at all
+// through OS-level "print to PDF" drivers, so links often came through
+// dead. Building the PDF directly guarantees the links work everywhere.
+function downloadNewsSummaryPdf() {
+  if (!_newsSummaryPrintData) return;
+  if (!window.jspdf || !window.jspdf.jsPDF) { toast('PDF library failed to load — check your connection and try again', 'warn'); return; }
+  const { total, catOrder, counts, overviewParts, combinedItems, sorted, hiringTotal, hiringCatOrder, hiringCounts, hiringSorted } = _newsSummaryPrintData;
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  const marginX = 42, marginTop = 50, marginBottom = 46;
+  const contentW = pageW - marginX * 2;
+  let y = marginTop;
+
+  function ensureSpace(h) {
+    if (y + h > pageH - marginBottom) { doc.addPage(); y = marginTop; }
+  }
+
+  function sectionHeading(text) {
+    ensureSpace(26);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.setTextColor(17, 17, 17);
+    doc.text(text, marginX, y);
+    y += 6;
+    doc.setDrawColor(204, 204, 204); doc.setLineWidth(0.75);
+    doc.line(marginX, y, pageW - marginX, y);
+    y += 16;
+  }
+
+  function categoryTag(x, topY, label, colorHex) {
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5);
+    const tw = doc.getTextWidth(label);
+    const padX = 5, h = 12;
+    const [r, g, b] = _hexToRgb(colorHex);
+    doc.setFillColor(Math.round(r * 0.15 + 255 * 0.85), Math.round(g * 0.15 + 255 * 0.85), Math.round(b * 0.15 + 255 * 0.85));
+    doc.roundedRect(x, topY, tw + padX * 2, h, 2.5, 2.5, 'F');
+    doc.setTextColor(r, g, b);
+    doc.text(label, x + padX, topY + h - 3.2);
+    return tw + padX * 2;
+  }
+
+  function tiles(items) {
+    const gap = 8, cols = 4;
+    const tileW = (contentW - gap * (cols - 1)) / cols;
+    const tileH = 42;
+    let col = 0;
+    items.forEach(it => {
+      if (col === 0) ensureSpace(tileH + 10);
+      const x = marginX + col * (tileW + gap);
+      doc.setDrawColor(221, 221, 221); doc.setLineWidth(0.75);
+      doc.rect(x, y, tileW, tileH);
+      const [r, g, b] = _hexToRgb(it.color);
+      doc.setFillColor(r, g, b);
+      doc.rect(x, y, 3, tileH, 'F');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(15); doc.setTextColor(17, 17, 17);
+      doc.text(String(it.count), x + 10, y + 19);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5); doc.setTextColor(102, 102, 102);
+      doc.text(doc.splitTextToSize(it.label.toUpperCase(), tileW - 14), x + 10, y + 30);
+      col++;
+      if (col === cols) { y += tileH + 10; col = 0; }
+    });
+    if (col !== 0) y += tileH + 10;
+  }
+
+  function combinedSummaryBlock(items) {
+    if (!items.length) return;
+    const indent = 24, boxPad = 12, headerH = 18, bulletGap = 8;
+    const measured = items.map(it => {
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
+      const labelLines = doc.splitTextToSize(`${it.label}${it.countNote}:`, contentW - indent);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+      const snippetLines = doc.splitTextToSize(it.snippet, contentW - indent);
+      const h = (labelLines.length + snippetLines.length) * 12 + bulletGap;
+      return { ...it, labelLines, snippetLines, h };
+    });
+    const bodyH = measured.reduce((s, m) => s + m.h, 0);
+    const totalH = headerH + bodyH + boxPad * 2;
+    ensureSpace(totalH + 16);
+
+    const boxY = y;
+    doc.setFillColor(248, 248, 248);
+    doc.rect(marginX, boxY, contentW, totalH, 'F');
+    const [ar, ag, ab] = _hexToRgb('#7c3aed');
+    doc.setFillColor(ar, ag, ab);
+    doc.rect(marginX, boxY, 3, totalH, 'F');
+
+    let cy = boxY + boxPad;
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(17, 17, 17);
+    doc.text('COMBINED SUMMARY', marginX + 14, cy + 6);
+    cy += headerH;
+
+    measured.forEach(m => {
+      const [r, g, b] = _hexToRgb(m.color);
+      doc.setFillColor(r, g, b);
+      doc.circle(marginX + indent - 6, cy + 3, 2, 'F');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(17, 17, 17);
+      doc.text(m.labelLines, marginX + indent, cy + 5);
+      cy += m.labelLines.length * 12;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(51, 51, 51);
+      doc.text(m.snippetLines, marginX + indent, cy + 5);
+      cy += m.snippetLines.length * 12 + bulletGap;
+    });
+
+    y = boxY + totalH + 16;
+  }
+
+  // Renders one story/role block: category tag(s) + date, title, body text,
+  // and an optional real clickable link (doc.link()) — heights are
+  // precomputed so the whole block is measured before ensureSpace() runs,
+  // guaranteeing it never splits awkwardly across a page break.
+  function entryBlock(tags, dateStr, title, bodyText, linkLabel, linkUrl) {
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
+    const titleLines = doc.splitTextToSize(title || '(untitled)', contentW);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5);
+    const bodyLines = doc.splitTextToSize(bodyText || '', contentW);
+    const tagH = 16, titleH = titleLines.length * 13 + 2, bodyH = bodyLines.length * 12.5 + 4, linkH = linkUrl ? 14 : 0, dividerGap = 10;
+    const totalH = tagH + titleH + bodyH + linkH + dividerGap;
+    ensureSpace(totalH);
+
+    let tx = marginX;
+    tags.forEach(t => { tx += categoryTag(tx, y, t.label, t.color) + 6; });
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(136, 136, 136);
+    const dateW = doc.getTextWidth(dateStr || '');
+    doc.text(dateStr || '', marginX + contentW - dateW, y + 9);
+    y += tagH;
+
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(17, 17, 17);
+    doc.text(titleLines, marginX, y + 9);
+    y += titleH;
+
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(68, 68, 68);
+    doc.text(bodyLines, marginX, y + 8);
+    y += bodyH;
+
+    if (linkUrl) {
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(29, 78, 216);
+      const lw = doc.getTextWidth(linkLabel);
+      doc.text(linkLabel, marginX, y + 8);
+      doc.setDrawColor(29, 78, 216); doc.setLineWidth(0.5);
+      doc.line(marginX, y + 9.5, marginX + lw, y + 9.5);
+      doc.link(marginX, y - 1, lw, 12, { url: linkUrl });
+      y += linkH;
+    }
+
+    y += dividerGap - 6;
+    doc.setDrawColor(229, 229, 229); doc.setLineWidth(0.5);
+    doc.line(marginX, y, marginX + contentW, y);
+    y += 6;
+  }
+
+  const dateStr = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(18); doc.setTextColor(17, 17, 17);
+  doc.text('Belgium — News Executive Summary', marginX, y);
+  y += 16;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(102, 102, 102);
+  doc.text(dateStr, marginX, y);
+  y += 20;
+
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(10.5); doc.setTextColor(51, 51, 51);
+  const overviewLines = doc.splitTextToSize(overviewParts.join(' '), contentW);
+  ensureSpace(overviewLines.length * 14);
+  doc.text(overviewLines, marginX, y + 9);
+  y += overviewLines.length * 14 + 8;
+
+  combinedSummaryBlock(combinedItems);
+
+  tiles([{ count: total, label: 'Live Stories', color: '#1d4ed8' }, ...catOrder.map(k => ({ count: counts[k] || 0, label: NEWS_CATEGORIES[k].label, color: NEWS_CATEGORIES[k].color }))]);
+  y += 6;
+
+  sectionHeading("Today's Stories");
+  if (sorted.length) {
+    sorted.slice(0, 40).forEach(a => {
+      const cat = NEWS_CATEGORIES[a.category] || { label: a.categoryLabel || 'News', color: '#64748b' };
+      const bodyText = a.summary || a.elsevierRelevance || a.description || 'No summary available.';
+      entryBlock([cat], a.publishedDate || a.foundDate || '', a.title, bodyText, a.url ? (a.sourceName || 'Source') : null, a.url);
+    });
+  } else {
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(136, 136, 136);
+    ensureSpace(14);
+    doc.text('No live stories to summarize.', marginX, y + 9);
+    y += 20;
+  }
+
+  y += 10;
+  sectionHeading('Competitor Hiring — Open Roles');
+  if (hiringTotal > 0) {
+    tiles([{ count: hiringTotal, label: 'Open Roles', color: '#f87171' }, ...hiringCatOrder.map(k => ({ count: hiringCounts[k] || 0, label: HIRING_CATEGORIES[k].label, color: HIRING_CATEGORIES[k].color }))]);
+    y += 6;
+    hiringSorted.slice(0, 20).forEach(j => {
+      const cat = HIRING_CATEGORIES[j.roleCategory] || { label: 'Other', color: '#64748b' };
+      const bodyText = `${j.location || 'Location not listed'}${j.department ? ' · ' + j.department : ''}`;
+      entryBlock([{ label: j.company || '', color: '#f87171' }, cat], j.postedDate || j.foundDate || '', j.title, bodyText, j.url ? 'View posting' : null, j.url);
+    });
+  } else {
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(136, 136, 136);
+    ensureSpace(14);
+    doc.text('No open competitor roles tracked right now.', marginX, y + 9);
+  }
+
+  doc.save(`belgium-news-summary-${new Date().toISOString().slice(0, 10)}.pdf`);
+}
+
 
 // Close modal on overlay click
 document.querySelectorAll('.overlay').forEach(el=>{
@@ -3504,10 +3917,15 @@ function renderNews() {
     </button>`;
 
   const allCats = ['all', ...Object.keys(NEWS_CATEGORIES)];
-  const catBtns = allCats.map(c => {
+  const summaryBtn = `<button id="news-summary-btn" class="news-summary-btn" onclick="showNewsSummaryModal()" title="Quick executive summary of today's news">
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    Summary
+  </button>`;
+  const catBtns = allCats.map((c, i) => {
     const safeId = 'nf-' + c.replace(/[^a-z0-9]/gi, '_');
     const label = c === 'all' ? 'All Topics' : NEWS_CATEGORIES[c].label;
-    return `<button id="${safeId}" class="news-filter-btn${c === _newsActiveCategory ? ' active' : ''}" onclick="setNewsCategory('${c}')">${label}</button>`;
+    const btn = `<button id="${safeId}" class="news-filter-btn${c === _newsActiveCategory ? ' active' : ''}" onclick="setNewsCategory('${c}')">${label}</button>`;
+    return i === 0 ? btn + summaryBtn : btn;
   }).join('') + `<button id="nf-hiring" class="news-filter-btn${_newsActiveCategory === 'hiring' ? ' active' : ''}" onclick="setNewsCategory('hiring')" title="Open roles at Elsevier RI competitors">Competitor Hiring</button>`;
 
   document.getElementById('content').innerHTML = `

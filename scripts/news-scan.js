@@ -169,6 +169,15 @@ function stripCdata(s) {
   const m = String(s || '').match(/<!\[CDATA\[([\s\S]*?)\]\]>/);
   return decodeEntities(m ? m[1] : s);
 }
+// Truncates at a word boundary (never mid-word) and marks the cut with an
+// ellipsis, instead of a raw slice() that can chop off mid-sentence.
+function truncateClean(str, maxLen) {
+  const s = String(str || '').trim();
+  if (s.length <= maxLen) return s;
+  const cut = s.slice(0, maxLen);
+  const lastSpace = cut.lastIndexOf(' ');
+  return (lastSpace > maxLen * 0.6 ? cut.slice(0, lastSpace) : cut).trim() + '…';
+}
 
 // Minimal RSS 2.0 <item> parser via regex — Google News RSS is well-formed
 // enough that a full XML parser isn't worth the extra dependency.
@@ -251,7 +260,7 @@ Mark irrelevant anything that's just general research findings or medical/scient
 
 ${batch.map((c, i) => `${i + 1}. [${c.categoryLabel}] "${c.title}" — ${c.description || '(no description)'}`).join('\n')}
 
-Respond with ONLY a JSON array, one object per article in the same order, each exactly: {"relevant": true|false, "summary": "a neutral 2-3 sentence summary of what the article actually reports (max ~3 lines) — written so a reader can judge relevance from the summary alone without opening the article — only if relevant, omit or empty string if not relevant", "reason": "one short, specific sentence on why it matters to an Elsevier sales agent here — name the institution/company and the angle — only if relevant, omit or empty string if not relevant"}`;
+Respond with ONLY a JSON array, one object per article in the same order, each exactly: {"relevant": true|false, "summary": "a neutral, complete summary of what the article actually reports, in AT MOST 3 short sentences — every sentence must be a complete sentence, never cut off mid-sentence, and the whole summary should stay under about 280 characters so it reads cleanly in a compact 3-line card — written so a reader can immediately understand what/who it's about without opening the article — only if relevant, omit or empty string if not relevant", "reason": "one short, specific sentence on why it matters to an Elsevier sales agent here — name the institution/company and the angle — only if relevant, omit or empty string if not relevant"}`;
 
   let res;
   const ctrl = new AbortController();
@@ -289,7 +298,7 @@ Respond with ONLY a JSON array, one object per article in the same order, each e
   batch.forEach((c, i) => {
     const v = verdicts[i];
     if (v && v.relevant) {
-      kept.push({ ...c, summary: String(v.summary || '').slice(0, 400), elsevierRelevance: String(v.reason || '').slice(0, 200) });
+      kept.push({ ...c, summary: truncateClean(v.summary, 480), elsevierRelevance: truncateClean(v.reason, 260) });
     } else {
       console.log(`  - filtered out (not Elsevier-relevant): ${c.title}`);
     }
@@ -297,11 +306,78 @@ Respond with ONLY a JSON array, one object per article in the same order, each e
   return kept;
 }
 
+// Articles saved before the "summary" field existed (or from a run where the
+// AI response omitted it) only carry the old one-line "reason" text, capped
+// short enough that it often reads as an abrupt mid-sentence cut in the News
+// Summary card. Re-run just those through a dedicated summary-only call —
+// unlike filterRelevance, this never drops an article: they already cleared
+// the relevance bar once and are already live/visible, so a second pass only
+// fills in the missing text.
+async function backfillSummaries(items) {
+  if (!items.length || !ANTHROPIC_API_KEY) return new Map();
+
+  const batch = items.slice(0, MAX_RELEVANCE_BATCH);
+  const prompt = `${ELSEVIER_CONTEXT}
+
+For each numbered article below, write a neutral, complete summary of what it actually reports, in AT MOST 3 short sentences — every sentence must be complete, never cut off mid-sentence, and the whole summary should stay under about 280 characters so it reads cleanly in a compact 3-line card — written so a reader can immediately understand what/who it's about without opening the article.
+
+${batch.map((c, i) => `${i + 1}. [${c.categoryLabel}] "${c.title}" — ${c.description || '(no description)'}`).join('\n')}
+
+Respond with ONLY a JSON array of strings, one summary per article in the same order.`;
+
+  let res;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 60000);
+  try {
+    res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'x-api-key': ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+      body: JSON.stringify({ model: RELEVANCE_MODEL, max_tokens: 2048, messages: [{ role: 'user', content: prompt }] }),
+      signal: ctrl.signal,
+    });
+  } catch (e) {
+    console.warn(`[news-scan] Backfill summary request failed (${e.message}) — skipping.`);
+    return new Map();
+  } finally {
+    clearTimeout(timer);
+  }
+  if (!res.ok) {
+    console.warn(`[news-scan] Backfill summary API call failed (HTTP ${res.status}) — skipping.`);
+    return new Map();
+  }
+
+  const data = await res.json();
+  const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n');
+  let summaries;
+  try {
+    const jsonMatch = text.match(/\[[\s\S]*\]/);
+    summaries = JSON.parse(jsonMatch ? jsonMatch[0] : text);
+  } catch (e) {
+    console.warn('[news-scan] Could not parse backfill summary response — skipping.');
+    return new Map();
+  }
+
+  const map = new Map();
+  batch.forEach((c, i) => { if (summaries[i]) map.set(c.id, truncateClean(summaries[i], 480)); });
+  return map;
+}
+
 async function main() {
   const articles = readJSON(DATA_FILE, []);
   const existingUrls = new Set(articles.map(a => a.url));
   const candidateCounts = {};
   const freshCandidates = [];
+
+  const needsBackfill = articles.filter(a => !a.summary && a.elsevierRelevance);
+  let backfilledCount = 0;
+  if (needsBackfill.length) {
+    console.log(`[news-scan] ${needsBackfill.length} existing article(s) missing a clean summary — backfilling...`);
+    const map = await backfillSummaries(needsBackfill.map(a => ({ id: a.id, title: a.title, description: a.description, categoryLabel: a.categoryLabel })));
+    for (const a of articles) {
+      if (map.has(a.id)) { a.summary = map.get(a.id); backfilledCount++; }
+    }
+    console.log(`[news-scan] Backfilled ${backfilledCount} summary/summaries.`);
+  }
 
   for (const category of CATEGORIES) {
     console.log(`[news-scan] Searching: ${category.label}...`);
@@ -373,19 +449,20 @@ async function main() {
   }
 
   const trimmed = live.slice(0, MAX_STORED_ARTICLES);
-  if (totalAdded > 0 || archivedCount > 0) saveJSON(DATA_FILE, trimmed);
+  if (totalAdded > 0 || archivedCount > 0 || backfilledCount > 0) saveJSON(DATA_FILE, trimmed);
 
   saveJSON(STATE_FILE, {
     lastRun: new Date().toISOString(),
     lastAddedCount: totalAdded,
     lastCandidateCount: freshCandidates.length,
     lastArchivedCount: archivedCount,
+    lastBackfilledCount: backfilledCount,
     candidateCounts,
     source: ANTHROPIC_API_KEY
       ? 'Google News RSS (discovery) + Claude Haiku (Elsevier-relevance filter)'
       : 'Google News RSS (free, no API key — relevance filter skipped)',
   });
-  console.log(`[news-scan] Done — ${totalAdded} new article(s) added, ${archivedCount} archived (${freshCandidates.length} candidates found).`);
+  console.log(`[news-scan] Done — ${totalAdded} new article(s) added, ${archivedCount} archived, ${backfilledCount} backfilled (${freshCandidates.length} candidates found).`);
 }
 
 main().catch(e => {
