@@ -3186,7 +3186,6 @@ const NEWS_CATEGORIES = {
 
 let _newsAllArticles    = [];
 let _newsActiveCategory = 'all';
-let _newsCompetitorInsights = null;
 
 function getDismissedNewsIds() {
   try { return JSON.parse(localStorage.getItem('be_crm_dismissed_news') || '[]'); }
@@ -3211,7 +3210,7 @@ async function loadNewsArticles() {
     const data = res.ok ? await res.json() : [];
     _newsAllArticles = Array.isArray(data) ? data : [];
   } catch(e) { _newsAllArticles = []; }
-  renderActiveNewsView();
+  renderNewsArticles();
   renderNewsScanStatus();
 }
 
@@ -3220,74 +3219,7 @@ function setNewsCategory(cat) {
   document.querySelectorAll('.news-filter-btn').forEach(b => b.classList.remove('active'));
   const safeId = 'nf-' + cat.replace(/[^a-z0-9]/gi, '_');
   document.getElementById(safeId)?.classList.add('active');
-  renderActiveNewsView();
-}
-
-// Dispatches the news-feed pane between the regular scanned-article list and
-// the Competitor Insights tab, which reuses the same feed area/card layout
-// instead of navigating away to the separate Competitor Insights page.
-function renderActiveNewsView() {
-  if (_newsActiveCategory === 'competitor_insights') {
-    renderCompetitorInsightsInFeed();
-  } else {
-    renderNewsArticles();
-  }
-}
-
-async function loadCompetitorInsightsForNews() {
-  if (_newsCompetitorInsights) return _newsCompetitorInsights;
-  try {
-    const res = await fetch('/belgium-crm/data/leapspace-competitors.json?t=' + Date.now());
-    const data = res.ok ? await res.json() : [];
-    _newsCompetitorInsights = Array.isArray(data) ? data : [];
-  } catch(e) { _newsCompetitorInsights = []; }
-  return _newsCompetitorInsights;
-}
-
-async function renderCompetitorInsightsInFeed() {
-  const feed = document.getElementById('news-feed');
-  if (feed) feed.innerHTML = `<div class="news-loading"><div class="news-spinner"></div>Loading…</div>`;
-  const list = await loadCompetitorInsightsForNews();
-  if (_newsActiveCategory !== 'competitor_insights') return; // tab changed while loading
-  renderCompetitorInsightCards(list);
-}
-
-function renderCompetitorInsightCards(list) {
-  const feed = document.getElementById('news-feed');
-  if (!feed) return;
-
-  if (!list.length) {
-    feed.innerHTML = `<div class="news-empty">
-      <div style="font-size:32px;margin-bottom:10px">­</div>
-      No competitor insights tracked yet.<br>
-      <small>The daily competitor scan runs automatically, or add one manually from the Competitor Insights page.</small>
-    </div>`;
-    return;
-  }
-
-  const sorted = list.slice().sort((a, b) => (b.addedDate || '').localeCompare(a.addedDate || ''));
-  feed.innerHTML = sorted.slice(0, 80).map(x => {
-    const safeUrl = (x.sourceUrl || '').replace(/'/g, '%27');
-    const badges = (x.elements || []).map(k => {
-      const el = LEAPSPACE_ELEMENTS[k];
-      if (!el) return '';
-      return `<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;background:${el.color}1a;color:${el.color};border:1px solid ${el.color}44">${esc(el.label)}</span>`;
-    }).join('');
-    return `<div class="news-card"${safeUrl ? ` onclick="window.open('${safeUrl}','_blank')"` : ''}>
-      <div class="news-card-top">
-        <span class="news-source-badge" style="background:#38bdf822;color:#38bdf8">${esc(x.company || '')}</span>
-        <span class="news-topic-tag">Competitor Insight</span>
-        <span class="news-date">${esc(x.addedDate || '')}</span>
-      </div>
-      <h3>${esc(x.product || '')}</h3>
-      ${x.howItCompetes ? `<p>${esc(x.howItCompetes)}</p>` : ''}
-      ${badges ? `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">${badges}</div>` : ''}
-      <div class="news-card-footer">
-        ${safeUrl ? `<a href="${safeUrl}" target="_blank" onclick="event.stopPropagation()">Read full article </a>` : ''}
-        ${x.sourceName ? `<span style="color:var(--muted);font-size:11px">· ${esc(x.sourceName)}</span>` : ''}
-      </div>
-    </div>`;
-  }).join('');
+  renderNewsArticles();
 }
 
 function renderNewsArticles() {
