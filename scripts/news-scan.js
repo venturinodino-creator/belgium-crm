@@ -354,8 +354,19 @@ function parseRssItems(xml) {
   return items;
 }
 
-async function fetchGoogleNewsRss(query) {
-  const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=BE&ceid=BE:nl`;
+// Belgium is genuinely bilingual (Dutch/Flemish + French/Walloon) — a single
+// Google News edition only covers one language community's press. Querying
+// only BE:nl (Dutch) means the francophone institutions in this file's
+// tracked list (ULB, Université de Liège, Université de Mons, Cliniques
+// universitaires Saint-Luc, the French side of Fondation contre le Cancer,
+// etc. — roughly half the list) would never surface any of their French-
+// language press coverage, however much of it genuinely exists. Query both
+// editions and merge, deduping by link (the same story sometimes appears
+// in both editions' index).
+const CEID_VARIANTS = ['BE:nl', 'BE:fr'];
+
+async function fetchGoogleNewsRssOnce(query, ceid) {
+  const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=BE&ceid=${ceid}`;
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 15000);
   try {
@@ -369,9 +380,24 @@ async function fetchGoogleNewsRss(query) {
     return parseRssItems(xml);
   } catch (e) {
     clearTimeout(timer);
-    console.warn(`  ! RSS fetch failed for "${query}": ${e.message}`);
+    console.warn(`  ! RSS fetch failed for "${query}" (${ceid}): ${e.message}`);
     return [];
   }
+}
+
+async function fetchGoogleNewsRss(query) {
+  const seenLinks = new Set();
+  const merged = [];
+  for (let i = 0; i < CEID_VARIANTS.length; i++) {
+    const items = await fetchGoogleNewsRssOnce(query, CEID_VARIANTS[i]);
+    for (const item of items) {
+      if (seenLinks.has(item.link)) continue;
+      seenLinks.add(item.link);
+      merged.push(item);
+    }
+    if (i < CEID_VARIANTS.length - 1) await sleep(REQUEST_DELAY_MS);
+  }
+  return merged;
 }
 
 function isRecent(pubDate) {
@@ -566,8 +592,6 @@ async function main() {
   const existingUrls = new Set(articles.map(a => a.url));
   const candidateCounts = {};
   const freshCandidates = [];
-  let rejectedSampleCount = 0; // TEMP DIAGNOSTIC — see below
-  const rawSampledCategories = new Set(); // TEMP DIAGNOSTIC — see below
 
   const needsBackfill = articles.filter(a => !a.bottomLine || !a.keyFindings || !a.keyFindings.length);
   let backfilledCount = 0;
@@ -602,18 +626,6 @@ async function main() {
       await sleep(REQUEST_DELAY_MS);
       categoryCandidates += items.length;
 
-      // TEMP DIAGNOSTIC — remove once diagnosed. Logs raw RSS results BEFORE
-      // any filtering (isRecent/dedup/institution-match) for the first query
-      // of each category, to see whether Google News is returning nothing
-      // at all vs. returning results that get filtered downstream.
-      if (!rawSampledCategories.has(category.key)) {
-        rawSampledCategories.add(category.key);
-        console.log(`  RAW QUERY [${category.key}] "${job.query.slice(0, 90)}" -> ${items.length} item(s)`);
-        for (const it of items.slice(0, 4)) {
-          console.log(`    - "${it.title}" (pubDate=${it.pubDate})`);
-        }
-      }
-
       for (const item of items) {
         if (!isRecent(item.pubDate)) continue;
         if (existingUrls.has(item.link)) continue;
@@ -621,14 +633,6 @@ async function main() {
         // its aliases — see institutionMatches) to actually appear in the
         // title/description — Google News RSS relevance ranking is loose.
         if (job.inst && !institutionMatches(job.inst, item.title + ' ' + item.description)) {
-          // TEMP DIAGNOSTIC — remove once the near-zero Belgium match rate is
-          // understood. Logs a small sample of what Google News actually
-          // returned for a query vs. the institution it was supposed to be
-          // about, so the mismatch is visible without needing raw RSS access.
-          if (rejectedSampleCount < 12) {
-            console.log(`  ! REJECTED [${job.inst}]: "${item.title}"`);
-            rejectedSampleCount++;
-          }
           continue;
         }
 
