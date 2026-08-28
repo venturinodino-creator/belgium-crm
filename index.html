@@ -1787,6 +1787,24 @@ function runContactsSync() {
 //  UTILS 
 function uid() { return 'id_' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
 function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+// Only http(s) URLs pass through — blocks a javascript:/data: URI from an
+// external data source (RSS feed, scraped job posting, etc.) ever being
+// opened via window.open().
+function safeHref(url) { const u = String(url||'').trim(); return /^https?:\/\//i.test(u) ? u : ''; }
+// Builds a `window.open('URL','_blank')` call safe to interpolate into an
+// inline onclick="..." HTML attribute: JSON.stringify() produces a properly
+// quote/backslash-escaped JS string literal, then esc() HTML-escapes that
+// literal so an embedded double-quote can't break out of the attribute
+// early (the previous safeUrl pattern, url.replace(/'/g,'%27'), only
+// handled a bare single quote and left the double-quote case — and any
+// non-http(s) scheme — unguarded).
+function safeOpenUrlOnclick(url) { return `window.open(${esc(JSON.stringify(safeHref(url)))},'_blank')`; }
+// Safely embeds arbitrary text as a JS string literal inside an inline
+// onclick="..." attribute (same JSON.stringify + esc() composition as
+// safeOpenUrlOnclick, generalized for non-URL values) — e.g. a contact name
+// like "O'Brien" or "d'Hondt" breaks a bare `='${esc(name)}'` pattern since
+// esc() doesn't escape single quotes.
+function jsStr(value) { return esc(JSON.stringify(String(value == null ? '' : value))); }
 
 // Escapes text, then turns any bare domain/URL mention (e.g. "kuleuven.be/...",
 // "bib.kuleuven.be/...") into a real clickable link — used for notes
@@ -2173,7 +2191,7 @@ async function showNewsSummaryModal() {
 
   const hiringListHtml = hiringSorted.length ? hiringSorted.slice(0, 20).map(j => {
     const cat = HIRING_CATEGORIES[j.roleCategory] || { label: 'Other', color: '#64748b' };
-    const link = j.url ? `<a href="${esc(j.url)}" target="_blank" rel="noopener noreferrer" style="font-size:10.5px;color:var(--accent2);text-decoration:none;font-weight:600">View posting ↗</a>` : '';
+    const link = j.url ? `<a href="${esc(safeHref(j.url))}" target="_blank" rel="noopener noreferrer" style="font-size:10.5px;color:var(--accent2);text-decoration:none;font-weight:600">View posting ↗</a>` : '';
     return `<div style="padding:10px 0;border-bottom:1px solid var(--border)">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
         <span class="news-topic-tag" style="background:#f8717122;color:#f87171">${esc(j.company || '')}</span>
@@ -2252,7 +2270,7 @@ function buildOverviewCardHtml(overview, articles, hiringTotal) {
   const sourceRows = articles.filter(a => a.url).slice(0, 15);
   const primaryCount = sourceRows.filter(a => a.sourceType === 'primary').length;
   const sourcesHtml = sourceRows.map(a =>
-    `<a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer" style="font-size:10.5px;color:var(--accent2);text-decoration:none;font-weight:600;margin-right:10px;white-space:nowrap">${esc(a.sourceName || 'Source')}</a>`
+    `<a href="${esc(safeHref(a.url))}" target="_blank" rel="noopener noreferrer" style="font-size:10.5px;color:var(--accent2);text-decoration:none;font-weight:600;margin-right:10px;white-space:nowrap">${esc(a.sourceName || 'Source')}</a>`
   ).join('');
 
   return `<div class="news-overview-card">
@@ -2275,7 +2293,7 @@ function buildOverviewCardHtml(overview, articles, hiringTotal) {
 function buildStoryCardHtml(a) {
   const cat = NEWS_CATEGORIES[a.category] || { label: a.categoryLabel || 'News', color: '#64748b' };
   const dateStr = esc(a.publishedDate || a.foundDate || '');
-  const sourceLink = a.url ? `<a href="${esc(a.url)}" target="_blank" rel="noopener noreferrer" style="font-size:10.5px;color:var(--accent2);text-decoration:none;font-weight:600">${esc(a.sourceName || 'Source')} ↗</a>` : '';
+  const sourceLink = a.url ? `<a href="${esc(safeHref(a.url))}" target="_blank" rel="noopener noreferrer" style="font-size:10.5px;color:var(--accent2);text-decoration:none;font-weight:600">${esc(a.sourceName || 'Source')} ↗</a>` : '';
   const hasAnalysis = Array.isArray(a.keyFindings) && a.keyFindings.length > 0;
 
   if (!hasAnalysis) {
@@ -2861,7 +2879,7 @@ async function loadAttentionFeed() {
     .slice(0, 5)
     .map(r => ({
       kind: 'tender',
-      onclick: r.url ? `window.open('${r.url.replace(/'/g,'%27')}','_blank')` : `nav('rfp')`,
+      onclick: r.url ? safeOpenUrlOnclick(r.url) : `nav('rfp')`,
       title: r.title,
       sub: `${r.institution || ''} · ${r.product}`,
       urgent: false,
@@ -2877,7 +2895,7 @@ async function loadAttentionFeed() {
       .slice(0, 5)
       .map(a => ({
         kind: 'news',
-        onclick: `window.open('${(a.url||'').replace(/'/g,'%27')}','_blank')`,
+        onclick: safeOpenUrlOnclick(a.url),
         title: a.title,
         sub: a.institution || a.categoryLabel || '',
         urgent: false,
@@ -3400,7 +3418,7 @@ function renderDetail() {
       <td><span class="badge b-${c.quality}">${c.quality==='verified'?' Verified':'  Seed'}</span></td>
       <td style="font-size:12px;color:var(--muted)">${c.lastContact||'—'}</td>
       <td onclick="event.stopPropagation()" style="white-space:nowrap">
-        <button class="btn btn-xs btn-outline" title="Log activity" onclick="openActivityLog('${c.id}','${esc(c.first+' '+c.last)}')">📋</button>
+        <button class="btn btn-xs btn-outline" title="Log activity" onclick="openActivityLog(${jsStr(c.id)},${jsStr(c.first+' '+c.last)})">📋</button>
         <button class="btn btn-xs btn-outline" data-admin-only onclick="openEditContact('${c.id}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
         <button class="btn btn-xs btn-danger" data-admin-only onclick="confirmDeleteContact('${c.id}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
       </td>
@@ -3541,7 +3559,7 @@ function renderContacts() {
       <td><span class="badge b-${c.quality}" style="font-size:10px">${c.quality==='verified'?' Verified':'  Seed'}</span></td>
       <td style="font-size:12px;color:var(--muted)">${c.lastContact||'—'}</td>
       <td style="white-space:nowrap">
-        <button class="btn btn-xs btn-outline" title="Log activity" onclick="openActivityLog('${c.id}','${esc(c.first+' '+c.last)}')">📋</button>
+        <button class="btn btn-xs btn-outline" title="Log activity" onclick="openActivityLog(${jsStr(c.id)},${jsStr(c.first+' '+c.last)})">📋</button>
         <button class="btn btn-xs btn-outline" data-admin-only onclick="openEditContact('${c.id}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
         <button class="btn btn-xs btn-danger" data-admin-only onclick="confirmDeleteContact('${c.id}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
       </td>
@@ -3905,19 +3923,19 @@ function renderNewsArticles() {
   feed.innerHTML = filtered.slice(0, 80).map(a => {
     const cat = NEWS_CATEGORIES[a.category] || { label: a.categoryLabel || 'News', color: '#64748b' };
     const badgeLabel = a.institution || cat.label;
-    const safeUrl = (a.url || '').replace(/'/g, '%27');
-    return `<div class="news-card" onclick="window.open('${safeUrl}','_blank')">
+    const hrefUrl = esc(safeHref(a.url));
+    return `<div class="news-card" onclick="${safeOpenUrlOnclick(a.url)}">
       <div class="news-card-top">
         <span class="news-source-badge" style="background:${cat.color}22;color:${cat.color}">${esc(badgeLabel)}</span>
         <span class="news-topic-tag">${esc(cat.label)}</span>
         <span class="news-date">${esc(a.publishedDate || a.foundDate || '')}</span>
-        ${_newsShowArchive ? '' : `<button onclick="event.stopPropagation();dismissNewsArticle('${a.id}')" title="Remove" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#334155;padding:4px;border-radius:4px;opacity:.5;transition:opacity .15s;flex-shrink:0" onmouseover="this.style.opacity=1;this.style.color='#ef4444'" onmouseout="this.style.opacity='.5';this.style.color='#334155'"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>`}
+        ${_newsShowArchive ? '' : `<button onclick="event.stopPropagation();dismissNewsArticle(${esc(JSON.stringify(a.id))})" title="Remove" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#334155;padding:4px;border-radius:4px;opacity:.5;transition:opacity .15s;flex-shrink:0" onmouseover="this.style.opacity=1;this.style.color='#ef4444'" onmouseout="this.style.opacity='.5';this.style.color='#334155'"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>`}
       </div>
       <h3>${esc(a.title)}</h3>
       ${a.description ? `<p>${esc(a.description)}</p>` : ''}
       ${a.elsevierRelevance ? `<p style="color:#38bdf8;font-size:12px;font-style:italic;margin-top:6px">Why it matters: ${esc(a.elsevierRelevance)}</p>` : ''}
       <div class="news-card-footer">
-        <a href="${safeUrl}" target="_blank" onclick="event.stopPropagation()">Read full article </a>
+        <a href="${hrefUrl}" target="_blank" onclick="event.stopPropagation()">Read full article </a>
         ${a.sourceName ? `<span style="color:var(--muted);font-size:11px">· ${esc(a.sourceName)}</span>` : ''}
       </div>
     </div>`;
@@ -4057,8 +4075,8 @@ function renderHiringFeed() {
 
   feed.innerHTML = sorted.slice(0, 100).map(j => {
     const cat = HIRING_CATEGORIES[j.roleCategory] || { label: 'Other', color: '#64748b' };
-    const safeUrl = (j.url || '').replace(/'/g, '%27');
-    return `<div class="news-card" onclick="window.open('${safeUrl}','_blank')">
+    const hrefUrl = esc(safeHref(j.url));
+    return `<div class="news-card" onclick="${safeOpenUrlOnclick(j.url)}">
       <div class="news-card-top">
         <span class="news-source-badge" style="background:#f8717122;color:#f87171">${esc(j.company || '')}</span>
         <span class="news-topic-tag" style="background:${cat.color}22;color:${cat.color}">${esc(cat.label)}</span>
@@ -4067,7 +4085,7 @@ function renderHiringFeed() {
       <h3>${esc(j.title || '')}</h3>
       <p>${esc(j.location || 'Location not listed')}${j.department ? ' · ' + esc(j.department) : ''}</p>
       <div class="news-card-footer">
-        <a href="${safeUrl}" target="_blank" onclick="event.stopPropagation()">View posting </a>
+        <a href="${hrefUrl}" target="_blank" onclick="event.stopPropagation()">View posting </a>
         ${j.source ? `<span style="color:var(--muted);font-size:11px">· ${esc(j.source)}</span>` : ''}
       </div>
     </div>`;
@@ -4089,7 +4107,7 @@ async function renderHiringScanStatus() {
     if (untrackedEl && Array.isArray(state.untracked) && state.untracked.length) {
       untrackedEl.innerHTML = state.untracked.map(u =>
         `<div style="font-size:11px;line-height:1.5;padding:5px 0;border-top:1px solid var(--border)">
-          <a href="${esc(u.url)}" target="_blank" style="color:var(--text);font-weight:600;text-decoration:none">${esc(u.company)}</a>
+          <a href="${esc(safeHref(u.url))}" target="_blank" style="color:var(--text);font-weight:600;text-decoration:none">${esc(u.company)}</a>
           <div style="color:var(--muted)">${esc(u.reason)}</div>
         </div>`).join('');
     }
@@ -4490,7 +4508,7 @@ function renderRFPOpps() {
     const overdue = deadline && r.status !== 'won' && r.status !== 'lost' && deadline < today;
     const hasCompetitor = r.competitor && r.competitor !== '—';
     const titleEl = r.url
-      ? `<a href="${esc(r.url)}" target="_blank" rel="noopener" style="color:#e2e8f0;font-weight:600;font-size:13.5px;text-decoration:none;line-height:1.3;display:flex;align-items:flex-start;gap:5px">${esc(r.title)}<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" style="opacity:.35;flex-shrink:0;margin-top:2px"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>`
+      ? `<a href="${esc(safeHref(r.url))}" target="_blank" rel="noopener" style="color:#e2e8f0;font-weight:600;font-size:13.5px;text-decoration:none;line-height:1.3;display:flex;align-items:flex-start;gap:5px">${esc(r.title)}<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" style="opacity:.35;flex-shrink:0;margin-top:2px"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>`
       : `<span style="color:#e2e8f0;font-weight:600;font-size:13.5px">${esc(r.title)}</span>`;
     return `<tr style="border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.025)'" onmouseout="this.style.background=''">
       <td style="padding:16px 14px;vertical-align:top">
@@ -4519,7 +4537,7 @@ function renderRFPOpps() {
       <td style="padding:16px 14px;vertical-align:top;color:#475569;font-size:12px;font-weight:600">${r.value?'€'+Number(r.value).toLocaleString():'—'}</td>
       <td style="padding:16px 14px;vertical-align:top;max-width:260px">
         <p style="color:#475569;font-size:11.5px;line-height:1.5;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden" title="${esc(r.notes||'')}">${esc(r.notes||'')}</p>
-        ${r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;margin-top:6px;color:#00f5c4;font-size:11px;font-weight:600;text-decoration:none">View source<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>` : ''}
+        ${r.url ? `<a href="${esc(safeHref(r.url))}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;margin-top:6px;color:#00f5c4;font-size:11px;font-weight:600;text-decoration:none">View source<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>` : ''}
       </td>
       <td style="padding:16px 10px;vertical-align:top;white-space:nowrap">
         <button onclick="deleteRFP('${r.id}')" title="Remove" style="background:none;border:none;cursor:pointer;color:#334155;padding:4px;border-radius:4px;opacity:.5;transition:opacity .15s" onmouseover="this.style.opacity=1;this.style.color='#ef4444'" onmouseout="this.style.opacity='.5';this.style.color='#334155'"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
@@ -5042,9 +5060,9 @@ function renderOpenAlex() {
     `<span style="background:${color}20;color:${color};border:1px solid ${color}40;border-radius:6px;padding:2px 10px;font-size:11px;font-weight:700">${tier}</span>`;
 
   const linkBtn = (s) =>
-    `<a href="${s.url}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:4px 10px;font-size:12px;color:#60a5fa;text-decoration:none;margin:3px 4px 3px 0">
+    `<a href="${esc(safeHref(s.url))}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:4px 10px;font-size:12px;color:#60a5fa;text-decoration:none;margin:3px 4px 3px 0">
       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 0 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-      ${s.label}</a>`;
+      ${esc(s.label)}</a>`;
 
   /* ── SECTION: KPI bar ───────────────────────────────────────────────── */
   const kpiBar = `
@@ -5147,7 +5165,7 @@ function renderOpenAlex() {
       ? `<span style="color:#e2e8f0;font-weight:700;font-size:12px">${feeText}</span>`
       : `<span style="color:#334155;font-size:12px">${d.status === 'subscriber' ? 'Not disclosed' : '—'}</span>`;
     const srcLinks = d.sources.length
-      ? d.sources.map(s => `<a href="${s.url}" target="_blank" rel="noopener" style="color:#60a5fa;font-size:11px;text-decoration:none;display:block;margin-bottom:5px">↗ ${s.label}</a>`).join('')
+      ? d.sources.map(s => `<a href="${esc(safeHref(s.url))}" target="_blank" rel="noopener" style="color:#60a5fa;font-size:11px;text-decoration:none;display:block;margin-bottom:5px">↗ ${esc(s.label)}</a>`).join('')
       : `<span style="color:#334155;font-size:11px">—</span>`;
     return `<tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
       <td style="padding:14px;color:#e2e8f0;font-weight:600;font-size:13px;line-height:1.4;vertical-align:top">${d.inst}</td>
@@ -5433,9 +5451,9 @@ function renderSubscriptionMatrix() {
 
     html += `<td style="padding:10px 10px;border-bottom:1px solid rgba(255,255,255,.04);text-align:center;vertical-align:middle;background:rgba(0,245,196,.02)" onclick="event.stopPropagation()">
       <div style="display:flex;flex-direction:column;gap:4px;align-items:center">
-        ${proofWos    ? `<a class="cmx-proof-link" href="${proofWos}"    target="_blank" rel="noopener" style="background:rgba(167,139,250,.12);color:#c4b5fd;border:1px solid rgba(167,139,250,.25)">${extIcon} WoS</a>` : ''}
-        ${proofOA     ? `<a class="cmx-proof-link" href="${proofOA}"     target="_blank" rel="noopener" style="background:rgba(0,245,196,.08);color:#00f5c4;border:1px solid rgba(0,245,196,.25)">${extIcon} OpenAlex</a>` : ''}
-        ${proofScopus ? `<a class="cmx-proof-link" href="${proofScopus}" target="_blank" rel="noopener" style="background:rgba(251,146,60,.1);color:#fb923c;border:1px solid rgba(251,146,60,.25)">${extIcon} Scopus</a>` : ''}
+        ${proofWos    ? `<a class="cmx-proof-link" href="${esc(safeHref(proofWos))}"    target="_blank" rel="noopener" style="background:rgba(167,139,250,.12);color:#c4b5fd;border:1px solid rgba(167,139,250,.25)">${extIcon} WoS</a>` : ''}
+        ${proofOA     ? `<a class="cmx-proof-link" href="${esc(safeHref(proofOA))}"     target="_blank" rel="noopener" style="background:rgba(0,245,196,.08);color:#00f5c4;border:1px solid rgba(0,245,196,.25)">${extIcon} OpenAlex</a>` : ''}
+        ${proofScopus ? `<a class="cmx-proof-link" href="${esc(safeHref(proofScopus))}" target="_blank" rel="noopener" style="background:rgba(251,146,60,.1);color:#fb923c;border:1px solid rgba(251,146,60,.25)">${extIcon} Scopus</a>` : ''}
         ${!proofWos && !proofOA && !proofScopus ? `<span style="font-size:10px;color:rgba(255,255,255,.2)">\u2014</span>` : ''}
       </div>
     </td>`;
@@ -5452,7 +5470,7 @@ function renderSubscriptionMatrix() {
     const ts = oaTier ? (OA_TIER_STYLE[oaTier] || OA_TIER_STYLE['Member']) : null;
     const oaLink = proofOA || `https://openalex.org/institutions?search=${encodeURIComponent(inst.name)}`;
     html += `<td class="cmx-oa-bg" onclick="event.stopPropagation()" style="padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.04);border-left:1px solid rgba(0,245,196,.1);text-align:center;vertical-align:middle">
-      <a href="${oaLink}" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;flex-direction:column;align-items:center;gap:3px">
+      <a href="${esc(safeHref(oaLink))}" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;flex-direction:column;align-items:center;gap:3px">
         ${oaTier ? `<span style="font-size:11px;font-weight:700;color:${ts.text};background:${ts.bg};border:1px solid ${ts.border};padding:3px 9px;border-radius:12px;white-space:nowrap;box-shadow:${ts.glow};transition:filter .15s" onmouseenter="this.style.filter='brightness(1.2)'" onmouseleave="this.style.filter=''">${oaTier}</span>
         ${oaFee ? `<span style="font-size:9px;color:rgba(255,255,255,.35);font-weight:600">${oaFee}</span>` : ''}` : `<span style="font-size:10px;font-weight:600;color:rgba(0,245,196,.6);background:rgba(0,245,196,.06);border:1px solid rgba(0,245,196,.15);padding:2px 9px;border-radius:10px;transition:filter .15s" onmouseenter="this.style.filter='brightness(1.3)'" onmouseleave="this.style.filter=''">Free API</span>`}
       </a>
@@ -5800,8 +5818,7 @@ async function loadDigestNews() {
     listEl.innerHTML = articles.slice(0, 100).map(a => {
       const cat = NEWS_CATEGORIES[a.category] || { label: a.categoryLabel || 'News', color: '#64748b' };
       const summaryText = a.summary || a.elsevierRelevance || a.description || 'No summary available.';
-      const safeUrl = (a.url || '').replace(/'/g, '%27');
-      return `<div style="padding:12px 18px;border-bottom:1px solid var(--border);cursor:pointer" onclick="window.open('${safeUrl}','_blank')">
+      return `<div style="padding:12px 18px;border-bottom:1px solid var(--border);cursor:pointer" onclick="${safeOpenUrlOnclick(a.url)}">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
           <span class="news-topic-tag" style="background:${cat.color}22;color:${cat.color}">${esc(cat.label)}</span>
           ${a.institution ? `<span style="font-size:11px;color:var(--muted)">${esc(a.institution)}</span>` : ''}
@@ -5840,8 +5857,7 @@ async function loadDigestHiring() {
         <th style="padding:8px 18px;font-weight:600">Apply by</th>
       </tr></thead>
       <tbody>${sorted.map(j => {
-        const safeUrl = (j.url || '').replace(/'/g, '%27');
-        return `<tr style="border-bottom:1px solid var(--border);cursor:pointer" onclick="window.open('${safeUrl}','_blank')">
+        return `<tr style="border-bottom:1px solid var(--border);cursor:pointer" onclick="${safeOpenUrlOnclick(j.url)}">
           <td style="padding:9px 18px;color:var(--text);font-weight:600">${esc(j.title || '')}</td>
           <td style="padding:9px 10px;color:var(--text2)">${esc(j.company || '')}</td>
           <td style="padding:9px 10px;color:var(--text2)">${esc(j.location || '—')}</td>
@@ -6364,7 +6380,7 @@ function _renderSearchResults({ unis, contacts, products }) {
     contacts.forEach(r => {
       const c = r.item;
       const inst = getInst(c.instId);
-      html += `<div class="gs-item" onclick="closeGlobalSearch();state.contactSearch='${esc((c.first+' '+c.last).trim())}';nav('contacts')">
+      html += `<div class="gs-item" onclick="closeGlobalSearch();state.contactSearch=${jsStr((c.first+' '+c.last).trim())};nav('contacts')">
         <div class="gs-score" style="border-color:var(--accent2);color:var(--accent2)">${r.score}</div>
         <div class="gs-item-info"><h5>${esc(c.first)} ${esc(c.last)}</h5><p>${esc(c.title||'')}${inst.short?' · '+esc(inst.short):''}</p></div>
         <span class="gs-tag gs-tag-contact">CONTACT</span>
@@ -7075,7 +7091,7 @@ function renderBarcelonaDecl() {
   const highCount = SIGNED.filter(s=>s.scopusRisk==='High').length;
 
   const signedRows = SIGNED.map(s => `
-    <tr style="border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer" onclick="window.open('${s.source}','_blank')">
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer" onclick="${safeOpenUrlOnclick(s.source)}">
       <td style="padding:11px 14px">
         <div style="display:flex;align-items:center;gap:8px">
           <span style="font-size:16px">${typeIcon[s.type]||'•'}</span>
