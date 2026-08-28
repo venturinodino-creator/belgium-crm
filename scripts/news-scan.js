@@ -566,6 +566,7 @@ async function main() {
   const existingUrls = new Set(articles.map(a => a.url));
   const candidateCounts = {};
   const freshCandidates = [];
+  let rejectedSampleCount = 0; // TEMP DIAGNOSTIC — see below
 
   const needsBackfill = articles.filter(a => !a.bottomLine || !a.keyFindings || !a.keyFindings.length);
   let backfilledCount = 0;
@@ -607,6 +608,14 @@ async function main() {
         // its aliases — see institutionMatches) to actually appear in the
         // title/description — Google News RSS relevance ranking is loose.
         if (job.inst && !institutionMatches(job.inst, item.title + ' ' + item.description)) {
+          // TEMP DIAGNOSTIC — remove once the near-zero Belgium match rate is
+          // understood. Logs a small sample of what Google News actually
+          // returned for a query vs. the institution it was supposed to be
+          // about, so the mismatch is visible without needing raw RSS access.
+          if (rejectedSampleCount < 12) {
+            console.log(`  ! REJECTED [${job.inst}]: "${item.title}"`);
+            rejectedSampleCount++;
+          }
           continue;
         }
 
