@@ -1,1 +1,82 @@
-{}
+{
+  "lastRun": "2026-08-28T18:12:43.143Z",
+  "totalOpenRoles": 0,
+  "perCompanyCounts": {
+    "Digital Science": {
+      "total": 0,
+      "nl": 0
+    },
+    "Allen Institute for AI": {
+      "total": 22,
+      "nl": 0
+    },
+    "Clarivate": {
+      "total": 162,
+      "nl": 0
+    }
+  },
+  "errors": {},
+  "untracked": [
+    {
+      "company": "scite",
+      "reason": "Not currently hiring (applications by email)",
+      "url": "https://scite.ai/jobs"
+    },
+    {
+      "company": "Consensus",
+      "reason": "Roles posted only to LinkedIn, no ATS board found",
+      "url": "https://consensus.app/home/careers/"
+    },
+    {
+      "company": "Paperguide",
+      "reason": "No formal careers page/ATS (small team, hires ad hoc via LinkedIn)",
+      "url": "https://linkedin.com/company/paperguideai"
+    },
+    {
+      "company": "IGI Global Scientific Publishing",
+      "reason": "Static list, applications by email",
+      "url": "https://www.igi-global.com/about/staff/job-opportunities/"
+    },
+    {
+      "company": "IEEE",
+      "reason": "Oracle Taleo, session-based, no public JSON API",
+      "url": "https://ieee.taleo.net/careersection/2/jobsearch.ftl"
+    },
+    {
+      "company": "Google",
+      "reason": "Proprietary/internal API, not public",
+      "url": "https://careers.google.com/"
+    },
+    {
+      "company": "OpenAI",
+      "reason": "General-purpose AI platform (Claude/GPT-style API) — no discrete product competing with Scopus/SciVal/Pure/Digital Commons",
+      "url": "https://openai.com/careers/"
+    },
+    {
+      "company": "Anthropic",
+      "reason": "General-purpose AI platform — no discrete product competing with Scopus/SciVal/Pure/Digital Commons",
+      "url": "https://anthropic.com/careers"
+    },
+    {
+      "company": "Elicit",
+      "reason": "AI research-assistant tool, not a Scopus/SciVal/Pure/Digital Commons-type institutional platform",
+      "url": "https://elicit.com/careers"
+    },
+    {
+      "company": "SciSpace",
+      "reason": "AI research-assistant tool, not a Scopus/SciVal/Pure/Digital Commons-type institutional platform",
+      "url": "https://typeset.io/careers"
+    },
+    {
+      "company": "Springer Nature",
+      "reason": "Publisher — no discrete analytics/CRIS/repository product competing with Scopus/SciVal/Pure/Digital Commons",
+      "url": "https://springernature.wd3.myworkdayjobs.com/SpringerNatureCareers"
+    },
+    {
+      "company": "Wiley",
+      "reason": "Publisher — no discrete analytics/CRIS/repository product competing with Scopus/SciVal/Pure/Digital Commons",
+      "url": "https://wiley.wd1.myworkdayjobs.com/wiley_careers"
+    }
+  ],
+  "source": "Company career-page ATS APIs (Greenhouse/Ashby/SmartRecruiters/Pinpoint/Workday) — not LinkedIn, see file header"
+}
