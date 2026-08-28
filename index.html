@@ -3786,13 +3786,23 @@ async function deleteContact(id) {
 }
 
 //  EXPORT 
+// Neutralizes CSV/formula injection: a value starting with =, +, -, @, tab or
+// CR is interpreted as an executable formula by Excel/Sheets when the file is
+// opened, not literal text — contact data here can originate from scraped
+// institution pages (discover.js), not just hand-entered CRM data, so it
+// isn't all trusted input. Prefixing with a leading apostrophe forces
+// spreadsheet apps to treat the cell as text, same defense OWASP recommends.
+function csvSafe(v) {
+  const s = String(v||'');
+  return /^[=+\-@\t\r]/.test(s) ? "'" + s : s;
+}
 function exportCSV() {
   const headers = ['First','Last','Title','Department','Institution','Type','City','Email','Phone','LinkedIn','Research Areas','Status','Priority','Last Contact','Quality','Notes'];
   const instMap = {};
   state.institutions.forEach(i=>{ instMap[i.id]=i; });
   const rows = state.contacts.map(c=>{
     const inst = instMap[c.instId]||{};
-    return [c.first,c.last,c.title,c.dept,inst.name,inst.type,inst.city,c.email,c.phone,c.linkedin,c.research,c.status,c.priority,c.lastContact,c.quality,c.notes].map(v=>'"'+(v||'').replace(/"/g,'""')+'"');
+    return [c.first,c.last,c.title,c.dept,inst.name,inst.type,inst.city,c.email,c.phone,c.linkedin,c.research,c.status,c.priority,c.lastContact,c.quality,c.notes].map(v=>'"'+csvSafe(v).replace(/"/g,'""')+'"');
   });
   const csv = [headers, ...rows].map(r=>r.join(',')).join('\n');
   const blob = new Blob([csv], {type:'text/csv'});
