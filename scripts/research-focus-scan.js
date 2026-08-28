@@ -68,8 +68,20 @@ async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 // Retries on 429/5xx with backoff so a transient rate-limit blip never gets
 // mistaken for "this institution doesn't exist" by the caller.
+//
+// Guarded with an AbortController — plain fetch() has no timeout, so a
+// stalled connection would otherwise hang the whole weekly workflow run
+// indefinitely instead of retrying or falling back (the same failure mode
+// found and fixed for news-scan.js's Anthropic call, generalized here).
 async function apiGet(url, attempt = 1) {
-  const res = await fetch(url, { headers: { 'User-Agent': `belgium-crm-research-focus-scan (mailto:${MAILTO})` } });
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 30000);
+  let res;
+  try {
+    res = await fetch(url, { headers: { 'User-Agent': `belgium-crm-research-focus-scan (mailto:${MAILTO})` }, signal: ctrl.signal });
+  } finally {
+    clearTimeout(timer);
+  }
   if (res.ok) return res.json();
   if ((res.status === 429 || res.status >= 500) && attempt <= 6) {
     const wait = Math.min(2000 * attempt, 15000);
