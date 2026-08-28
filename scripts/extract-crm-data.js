@@ -66,10 +66,24 @@ function readJSON(path, fallback) {
   try { return JSON.parse(readFileSync(path, 'utf8')); } catch { return fallback; }
 }
 
+// Guards every Supabase REST call with a timeout — plain fetch() has none,
+// so a stalled connection would otherwise hang the whole workflow run
+// indefinitely instead of falling back cleanly (the same failure mode found
+// and fixed for news-scan.js's Anthropic call, generalized here).
+async function supaFetch(url, options = {}) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 30000);
+  try {
+    return await fetch(url, { ...options, signal: ctrl.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function fetchLivePending() {
   if (!SUPA_SERVICE_KEY) return null;
   try {
-    const res = await fetch(`${SUPA_URL}/rest/v1/pending_contacts?select=id,first,last,institution_id,institution_name,department,created_at,status&region=eq.belgium`, {
+    const res = await supaFetch(`${SUPA_URL}/rest/v1/pending_contacts?select=id,first,last,institution_id,institution_name,department,created_at,status&region=eq.belgium`, {
       headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}` }
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -83,7 +97,7 @@ async function fetchLivePending() {
 async function fetchLiveContacts() {
   if (!SUPA_SERVICE_KEY) return null;
   try {
-    const res = await fetch(`${SUPA_URL}/rest/v1/crm_contacts?select=id,status,priority,quality,inst_id&region=eq.belgium`, {
+    const res = await supaFetch(`${SUPA_URL}/rest/v1/crm_contacts?select=id,status,priority,quality,inst_id&region=eq.belgium`, {
       headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}` }
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -102,7 +116,7 @@ async function fetchLiveContacts() {
 async function fetchInstitutionOverrides() {
   if (!SUPA_SERVICE_KEY) return {};
   try {
-    const res = await fetch(`${SUPA_URL}/rest/v1/crm_institutions?select=id,warmth,contract_value,renewal_date,products&region=eq.belgium`, {
+    const res = await supaFetch(`${SUPA_URL}/rest/v1/crm_institutions?select=id,warmth,contract_value,renewal_date,products&region=eq.belgium`, {
       headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}` }
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -117,7 +131,7 @@ async function fetchInstitutionOverrides() {
 async function fetchOpportunities() {
   if (!SUPA_SERVICE_KEY) return [];
   try {
-    const res = await fetch(`${SUPA_URL}/rest/v1/crm_opportunities?select=id,inst_id,name,stage,value,close_date&region=eq.belgium`, {
+    const res = await supaFetch(`${SUPA_URL}/rest/v1/crm_opportunities?select=id,inst_id,name,stage,value,close_date&region=eq.belgium`, {
       headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}` }
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -131,7 +145,7 @@ async function fetchOpportunities() {
 async function fetchInteractions() {
   if (!SUPA_SERVICE_KEY) return [];
   try {
-    const res = await fetch(`${SUPA_URL}/rest/v1/crm_interactions?select=id,inst_id,contact_id,date,type&region=eq.belgium`, {
+    const res = await supaFetch(`${SUPA_URL}/rest/v1/crm_interactions?select=id,inst_id,contact_id,date,type&region=eq.belgium`, {
       headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}` }
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);

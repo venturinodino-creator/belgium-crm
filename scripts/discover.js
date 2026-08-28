@@ -18,12 +18,26 @@ const SUPA_URL = 'https://cfhljbexesdrabmadpcc.supabase.co';
 const SUPA_KEY = 'sb_publishable_PE2Yc0ivOT4F4fE80CXJUw_kbch9TpZ'; // publishable key — read-only here, safe to embed
 const SUPA_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY; // required to write pending_contacts (RLS: insert requires is_admin())
 
+// Guards every Supabase REST call with a timeout — plain fetch() has none,
+// so a stalled connection would otherwise hang the whole workflow run
+// indefinitely instead of falling back cleanly (the same failure mode found
+// and fixed for news-scan.js's Anthropic call, generalized here).
+async function supaFetch(url, options = {}) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 30000);
+  try {
+    return await fetch(url, { ...options, signal: ctrl.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 // The admin sets scrape targets from the CRM's "New Contacts" page, which
 // writes to this table. Falls back to the local CONFIG_FILE if Supabase is
 // unreachable, so a scan never silently fails from a transient network issue.
 async function fetchScrapeConfig() {
   try {
-    const res = await fetch(`${SUPA_URL}/rest/v1/scrape_config?select=types&region=eq.belgium`, {
+    const res = await supaFetch(`${SUPA_URL}/rest/v1/scrape_config?select=types&region=eq.belgium`, {
       headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}` }
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -41,7 +55,7 @@ async function fetchScrapeConfig() {
 async function fetchExistingPending() {
   if (!SUPA_SERVICE_KEY) return [];
   try {
-    const res = await fetch(`${SUPA_URL}/rest/v1/pending_contacts?select=first,last,email&region=eq.belgium`, {
+    const res = await supaFetch(`${SUPA_URL}/rest/v1/pending_contacts?select=first,last,email&region=eq.belgium`, {
       headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}` }
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -58,7 +72,7 @@ async function insertPendingContacts(rows) {
     console.warn('SUPABASE_SERVICE_ROLE_KEY not set — skipping Supabase insert (add it as a GitHub Actions secret).');
     return 0;
   }
-  const res = await fetch(`${SUPA_URL}/rest/v1/pending_contacts`, {
+  const res = await supaFetch(`${SUPA_URL}/rest/v1/pending_contacts`, {
     method: 'POST',
     headers: {
       apikey: SUPA_SERVICE_KEY,
