@@ -1,27 +1,30 @@
 /**
  * news-scan.js — Daily Belgium research news scan for Elsevier's
- * competitive/business interests specifically (not general science news).
+ * competitive/business interests specifically (not general science news),
+ * angled for a sales agent selling ScienceDirect/Scopus/LeapSpace into
+ * Belgium institutions.
  *
  * Two stages:
  * 1. Free discovery: queries Google News RSS per institution/category,
  *    keyword-filtered against tracked SEED_INSTITUTIONS, with query terms
  *    scoped to research-information/scholarly-publishing/AI-for-research
- *    topics rather than any AI or funding mention. A fourth category runs
- *    the same discovery per named LeapSpace competitor (TRACKED_COMPETITORS)
- *    instead of per institution, surfacing competitor product launches,
- *    partnerships, and rollouts. Runs server-side
- *    (GitHub Actions) since a browser can't fetch news.google.com directly
- *    (CORS) without a proxy.
+ *    topics rather than any AI or funding mention. AI Development & Adoption
+ *    and Competitor Announcements each run two query angles per entity
+ *    (institution or competitor) instead of one — see their queryFor
+ *    comments below. Competitor Announcements runs per named LeapSpace
+ *    competitor (TRACKED_COMPETITORS) instead of per institution. Runs
+ *    server-side (GitHub Actions) since a browser can't fetch
+ *    news.google.com directly (CORS) without a proxy.
  * 2. Relevance filter: keyword matching alone still lets through stories
- *    that are topically AI/funding but irrelevant to Elsevier's business
- *    (e.g. an AI model for gambling-harm prediction, a childhood-cancer
- *    treatment grant) — a single batched Claude Haiku call judges each
- *    freshly-discovered candidate against Elsevier's actual business
- *    (scholarly publishing, research information, AI research tools,
- *    library/database subscriptions) and drops anything irrelevant, tagging
- *    keepers with a one-line "why it matters" note. Requires
- *    ANTHROPIC_API_KEY; skipped (keyword matches kept as-is) if unset, same
- *    fallback pattern as competitor-scan.js.
+ *    that are topically on-theme but not actually useful to a sales agent
+ *    (e.g. a study-specific research grant that will never touch a library
+ *    budget, or an AI model for an unrelated domain) — a single batched
+ *    Claude Haiku call judges each freshly-discovered candidate against a
+ *    category-specific bar (see the prompt in filterRelevance()) and drops
+ *    anything that doesn't clear it, tagging keepers with a one-line "why
+ *    it matters" note naming the institution/company and the angle.
+ *    Requires ANTHROPIC_API_KEY; skipped (keyword matches kept as-is) if
+ *    unset, same fallback pattern as competitor-scan.js.
  *
  * Run: node scripts/news-scan.js
  */
@@ -83,29 +86,47 @@ const CATEGORIES = [
     key: 'ai_adoption',
     label: 'AI Development & Adoption',
     perInstitution: true,
-    // Scoped to AI *for research/publishing* specifically — not any AI story
-    // that happens to mention a tracked institution (e.g. an AI model for
-    // an unrelated domain built by one of its researchers).
-    queryFor: (inst) => `"${inst}" (AI OR "artificial intelligence" OR "machine learning") (research OR literature OR "scientific discovery" OR publishing OR library OR database OR "research assistant")`,
+    // Two angles per institution, both scoped to AI *for research/publishing*
+    // specifically: (1) the institution building its own AI research tool
+    // in-house — a build-vs-buy competitive signal — and (2) the institution
+    // adopting/rolling out a (usually third-party) AI research tool, which
+    // flags what's already in play at that account. Both matter to a sales
+    // agent positioning LeapSpace/ScienceDirect/Scopus. Kept to the same
+    // 3-clause shape (institution + angle-terms + context-terms) as the
+    // rest of this file — a wider 5-clause version was tried and dropped:
+    // Google News RSS's matching goes loose/fuzzy on overly long boolean
+    // queries, so it returned huge raw hit counts that mostly didn't even
+    // contain the institution's literal name.
+    queryFor: (inst) => [
+      `"${inst}" (develops OR builds OR "in-house AI") (research OR literature OR "scientific discovery" OR publishing OR library OR database OR "research assistant")`,
+      `"${inst}" (adopts OR "rolls out" OR partners OR selects) AI (research OR literature OR "scientific discovery" OR publishing OR library OR database OR "research assistant")`,
+    ],
   },
   {
     key: 'funding',
     label: 'Funding Received',
     perInstitution: true,
-    // Scoped to funding for research infrastructure/information/AI tools —
-    // not any grant (e.g. a clinical treatment trial has nothing to do with
-    // Elsevier's business even though it's "funding" and "research").
-    queryFor: (inst) => `"${inst}" (funding OR grant OR investment) ("research infrastructure" OR library OR database OR subscription OR "open access" OR "research information" OR "AI tools" OR bibliometric OR CRIS)`,
+    // Scoped to funding that could plausibly convert into an Elsevier
+    // purchase or renewal — research infrastructure/library/digital-tools
+    // budgets — not a grant for a specific research project or study (which
+    // never touches a library/subscription budget even if it's AI-related).
+    // The relevance filter below applies the sharper "would this money buy
+    // an Elsevier product" test; these keywords are just the first pass.
+    queryFor: (inst) => `"${inst}" (funding OR grant OR investment OR budget) ("research infrastructure" OR library OR database OR subscription OR "open access" OR "research information" OR "AI tools" OR bibliometric OR CRIS OR "digital infrastructure")`,
   },
   {
     key: 'policy',
     label: 'Belgium Research Policy',
     perInstitution: false,
+    // High-level/ministry-level only — policy that could move institutional
+    // purchasing power or touch existing Elsevier subscriptions, not
+    // individual-researcher or single-study stories.
     queries: [
       'Belgium research funding policy BELSPO OR FWO OR FNRS',
       'Belgium universities "open access" OR "open science" policy',
       'Belgium research assessment reform',
       'Belgium library Scopus OR "Web of Science" OR subscription cancellation',
+      'Belgium VLIR OR FWO OR FNRS Elsevier OR "Web of Science" OR Springer national license negotiation',
     ],
   },
   {
@@ -113,9 +134,15 @@ const CATEGORIES = [
     label: 'Competitor Announcements',
     perInstitution: true,
     entities: TRACKED_COMPETITORS,
-    // Company-level news from named LeapSpace competitors — new products,
-    // partnerships, rollouts, expansions — not general company news.
-    queryFor: (co) => `"${co}" (launches OR unveils OR announces OR partnership OR collaborat* OR "rolls out" OR expands OR acquisition OR "new tool" OR "new feature") (research OR publishing OR AI OR "scientific literature" OR database OR scholarly OR "research assistant")`,
+    // Two angles per competitor: (1) the general product launch/update —
+    // the competitive-landscape shift itself — and (2) a signal that a
+    // specific Belgium institution is adopting, piloting, or evaluating
+    // it, which is the more actionable one for a sales agent since it flags
+    // a live or at-risk account.
+    queryFor: (co) => [
+      `"${co}" (launches OR unveils OR announces OR partnership OR collaborat* OR "rolls out" OR expands OR acquisition OR "new tool" OR "new feature") (research OR publishing OR AI OR "scientific literature" OR database OR scholarly OR "research assistant")`,
+      `"${co}" (Belgium OR Belgian OR Flemish OR Walloon) (adopts OR selects OR partners OR pilots OR licenses OR subscribes OR trial OR evaluat*)`,
+    ],
   },
 ];
 
@@ -213,11 +240,18 @@ async function filterRelevance(candidates) {
 
   const prompt = `${ELSEVIER_CONTEXT}
 
-For each numbered article below, decide whether it is genuinely relevant to Elsevier's business and competitive interests as described above — i.e. about scholarly publishing, research information infrastructure, AI research/discovery tools, library or database subscriptions, bibliometrics, or funding/policy specifically tied to those areas. Mark irrelevant anything that is just general research findings, medical/scientific results, or an AI application unrelated to research infrastructure — even if it mentions a tracked institution, "AI", or "funding".
+You are filtering this news feed for an Elsevier sales agent selling ScienceDirect/Scopus/LeapSpace into Belgium institutions. For each numbered article below, decide whether it's genuinely relevant using the category-specific bar for its bracketed category:
+
+- [AI Development & Adoption]: keep only if it's a Belgium institution (mainly universities, though a medical centre or major research institute counts too) either developing its own AI research/publishing tool, or adopting/rolling out one (in-house or third-party) — either signals what's live at that account. Reject AI news with no research/scholarly-tools angle (e.g. clinical diagnostic AI, unrelated campus IT).
+- [Funding Received]: keep ONLY if the money could plausibly be used to purchase or renew an Elsevier product — i.e. funding for research infrastructure, library systems, digital research tools, or an institutional research-support budget. Reject funding for a specific research project or study even if it mentions AI or "research" — that money never touches a library/subscription budget.
+- [Belgium Research Policy]: keep only high-level, ministry/national-level policy (BELSPO, national funding agency, open-access mandates, VLIR/FWO/FNRS national licensing negotiations, research assessment reform) that could move institutional purchasing power or affect existing Elsevier subscriptions. Reject individual-researcher or single-study policy stories.
+- [Competitor Announcements]: keep a genuine competitor product launch/update, OR a report that a Belgium institution is adopting, piloting, or evaluating a competitor's product. For an adoption story, the reason must name the institution and what it means for the competitive landscape or an existing Elsevier relationship there.
+
+Mark irrelevant anything that's just general research findings or medical/scientific results, even if it mentions a tracked institution, "AI", or "funding".
 
 ${batch.map((c, i) => `${i + 1}. [${c.categoryLabel}] "${c.title}" — ${c.description || '(no description)'}`).join('\n')}
 
-Respond with ONLY a JSON array, one object per article in the same order, each exactly: {"relevant": true|false, "reason": "one short sentence explaining why it matters to Elsevier, only if relevant — omit or empty string if not relevant"}`;
+Respond with ONLY a JSON array, one object per article in the same order, each exactly: {"relevant": true|false, "reason": "one short, specific sentence on why it matters to an Elsevier sales agent here — name the institution/company and the angle — only if relevant, omit or empty string if not relevant"}`;
 
   let res;
   const ctrl = new AbortController();
@@ -274,7 +308,10 @@ async function main() {
     let categoryCandidates = 0;
 
     const jobs = category.perInstitution
-      ? (category.entities || ALL_INSTITUTIONS).map(inst => ({ inst, query: category.queryFor(inst) }))
+      ? (category.entities || ALL_INSTITUTIONS).flatMap(inst => {
+          const q = category.queryFor(inst);
+          return (Array.isArray(q) ? q : [q]).map(query => ({ inst, query }));
+        })
       : category.queries.map(q => ({ inst: null, query: q }));
 
     for (const job of jobs) {
