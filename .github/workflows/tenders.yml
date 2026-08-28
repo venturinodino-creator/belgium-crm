@@ -7,11 +7,11 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 concurrency:
   group: tenders-${{ github.ref }}
   cancel-in-progress: false
-  issues: write
 
 jobs:
   scan:
