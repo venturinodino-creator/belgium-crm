@@ -665,7 +665,7 @@
     </p>
     <div class="stats-row">
       <div class="stat">
-        <div class="stat-val">38<span class="unit">+</span></div>
+        <div class="stat-val" id="stat-institutions">38<span class="unit">+</span></div>
         <div class="stat-lbl">Institutions tracked</div>
       </div>
       <div class="stat">
@@ -695,7 +695,7 @@
       Try <a href="#" onclick="setSearch('KU Leuven'); return false">KU Leuven</a>,
       <a href="#" onclick="setSearch('Brussels'); return false">Brussels</a>, or
       <a href="#" onclick="setSearch('Medical'); return false">Medical centres</a> —
-      or browse all 38 institutions below.
+      or browse all <span id="hint-institutions">38</span> institutions below.
     </p>
 
     <div class="live-label"><span class="live-dot"></span> Live coverage</div>
@@ -899,7 +899,7 @@
   <div class="section-tag">Join the platform</div>
   <h2 class="cta-h2">Enter the CRM.</h2>
   <p class="cta-sub">
-    All <em>38 institutions</em>, <em id="cta-contacts">300+ contacts</em>, and <em>7 competitor product tracks</em><br>
+    All <em id="cta-institutions">38 institutions</em>, <em id="cta-contacts">300+ contacts</em>, and <em>7 competitor product tracks</em><br>
     — ready and waiting.
   </p>
   <a href="index.html" class="btn-big">
@@ -912,7 +912,7 @@
 <!-- Bottom bar -->
 <div class="bottom-bar">
   <div>Research CRM <span style="margin:0 8px;opacity:.3">/</span> Belgium <span style="margin:0 8px;opacity:.3">/</span> <span class="status-dot"></span> All systems operational</div>
-  <div>🎯 38 institutions tracked</div>
+  <div>🎯 <span id="bar-institutions">38</span> institutions tracked</div>
 </div>
 
 <!-- Toast notification -->
@@ -1106,24 +1106,40 @@ function toast(msg) {
 }
 renderRegionSwitcher();
 
-// Live contact count, straight from Supabase, region-scoped — replaces the
-// previously hardcoded "300+ contacts" placeholder figure.
+// Live institution/contact counts, straight from Supabase, region-scoped.
+// crm_contacts/crm_institutions SELECT is restricted to authenticated
+// sessions (a visitor here hasn't signed in yet), so a direct table query
+// always came back empty under RLS — not an error, just zero visible rows,
+// which is why this used to render "0+". crm_public_stats() is a
+// SECURITY DEFINER function that exposes just these two counts (no contact
+// PII) to anonymous callers.
 (async function loadLiveStats() {
   try {
     const SUPA_URL = 'https://cfhljbexesdrabmadpcc.supabase.co';
     const SUPA_KEY = 'sb_publishable_PE2Yc0ivOT4F4fE80CXJUw_kbch9TpZ';
-    const res = await fetch(`${SUPA_URL}/rest/v1/crm_contacts?select=id&region=eq.belgium`, {
-      headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`, Prefer: 'count=exact', Range: '0-0' },
+    const res = await fetch(`${SUPA_URL}/rest/v1/rpc/crm_public_stats`, {
+      method: 'POST',
+      headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_region: 'belgium' }),
     });
-    const range = res.headers.get('content-range'); // "0-0/<total>"
-    const total = range ? parseInt(range.split('/')[1], 10) : null;
-    if (total != null && !isNaN(total)) {
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const rows = await res.json();
+    const stats = rows && rows[0];
+    if (stats) {
+      const instEl = document.getElementById('stat-institutions');
       const statEl = document.getElementById('stat-contacts');
       const ctaEl  = document.getElementById('cta-contacts');
-      if (statEl) statEl.innerHTML = total + '<span class="unit">+</span>';
-      if (ctaEl)  ctaEl.textContent = total + '+ contacts';
+      const ctaInstEl = document.getElementById('cta-institutions');
+      const hintEl = document.getElementById('hint-institutions');
+      const barEl  = document.getElementById('bar-institutions');
+      if (instEl && stats.institutions != null) instEl.innerHTML = stats.institutions + '<span class="unit">+</span>';
+      if (statEl && stats.contacts != null) statEl.innerHTML = stats.contacts + '<span class="unit">+</span>';
+      if (ctaEl && stats.contacts != null) ctaEl.textContent = stats.contacts + '+ contacts';
+      if (ctaInstEl && stats.institutions != null) ctaInstEl.textContent = stats.institutions + ' institutions';
+      if (hintEl && stats.institutions != null) hintEl.textContent = stats.institutions;
+      if (barEl && stats.institutions != null) barEl.textContent = stats.institutions;
     }
-  } catch (e) { /* keep the static fallback figure already in the markup */ }
+  } catch (e) { /* keep the static fallback figures already in the markup */ }
 })();
 
 // ── Institution data ────────────────────────────────────────────────────────
@@ -1230,23 +1246,6 @@ function setSearch(val){
 
 // Expiry count
 document.getElementById('expiry-count').textContent = '8';
-
-// Live contact count from CRM localStorage
-(function(){
-  try {
-    var raw = localStorage.getItem('be_crm_contacts');
-    if (raw) {
-      var contacts = JSON.parse(raw);
-      var count = Array.isArray(contacts) ? contacts.length : 0;
-      if (count > 0) {
-        var statEl = document.getElementById('stat-contacts');
-        var ctaEl  = document.getElementById('cta-contacts');
-        if (statEl) statEl.innerHTML = count + '<span class="unit">+</span>';
-        if (ctaEl)  ctaEl.textContent = count + '+ contacts';
-      }
-    }
-  } catch(e) {}
-})();
 
 // Toast
 (function(){
