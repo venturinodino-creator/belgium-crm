@@ -1,0 +1,244 @@
+/* ═══════════════════════════════════════════════════════════════════
+   NL Research CRM — Global Animations v1.0
+   Drop this file next to index.html and add to <head>:
+     <link rel="stylesheet" href="animations.css">
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── KEYFRAMES ─────────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── PAGE TRANSITION ───────────────────────────────────────────── */
+#content.page-enter {
+  animation: fadeUp .22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── STAT CARDS (Dashboard) ────────────────────────────────────── */
+.stat-card {
+  position: relative;
+  overflow: hidden;
+  transition: border-color .2s, box-shadow .2s, transform .2s;
+}
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--border2), transparent);
+  opacity: 0;
+  transition: opacity .2s;
+}
+.stat-card:hover {
+  border-color: var(--border2);
+  box-shadow: 0 4px 14px rgba(0,0,0,.09);
+  transform: translateY(-2px);
+}
+.stat-card:hover::after {
+  opacity: 1;
+}
+
+/* ── STAT NUMBER ENTRY ──────────────────────────────────────────── */
+.stat-card .stat-value {
+  animation: countUp .35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── INSTITUTION CARDS ─────────────────────────────────────────── */
+.ic {
+  animation: cardIn .28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── NEWS CARDS ─────────────────────────────────────────────────── */
+.news-card {
+  position: relative;
+  overflow: hidden;
+  transition: border-color .2s, box-shadow .2s, transform .2s;
+}
+.news-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--border2), transparent);
+  opacity: 0;
+  transition: opacity .2s;
+}
+.news-card:hover {
+  border-color: var(--border2);
+  box-shadow: 0 6px 20px rgba(0,0,0,.10);
+  transform: translateY(-2px);
+}
+.news-card:hover::after {
+  opacity: 1;
+}
+
+/* ── PIPELINE / KANBAN CARDS ────────────────────────────────────── */
+.pipeline-card {
+  position: relative;
+  overflow: hidden;
+  transition: border-color .2s, box-shadow .2s, transform .2s;
+}
+.pipeline-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--border2), transparent);
+  opacity: 0;
+  transition: opacity .2s;
+}
+.pipeline-card:hover {
+  border-color: var(--border2);
+  box-shadow: 0 4px 14px rgba(0,0,0,.12);
+  transform: translateY(-2px);
+}
+.pipeline-card:hover::after {
+  opacity: 1;
+}
+
+/* ── TODAY'S ACTIONS ────────────────────────────────────────────── */
+.action-item {
+  transition: background .15s, border-color .15s, transform .15s;
+}
+.action-item:hover {
+  transform: translateX(3px);
+  border-color: var(--border2);
+}
+
+/* ── INTERACTION LOG ROWS ───────────────────────────────────────── */
+.int-row {
+  transition: border-color .15s, transform .15s;
+}
+.int-row:hover {
+  border-color: var(--border2);
+  transform: translateX(2px);
+}
+
+/* ── ACCOUNT GRID CELLS ─────────────────────────────────────────── */
+.acct-cell {
+  transition: border-color .18s, transform .18s, box-shadow .18s;
+}
+.acct-cell:hover {
+  border-color: var(--border2);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,.07);
+}
+
+/* ── INSTITUTION TYPE BARS ──────────────────────────────────────── */
+.bk-row {
+  border-left: 2px solid transparent;
+  transition: background .12s, border-color .12s, padding-left .15s;
+  padding-left: 4px;
+}
+.bk-row:hover {
+  border-left-color: var(--border2);
+  padding-left: 9px;
+}
+
+/* ── RECENTLY CONTACTED ROWS ────────────────────────────────────── */
+.recent-row {
+  border-radius: 5px;
+  padding-left: 4px;
+  padding-right: 4px;
+  margin-left: -4px;
+  margin-right: -4px;
+  cursor: pointer;
+  transition: background .15s;
+}
+.recent-row:hover {
+  background: rgba(0,0,0,.04);
+}
+
+/* ── CONTACT / DIRECTORY TABLE ROWS ────────────────────────────── */
+tbody tr {
+  transition: background .1s, transform .12s;
+}
+tbody tr:hover {
+  transform: translateX(1px);
+}
+
+/* ── NAV ITEMS ──────────────────────────────────────────────────── */
+.nav-item {
+  transition: background .15s, color .15s, transform .15s;
+}
+.nav-item:hover {
+  transform: translateX(2px);
+}
+.nav-item.active {
+  transform: translateX(2px);
+}
+
+/* ── MAP FILTER BUTTONS ─────────────────────────────────────────── */
+.map-filter-btn {
+  transition: border-color .15s, color .15s, transform .15s, background .15s;
+}
+.map-filter-btn:hover {
+  transform: translateY(-1px);
+}
+.map-filter-btn.active {
+  transform: translateY(-1px);
+}
+
+/* ── NEWS FILTER BUTTONS ────────────────────────────────────────── */
+.news-filter-btn {
+  transition: background .15s, border-color .15s, color .15s, transform .15s;
+}
+.news-filter-btn:hover {
+  transform: translateY(-1px);
+}
+.news-filter-btn.active {
+  transform: translateY(-1px);
+}
+
+/* ── QUICK-ACTION BUTTONS ───────────────────────────────────────── */
+.btn:active {
+  transform: scale(0.96);
+  transition: transform .08s;
+}
+
+/* ── MODAL ENTRANCE ─────────────────────────────────────────────── */
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.96) translateY(6px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.overlay.open .modal {
+  animation: modalIn .2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── TOAST ──────────────────────────────────────────────────────── */
+.toast {
+  transition: all .28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ── SUBSCRIPTION MATRIX ROWS ───────────────────────────────────── */
+.sub-matrix tr,
+.matrix-row {
+  transition: background .12s, transform .12s;
+}
+.sub-matrix tr:hover,
+.matrix-row:hover {
+  transform: translateX(1px);
+}
+
+/* ── CARD STAGGER HELPERS (set by animations.js) ────────────────── */
+.stagger-1  { animation-delay: .03s !important; }
+.stagger-2  { animation-delay: .06s !important; }
+.stagger-3  { animation-delay: .09s !important; }
+.stagger-4  { animation-delay: .12s !important; }
+.stagger-5  { animation-delay: .15s !important; }
+.stagger-6  { animation-delay: .18s !important; }
+.stagger-7  { animation-delay: .21s !important; }
+.stagger-8  { animation-delay: .24s !important; }
+.stagger-9  { animation-delay: .27s !important; }
+.stagger-10 { animation-delay: .30s !important; }
+.stagger-11 { animation-delay: .33s !important; }
+.stagger-12 { animation-delay: .36s !important; }
