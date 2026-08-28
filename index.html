@@ -3184,8 +3184,10 @@ const NEWS_CATEGORIES = {
   competitor_announcements: { label: 'Competitor Announcements',   color: '#7c3aed' },
 };
 
-let _newsAllArticles    = [];
-let _newsActiveCategory = 'all';
+let _newsAllArticles     = [];
+let _newsArchiveArticles = null; // lazy-loaded on first "View Archive" click
+let _newsShowArchive     = false;
+let _newsActiveCategory  = 'all';
 
 function getDismissedNewsIds() {
   try { return JSON.parse(localStorage.getItem('be_crm_dismissed_news') || '[]'); }
@@ -3222,22 +3224,45 @@ function setNewsCategory(cat) {
   renderNewsArticles();
 }
 
+async function toggleNewsArchiveView() {
+  _newsShowArchive = !_newsShowArchive;
+  const btn = document.getElementById('toggle-archive-btn');
+  if (btn) btn.innerHTML = _newsShowArchive
+    ? '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px"><polyline points="15 18 9 12 15 6"/></svg>Back to live feed'
+    : '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8"/><line x1="10" y1="13" x2="14" y2="13"/></svg>View archive';
+  if (_newsShowArchive && _newsArchiveArticles === null) {
+    const feed = document.getElementById('news-feed');
+    if (feed) feed.innerHTML = `<div class="news-loading"><div class="news-spinner"></div>Loading…</div>`;
+    try {
+      const res = await fetch('/belgium-crm/data/archive/news.json?t=' + Date.now());
+      const data = res.ok ? await res.json() : [];
+      _newsArchiveArticles = Array.isArray(data) ? data : [];
+    } catch(e) { _newsArchiveArticles = []; }
+  }
+  renderNewsArticles();
+}
+
 function renderNewsArticles() {
   const feed = document.getElementById('news-feed');
   if (!feed) return;
 
   const dismissed = getDismissedNewsIds();
+  const sourceArticles = _newsShowArchive ? (_newsArchiveArticles || []) : _newsAllArticles;
   // news.json can carry duplicate ids if an overlapping scan run added the
   // same article twice before the first commit landed — dedupe defensively.
   const seenIds = new Set();
-  const deduped = _newsAllArticles.filter(a => !seenIds.has(a.id) && seenIds.add(a.id));
+  const deduped = sourceArticles.filter(a => !seenIds.has(a.id) && seenIds.add(a.id));
   const visible = deduped.filter(a => !dismissed.includes(a.id));
   const filtered = _newsActiveCategory === 'all'
     ? visible
     : visible.filter(a => a.category === _newsActiveCategory);
 
   if (!filtered.length) {
-    feed.innerHTML = `<div class="news-empty">
+    feed.innerHTML = _newsShowArchive ? `<div class="news-empty">
+      <div style="font-size:32px;margin-bottom:10px">­</div>
+      No archived articles yet.<br>
+      <small>Articles are moved here automatically once they're more than 7 days old.</small>
+    </div>` : `<div class="news-empty">
       <div style="font-size:32px;margin-bottom:10px">­</div>
       No articles yet.<br>
       <small>The daily scan runs at 07:00 UTC — check back after that, or run it manually from GitHub Actions.</small>
@@ -3254,7 +3279,7 @@ function renderNewsArticles() {
         <span class="news-source-badge" style="background:${cat.color}22;color:${cat.color}">${esc(badgeLabel)}</span>
         <span class="news-topic-tag">${esc(cat.label)}</span>
         <span class="news-date">${esc(a.publishedDate || a.foundDate || '')}</span>
-        <button onclick="event.stopPropagation();dismissNewsArticle('${a.id}')" title="Remove" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#334155;padding:4px;border-radius:4px;opacity:.5;transition:opacity .15s;flex-shrink:0" onmouseover="this.style.opacity=1;this.style.color='#ef4444'" onmouseout="this.style.opacity='.5';this.style.color='#334155'"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+        ${_newsShowArchive ? '' : `<button onclick="event.stopPropagation();dismissNewsArticle('${a.id}')" title="Remove" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#334155;padding:4px;border-radius:4px;opacity:.5;transition:opacity .15s;flex-shrink:0" onmouseover="this.style.opacity=1;this.style.color='#ef4444'" onmouseout="this.style.opacity='.5';this.style.color='#334155'"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>`}
       </div>
       <h3>${esc(a.title)}</h3>
       ${a.description ? `<p>${esc(a.description)}</p>` : ''}
@@ -3283,7 +3308,12 @@ async function renderNewsScanStatus() {
 function renderNews() {
   document.getElementById('page-title').textContent = 'Belgium Research News';
   document.getElementById('page-sub').textContent = 'AI, funding, policy, and competitor news relevant to Elsevier\'s business — scanned daily, filtered for relevance';
+  _newsShowArchive = false;
   document.getElementById('topbar-actions').innerHTML = `
+    <button class="btn btn-outline" id="toggle-archive-btn" onclick="toggleNewsArchiveView()" style="font-size:12px" title="View articles older than 7 days that have been moved out of the live feed">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8"/><line x1="10" y1="13" x2="14" y2="13"/></svg>
+      View archive
+    </button>
     <button class="btn btn-outline" data-admin-only id="run-btn-news" onclick="runAgentNow('news-scan.yml','run-btn-news','News Scan')" style="font-size:12px" title="Triggers a fresh scan for the latest AI/funding/policy/competitor news right now via GitHub Actions">
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px"><polygon points="5 3 19 12 5 21 5 3"/></svg>
       Run news scan now
