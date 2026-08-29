@@ -1280,13 +1280,31 @@ function renderList(list){
   }).join('');
 }
 
+// How people actually name these categories. Without this, the "Medical
+// centres" example the page itself suggests matches nothing, because the
+// stored type is just "medical".
+const LB_TYPE_WORDS = {
+  university: 'university universities college',
+  medical:    'medical centre center centres centers hospital hospitals clinic umc',
+  research:   'research institute institutes laboratory lab centre center',
+  ngo:        'ngo foundation charity society trust non-profit nonprofit',
+};
+
+function lbHaystack(i){
+  return [i.name, i.short, i.city, i.type, LB_TYPE_WORDS[i.type] || '']
+    .join(' ').toLowerCase();
+}
+
 function lbApply(){
   const q = _lbQuery.trim().toLowerCase();
+  // Every word has to appear somewhere, so "medical amsterdam" narrows rather
+  // than widening the way a single substring test would.
+  const terms = q ? q.split(/\s+/).filter(Boolean) : [];
   const list = sorted.filter(i => {
     if (_lbType !== 'all' && i.type !== _lbType) return false;
-    if (!q) return true;
-    return i.name.toLowerCase().includes(q) || i.short.toLowerCase().includes(q)
-        || i.city.toLowerCase().includes(q) || i.type.toLowerCase().includes(q);
+    if (!terms.length) return true;
+    const hay = lbHaystack(i);
+    return terms.every(t => hay.includes(t));
   });
   renderList(list);
 }
