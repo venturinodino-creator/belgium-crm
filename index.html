@@ -3399,7 +3399,7 @@ function renderInstitutions() {
         <td>${i.founded||'—'}</td>
         <td>${cc} contact${cc!==1?'s':''}</td>
         <td onclick="event.stopPropagation()" style="white-space:nowrap">
-          ${i.website?`<a class="ext-link" href="${esc(i.website)}" target="_blank"> Website</a>`:''}&nbsp;
+          ${i.website?`<a class="ext-link" href="${esc(safeHref(i.website))}" target="_blank"> Website</a>`:''}&nbsp;
           <button class="btn btn-xs btn-outline" data-admin-only onclick="openEditInstitution('${i.id}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
           <button class="btn btn-xs btn-danger" data-admin-only onclick="confirmDeleteInst('${i.id}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
         </td>
@@ -3494,7 +3494,7 @@ function renderDetail() {
           </div>
         </div>
         <div style="display:flex;gap:8px;flex-shrink:0">
-          ${inst.website?`<a href="${esc(inst.website)}" target="_blank" class="btn btn-outline btn-sm"> Website</a>`:''}
+          ${inst.website?`<a href="${esc(safeHref(inst.website))}" target="_blank" class="btn btn-outline btn-sm"> Website</a>`:''}
         </div>
       </div>
       ${inst.description?`<p style="margin-top:12px;font-size:13px;color:var(--muted)">${esc(inst.description)}</p>`:''}
@@ -6988,9 +6988,9 @@ async function renderPendingContacts() {
         <span class="badge b-${getInstType(c.institution_id)}" style="font-size:10px">${esc(c.institution_name||c.institution_id||'Unknown')}</span>
       </td>
       <td style="padding:12px 14px;font-size:12px">${c.email ? `<a href="mailto:${esc(c.email)}" style="color:var(--accent)">${esc(c.email)}</a>` : '—'}</td>
-      <td style="padding:12px 14px;font-size:12px">${c.linkedin ? `<a href="${esc(c.linkedin)}" target="_blank" style="color:#38bdf8">LinkedIn</a>` : '—'}</td>
+      <td style="padding:12px 14px;font-size:12px">${c.linkedin ? `<a href="${esc(safeHref(c.linkedin))}" target="_blank" style="color:#38bdf8">LinkedIn</a>` : '—'}</td>
       <td style="padding:12px 14px;font-size:11px;color:var(--muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.research||'')}</td>
-      <td style="padding:12px 14px;font-size:11px">${c.source_url ? `<a href="${esc(c.source_url)}" target="_blank" style="color:var(--muted)">Source</a>` : '—'}</td>
+      <td style="padding:12px 14px;font-size:11px">${c.source_url ? `<a href="${esc(safeHref(c.source_url))}" target="_blank" style="color:var(--muted)">Source</a>` : '—'}</td>
       <td style="padding:12px 14px;white-space:nowrap">
         <button class="btn btn-primary" style="font-size:11px;padding:5px 12px;margin-right:6px" onclick="acceptPendingContact('${c.id}', this)">✓ Accept</button>
         <button class="btn btn-danger" style="font-size:11px;padding:5px 12px" onclick="deletePendingContact('${c.id}', this)">✕ Delete</button>
