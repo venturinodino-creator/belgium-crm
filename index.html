@@ -1211,19 +1211,37 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
 .ia-prod-n i{color:var(--accent);font-style:normal;margin-left:3px}
 .ia-prod-s{display:block;font-size:11px;font-weight:800;margin-top:3px}
 .ia-prod-r{display:block;font-size:9.5px;color:var(--muted);margin-top:2px}
-.ia-prod-p{display:inline-block;font-size:9.5px;color:var(--info);margin-top:3px;text-decoration:none}
-.ia-prod-p:hover{text-decoration:underline}
-/* products with no evidence either way — named as open questions, on one line
-   rather than as tiles that would outnumber the real findings 5 to 2 */
-.ia-silent{font-size:10.5px;line-height:1.55;color:var(--muted);margin:11px 0 0;padding-top:10px;
-  border-top:1px solid var(--border)}
-.ia-silent b{color:var(--muted2);font-weight:800}
+.ia-prod-p{display:block;font-size:9.5px;color:var(--info);margin-top:3px}
+.ia-prod-x{display:block;font-size:9.5px;color:var(--muted);margin-top:3px;opacity:.6}
+/* A tile is a link only when there is a source to open; the rest stay flat so
+   the panel never offers a click it cannot honour. */
+.ia-prod.is-linked{display:block;text-decoration:none;cursor:pointer;
+  transition:transform .15s ease,filter .15s ease}
+.ia-prod.is-linked:hover{transform:translateY(-2px);filter:brightness(1.22)}
+.ia-prod.is-linked:hover .ia-prod-p{text-decoration:underline}
+.ia-prod.is-linked:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 .ia-clear{background:rgba(0,245,196,.10);border:1px solid rgba(0,245,196,.4);color:var(--accent);
   border-radius:20px;padding:4px 11px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
 .ia-clear span{margin-left:6px;opacity:.7}
 .ia-clear:hover{background:rgba(0,245,196,.18)}
 
+
+/* Daily Digest summary */
+.dg-summary{padding:15px 18px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.017)}
+.dg-lead{font-size:13px;line-height:1.55;color:var(--text2);margin:0 0 12px}
+.dg-lead b{color:var(--text);font-weight:800}
+.dg-cats{display:flex;flex-direction:column;gap:5px;margin-bottom:11px}
+.dg-cat{display:grid;grid-template-columns:8px 1fr 90px 26px;align-items:center;gap:9px;background:none;
+  border:none;padding:3px 0;cursor:pointer;font-family:inherit;text-align:left;transition:opacity .15s}
+.dg-cat:hover{opacity:.78}
+.dg-cat[aria-pressed="true"] .dg-cat-l{color:var(--accent);font-weight:700}
+.dg-cat-dot{width:8px;height:8px;border-radius:2px}
+.dg-cat-l{font-size:11.5px;color:var(--muted2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dg-cat-bar{height:5px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden;display:block}
+.dg-cat-bar span{display:block;height:100%;border-radius:3px}
+.dg-cat-n{font-size:12px;font-weight:800;color:var(--text2);text-align:right;font-variant-numeric:tabular-nums}
+.dg-note{font-size:11px;line-height:1.5;color:var(--muted);margin:0;padding-top:10px;border-top:1px solid var(--border)}
 </style>
   <link rel="stylesheet" href="animations.css">
 </head>
@@ -4406,8 +4424,8 @@ function iaAnalyticsHtml(inst, contacts) {
     { k: 'symplectic', label: 'Symplectic' },
   ];
   // "no" and "unknown" are not findings — no cell of either kind carries a
-  // proof link anywhere in the dataset — so they are named as the absence
-  // they are and collected on one quiet line instead of taking a tile each.
+  // proof link anywhere in the dataset — so they get no tile at all rather
+  // than sitting alongside confirmed intelligence at the same size.
   const STATE = {
     expiring:  { t: 'Expiring',  c: '#fb923c', bg: 'rgba(251,146,60,.14)', urgency: 0, known: true },
     cancelled: { t: 'Cancelled', c: '#f87171', bg: 'rgba(248,113,113,.14)', urgency: 1, known: true },
@@ -4419,24 +4437,25 @@ function iaAnalyticsHtml(inst, contacts) {
   };
   const cells = PRODUCTS.filter(p => cd[p.k]).map(p => ({ p, st: STATE[cd[p.k]] || STATE.unknown }));
   const known = cells.filter(c => c.st.known).sort((a, b) => a.st.urgency - b.st.urgency);
-  const silent = cells.filter(c => !c.st.known);
 
   const posture = known.map(({ p }) => {
     const st = STATE[cd[p.k]];
     const renewal = cd[p.k + 'Renewal'];
     const proof = cd[p.k + 'Proof'] || (p.k === 'wos' ? cd.proofWos : '');
-    return `<div class="ia-prod" style="background:${st.bg};border-color:${st.c}33">
-      <span class="ia-prod-n">${p.label}${p.ours ? '<i title="Elsevier product">•</i>' : ''}</span>
+    const style = `background:${st.bg};border-color:${st.c}33`;
+    const inner = `
+      <span class="ia-prod-n">${p.label}${p.ours ? '<i title="Elsevier product">&bull;</i>' : ''}</span>
       <span class="ia-prod-s" style="color:${st.c}">${st.t}</span>
       ${renewal ? `<span class="ia-prod-r">${esc(renewal)}</span>` : ''}
-      ${proof ? `<a class="ia-prod-p" href="${esc(proof)}" target="_blank" rel="noopener" title="Source">source</a>` : ''}
-    </div>`;
+      ${proof ? '<span class="ia-prod-p">View source &rarr;</span>'
+              : '<span class="ia-prod-x">No source recorded</span>'}`;
+    // The whole tile opens the evidence. Without a source there is nothing to
+    // open, so that tile stays inert instead of looking clickable and doing nothing.
+    return proof
+      ? `<a class="ia-prod is-linked" href="${esc(safeHref(proof))}" target="_blank" rel="noopener"
+           title="Open the recorded source for ${esc(p.label)}" style="${style}">${inner}</a>`
+      : `<div class="ia-prod" style="${style}">${inner}</div>`;
   }).join('');
-
-  const silentLine = silent.length
-    ? `<p class="ia-silent"><b>Nothing established yet</b> for ${esc(silent.map(c => c.p.label).join(', '))}
-       — no evidence either way, so these are open questions rather than confirmed gaps.</p>`
-    : '';
 
   const oaTier = cd.openalexTier ? `${cd.openalexTier}${cd.openalexFee ? ' · ' + cd.openalexFee : ''}` : 'Free API';
 
@@ -4493,7 +4512,6 @@ function iaAnalyticsHtml(inst, contacts) {
       <div class="ia-panel ia-wide">
         <div class="ia-h">Subscription posture <b>OpenAlex: ${esc(oaTier)}</b></div>
         ${posture ? `<div class="ia-prods">${posture}</div>` : '<p class="ia-empty">Nothing confirmed for this institution yet.</p>'}
-        ${silentLine}
       </div>
     </div>
   </div>`;
@@ -7315,6 +7333,77 @@ async function renderDailyDigest() {
   loadDigestHiring();
 }
 
+// Condenses the feed into a few plain sentences and counts. Only fields the
+// articles actually carry are used: several have no written summary at all,
+// and that gap is stated rather than padded over.
+function digestSummarise(articles) {
+  const dates = articles.map(a => (a.publishedDate || a.foundDate || '').slice(0, 10)).filter(Boolean).sort();
+  const cats = {}, who = {};
+  let analysed = 0;
+  articles.forEach(a => {
+    const c = a.categoryLabel || (NEWS_CATEGORIES[a.category] || {}).label || 'Other';
+    cats[c] = (cats[c] || 0) + 1;
+    if (a.institution) who[a.institution] = (who[a.institution] || 0) + 1;
+    if (digestHasOwnSummary(a)) analysed++;
+  });
+  return {
+    total: articles.length,
+    from: dates[0] || '', to: dates[dates.length - 1] || '',
+    days: new Set(dates).size,
+    cats: Object.entries(cats).sort((a, b) => b[1] - a[1]),
+    who: Object.entries(who).sort((a, b) => b[1] - a[1]),
+    analysed,
+  };
+}
+
+// True only when the article carries prose that is not just its own headline
+// repeated — the feed does that for most entries.
+function digestHasOwnSummary(a) {
+  const t = (a.title || '').replace(/[^a-z0-9]/gi, '').toLowerCase();
+  const s = (a.summary || a.elsevierRelevance || a.bottomLine || a.description || '').replace(/[^a-z0-9]/gi, '').toLowerCase();
+  return !!s && s !== t && !(t && s.startsWith(t));
+}
+
+function digestSummaryHtml(articles) {
+  if (!articles.length) return '';
+  const s = digestSummarise(articles);
+  const span = s.from === s.to
+    ? `on ${esc(s.from)}`
+    : `between ${esc(s.from)} and ${esc(s.to)}`;
+  const lead = s.cats[0];
+  const top = s.who[0];
+  const dutch = s.who.filter(([n]) => !/^(anthropic|openai|google|microsoft|meta|amazon|ieee|nvidia|apple)$/i.test(n));
+
+  const bars = s.cats.map(([label, n]) => {
+    const col = (Object.values(NEWS_CATEGORIES).find(c => c.label === label) || {}).color || '#64748b';
+    return `<button class="dg-cat" onclick="digestFilterCat(${jsStr(label)})" aria-pressed="${window.DIGEST_CAT === label}">
+      <span class="dg-cat-dot" style="background:${col}"></span>
+      <span class="dg-cat-l">${esc(label)}</span>
+      <span class="dg-cat-bar"><span style="width:${Math.round(n / s.total * 100)}%;background:${col}"></span></span>
+      <span class="dg-cat-n">${n}</span>
+    </button>`;
+  }).join('');
+
+  return `<div class="dg-summary">
+    <p class="dg-lead">
+      <b>${s.total} article${s.total === 1 ? '' : 's'}</b> ${span}${s.days > 1 ? ` across ${s.days} days` : ''}.
+      ${lead ? `Mostly <b>${esc(lead[0].toLowerCase())}</b> (${lead[1]} of ${s.total})` : ''}${top && top[1] > 1 ? `, with <b>${esc(top[0])}</b> in ${top[1]} of them` : ''}.
+    </p>
+    <div class="dg-cats">${bars}</div>
+    <p class="dg-note">
+      ${dutch.length ? `In your territory: ${dutch.slice(0, 4).map(([n, c]) => esc(n) + (c > 1 ? ` (${c})` : '')).join(', ')}.` : 'No institution from your territory appears in this batch.'}
+      ${s.analysed < s.total ? ` ${s.analysed} of ${s.total} carry written analysis; the rest are headlines only.` : ''}
+    </p>
+  </div>`;
+}
+
+// Clicking a category in the summary narrows the list beneath it.
+window.DIGEST_CAT = null;
+function digestFilterCat(label) {
+  window.DIGEST_CAT = window.DIGEST_CAT === label ? null : label;
+  loadDigestNews();
+}
+
 async function loadDigestNews() {
   const listEl = document.getElementById('digest-news-list');
   const countEl = document.getElementById('digest-news-count');
@@ -7333,9 +7422,18 @@ async function loadDigestNews() {
       return;
     }
 
-    listEl.innerHTML = articles.slice(0, 100).map(a => {
+    const summaryHtml = digestSummaryHtml(articles);
+    const shown = window.DIGEST_CAT
+      ? articles.filter(a => (a.categoryLabel || (NEWS_CATEGORIES[a.category] || {}).label) === window.DIGEST_CAT)
+      : articles;
+
+    listEl.innerHTML = summaryHtml + shown.slice(0, 100).map(a => {
       const cat = NEWS_CATEGORIES[a.category] || { label: a.categoryLabel || 'News', color: '#64748b' };
-      const summaryText = a.summary || a.elsevierRelevance || a.description || 'No summary available.';
+      // Most entries repeat their headline as the description; printing it
+      // again just doubles every row, so it is dropped when that happens.
+      const summaryText = digestHasOwnSummary(a)
+        ? (a.summary || a.elsevierRelevance || a.bottomLine || a.description)
+        : '';
       return `<div style="padding:12px 18px;border-bottom:1px solid var(--border);cursor:pointer" onclick="${safeOpenUrlOnclick(a.url)}">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
           <span class="news-topic-tag" style="background:${cat.color}22;color:${cat.color}">${esc(cat.label)}</span>
@@ -7343,7 +7441,7 @@ async function loadDigestNews() {
           <span style="font-size:11px;color:var(--muted);margin-left:auto">${esc(a.publishedDate || a.foundDate || '')}</span>
         </div>
         <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">${esc(a.title || '')}</div>
-        <p style="font-size:12px;color:var(--text2);line-height:1.4;margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${esc(summaryText)}</p>
+        ${summaryText ? `<p style="font-size:12px;color:var(--text2);line-height:1.4;margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${esc(summaryText)}</p>` : ''}
       </div>`;
     }).join('');
   } catch(e) {
@@ -7954,6 +8052,7 @@ document.addEventListener('keydown', e => { if (e.key==='Escape') closeGlobalSea
   </div>
   <span id="user-email-badge"></span>
   <span id="user-role-badge" style="font-weight:700;color:var(--primary)"></span>
+  <a href="landing.html" title="Open the public Belgium page — you stay signed in" style="color:var(--muted);font-size:11px;text-decoration:none;padding:2px 8px;border:1px solid var(--border);border-radius:9px;white-space:nowrap">Front page</a>
   <button onclick="logout()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;text-decoration:underline;padding:0">Log out</button>
 </div>
 

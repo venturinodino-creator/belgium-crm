@@ -985,6 +985,27 @@
     if (res.error) { msg.textContent = 'Error: ' + res.error.message; }
     else { window.location.href = 'index.html'; }
   };
+  // Someone arriving from the app's "Front page" link is already signed in,
+  // so the sign-in wording would be wrong. Relabel once the session is known;
+  // the links still work, they just no longer ask for credentials.
+  (async function(){
+    try {
+      await initSupabase();
+      var res = await supabaseClient.auth.getSession();
+      if (!res.data || !res.data.session) return;
+      document.querySelectorAll('a[href="index.html"]').forEach(function(a){
+        a.querySelectorAll('*').forEach(function(n){
+          if (n.children.length === 0 && /sign in/i.test(n.textContent)) n.textContent = n.textContent.replace(/sign in/i, 'Open the CRM');
+        });
+        a.childNodes.forEach(function(n){
+          if (n.nodeType === 3 && /sign in/i.test(n.nodeValue)) n.nodeValue = n.nodeValue.replace(/sign in/i, 'Open the CRM');
+        });
+      });
+      var note = document.querySelector('.cta-note');
+      if (note) note.textContent = 'Internal platform \u00b7 You are signed in';
+    } catch (e) { /* wording is cosmetic; never block the page on it */ }
+  })();
+
   // Every "enter the CRM" link on this page points to index.html — intercept
   // all of them so signed-out visitors get the modal instead of a dead page.
   document.addEventListener('click', function(e){
