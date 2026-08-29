@@ -2913,14 +2913,49 @@ document.querySelectorAll('.overlay').forEach(el=>{
 });
 
 //  NAVIGATION 
-function nav(view, extra={}) {
+// Builds the address for a view, reusing the ?view=/&inst= parameters the app
+// already understands for deep links, so a copied URL still opens the right
+// screen after a reload.
+function navUrlFor(view, instId) {
+  const p = new URLSearchParams(location.search);
+  p.delete('view'); p.delete('inst');
+  if (view && view !== 'dashboard') p.set('view', view);
+  if (view === 'detail' && instId) p.set('inst', instId);
+  const q = p.toString();
+  return location.pathname + (q ? '?' + q : '');
+}
+
+function nav(view, extra={}, fromHistory=false) {
   state.view = view;
   if(extra.instId) state.detailInstId = extra.instId;
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
   const target = document.querySelector(`[data-view="${view}"]`);
   if(target) target.classList.add('active');
+  // Record the view so Back walks through screens instead of leaving the site.
+  // Skipped when the move came *from* Back, or the entry would be re-added.
+  if (!fromHistory) {
+    const instId = view === 'detail' ? (extra.instId || state.detailInstId) : null;
+    const prev = history.state;
+    if (!prev || prev.view !== view || prev.instId !== instId) {
+      try { history.pushState({ view, instId }, '', navUrlFor(view, instId)); } catch(e) {}
+    }
+  }
   render();
 }
+
+addEventListener('popstate', e => {
+  let view, instId;
+  if (e.state && e.state.view) { view = e.state.view; instId = e.state.instId; }
+  else {
+    const p = new URLSearchParams(location.search);
+    view = p.get('view') || 'dashboard';
+    instId = p.get('inst');
+  }
+  // An institution may have been deleted since that entry was recorded.
+  if (view === 'detail' && !(instId && getInst(instId).id)) { view = 'institutions'; instId = null; }
+  if (instId) state.detailInstId = instId;
+  nav(view, instId ? { instId } : {}, true);
+});
 
 //  RENDER 
 function render() {
@@ -3039,40 +3074,70 @@ function dshRelTime(ts) {
 // ── Hero headline ───────────────────────────────────────────
 // Chosen from a priority ladder rather than pinned to one metric, so the page
 // still leads with something true when a given count happens to be zero.
-let _dshPending = null; // filled in asynchronously by loadPendingCount
+let _dshPending = null, _dshNewsToday = 0; // filled in asynchronously by loadPendingCount
+// Money on the table, formatted short: 600000 -> "EUR 600k".
+function dshOpenTenderValue(list) {
+  const total = list.reduce((sum, r) => sum + (parseFloat(String(r.value || '').replace(/[^0-9.]/g, '')) || 0), 0);
+  if (!total) return null;
+  if (total >= 1e6) return '\u20ac' + (total / 1e6).toFixed(total >= 1e7 ? 0 : 1).replace(/\.0$/, '') + 'm';
+  if (total >= 1e3) return '\u20ac' + Math.round(total / 1e3) + 'k';
+  return '\u20ac' + total;
+}
+
+// The headline is picked from a ladder of things worth acting on, opportunity
+// first. Gaps and shortfalls belong in the sub-line, not in the sentence that
+// opens the day.
 function dshHeroLead() {
   const insts = state.institutions || [];
-  const untracked = insts.filter(i => !(window.COMP_DATA || {})[i.id]).length;
+  const today = new Date().toISOString().slice(0, 10);
 
-  let tender = null;
-  try {
-    const today = new Date().toISOString().slice(0, 10);
-    tender = (getRFPs() || [])
-      .filter(r => r.deadline && !['won','lost'].includes(r.status))
-      .map(r => ({ r, days: daysBetween(today, r.deadline) }))
-      .filter(x => x.days >= 0 && x.days <= 21)
-      .sort((a, b) => a.days - b.days)[0];
-  } catch(e) {}
+  let rfps = [];
+  try { rfps = (getRFPs() || []).filter(r => !['won', 'lost'].includes(r.status)); } catch(e) {}
 
-  if (tender) return {
-    html: `A tender closes in <span class="lead">${tender.days === 0 ? 'today' : tender.days + ' days'}</span>.`,
-    sub: esc(tender.r.title || tender.r.institution || 'Open tender'),
-    cta: { label:'Open the tender', view:'rfp' },
+  const fresh = rfps.filter(r => {
+    const d = r.createdAt || r.publishedDate;
+    return d && daysBetween(String(d).slice(0, 10), today) <= 14;
+  });
+  const closing = rfps
+    .filter(r => r.deadline)
+    .map(r => ({ r, days: daysBetween(today, r.deadline) }))
+    .filter(x => x.days >= 0 && x.days <= 21)
+    .sort((a, b) => a.days - b.days)[0];
+
+  if (fresh.length) return {
+    html: `<span class="lead">${fresh.length} new tender${fresh.length === 1 ? '' : 's'}</span> opened this fortnight.`,
+    sub: fresh[0].title || fresh[0].institution || 'New opportunity',
+    cta: { label: 'See the opportunities', view: 'rfp' },
   };
+  if (closing) return {
+    html: `A tender closes in <span class="lead">${closing.days === 0 ? 'today' : closing.days + ' days'}</span>.`,
+    sub: closing.r.title || closing.r.institution || 'Open tender',
+    cta: { label: 'Open the tender', view: 'rfp' },
+  };
+  if (rfps.length) {
+    const worth = dshOpenTenderValue(rfps);
+    return {
+      html: worth
+        ? `<span class="lead">${worth}</span> of tenders are live on your board.`
+        : `<span class="lead">${rfps.length} tender${rfps.length === 1 ? '' : 's'}</span> are live on your board.`,
+      sub: rfps[0].title || rfps[0].institution || '',
+      cta: { label: 'Work the pipeline', view: 'rfp' },
+    };
+  }
   if (_dshPending > 0) return {
-    html: `<span class="lead">${_dshPending} contact${_dshPending === 1 ? '' : 's'}</span> waiting for your review.`,
-    sub: 'Found by the Contact Discovery agent',
-    cta: { label:'Review new contacts', view:'pending' },
+    html: `<span class="lead">${_dshPending} new contact${_dshPending === 1 ? '' : 's'}</span> found for you.`,
+    sub: 'Discovered overnight by the contact agent',
+    cta: { label: 'Review them', view: 'pending' },
   };
-  if (untracked > 0) return {
-    html: `<span class="lead">${untracked} institutions</span> have no subscription intel.`,
-    sub: `Out of ${insts.length} in your territory`,
-    cta: { label:'Start filling the gaps', view:'institutions' },
+  if (_dshNewsToday > 0) return {
+    html: `<span class="lead">${_dshNewsToday} ${_dshNewsToday === 1 ? 'story' : 'stories'}</span> broke in your territory today.`,
+    sub: 'From the research news scan',
+    cta: { label: 'Read the news', view: 'news' },
   };
   return {
-    html: `Everything is <span class="lead">up to date</span>.`,
-    sub: 'Nothing needs you right now',
-    cta: { label:'Browse institutions', view:'institutions' },
+    html: `Your territory is <span class="lead">up to date</span>.`,
+    sub: `${insts.length} institutions tracked and quiet`,
+    cta: { label: 'Browse institutions', view: 'institutions' },
   };
 }
 function dshRenderLead() {
@@ -5461,6 +5526,13 @@ async function onSignedIn(session) {
     document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
     document.querySelector(`[data-view="${requestedView}"]`).classList.add('active');
   }
+  // Seed the first entry so the opening view is part of history rather than a
+  // blank slot that Back would fall straight through.
+  try {
+    history.replaceState(
+      { view: state.view, instId: state.view === 'detail' ? state.detailInstId : null },
+      '', navUrlFor(state.view, state.detailInstId));
+  } catch(e) {}
   render();
 }
 async function bootstrapApp() {
@@ -7583,6 +7655,7 @@ async function loadNewsCount() {
     const list = Array.isArray(articles) ? articles : [];
     const today = todayStr();
     const todayCount = list.filter(a => a.foundDate === today).length;
+    if (typeof _dshNewsToday !== 'undefined') { _dshNewsToday = todayCount; if (typeof dshRenderLead === 'function') dshRenderLead(); }
     if (el) el.textContent = list.length ? list.length : '—';
     if (sub) {
       if (!list.length) sub.textContent = 'Not scanned yet';
