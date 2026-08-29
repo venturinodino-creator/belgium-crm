@@ -1151,7 +1151,11 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
 
 /* role mix */
 .ia-bar{display:flex;height:9px;border-radius:5px;overflow:hidden;gap:2px;margin-bottom:11px}
-.ia-seg{height:100%;border:none;padding:0;border-radius:2px;cursor:pointer;transition:opacity .15s,transform .15s;transform-origin:bottom}
+/* Most contacts come from OpenAlex, so the staff tier can be 85% of the list and
+   would squeeze leadership down to a few unclickable pixels. Every tier that
+   exists keeps a usable width; the legend beside it carries the exact counts. */
+.ia-seg{height:100%;border:none;padding:0;border-radius:2px;cursor:pointer;min-width:16px;
+  transition:opacity .15s,transform .15s;transform-origin:bottom}
 .ia-seg:hover{transform:scaleY(1.45)}
 .ia-seg[aria-pressed="true"]{outline:1px solid #fff6;outline-offset:1px}
 .ia-keys{display:flex;flex-direction:column;gap:5px}
@@ -1161,6 +1165,13 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
 .ia-key[aria-pressed="true"]{color:var(--accent);font-weight:700}
 .ia-key i{width:8px;height:8px;border-radius:2px;flex-shrink:0}
 .ia-key b{margin-left:auto;color:var(--text2);font-weight:700}
+/* marks the one tier that is a hand-typed flag rather than a read job title */
+.ia-key u{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;width:12px;height:12px;
+  margin-left:4px;border-radius:50%;background:rgba(255,255,255,.09);color:var(--muted);font-size:8.5px;
+  font-weight:800;cursor:help;flex-shrink:0}
+.ia-note{font-size:11px;line-height:1.5;color:var(--muted);margin:11px 0 0;padding-top:10px;
+  border-top:1px solid var(--border)}
+.ia-note b{color:var(--text2);font-weight:800}
 
 /* departments */
 .ia-rows{display:flex;flex-direction:column;gap:6px}
@@ -1181,10 +1192,17 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
 .ia-tile:hover{background:rgba(255,255,255,.055);transform:translateY(-2px)}
 .ia-tile[aria-pressed="true"]{border-color:rgba(0,245,196,.45);background:rgba(0,245,196,.07)}
 .ia-tile-n{display:block;font-size:21px;font-weight:800;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.ia-tile-n em{font-style:normal;font-size:13px;font-weight:700;color:var(--muted);letter-spacing:0}
 .ia-tile-l{display:block;font-size:10.5px;font-weight:700;color:var(--muted2);margin-top:5px}
 .ia-tile-s{display:block;font-size:9.5px;color:var(--muted);margin-top:2px}
-.ia-flag{margin-top:10px;font-size:10.5px;color:#fbbf24;background:rgba(251,191,36,.09);
-  border:1px solid rgba(251,191,36,.22);border-radius:8px;padding:6px 9px;line-height:1.45}
+/* the duplicate warning is a control: it filters the table to the offending rows */
+.ia-flag{display:block;width:100%;margin-top:10px;font-size:10.5px;color:#fbbf24;background:rgba(251,191,36,.09);
+  border:1px solid rgba(251,191,36,.22);border-radius:8px;padding:6px 9px;line-height:1.45;
+  font-family:inherit;text-align:left;cursor:pointer;transition:background .15s}
+.ia-flag:hover{background:rgba(251,191,36,.16)}
+.ia-flag[aria-pressed="true"]{background:rgba(251,191,36,.2);border-color:rgba(251,191,36,.5)}
+.ia-flag u{display:block;text-decoration:none;color:var(--muted);font-size:9.5px;margin-top:3px}
+.ia-flag:hover u{color:#fbbf24;text-decoration:underline}
 
 /* posture */
 .ia-prods{display:flex;gap:8px;flex-wrap:wrap}
@@ -1195,6 +1213,11 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
 .ia-prod-r{display:block;font-size:9.5px;color:var(--muted);margin-top:2px}
 .ia-prod-p{display:inline-block;font-size:9.5px;color:var(--info);margin-top:3px;text-decoration:none}
 .ia-prod-p:hover{text-decoration:underline}
+/* products with no evidence either way — named as open questions, on one line
+   rather than as tiles that would outnumber the real findings 5 to 2 */
+.ia-silent{font-size:10.5px;line-height:1.55;color:var(--muted);margin:11px 0 0;padding-top:10px;
+  border-top:1px solid var(--border)}
+.ia-silent b{color:var(--muted2);font-weight:800}
 
 .ia-clear{background:rgba(0,245,196,.10);border:1px solid rgba(0,245,196,.4);color:var(--accent);
   border-radius:20px;padding:4px 11px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
@@ -4237,24 +4260,36 @@ function renderInstitutions() {
 /* ═══════════════════════════════════════════════════════════════════════════
    Institution analytics — a panel above the contact table.
 
-   Everything here is computed from data the CRM already holds. Two things it
-   deliberately does not show: an engagement timeline and a "last contacted"
-   trend, because no contact carries a lastContact date and the interaction
-   log is empty, so both would be an empty axis pretending to be a chart.
+   Three rules this panel follows, learned from getting them wrong:
+
+   1. Count people, not rows. The same person is sometimes stored twice, so
+      row counts overstate the list — and the panel used to flag a duplicate
+      in one corner while counting it twice in every other number.
+   2. Never dress a manual flag as a job title. "Marked high" is something a
+      person typed; library leadership is derived from the title. Mixing them
+      in one chart made the biggest band the one that did not count.
+   3. Absence is not a finding. A product with no evidence either way is not
+      intelligence, so it does not get a tile the size of a real one.
+
+   Two things it deliberately does not show: an engagement timeline and a
+   "last contacted" trend, because no contact carries a lastContact date and
+   the interaction log is empty, so both would be an empty axis pretending
+   to be a chart.
 
    The segments are controls: clicking one filters the table beneath.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-window.IA_FILTER = null;   // {kind:'role'|'dept'|'quality'|'email', value}
+window.IA_FILTER = null;   // {kind:'role'|'dept'|'email'|'dupe', value}
 
 const IA_TIERS = [
-  { r: 0, label: 'Library leadership', hex: '#00f5c4' },
-  { r: 1, label: 'Research directors', hex: '#38bdf8' },
+  { r: 0, label: 'Library leadership',  hex: '#00f5c4' },
+  { r: 1, label: 'Research directors',  hex: '#38bdf8' },
   { r: 2, label: 'Dept & faculty heads', hex: '#818cf8' },
   { r: 3, label: 'Other senior',        hex: '#a78bfa' },
-  { r: 4, label: 'Flagged high',        hex: '#fbbf24' },
+  { r: 4, label: 'Marked high by hand', hex: '#fbbf24' },
   { r: 5, label: 'Researchers & staff', hex: '#64748b' },
 ];
+const IA_LEAD_MAX = 2;   // ranks 0–2 are the people who decide or steer a renewal
 
 function iaSetFilter(kind, value) {
   const f = window.IA_FILTER;
@@ -4263,14 +4298,34 @@ function iaSetFilter(kind, value) {
 }
 function iaClearFilter() { window.IA_FILTER = null; renderDetail(); }
 
+function iaNameKey(c) {
+  return `${c.first || ''} ${c.last || ''}`.toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
 function iaMatches(c) {
   const f = window.IA_FILTER;
   if (!f) return true;
-  if (f.kind === 'role') return cxRoleRank(c) === Number(f.value);
-  if (f.kind === 'dept') return (c.dept || '—') === f.value;
-  if (f.kind === 'quality') return c.quality === f.value;
+  if (f.kind === 'role')  return cxRoleRank(c) === Number(f.value);
+  if (f.kind === 'leads') return cxRoleRank(c) <= IA_LEAD_MAX;
+  if (f.kind === 'dept')  return (c.dept || '—') === f.value;
   if (f.kind === 'email') return f.value === 'missing' ? !c.email : !!c.email;
+  if (f.kind === 'dupe')  return (window.IA_DUPE_KEYS || []).includes(iaNameKey(c));
   return true;
+}
+
+// Collapses the rows down to one entry per person. Where a name appears
+// twice, the record kept is the one that says the most: the most senior
+// title first, then whichever carries an email, then a verified one.
+function iaPeople(contacts) {
+  const by = new Map();
+  contacts.forEach(c => {
+    const k = iaNameKey(c);
+    const prev = by.get(k);
+    if (!prev) { by.set(k, c); return; }
+    const score = x => (9 - cxRoleRank(x)) * 4 + (x.email ? 2 : 0) + (x.quality === 'verified' ? 1 : 0);
+    if (score(c) > score(prev)) by.set(k, c);
+  });
+  return [...by.values()];
 }
 
 // Normalises the department label so "University Library" and "Utrecht
@@ -4282,14 +4337,24 @@ function iaDeptKey(d) {
 }
 
 function iaAnalyticsHtml(inst, contacts) {
-  const n = contacts.length || 1;
   const f = window.IA_FILTER;
 
-  // ── role mix ───────────────────────────────────────────────────────────
+  // ── one entry per person; every number below counts these, not rows ─────
+  const people = iaPeople(contacts);
+  const n = people.length || 1;
+  const dupeKeys = [];
+  const seenKeys = new Set();
+  contacts.forEach(c => {
+    const k = iaNameKey(c);
+    if (seenKeys.has(k)) { if (!dupeKeys.includes(k)) dupeKeys.push(k); } else seenKeys.add(k);
+  });
+  window.IA_DUPE_KEYS = dupeKeys;
+
+  // ── seniority ──────────────────────────────────────────────────────────
   const tierCounts = {};
-  contacts.forEach(c => { const r = cxRoleRank(c); tierCounts[r] = (tierCounts[r] || 0) + 1; });
+  people.forEach(c => { const r = cxRoleRank(c); tierCounts[r] = (tierCounts[r] || 0) + 1; });
   const tiers = IA_TIERS.filter(t => tierCounts[t.r]);
-  const decisionMakers = contacts.filter(c => cxRoleRank(c) <= 2).length;
+  const leaders = people.filter(c => cxRoleRank(c) <= IA_LEAD_MAX);
 
   const roleBar = tiers.map(t => {
     const on = f && f.kind === 'role' && Number(f.value) === t.r;
@@ -4301,12 +4366,12 @@ function iaAnalyticsHtml(inst, contacts) {
   const roleKey = tiers.map(t => {
     const on = f && f.kind === 'role' && Number(f.value) === t.r;
     return `<button class="ia-key" onclick="iaSetFilter('role',${t.r})" aria-pressed="${!!on}">
-      <i style="background:${t.hex}"></i>${t.label} <b>${tierCounts[t.r]}</b></button>`;
+      <i style="background:${t.hex}"></i>${t.label}${t.r === 4 ? '<u title="Priority typed in by hand, not read from a job title">?</u>' : ''} <b>${tierCounts[t.r]}</b></button>`;
   }).join('');
 
   // ── departments, merged on a normalised key ────────────────────────────
   const deptMap = {};
-  contacts.forEach(c => {
+  people.forEach(c => {
     const k = iaDeptKey(c.dept);
     (deptMap[k] = deptMap[k] || { label: c.dept || '—', n: 0, variants: new Set() });
     deptMap[k].n++; deptMap[k].variants.add(c.dept || '—');
@@ -4322,16 +4387,12 @@ function iaAnalyticsHtml(inst, contacts) {
     </button>`;
   }).join('');
 
-  // ── contactability ─────────────────────────────────────────────────────
-  const verified = contacts.filter(c => c.quality === 'verified').length;
-  const noEmail = contacts.filter(c => !c.email).length;
-
-  // ── data quality: same person recorded twice ───────────────────────────
-  const seen = {}, dupes = [];
-  contacts.forEach(c => {
-    const k = `${(c.first || '').toLowerCase()} ${(c.last || '').toLowerCase()}`.trim();
-    if (seen[k]) { if (!dupes.includes(k)) dupes.push(k); } else seen[k] = 1;
-  });
+  // ── can you reach the people who matter? ───────────────────────────────
+  // Coverage of the whole list is not the question a rep has; coverage of
+  // the leadership is, so that is what the tiles count.
+  const leadReach = leaders.filter(c => c.email).length;
+  const noEmail = people.filter(c => !c.email).length;
+  const reachPct = leaders.length ? Math.round(leadReach / leaders.length * 100) : 0;
 
   // ── subscription posture ───────────────────────────────────────────────
   const cd = (window.COMP_DATA || {})[inst.id] || {};
@@ -4344,17 +4405,24 @@ function iaAnalyticsHtml(inst, contacts) {
     { k: 'converis',   label: 'Converis' },
     { k: 'symplectic', label: 'Symplectic' },
   ];
+  // "no" and "unknown" are not findings — no cell of either kind carries a
+  // proof link anywhere in the dataset — so they are named as the absence
+  // they are and collected on one quiet line instead of taking a tile each.
   const STATE = {
-    yes:       { t: 'Active',    c: '#4ade80', bg: 'rgba(74,222,128,.12)' },
-    likely:    { t: 'Likely',    c: '#60a5fa', bg: 'rgba(96,165,250,.12)' },
-    expiring:  { t: 'Expiring',  c: '#fb923c', bg: 'rgba(251,146,60,.14)' },
-    cancelled: { t: 'Cancelled', c: '#f87171', bg: 'rgba(248,113,113,.14)' },
-    no:        { t: 'None',      c: 'var(--muted)', bg: 'rgba(255,255,255,.04)' },
-    unknown:   { t: 'Unknown',   c: 'var(--muted)', bg: 'rgba(255,255,255,.04)' },
-    free:      { t: 'Free API',  c: '#fbbf24', bg: 'rgba(251,191,36,.12)' },
+    expiring:  { t: 'Expiring',  c: '#fb923c', bg: 'rgba(251,146,60,.14)', urgency: 0, known: true },
+    cancelled: { t: 'Cancelled', c: '#f87171', bg: 'rgba(248,113,113,.14)', urgency: 1, known: true },
+    yes:       { t: 'Active',    c: '#4ade80', bg: 'rgba(74,222,128,.12)', urgency: 2, known: true },
+    likely:    { t: 'Likely',    c: '#60a5fa', bg: 'rgba(96,165,250,.12)', urgency: 3, known: true },
+    free:      { t: 'Free API',  c: '#fbbf24', bg: 'rgba(251,191,36,.12)', urgency: 4, known: true },
+    no:        { t: 'Not seen',  c: 'var(--muted)', bg: '', urgency: 8, known: false },
+    unknown:   { t: 'No data',   c: 'var(--muted)', bg: '', urgency: 9, known: false },
   };
-  const posture = PRODUCTS.filter(p => cd[p.k]).map(p => {
-    const st = STATE[cd[p.k]] || STATE.unknown;
+  const cells = PRODUCTS.filter(p => cd[p.k]).map(p => ({ p, st: STATE[cd[p.k]] || STATE.unknown }));
+  const known = cells.filter(c => c.st.known).sort((a, b) => a.st.urgency - b.st.urgency);
+  const silent = cells.filter(c => !c.st.known);
+
+  const posture = known.map(({ p }) => {
+    const st = STATE[cd[p.k]];
     const renewal = cd[p.k + 'Renewal'];
     const proof = cd[p.k + 'Proof'] || (p.k === 'wos' ? cd.proofWos : '');
     return `<div class="ia-prod" style="background:${st.bg};border-color:${st.c}33">
@@ -4364,14 +4432,25 @@ function iaAnalyticsHtml(inst, contacts) {
       ${proof ? `<a class="ia-prod-p" href="${esc(proof)}" target="_blank" rel="noopener" title="Source">source</a>` : ''}
     </div>`;
   }).join('');
+
+  const silentLine = silent.length
+    ? `<p class="ia-silent"><b>Nothing established yet</b> for ${esc(silent.map(c => c.p.label).join(', '))}
+       — no evidence either way, so these are open questions rather than confirmed gaps.</p>`
+    : '';
+
   const oaTier = cd.openalexTier ? `${cd.openalexTier}${cd.openalexFee ? ' · ' + cd.openalexFee : ''}` : 'Free API';
 
   const filterChip = f ? `<button class="ia-clear" onclick="iaClearFilter()">
       Showing ${f.kind === 'role' ? (IA_TIERS.find(t => t.r === Number(f.value)) || {}).label
+              : f.kind === 'leads' ? 'the leadership'
               : f.kind === 'dept' ? esc(f.value)
-              : f.kind === 'quality' ? f.value
+              : f.kind === 'dupe' ? 'the duplicated name'
               : f.value === 'missing' ? 'contacts without an email' : 'contacts with an email'}
       <span>&times;</span></button>` : '';
+
+  const countLine = contacts.length === people.length
+    ? `${people.length} ${people.length === 1 ? 'person' : 'people'}`
+    : `${people.length} people in ${contacts.length} records`;
 
   return `<div class="card ia-card">
     <div class="card-header" style="margin-bottom:14px">
@@ -4381,10 +4460,12 @@ function iaAnalyticsHtml(inst, contacts) {
 
     <div class="ia-grid">
       <div class="ia-panel">
-        <div class="ia-h">Role mix
-          <b>${decisionMakers} decision-maker${decisionMakers === 1 ? '' : 's'} of ${contacts.length}</b></div>
+        <div class="ia-h">Seniority <b>${countLine}</b></div>
         <div class="ia-bar">${roleBar}</div>
         <div class="ia-keys">${roleKey}</div>
+        <p class="ia-note">${leaders.length
+          ? `<b>${leaders.length}</b> of ${people.length} hold a library, research or faculty leadership title.`
+          : `No library, research or faculty leadership title recorded here yet.`}</p>
       </div>
 
       <div class="ia-panel">
@@ -4393,25 +4474,26 @@ function iaAnalyticsHtml(inst, contacts) {
       </div>
 
       <div class="ia-panel">
-        <div class="ia-h">Contactability</div>
+        <div class="ia-h">Reachability</div>
         <div class="ia-mini">
-          <button class="ia-tile" onclick="iaSetFilter('quality','verified')" aria-pressed="${!!(f && f.kind === 'quality' && f.value === 'verified')}">
-            <span class="ia-tile-n" style="color:#4ade80">${verified}</span>
-            <span class="ia-tile-l">Verified</span>
-            <span class="ia-tile-s">${Math.round(verified / n * 100)}% of the list</span>
+          <button class="ia-tile" onclick="iaSetFilter('leads',1)" aria-pressed="${!!(f && f.kind === 'leads')}">
+            <span class="ia-tile-n" style="color:${leaders.length && leadReach === leaders.length ? '#4ade80' : leaders.length ? '#fb923c' : 'var(--muted)'}">${leadReach}<em>/${leaders.length}</em></span>
+            <span class="ia-tile-l">Leaders with an email</span>
+            <span class="ia-tile-s">${leaders.length ? (reachPct === 100 ? 'all reachable' : reachPct + '% of the leadership') : 'none identified yet'}</span>
           </button>
           <button class="ia-tile" onclick="iaSetFilter('email','missing')" aria-pressed="${!!(f && f.kind === 'email' && f.value === 'missing')}">
             <span class="ia-tile-n" style="color:${noEmail ? '#fb923c' : '#4ade80'}">${noEmail}</span>
-            <span class="ia-tile-l">No email</span>
+            <span class="ia-tile-l">No email at all</span>
             <span class="ia-tile-s">${noEmail ? 'cannot be reached yet' : 'everyone reachable'}</span>
           </button>
         </div>
-        ${dupes.length ? `<p class="ia-flag">⚠ ${dupes.length} name${dupes.length === 1 ? '' : 's'} recorded twice — ${esc(dupes.slice(0, 2).map(d => d.replace(/\b\w/g, m => m.toUpperCase())).join(', '))}${dupes.length > 2 ? '…' : ''}</p>` : ''}
+        ${dupeKeys.length ? `<button class="ia-flag" onclick="iaSetFilter('dupe',1)" aria-pressed="${!!(f && f.kind === 'dupe')}">⚠ ${dupeKeys.length} name${dupeKeys.length === 1 ? '' : 's'} stored twice — ${esc(dupeKeys.slice(0, 2).map(d => d.replace(/\b\w/g, m => m.toUpperCase())).join(', '))}${dupeKeys.length > 2 ? '…' : ''}<u>show the records</u></button>` : ''}
       </div>
 
       <div class="ia-panel ia-wide">
         <div class="ia-h">Subscription posture <b>OpenAlex: ${esc(oaTier)}</b></div>
-        <div class="ia-prods">${posture || '<p class="ia-empty">No subscription intelligence recorded for this institution yet.</p>'}</div>
+        ${posture ? `<div class="ia-prods">${posture}</div>` : '<p class="ia-empty">Nothing confirmed for this institution yet.</p>'}
+        ${silentLine}
       </div>
     </div>
   </div>`;
