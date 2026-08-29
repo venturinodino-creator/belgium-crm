@@ -2149,11 +2149,11 @@ async function showNewsSummaryModal() {
   }
 
   const tilesHtml = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin:14px 0">
-    <div style="background:var(--bg3);border-radius:10px;padding:12px;border-left:3px solid var(--accent2)">
+    <div onclick="scrollToNewsCategory('all')" title="Jump to Today's Stories" style="cursor:pointer;background:var(--bg3);border-radius:10px;padding:12px;border-left:3px solid var(--accent2);transition:background .15s" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='var(--bg3)'">
       <div style="font-size:22px;font-weight:800;color:var(--text)">${total}</div>
       <div style="font-size:10px;color:var(--muted);font-weight:600;margin-top:2px">LIVE STORIES</div>
     </div>
-    ${catOrder.map(k => `<div style="background:var(--bg3);border-radius:10px;padding:12px;border-left:3px solid ${NEWS_CATEGORIES[k].color}">
+    ${catOrder.map(k => `<div onclick="scrollToNewsCategory('${k}')" title="${counts[k] ? 'Jump to ' + esc(NEWS_CATEGORIES[k].label) : 'No stories in this category yet'}" style="cursor:pointer;background:var(--bg3);border-radius:10px;padding:12px;border-left:3px solid ${NEWS_CATEGORIES[k].color};transition:background .15s" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='var(--bg3)'">
       <div style="font-size:22px;font-weight:800;color:var(--text)">${counts[k] || 0}</div>
       <div style="font-size:10px;color:var(--muted);font-weight:600;margin-top:2px">${esc(NEWS_CATEGORIES[k].label.toUpperCase())}</div>
     </div>`).join('')}
@@ -2162,7 +2162,7 @@ async function showNewsSummaryModal() {
   const barsHtml = `<div style="margin:14px 0">${catOrder.map(k => {
     const v = counts[k] || 0;
     const pct = Math.round((v / maxCount) * 100);
-    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+    return `<div onclick="scrollToNewsCategory('${k}')" title="${v ? 'Jump to ' + esc(NEWS_CATEGORIES[k].label) : 'No stories in this category yet'}" style="cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:6px">
       <span style="width:160px;font-size:11px;color:var(--muted);flex-shrink:0">${esc(NEWS_CATEGORIES[k].label)}</span>
       <div style="flex:1;background:var(--bg3);border-radius:6px;height:14px;overflow:hidden">
         <div style="width:${pct}%;height:100%;background:${NEWS_CATEGORIES[k].color}"></div>
@@ -2179,7 +2179,25 @@ async function showNewsSummaryModal() {
   // each individual story, just rolled up across the whole live set.
   const overviewCardHtml = buildOverviewCardHtml(overview, sorted, hiringTotal);
 
-  const storiesHtml = sorted.length ? sorted.slice(0, 40).map(a => buildStoryCardHtml(a)).join('') : `<div class="news-empty">No live stories to summarize yet.</div>`;
+  // Grouped by category (Funding Received, AI Development & Adoption, ...)
+  // instead of one flat chronological list — each group heading is the
+  // scroll target the KPI tiles/bars above jump to, so clicking "AI
+  // Development & Adoption" lands you on exactly that section instead of
+  // making you scan the whole list. Newest-first within each group; empty
+  // categories are skipped (nothing to jump to or show).
+  const storiesHtml = sorted.length ? catOrder.map(k => {
+    const inCat = sorted.filter(a => a.category === k);
+    if (!inCat.length) return '';
+    const cardsHtml = inCat.slice(0, 40).map(a => buildStoryCardHtml(a)).join('');
+    return `<div id="news-group-${k}" style="margin-top:18px">
+      <div style="display:flex;align-items:center;gap:8px;padding-bottom:6px;margin-bottom:8px;border-bottom:1px solid var(--border)">
+        <span style="width:8px;height:8px;border-radius:50%;background:${NEWS_CATEGORIES[k].color};flex-shrink:0"></span>
+        <span style="font-size:12px;font-weight:700;color:var(--text)">${esc(NEWS_CATEGORIES[k].label)}</span>
+        <span style="font-size:11px;color:var(--muted)">${inCat.length}</span>
+      </div>
+      ${cardsHtml}
+    </div>`;
+  }).join('') : `<div class="news-empty">No live stories to summarize yet.</div>`;
 
   const hiringTilesHtml = hiringTotal > 0 ? `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin:14px 0">
     <div style="background:var(--bg3);border-radius:10px;padding:12px;border-left:3px solid #f87171">
@@ -2212,7 +2230,7 @@ async function showNewsSummaryModal() {
     ${overviewCardHtml}
     ${tilesHtml}
     ${barsHtml}
-    <h4 style="font-size:12px;color:var(--text);margin:16px 0 4px">Today's Stories — Full Analysis</h4>
+    <h4 id="news-group-all" style="font-size:12px;color:var(--text);margin:16px 0 4px">Today's Stories — Full Analysis</h4>
     <div>${storiesHtml}</div>
     <h4 style="font-size:12px;color:var(--text);margin:20px 0 4px">Competitor Hiring — Open Roles</h4>
     ${hiringTilesHtml}
@@ -2222,6 +2240,29 @@ async function showNewsSummaryModal() {
   // identical, source-linked report instantly via print-to-PDF, with no
   // re-fetch and no async gap that could detach it from the click gesture.
   _newsSummaryPrintData = { total, catOrder, counts, overviewParts, overview, sorted, hiringTotal, hiringCatOrder, hiringCounts, hiringSorted };
+}
+
+// Jumps the News Summary modal to a given category's group of stories —
+// wired to the KPI tiles and breakdown bars in showNewsSummaryModal() above,
+// so clicking "Funding Received" lands you on that section instead of
+// making you scroll the whole flat list. 'all' targets the "Today's
+// Stories" heading itself. A category with zero live stories has no group
+// to jump to (buildStoryCardHtml groups skip empty categories), so that
+// case surfaces a toast instead of silently doing nothing.
+function scrollToNewsCategory(key) {
+  const target = document.getElementById('news-group-' + key);
+  if (!target) { try { toast('No stories in this category yet', 'warn'); } catch(e){} return; }
+  target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // Hex, not the CSS var — this gets string-concatenated with an alpha
+  // suffix below for a plain inline backgroundColor, where var(--accent2)
+  // wouldn't resolve.
+  const flashColor = key === 'all' ? '#8b5cf6' : (NEWS_CATEGORIES[key] || {}).color;
+  if (flashColor) {
+    target.style.transition = 'background-color .3s';
+    const prevBg = target.style.backgroundColor;
+    target.style.backgroundColor = flashColor + '22';
+    setTimeout(() => { target.style.backgroundColor = prevBg; }, 900);
+  }
 }
 
 // Truncates at a word boundary (never mid-word) and marks the cut with an
