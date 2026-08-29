@@ -4062,9 +4062,16 @@ const HIRING_COMPANIES = [
   'Google', 'OpenAI', 'Anthropic',
 ];
 const HIRING_CATEGORIES = {
-  sam:     { label: 'Strategic Account Mgmt', color: '#059669' },
-  csm:     { label: 'Customer Success',       color: '#1d4ed8' },
-  channel: { label: 'Channel & Partnerships', color: '#d97706' },
+  sam:            { label: 'Strategic Account Mgmt',   color: '#059669' },
+  csm:            { label: 'Customer Success',         color: '#1d4ed8' },
+  channel:        { label: 'Channel & Partnerships',   color: '#d97706' },
+  presales:       { label: 'Pre-Sales Consultant',     color: '#7c3aed' },
+  implementation: { label: 'Implementation/Onboarding', color: '#0891b2' },
+  support:        { label: 'Technical/Product Support', color: '#dc2626' },
+  service:        { label: 'Customer Service/Licence',  color: '#db2777' },
+  training:       { label: 'Training & Education',     color: '#65a30d' },
+  analytics:      { label: 'Usage & Reporting',        color: '#4f46e5' },
+  marketing:      { label: 'Product Marketing',        color: '#ea580c' },
 };
 
 let _hiringAllJobs        = [];
@@ -4122,8 +4129,8 @@ function renderHiringFeed() {
   if (!sorted.length) {
     feed.innerHTML = `<div class="news-empty">
       <div style="font-size:32px;margin-bottom:10px">­</div>
-      No open Strategic Account, Customer Success, or Channel roles tracked right now.<br>
-      <small>Scoped to Belgium and EMEA-hub (London, Dublin, Berlin, Paris, remote-EMEA, etc.) SAM/CSM/Channel hiring tied to each competitor's research-solutions line. The daily scan runs at 07:00 UTC — check back after that, or run it manually from the button above.</small>
+      No open customer-facing roles tracked right now.<br>
+      <small>Scoped to Belgium and EMEA-hub (London, Dublin, Berlin, Paris, remote-EMEA, etc.) hiring tied to each competitor's research-solutions line — Strategic Account Mgmt, Channel & Partnerships, and the full customer lifecycle (Customer Success, Pre-Sales, Implementation/Onboarding, Support, Customer Service, Training, Usage & Reporting, Product Marketing). The daily scan runs at 07:00 UTC — check back after that, or run it manually from the button above.</small>
     </div>`;
     return;
   }

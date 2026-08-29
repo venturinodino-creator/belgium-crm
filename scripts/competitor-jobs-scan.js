@@ -2,11 +2,16 @@
  * competitor-jobs-scan.js — Daily scan of open roles at companies that sell
  * a product directly competing with one of Elsevier's named RI solutions
  * (Scopus, SciVal, Pure, Insight Graph, 4GU reports, Digital Commons),
- * scoped to a Belgium account manager's specific interest:
- * Strategic/Senior Account Management (SAM), Customer Success (CSM), and
- * Channel/Partnerships hiring tied to that competing product line (not
- * engineering, product, editorial, ops, or an unrelated business line like
- * a diversified competitor's IP/patent or clinical-regulatory arm).
+ * scoped to a Belgium account manager's specific interest: go-to-market
+ * and customer-facing hiring tied to that competing product line — Strategic/
+ * Senior Account Management (SAM), Channel/Partnerships, and the full
+ * customer-lifecycle line (Customer Success, pre-sales/solution consulting,
+ * implementation/onboarding, technical/product support, customer service &
+ * licence admin, training & customer education, usage/reporting analytics,
+ * product marketing) — not engineering, core product/eng management,
+ * editorial, finance, HR, or an unrelated business line like a diversified
+ * competitor's IP/patent or clinical-regulatory arm. See classifyRole()
+ * below for the exact title patterns per category.
  *
  * Only 3 of the companies tracked elsewhere in this app (e.g. in
  * news-scan.js's Competitor Announcements) actually qualify — see SOURCES
@@ -68,26 +73,37 @@ const REQUEST_TIMEOUT_MS = 20000;
 // Netherlands-relevant location match — Dutch city names + country
 // name/abbrev, plus EMEA/Europe-remote and the specific European hub
 // cities these companies actually staff EMEA sales/CSM/channel roles
-// out of (London, Dublin, Berlin, Paris, etc). A SAM/CSM/Channel role
+// out of (London, Dublin, Berlin, Paris, etc). A tracked customer-facing role
 // based in one of those hubs, or explicitly remote-EMEA, plausibly
 // covers Dutch accounts even without a Dutch city in the listing — ATS
 // location fields are almost never literally "EMEA", they name a city,
 // so the city list matters more than the EMEA/Europe tokens alone.
 const NL_LOCATION_RE = /netherlands|nederland|amsterdam|utrecht|rotterdam|the hague|den haag|eindhoven|groningen|delft|leiden|maastricht|\bnl\b|\bemea\b|remote[\s,-]*europe|europe[\s,-]*remote|london|dublin|berlin|munich|frankfurt|paris|madrid|barcelona|lisbon|stockholm|copenhagen|zurich|milan|brussels|dubai/i;
 
-// Only three role families matter to a sales agent tracking competitor
-// go-to-market headcount: Strategic/Senior Account Management, Customer
-// Success, and Channel/Partnerships. Everything else (engineering, product,
-// ops, editorial, support, etc.) is excluded entirely rather than tagged
-// "other" — a role that doesn't match one of these is not shown.
+// Role families that matter to a sales agent tracking competitor go-to-market
+// and customer-facing headcount: Strategic/Senior Account Management,
+// Channel/Partnerships, and the full customer-lifecycle line (Customer
+// Success, pre-sales/solution consulting, implementation/onboarding,
+// technical/product support, customer service & licence admin, training &
+// customer education, usage/reporting analytics, and product marketing).
+// Everything else (engineering, core product/eng management, finance, HR,
+// editorial, etc.) is excluded entirely rather than tagged "other" — a role
+// that doesn't match one of these is not shown.
 const SAM_TITLE_RE = /\b(strategic account (manager|director|executive)|senior account (manager|executive)|key account (manager|director)|enterprise account (manager|executive)|account (manager|executive|director)|regional sales (manager|director))\b/i;
 const CSM_TITLE_RE = /\b(customer success (manager|director|lead)|client success (manager|director)|customer success)\b/i;
 const CHANNEL_TITLE_RE = /\b(channel (manager|director|sales|partnerships?)|partner(ship)? (manager|director|lead)|alliance(s)? (manager|director)|business development (manager|director))\b/i;
+const PRESALES_TITLE_RE = /\b(customer consultant|solutions? consultant|pre-?sales (consultant|engineer|manager))\b/i;
+const IMPLEMENTATION_TITLE_RE = /\b(implementation (manager|specialist|consultant|lead)|onboarding (specialist|manager|lead|consultant))\b/i;
+const SUPPORT_TITLE_RE = /\b(technical support (analyst|specialist|engineer|representative)|product support (specialist|analyst|engineer)|support analyst)\b/i;
+const SERVICE_TITLE_RE = /\b(customer service (representative|rep|associate|agent)|licen[cs]e administrator|licen[cs]ing administrator)\b/i;
+const TRAINING_TITLE_RE = /\b(training specialist|customer education (manager|specialist|lead)|training (manager|lead|coordinator))\b/i;
+const ANALYTICS_TITLE_RE = /\b(usage (&|and) reporting analyst|usage analyst|reporting analyst|usage \& reporting)\b/i;
+const MARKETING_TITLE_RE = /\b(product marketing manager|market development manager)\b/i;
 
-// Once a title matches one of the three role families above, exclude it if
-// it's clearly scoped to a business line that doesn't compete with
-// Elsevier's Research Intelligence / scholarly-publishing solutions — e.g.
-// a diversified competitor's IP/patent, life-sciences-regulatory, or
+// Once a title matches one of the role families above, exclude it if it's
+// clearly scoped to a business line that doesn't compete with Elsevier's
+// Research Intelligence / scholarly-publishing solutions — e.g. a
+// diversified competitor's IP/patent, life-sciences-regulatory, or
 // clinical-consulting arm. Title/department-only data means this is a
 // best-effort keyword check, not a guarantee.
 const NON_RESEARCH_VERTICAL_RE = /\b(patent|trademark|intellectual property|ip (services|management|licensing)|regulatory affairs|clinical trial|pharmacovigilance|drug safety|life sciences consulting)\b/i;
@@ -98,6 +114,13 @@ function classifyRole(title, department) {
   if (SAM_TITLE_RE.test(title)) return 'sam';
   if (CSM_TITLE_RE.test(title)) return 'csm';
   if (CHANNEL_TITLE_RE.test(title)) return 'channel';
+  if (PRESALES_TITLE_RE.test(title)) return 'presales';
+  if (IMPLEMENTATION_TITLE_RE.test(title)) return 'implementation';
+  if (SUPPORT_TITLE_RE.test(title)) return 'support';
+  if (SERVICE_TITLE_RE.test(title)) return 'service';
+  if (TRAINING_TITLE_RE.test(title)) return 'training';
+  if (ANALYTICS_TITLE_RE.test(title)) return 'analytics';
+  if (MARKETING_TITLE_RE.test(title)) return 'marketing';
   return null;
 }
 
@@ -302,7 +325,7 @@ const UNTRACKED_COMPANIES = [
 
 // Companies that DO have a usable ATS but are excluded on purpose: nothing
 // they sell directly competes with Scopus/SciVal/Pure/Digital Commons, so
-// their SAM/CSM/Channel hiring isn't a signal for this feature even though
+// their tracked customer-facing hiring isn't a signal for this feature even though
 // they're tracked elsewhere as broader Elsevier competitors.
 const NOT_PRODUCT_COMPETITOR = [
   { company: 'OpenAI', reason: "General-purpose AI platform (Claude/GPT-style API) — no discrete product competing with Scopus/SciVal/Pure/Digital Commons", url: 'https://openai.com/careers/' },
@@ -329,7 +352,7 @@ async function main() {
         if (!j.title || !j.url) continue;
         if (!NL_LOCATION_RE.test(j.location || '')) continue;
         const roleCategory = classifyRole(j.title, j.department);
-        if (!roleCategory) continue; // not a SAM/CSM/Channel role in the research-solutions line
+        if (!roleCategory) continue; // not a tracked customer-facing role in the research-solutions line
         perCompanyCounts[src.company].nl++;
         const key = j.company + '|' + j.url;
         const prior = existingByKey.get(key);
@@ -363,7 +386,7 @@ async function main() {
           applicationDeadline: extractDeadline(descriptionHtml),
         });
       }
-      console.log(`[competitor-jobs] ${src.company}: ${jobs.length} open role(s), ${perCompanyCounts[src.company].nl} Netherlands SAM/CSM/Channel matches`);
+      console.log(`[competitor-jobs] ${src.company}: ${jobs.length} open role(s), ${perCompanyCounts[src.company].nl} Netherlands tracked-role matches`);
     } catch (e) {
       errors[src.company] = e.message;
       console.warn(`[competitor-jobs] ${src.company} failed: ${e.message}`);
@@ -381,7 +404,7 @@ async function main() {
     untracked: [...UNTRACKED_COMPANIES, ...NOT_PRODUCT_COMPETITOR],
     source: 'Company career-page ATS APIs (Greenhouse/Ashby/SmartRecruiters/Pinpoint/Workday) — not LinkedIn, see file header',
   });
-  console.log(`[competitor-jobs] Done — ${allJobs.length} Netherlands SAM/CSM/Channel role(s) across ${SOURCES.length - Object.keys(errors).length}/${SOURCES.length} tracked companies.`);
+  console.log(`[competitor-jobs] Done — ${allJobs.length} Netherlands tracked customer-facing role(s) across ${SOURCES.length - Object.keys(errors).length}/${SOURCES.length} tracked companies.`);
 }
 
 main().catch(e => {
