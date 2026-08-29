@@ -1,0 +1,31 @@
+{
+  "_comment": "Staff/contact directory pages used by scripts/discover-staff.js to find decision-makers (library, research-support and collection leads) that OpenAlex never returns. Each URL was manually verified to load and to list named staff. Add entries as new directories are confirmed; a URL that stops resolving is reported by the scan and skipped, never fatal.",
+  "region": "belgium",
+  "sources": [
+    {
+      "instId": "uantwerpen",
+      "instName": "University of Antwerp",
+      "emailDomain": "uantwerpen.be",
+      "urls": [
+        "https://www.uantwerpen.be/en/library/contact/"
+      ]
+    },
+    {
+      "instId": "kuleuven",
+      "instName": "KU Leuven",
+      "emailDomain": "kuleuven.be",
+      "urls": [
+        "https://bib.kuleuven.be/english/rbib/about/contact",
+        "https://bib.kuleuven.be/english/about/contact"
+      ]
+    },
+    {
+      "instId": "ugent",
+      "instName": "Ghent University",
+      "emailDomain": "ugent.be",
+      "urls": [
+        "https://www.ugent.be/we/en/faculty/faculty-offices/library/team.htm"
+      ]
+    }
+  ]
+}

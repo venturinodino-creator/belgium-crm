@@ -1,0 +1,52 @@
+name: Weekly Decision-Maker Discovery
+
+# Companion to discover.yml. That scan reads OpenAlex and can only ever return
+# researchers; this one reads the institution library/research-support staff
+# directories listed in data/staff-sources.json, so the review queue also gets
+# the people who actually hold subscription budgets. Staff pages change far
+# more slowly than publication records, so this runs weekly rather than daily.
+
+on:
+  schedule:
+    - cron: '30 7 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: discover-staff-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  discover-staff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run decision-maker discovery
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/discover-staff.js
+      - name: Commit state
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add data/pending-staff-contacts.json data/staff-scan-state.json
+          if git diff --staged --quiet; then
+            echo "Nothing to commit"
+            exit 0
+          fi
+          git commit -m "staff: auto-discover $(date +%Y-%m-%d)"
+          for attempt in 1 2 3; do
+            if git pull --rebase origin main && git push; then
+              echo "Pushed successfully"
+              exit 0
+            fi
+            echo "Push attempt $attempt failed (likely a concurrent run of this workflow) — retrying"
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 5))
+          done
+          echo "::warning::Could not push staff-discovery results after 3 attempts. Findings were not saved to the audit trail, but any contacts inserted into Supabase are already in the review queue, and the next scan will resurface anything missed."
