@@ -1321,7 +1321,7 @@ document.getElementById('expiry-count').textContent = '8';
     ngo:        [173, 132, 224],
   };
 
-  let stars = [], nodes = [], links = [], pulses = [];
+  let stars = [], nodes = [], links = [], pulses = [], flares = [];
   const pointer = { x: -1e4, y: -1e4, on: false, ex: -1e4, ey: -1e4 };
 
   function resize() {
@@ -1341,14 +1341,16 @@ document.getElementById('expiry-count').textContent = '8';
     stars = Array.from({ length: count }, () => {
       const depth = Math.pow(Math.random(), 1.6);   // most stars far away
       const dir = Math.random() * Math.PI * 2;
-      const speed = 0.025 + depth * 0.075;          // gentle, depth-scaled
+      // Fast enough to read as travel when you sit still and watch, slow
+      // enough that nothing darts.
+      const speed = 0.07 + depth * 0.20;
       return {
         x: Math.random() * W,
         y: Math.random() * H,
         z: depth,
         r: 0.35 + depth * 1.15,
         tw: Math.random() * Math.PI * 2,
-        tws: 0.10 + Math.random() * 0.28,           // a slow breath, not a flicker
+        tws: 0.22 + Math.random() * 0.45,           // a breath, still not a flicker
         vx: Math.cos(dir) * speed,
         vy: Math.sin(dir) * speed,
         wan: Math.random() * Math.PI * 2,
@@ -1407,8 +1409,16 @@ document.getElementById('expiry-count').textContent = '8';
   const easeInOut = u => u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
 
   function spawnPulse() {
-    if (!links.length || pulses.length >= 3) return;
-    pulses.push({ l: links[(Math.random() * links.length) | 0], t: 0, sp: 0.0022 + Math.random() * 0.0022 });
+    if (!links.length || pulses.length >= 5) return;
+    pulses.push({ l: links[(Math.random() * links.length) | 0], t: 0, sp: 0.0042 + Math.random() * 0.0038 });
+  }
+
+  // A scan landing on one institution: the node brightens and a single thin
+  // ring opens out and fades. It is the one event large enough to catch the
+  // eye from across the page, which is why only one runs at a time.
+  function spawnFlare() {
+    if (!nodes.length || flares.length) return;
+    flares.push({ n: (Math.random() * nodes.length) | 0, t: 0 });
   }
 
   // ── draw ─────────────────────────────────────────────────────────────────
@@ -1449,8 +1459,29 @@ document.getElementById('expiry-count').textContent = '8';
     ctx.clearRect(0, 0, W, H);
     aurora();
 
+    // ── the cursor light ───────────────────────────────────────────────────
+    // Lighting each star individually only ever produced slightly brighter
+    // dots. What reads as "a light" is a pool of illumination the stars sit
+    // inside — a torch passing over a star chart. Two stops: a broad soft
+    // wash, and a tighter core so the centre has somewhere to be.
+    if (pointer.on && !reduced) {
+      const R = 230;
+      const wash = ctx.createRadialGradient(pointer.ex, pointer.ey, 0, pointer.ex, pointer.ey, R);
+      wash.addColorStop(0.00, 'rgba(150,215,255,0.085)');
+      wash.addColorStop(0.35, 'rgba(130,200,245,0.045)');
+      wash.addColorStop(1.00, 'rgba(120,190,240,0)');
+      ctx.fillStyle = wash;
+      ctx.beginPath(); ctx.arc(pointer.ex, pointer.ey, R, 0, 6.283); ctx.fill();
+
+      const core = ctx.createRadialGradient(pointer.ex, pointer.ey, 0, pointer.ex, pointer.ey, 74);
+      core.addColorStop(0, 'rgba(190,235,255,0.10)');
+      core.addColorStop(1, 'rgba(190,235,255,0)');
+      ctx.fillStyle = core;
+      ctx.beginPath(); ctx.arc(pointer.ex, pointer.ey, 74, 0, 6.283); ctx.fill();
+    }
+
     // starfield
-    const REACH = 150;
+    const REACH = 230;                 // matches the light, so the two agree
     for (const s of stars) {
       if (!reduced) {
         s.wan += (s.wans * dt) / 1000;
@@ -1469,27 +1500,33 @@ document.getElementById('expiry-count').textContent = '8';
         if (d < REACH) { const u = 1 - d / REACH; near = u * u; }  // soft falloff
       }
 
-      if (near > 0.015) {
-        const rr = s.r + 8 * near;
+      // Stars inside the light bloom rather than merely brighten: a real halo
+      // and a slightly fatter core is what makes the effect legible.
+      if (near > 0.01) {
+        const rr = s.r + 16 * near;
         const halo = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, rr);
-        halo.addColorStop(0, `rgba(196,226,255,${0.30 * near})`);
-        halo.addColorStop(1, 'rgba(196,226,255,0)');
+        halo.addColorStop(0, `rgba(205,232,255,${0.62 * near})`);
+        halo.addColorStop(0.45, `rgba(190,224,255,${0.20 * near})`);
+        halo.addColorStop(1, 'rgba(190,224,255,0)');
         ctx.globalAlpha = 1;
         ctx.fillStyle = halo;
         ctx.beginPath(); ctx.arc(s.x, s.y, rr, 0, 6.283); ctx.fill();
       }
 
-      ctx.globalAlpha = Math.min(1, (0.14 + s.z * 0.46) * tw + near * 0.40);
-      ctx.fillStyle = '#d8e6fb';
-      ctx.beginPath(); ctx.arc(s.x, s.y, s.r + near * 0.5, 0, 6.283); ctx.fill();
+      ctx.globalAlpha = Math.min(1, (0.16 + s.z * 0.48) * tw + near * 0.75);
+      ctx.fillStyle = '#e6f1ff';
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r + near * 1.5, 0, 6.283); ctx.fill();
     }
     ctx.globalAlpha = 1;
 
-    // node motion
+    // node motion — the whole field also sways as one on a very long cycle,
+    // so there is always movement even when no single node is doing much.
+    const swayX = reduced ? 0 : Math.sin(t * 0.055) * 14 + Math.cos(t * 0.031) * 7;
+    const swayY = reduced ? 0 : Math.cos(t * 0.043) * 10 + Math.sin(t * 0.027) * 5;
     for (const n of nodes) {
       if (!reduced) { n.p1 += (n.s1 * dt) / 1000; n.p2 += (n.s2 * dt) / 1000; }
-      let x = n.hx + Math.sin(n.p1) * n.ax + Math.cos(n.p2 * 0.7) * (n.ax * 0.35);
-      let y = n.hy + Math.cos(n.p2) * n.ay + Math.sin(n.p1 * 0.6) * (n.ay * 0.4);
+      let x = n.hx + swayX + Math.sin(n.p1) * n.ax + Math.cos(n.p2 * 0.7) * (n.ax * 0.35);
+      let y = n.hy + swayY + Math.cos(n.p2) * n.ay + Math.sin(n.p1 * 0.6) * (n.ay * 0.4);
       if (pointer.on) {
         const dx = pointer.ex - x, dy = pointer.ey - y, d = Math.hypot(dx, dy);
         if (d < 210 && d > 0.01) { const k = (1 - d / 210) * 6; x += (dx / d) * k; y += (dy / d) * k; }
@@ -1503,8 +1540,9 @@ document.getElementById('expiry-count').textContent = '8';
       const d = Math.hypot(a.x - b.x, a.y - b.y);
       if (d > 225) continue;
       if (!reduced) l.ph += (l.sp * dt) / 1000;
-      const breath = reduced ? 0.7 : 0.62 + Math.sin(l.ph) * 0.38;
-      let alpha = (1 - d / 225) * 0.16 * breath;
+      // A wider swing, so the mesh visibly ripples rather than sitting still.
+      const breath = reduced ? 0.7 : 0.52 + Math.sin(l.ph) * 0.48;
+      let alpha = (1 - d / 225) * 0.19 * breath;
       if (pointer.on) {
         const md = Math.min(Math.hypot(pointer.ex - a.x, pointer.ey - a.y),
                             Math.hypot(pointer.ex - b.x, pointer.ey - b.y));
@@ -1518,7 +1556,8 @@ document.getElementById('expiry-count').textContent = '8';
     // signals — rare, slow, and eased at both ends
     if (!reduced) {
       acc += dt;
-      if (acc > 2400) { acc = 0; spawnPulse(); }
+      if (acc > 900) { acc = 0; spawnPulse(); if (Math.random() < 0.42) spawnFlare(); }
+
       for (let i = pulses.length - 1; i >= 0; i--) {
         const p = pulses[i];
         p.t += p.sp * (dt / 16);
@@ -1526,22 +1565,49 @@ document.getElementById('expiry-count').textContent = '8';
         const a = nodes[p.l.a], b = nodes[p.l.b];
         const u = easeInOut(p.t);
         const x = a.x + (b.x - a.x) * u, y = a.y + (b.y - a.y) * u;
-        const fade = Math.sin(p.t * Math.PI) * 0.6;
-        const g = ctx.createRadialGradient(x, y, 0, x, y, 7);
-        g.addColorStop(0, `rgba(205,240,235,${fade})`);
+        const fade = Math.sin(p.t * Math.PI) * 0.75;
+
+        // a short trail behind the head, so the travel direction reads
+        const tu = easeInOut(Math.max(0, p.t - 0.10));
+        const tx = a.x + (b.x - a.x) * tu, ty = a.y + (b.y - a.y) * tu;
+        const lg = ctx.createLinearGradient(tx, ty, x, y);
+        lg.addColorStop(0, 'rgba(150,235,220,0)');
+        lg.addColorStop(1, `rgba(190,245,235,${fade * 0.55})`);
+        ctx.strokeStyle = lg; ctx.lineWidth = 1.4; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(x, y); ctx.stroke();
+
+        const g = ctx.createRadialGradient(x, y, 0, x, y, 8);
+        g.addColorStop(0, `rgba(215,250,244,${fade})`);
         g.addColorStop(1, 'rgba(120,220,205,0)');
         ctx.fillStyle = g;
-        ctx.beginPath(); ctx.arc(x, y, 7, 0, 6.283); ctx.fill();
+        ctx.beginPath(); ctx.arc(x, y, 8, 0, 6.283); ctx.fill();
+      }
+
+      // scan rings
+      for (let i = flares.length - 1; i >= 0; i--) {
+        const fl = flares[i];
+        fl.t += dt / 1900;
+        if (fl.t >= 1) { flares.splice(i, 1); continue; }
+        const n = nodes[fl.n]; if (!n) { flares.splice(i, 1); continue; }
+        const ease = 1 - Math.pow(1 - fl.t, 3);       // opens fast, settles slow
+        const rad = 6 + ease * 62;
+        const a = (1 - fl.t) * 0.30;
+        const [r, g, b] = n.rgb;
+        ctx.strokeStyle = `rgba(${r + 50},${g + 50},${b + 50},${a})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(n.x, n.y, rad, 0, 6.283); ctx.stroke();
+        n.flareBoost = (1 - fl.t) * 0.8;
       }
     }
 
     // nodes
     for (const n of nodes) {
       const [r, g, b] = n.rgb;
-      let boost = 0;
+      let boost = n.flareBoost || 0;
+      n.flareBoost = 0;
       if (pointer.on) {
         const d = Math.hypot(pointer.ex - n.x, pointer.ey - n.y);
-        if (d < 170) { const u = 1 - d / 170; boost = u * u * 0.75; }
+        if (d < 170) { const u = 1 - d / 170; boost = Math.max(boost, u * u * 0.75); }
       }
       const rad = n.r * (4.5 + boost * 4);
       const halo = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, rad);
