@@ -1273,8 +1273,9 @@ let state = {
   instType: '',
   contactSearch: '',
   contactInst: '',
-  contactStatus: '',
   contactPriority: '',
+  contactDept: '',
+  contactView: localStorage.getItem('crm_contacts_view') || 'list',
   detailInstId: null,
   editInstId: null,
   editContactId: null,
@@ -3527,37 +3528,57 @@ function renderDetail() {
     </div>`;
 }
 
-//  CONTACTS 
+//  CONTACTS
+let _contactExpanded = new Set();
+
+// Decision-maker roles for subscription conversations. Anyone whose job title
+// matches is surfaced as high priority regardless of the stored value, so new
+// imports don't need manual re-tagging.
+const CX_SENIOR_TITLE_RE = /\b(?:research|library|libraries|faculty|department|dept\.?|collection|acquisitions?)\b[^,;|]{0,30}\b(?:director|manager|head|lead|dean|officer)\b|\b(?:director|head|dean)\b[^,;|]{0,30}\b(?:research|library|libraries|faculty|department|collection)\b/i;
+function cxIsSeniorRole(c) { return CX_SENIOR_TITLE_RE.test(c.title || ''); }
+function cxPriority(c) { return cxIsSeniorRole(c) ? 'high' : (c.priority || 'medium'); }
+
+const CX_PRIORITY_META = {
+  high:   {label:'High',   bg:'rgba(239,68,68,.10)',  fg:'#fca5a5', bd:'rgba(239,68,68,.35)'},
+  medium: {label:'Medium', bg:'rgba(234,179,8,.10)',  fg:'#fde68a', bd:'rgba(234,179,8,.35)'},
+  low:    {label:'Low',    bg:'rgba(255,255,255,.06)',fg:'var(--muted2)', bd:'var(--border2)'},
+};
+
+function cxSetView(v) { state.contactView = v; localStorage.setItem('crm_contacts_view', v); renderContacts(); }
+function cxClearFilters() {
+  state.contactSearch=''; state.contactInst=''; state.contactPriority='';
+  state.contactDept=''; state.contactPage=1; renderContacts();
+}
+function cxToggleGroup(instId) {
+  if (_contactExpanded.has(instId)) _contactExpanded.delete(instId); else _contactExpanded.add(instId);
+  renderContacts();
+}
+function cxExpandAll(ids) { _contactExpanded = new Set(ids); renderContacts(); }
+function cxCollapseAll() { _contactExpanded = new Set(); renderContacts(); }
+
 function renderContacts() {
   document.getElementById('page-title').textContent = 'Contacts';
   document.getElementById('page-sub').textContent = `${state.contacts.length} contacts across all institutions`;
   document.getElementById('topbar-actions').innerHTML = `<button class="btn btn-accent" data-admin-only onclick="openAddContact()">+ Add Contact</button>`;
+
+  const hasActiveFilter = !!(state.contactSearch || state.contactInst || state.contactPriority || state.contactDept);
 
   let contacts = state.contacts.filter(c=>{
     const inst = getInst(c.instId);
     const search = state.contactSearch.toLowerCase();
     if(search && !`${c.first} ${c.last} ${c.title} ${c.dept} ${c.research} ${inst.name}`.toLowerCase().includes(search)) return false;
     if(state.contactInst && c.instId!==state.contactInst) return false;
-    if(state.contactStatus && c.status!==state.contactStatus) return false;
-    if(state.contactPriority && c.priority!==state.contactPriority) return false;
+    if(state.contactPriority && cxPriority(c)!==state.contactPriority) return false;
+    if(state.contactDept && (c.dept||'')!==state.contactDept) return false;
     return true;
   });
 
-  // Sort
-  const {col, dir} = state.contactSort;
-  contacts.sort((a,b)=>{
-    let av=a[col]||'', bv=b[col]||'';
-    if(col==='inst') { av=getInst(a.instId).name||''; bv=getInst(b.instId).name||''; }
-    return dir * av.localeCompare(bv);
-  });
-
   const total = contacts.length;
-  const totalPages = Math.max(1, Math.ceil(total/PER_PAGE));
-  if(state.contactPage > totalPages) state.contactPage = totalPages;
-  const paged = contacts.slice((state.contactPage-1)*PER_PAGE, state.contactPage*PER_PAGE);
-
   const instOptsFlt = state.institutions.slice().sort((a,b)=>a.name.localeCompare(b.name))
     .map(i=>`<option value="${esc(i.id)}" ${state.contactInst===i.id?'selected':''}>${esc(i.name)}</option>`).join('');
+  const deptOptsFlt = Array.from(new Set(state.contacts.map(c=>c.dept).filter(Boolean))).sort((a,b)=>a.localeCompare(b))
+    .map(d=>`<option value="${esc(d)}" ${state.contactDept===d?'selected':''}>${esc(d)}</option>`).join('');
+  const instCount = new Set(contacts.map(c=>c.instId)).size;
 
   const toolbar = `
     <div class="toolbar">
@@ -3568,11 +3589,8 @@ function renderContacts() {
       <select class="flt" onchange="state.contactInst=this.value;state.contactPage=1;renderContacts()">
         <option value="">All Institutions</option>${instOptsFlt}
       </select>
-      <select class="flt" onchange="state.contactStatus=this.value;state.contactPage=1;renderContacts()">
-        <option value="">All Statuses</option>
-        <option value="active" ${state.contactStatus==='active'?'selected':''}>Active</option>
-        <option value="prospect" ${state.contactStatus==='prospect'?'selected':''}>Prospect</option>
-        <option value="inactive" ${state.contactStatus==='inactive'?'selected':''}>Inactive</option>
+      <select class="flt" onchange="state.contactDept=this.value;state.contactPage=1;renderContacts()">
+        <option value="">All Departments</option>${deptOptsFlt}
       </select>
       <select class="flt" onchange="state.contactPriority=this.value;state.contactPage=1;renderContacts()">
         <option value="">All Priorities</option>
@@ -3580,36 +3598,116 @@ function renderContacts() {
         <option value="medium" ${state.contactPriority==='medium'?'selected':''}>Medium</option>
         <option value="low" ${state.contactPriority==='low'?'selected':''}>Low</option>
       </select>
-      <span style="font-size:12px;color:var(--muted)">${total} result${total!==1?'s':''}</span>
+      ${hasActiveFilter ? `<button class="btn btn-outline btn-xs" onclick="cxClearFilters()">Clear filters</button>` : ''}
+      <span style="font-size:12px;color:var(--muted)">${total} result${total!==1?'s':''} across ${instCount} institution${instCount!==1?'s':''}</span>
+      <div style="display:flex;border:1px solid var(--border2);border-radius:7px;overflow:hidden;margin-left:auto">
+        <button onclick="cxSetView('list')" title="List view" style="padding:6px 10px;background:${state.contactView==='list'?'rgba(0,245,196,.1)':'transparent'};border:none;cursor:pointer;color:${state.contactView==='list'?'var(--accent)':'var(--muted)'};display:flex;align-items:center">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        </button>
+        <button onclick="cxSetView('grouped')" title="Group by institution" style="padding:6px 10px;background:${state.contactView==='grouped'?'rgba(0,245,196,.1)':'transparent'};border:none;cursor:pointer;color:${state.contactView==='grouped'?'var(--accent)':'var(--muted)'};display:flex;align-items:center">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        </button>
+      </div>
     </div>`;
 
-  function th(label, col) {
-    const active = state.contactSort.col === col;
-    const arrow = active ? (state.contactSort.dir===1?' ':' ') : '';
-    return `<th onclick="sortContacts('${col}')">${label}${arrow}</th>`;
-  }
-
-  const rows = paged.length ? paged.map(c=>{
+  function contactRowHtml(c, showInst) {
     const inst = getInst(c.instId);
     const col = avatarColor(c.first+c.last);
+    const prio = cxPriority(c);
+    const senior = cxIsSeniorRole(c);
     return `<tr>
       <td><div class="name-cell"><div class="av" style="background:${col}">${initials(c.first,c.last)}</div>
         <div><div style="font-weight:600">${esc(c.first)} ${esc(c.last)}</div>
-        <div style="font-size:11px;color:var(--muted)">${esc(c.title||'')}</div></div></div></td>
-      <td style="font-size:12px"><a href="#" style="color:var(--info);text-decoration:none" onclick="event.preventDefault();nav('detail',{instId:'${inst.id}'})">${esc(inst.short||inst.name||'—')}</a></td>
+        <div style="font-size:11px;color:${senior?'var(--text)':'var(--muted)'};font-weight:${senior?600:400}">${esc(c.title||'')}</div></div></div></td>
+      ${showInst ? `<td style="font-size:12px"><a href="#" style="color:var(--info);text-decoration:none" onclick="event.preventDefault();nav('detail',{instId:'${inst.id}'})">${esc(inst.short||inst.name||'—')}</a></td>` : ''}
       <td style="font-size:12px;color:var(--muted)">${esc(c.dept||'—')}</td>
       <td>${c.email?`<a class="ext-link" href="mailto:${esc(c.email)}">${esc(c.email)}</a>`:'<span style="color:var(--muted);font-size:12px">—</span>'}</td>
-      <td><span class="badge b-${c.status}">${c.status}</span></td>
-      <td><span class="badge b-${c.priority}">${c.priority}</span></td>
-      <td><span class="badge b-${c.quality}" style="font-size:10px">${c.quality==='verified'?' Verified':'  Seed'}</span></td>
-      <td style="font-size:12px;color:var(--muted)">${c.lastContact||'—'}</td>
+      <td><span class="badge b-${prio}"${senior?' title="High priority: decision-maker role"':''}>${prio}</span></td>
+      <td><span class="badge b-${c.quality}" style="font-size:10px">${c.quality==='verified'?'Verified':'Seed'}</span></td>
       <td style="white-space:nowrap">
-        <button class="btn btn-xs btn-outline" title="Log activity" onclick="openActivityLog(${jsStr(c.id)},${jsStr(c.first+' '+c.last)})">📋</button>
+        <button class="btn btn-xs btn-outline" title="Log activity" onclick="openActivityLog(${jsStr(c.id)},${jsStr(c.first+' '+c.last)})"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1Z"/><path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="16" y2="15"/></svg></button>
         <button class="btn btn-xs btn-outline" data-admin-only onclick="openEditContact('${c.id}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
         <button class="btn btn-xs btn-danger" data-admin-only onclick="confirmDeleteContact('${c.id}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
       </td>
     </tr>`;
-  }).join('') : `<tr><td colspan="9"><div class="empty" style="padding:30px"><div class="ei"><span style="display:inline-flex"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span></div><h3>No contacts found</h3><p>Try adjusting your filters.</p></div></td></tr>`;
+  }
+
+  const emptyState = `<div class="empty" style="padding:30px"><div class="ei"><span style="display:inline-flex"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span></div><h3>No contacts found</h3><p>Try adjusting your filters.</p>${hasActiveFilter?`<button class="btn btn-outline" style="margin-top:10px" onclick="cxClearFilters()">Clear filters</button>`:''}</div>`;
+
+  if (state.contactView === 'grouped') {
+    const groups = {};
+    const order = [];
+    contacts.forEach(c=>{
+      if (!groups[c.instId]) { groups[c.instId] = []; order.push(c.instId); }
+      groups[c.instId].push(c);
+    });
+    const groupLabel = id => { const i = getInst(id); return i.short || i.name || ''; };
+    order.sort((a,b)=>groupLabel(a).localeCompare(groupLabel(b), undefined, {sensitivity:'base'}));
+    // Decision-makers first inside each institution, then alphabetically.
+    const PRIO_RANK = {high:0, medium:1, low:2};
+    order.forEach(id=>groups[id].sort((a,b)=>{
+      const r = (PRIO_RANK[cxPriority(a)] ?? 3) - (PRIO_RANK[cxPriority(b)] ?? 3);
+      return r !== 0 ? r : (a.last||'').localeCompare(b.last||'');
+    }));
+
+    const groupsHtml = !order.length ? emptyState : `<div class="table-wrap">
+      ${order.map((instId, gi)=>{
+        const inst = getInst(instId);
+        const list = groups[instId];
+        const isOpen = hasActiveFilter || _contactExpanded.has(instId);
+        const prioCounts = {};
+        list.forEach(c=>{ const p = cxPriority(c); prioCounts[p] = (prioCounts[p]||0)+1; });
+        return `<div style="${gi>0?'border-top:1px solid var(--border);':''}">
+          <div onclick="cxToggleGroup('${instId}')" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:12px 16px;transition:background .12s" onmouseenter="this.style.background='rgba(255,255,255,.02)'" onmouseleave="this.style.background='transparent'">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--muted)" stroke-width="2.5" style="flex-shrink:0;transition:transform .15s;transform:rotate(${isOpen?90:0}deg)"><polyline points="9 18 15 12 9 6"/></svg>
+            <div style="flex:1;min-width:0">
+              <a href="#" onclick="event.preventDefault();event.stopPropagation();nav('detail',{instId:'${instId}'})" style="font-weight:700;color:var(--text2);text-decoration:none">${esc(inst.short||inst.name||'Unknown')}</a>
+              <span style="font-size:11px;color:var(--muted);margin-left:8px">${esc(inst.city||'')}</span>
+            </div>
+            <div style="display:flex;gap:5px;align-items:center">
+              ${['high','medium','low'].filter(p=>prioCounts[p]).map(p=>{const m=CX_PRIORITY_META[p];return `<span title="${m.label} priority" style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:${m.bg};color:${m.fg};border:1px solid ${m.bd}">${prioCounts[p]}</span>`;}).join('')}
+              <span class="badge" style="background:rgba(255,255,255,.06);color:var(--muted2);border:1px solid var(--border2)">${list.length} contact${list.length!==1?'s':''}</span>
+            </div>
+          </div>
+          ${isOpen ? `<table style="margin:0 0 4px">
+            <tbody>${list.map(c=>contactRowHtml(c,false)).join('')}</tbody>
+          </table>` : ''}
+        </div>`;
+      }).join('')}
+    </div>`;
+
+    document.getElementById('content').innerHTML = toolbar + `
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:10px">
+        <button class="btn btn-outline btn-xs" onclick='cxExpandAll(${JSON.stringify(order)})'>Expand all</button>
+        <button class="btn btn-outline btn-xs" onclick="cxCollapseAll()">Collapse all</button>
+      </div>` + groupsHtml;
+    return;
+  }
+
+  // List view (default) - sortable, paginated flat table
+  const PRIO_RANK = {high:0, medium:1, low:2};
+  const {col, dir} = state.contactSort;
+  contacts = contacts.slice().sort((a,b)=>{
+    if(col==='priority') {
+      const r = (PRIO_RANK[cxPriority(a)] ?? 3) - (PRIO_RANK[cxPriority(b)] ?? 3);
+      return dir * (r !== 0 ? r : (a.last||'').localeCompare(b.last||''));
+    }
+    let av=a[col]||'', bv=b[col]||'';
+    if(col==='inst') { av=getInst(a.instId).name||''; bv=getInst(b.instId).name||''; }
+    return dir * String(av).localeCompare(String(bv));
+  });
+
+  const totalPages = Math.max(1, Math.ceil(total/PER_PAGE));
+  if(state.contactPage > totalPages) state.contactPage = totalPages;
+  const paged = contacts.slice((state.contactPage-1)*PER_PAGE, state.contactPage*PER_PAGE);
+
+  function th(label, col) {
+    const active = state.contactSort.col === col;
+    const arrow = active ? (state.contactSort.dir===1?' &#9650;':' &#9660;') : '';
+    return `<th onclick="sortContacts('${col}')">${label}${arrow}</th>`;
+  }
+
+  const rows = paged.length ? paged.map(c=>contactRowHtml(c,true)).join('') : `<tr><td colspan="7">${emptyState}</td></tr>`;
 
   const pgButtons = Array.from({length:totalPages},(_,i)=>
     `<button class="pg-btn ${state.contactPage===i+1?'active':''}" onclick="state.contactPage=${i+1};renderContacts()">${i+1}</button>`
@@ -3620,11 +3718,11 @@ function renderContacts() {
       <table>
         <thead><tr>
           ${th('Name','last')}${th('Institution','inst')}<th>Dept.</th><th>Email</th>
-          ${th('Status','status')}${th('Priority','priority')}<th>Quality</th>${th('Last Contact','lastContact')}<th>Actions</th>
+          ${th('Priority','priority')}<th>Quality</th><th>Actions</th>
         </tr></thead>
         <tbody>${rows}</tbody>
       </table>
-      <div class="pg"><span>Showing ${(state.contactPage-1)*PER_PAGE+1}–${Math.min(state.contactPage*PER_PAGE,total)} of ${total}</span>
+      <div class="pg"><span>Showing ${total?((state.contactPage-1)*PER_PAGE+1):0}-${Math.min(state.contactPage*PER_PAGE,total)} of ${total}</span>
         <div class="pg-btns">${pgButtons}</div></div>
     </div>`;
 }
