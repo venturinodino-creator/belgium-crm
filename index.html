@@ -1242,6 +1242,13 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
 .dg-cat-bar span{display:block;height:100%;border-radius:3px}
 .dg-cat-n{font-size:12px;font-weight:800;color:var(--text2);text-align:right;font-variant-numeric:tabular-nums}
 .dg-note{font-size:11px;line-height:1.5;color:var(--muted);margin:0;padding-top:10px;border-top:1px solid var(--border)}
+
+/* Back to Dashboard — sits above #content so view renderers cannot clear it.
+   Matches the padding of .content so the two line up, and tightens the gap
+   below itself only when it is actually showing. */
+#back-to-main:not(:empty){padding:22px 28px 0}
+#back-to-main .back-btn{margin-bottom:0 !important}
+#back-to-main:not(:empty) + .content{padding-top:10px !important}
 </style>
   <link rel="stylesheet" href="animations.css">
 </head>
@@ -1330,6 +1337,7 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
     </div>
     <div class="topbar-right" id="topbar-actions"></div>
   </div>
+  <div id="back-to-main"></div>
   <div class="content" id="content"></div>
 </div>
 
@@ -3069,6 +3077,17 @@ addEventListener('popstate', e => {
 });
 
 //  RENDER 
+// Every screen gets a way back to the main page. Rendered after the view so
+// it survives renderers that replace #content, and left empty on the
+// Dashboard itself.
+function renderBackToMain() {
+  const host = document.getElementById('back-to-main');
+  if (!host) return;
+  host.innerHTML = state.view === 'dashboard'
+    ? ''
+    : '<div class="back-btn" onclick="nav(\'dashboard\')">&larr; Back to Dashboard</div>';
+}
+
 function render() {
   const views = {
     dashboard: renderDashboard,
@@ -3089,6 +3108,7 @@ function render() {
     summary: renderSummaryReports,
   };
   (views[state.view] || renderDashboard)();
+  renderBackToMain();
   applyRoleUI();
 }
 
