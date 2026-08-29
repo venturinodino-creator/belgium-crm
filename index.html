@@ -5523,20 +5523,34 @@ function saveAIInsights(list) { localStorage.setItem('be_crm_ai_insights', JSON.
 /* ── LeapSpace Insights: battle-card copy (server-generated) ────────────── */
 // data/leapspace-battlecard.json holds { entries, executiveSummary,
 // executiveSummaryDate }: entries is a { whatTheyDid, counter } write-up
-// per competitor id, executiveSummary is a single board-ready paragraph
-// over the whole tracked set — both generated server-side by
-// competitor-scan.js from each entry's howItCompetes text (see that
-// script's header comment for why generation happens there but ranking
-// happens here).
+// per competitor id; executiveSummary is a board-ready read of the whole
+// tracked set, shaped as {headline, pressurePoint, topThreats: [...],
+// strength} rather than one paragraph — a board reader scans a summary
+// rather than reading it start to finish, so it renders as a headline plus
+// short independent bullets instead of a wall of prose that buries the
+// threats mid-sentence. Both generated server-side by competitor-scan.js
+// from each entry's howItCompetes text (see that script's header comment
+// for why generation happens there but ranking happens here).
 function getBattleCard() {
-  try { return JSON.parse(localStorage.getItem('be_crm_battlecard') || '{}'); } catch(e) { return {}; }
+  try { return JSON.parse(localStorage.getItem('nl_crm_battlecard') || '{}'); } catch(e) { return {}; }
 }
-function saveBattleCard(obj) { localStorage.setItem('be_crm_battlecard', JSON.stringify(obj)); }
+function saveBattleCard(obj) { localStorage.setItem('nl_crm_battlecard', JSON.stringify(obj)); }
 function getBattleCardCopy() { return getBattleCard().entries || {}; }
+function executiveSummaryPlainText(s) {
+  if (!s) return '';
+  const lines = [s.headline];
+  if (s.pressurePoint) lines.push('', s.pressurePoint);
+  if (s.topThreats && s.topThreats.length) {
+    lines.push('', 'Top threats:');
+    s.topThreats.forEach(function(t){ lines.push('• ' + t); });
+  }
+  if (s.strength) lines.push('', 'LeapSpace\'s edge: ' + s.strength);
+  return lines.join('\n');
+}
 function copyExecutiveSummary() {
   const summary = getBattleCard().executiveSummary;
   if (!summary) return;
-  navigator.clipboard.writeText(summary).then(function(){
+  navigator.clipboard.writeText(executiveSummaryPlainText(summary)).then(function(){
     try { toast('Executive summary copied — paste it anywhere', 'ok'); } catch(e){}
   }).catch(function(){
     try { toast('Could not copy — select the text manually', 'warn'); } catch(e){}
@@ -5755,8 +5769,19 @@ function renderCompetitorInsights() {
       </div>
       ${battleCard.executiveSummary ? `<button onclick="copyExecutiveSummary()" class="btn btn-outline" style="font-size:11px;padding:5px 12px;display:flex;align-items:center;gap:6px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy for board</button>` : ''}
     </div>
-    ${battleCard.executiveSummary
-      ? `<p style="font-size:12.5px;line-height:1.7;color:rgba(255,255,255,.65);margin:0;max-width:900px">${esc(battleCard.executiveSummary)}</p>`
+    ${battleCard.executiveSummary ? (function(s){
+        const threatsHtml = (s.topThreats && s.topThreats.length)
+          ? `<ul style="margin:8px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px">
+              ${s.topThreats.map(t => `<li style="display:flex;gap:8px;align-items:flex-start;font-size:12px;line-height:1.5;color:rgba(255,255,255,.65)">
+                <span style="width:5px;height:5px;border-radius:50%;background:#f87171;flex-shrink:0;margin-top:6px"></span>${esc(t)}
+              </li>`).join('')}
+            </ul>`
+          : '';
+        return `<p style="font-size:13.5px;font-weight:700;line-height:1.5;color:#f8fafc;margin:0;max-width:820px">${esc(s.headline)}</p>
+          ${s.pressurePoint ? `<p style="font-size:12px;line-height:1.5;color:rgba(255,255,255,.5);margin:6px 0 0;max-width:820px">${esc(s.pressurePoint)}</p>` : ''}
+          ${threatsHtml}
+          ${s.strength ? `<div style="display:flex;gap:8px;align-items:flex-start;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.07);font-size:12px;line-height:1.5;color:#00f5c4"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#00f5c4" stroke-width="2.5" style="flex-shrink:0;margin-top:2px"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.5 5.5 21l2-7.5L2 9h7z"/></svg><span>${esc(s.strength)}</span></div>` : ''}`;
+      })(battleCard.executiveSummary)
       : `<p style="font-size:12px;color:rgba(255,255,255,.4);margin:0;line-height:1.6">A board-ready summary of the whole competitive landscape is written by the nightly scan agent — check back after the next run, or click <b style="color:rgba(255,255,255,.6)">Scan for New Solutions</b> to pull in one already generated.</p>`}
   </div>`;
 
