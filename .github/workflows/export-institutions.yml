@@ -1,0 +1,50 @@
+name: Export Institutions For Landing Page
+
+# The landing page board reads data/institutions.json because row-level
+# security hides crm_institutions from anonymous callers. This keeps that file
+# in step with the CRM so the public page cannot drift behind again.
+
+on:
+  schedule:
+    - cron: '15 8 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: export-institutions-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Export institutions
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/export-institutions.js
+      - name: Commit
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add data/institutions.json
+          if git diff --staged --quiet; then
+            echo "Institution list unchanged"
+            exit 0
+          fi
+          git commit -m "institutions: sync landing board $(date +%Y-%m-%d)"
+          for attempt in 1 2 3; do
+            if git pull --rebase origin main && git push; then
+              echo "Pushed"
+              exit 0
+            fi
+            echo "Push attempt $attempt failed — retrying"
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 5))
+          done
+          echo "::warning::Could not push the institution export after 3 attempts. The committed file is still valid; the next run will retry."

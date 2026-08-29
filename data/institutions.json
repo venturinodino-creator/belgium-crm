@@ -1,0 +1,268 @@
+[
+ {
+  "id": "uza",
+  "name": "Antwerp University Hospital",
+  "short": "UZA",
+  "type": "medical",
+  "city": "Edegem"
+ },
+ {
+  "id": "bruegel",
+  "name": "Bruegel",
+  "short": "Bruegel",
+  "type": "research",
+  "city": "Brussels"
+ },
+ {
+  "id": "chuliege",
+  "name": "CHU de Liège",
+  "short": "CHU Liège",
+  "type": "medical",
+  "city": "Liège"
+ },
+ {
+  "id": "chunamur",
+  "name": "CHU UCL Namur (Godinne)",
+  "short": "CHU UCL Namur",
+  "type": "medical",
+  "city": "Yvoir"
+ },
+ {
+  "id": "saintluc",
+  "name": "Cliniques universitaires Saint-Luc",
+  "short": "Saint-Luc",
+  "type": "medical",
+  "city": "Woluwe-Saint-Lambert"
+ },
+ {
+  "id": "egmont",
+  "name": "Egmont Institute (Royal Institute for International Relations)",
+  "short": "Egmont Institute",
+  "type": "research",
+  "city": "Brussels"
+ },
+ {
+  "id": "fnrs",
+  "name": "F.R.S.-FNRS",
+  "short": "F.R.S.-FNRS",
+  "type": "ngo",
+  "city": "Brussels"
+ },
+ {
+  "id": "flandersmake",
+  "name": "Flanders Make",
+  "short": "Flanders Make",
+  "type": "research",
+  "city": "Lommel"
+ },
+ {
+  "id": "fondationcontrelecancer",
+  "name": "Fondation contre le Cancer / Stichting tegen Kanker",
+  "short": "Fondation contre le Cancer",
+  "type": "ngo",
+  "city": "Brussels"
+ },
+ {
+  "id": "ugent",
+  "name": "Ghent University",
+  "short": "UGent",
+  "type": "university",
+  "city": "Ghent"
+ },
+ {
+  "id": "uzgent",
+  "name": "Ghent University Hospital",
+  "short": "UZ Gent",
+  "type": "medical",
+  "city": "Ghent"
+ },
+ {
+  "id": "uhasselt",
+  "name": "Hasselt University",
+  "short": "UHasselt",
+  "type": "university",
+  "city": "Hasselt"
+ },
+ {
+  "id": "erasme",
+  "name": "Hôpital Erasme",
+  "short": "Erasme",
+  "type": "medical",
+  "city": "Anderlecht"
+ },
+ {
+  "id": "imec",
+  "name": "imec",
+  "short": "imec",
+  "type": "research",
+  "city": "Leuven"
+ },
+ {
+  "id": "bordet",
+  "name": "Institut Jules Bordet",
+  "short": "Bordet",
+  "type": "medical",
+  "city": "Brussels"
+ },
+ {
+  "id": "solvay",
+  "name": "International Solvay Institutes for Physics and Chemistry",
+  "short": "Solvay Institutes",
+  "type": "research",
+  "city": "Brussels"
+ },
+ {
+  "id": "itinera",
+  "name": "Itinera Institute",
+  "short": "Itinera",
+  "type": "research",
+  "city": "Brussels"
+ },
+ {
+  "id": "kbf",
+  "name": "King Baudouin Foundation",
+  "short": "King Baudouin Fdn",
+  "type": "ngo",
+  "city": "Brussels"
+ },
+ {
+  "id": "kotk",
+  "name": "Kom op tegen Kanker",
+  "short": "Kom op tegen Kanker",
+  "type": "ngo",
+  "city": "Brussels"
+ },
+ {
+  "id": "kuleuven",
+  "name": "KU Leuven",
+  "short": "KU Leuven",
+  "type": "university",
+  "city": "Leuven"
+ },
+ {
+  "id": "fwo",
+  "name": "Research Foundation – Flanders",
+  "short": "FWO",
+  "type": "ngo",
+  "city": "Brussels"
+ },
+ {
+  "id": "royalacademiesbelgium",
+  "name": "Royal Academies for Science and the Arts of Belgium",
+  "short": "RASAB",
+  "type": "research",
+  "city": "Brussels"
+ },
+ {
+  "id": "bira",
+  "name": "Royal Belgian Institute for Space Aeronomy",
+  "short": "BIRA-IASB",
+  "type": "research",
+  "city": "Brussels"
+ },
+ {
+  "id": "rbins",
+  "name": "Royal Belgian Institute of Natural Sciences",
+  "short": "RBINS",
+  "type": "research",
+  "city": "Brussels"
+ },
+ {
+  "id": "rmi",
+  "name": "Royal Meteorological Institute of Belgium",
+  "short": "RMI",
+  "type": "research",
+  "city": "Brussels"
+ },
+ {
+  "id": "rob",
+  "name": "Royal Observatory of Belgium",
+  "short": "ROB",
+  "type": "research",
+  "city": "Brussels"
+ },
+ {
+  "id": "sciensano",
+  "name": "Sciensano",
+  "short": "Sciensano",
+  "type": "research",
+  "city": "Brussels"
+ },
+ {
+  "id": "uclouvain",
+  "name": "UCLouvain",
+  "short": "UCLouvain",
+  "type": "university",
+  "city": "Louvain-la-Neuve"
+ },
+ {
+  "id": "uliege",
+  "name": "Université de Liège",
+  "short": "ULiège",
+  "type": "university",
+  "city": "Liège"
+ },
+ {
+  "id": "umons",
+  "name": "Université de Mons",
+  "short": "UMons",
+  "type": "university",
+  "city": "Mons"
+ },
+ {
+  "id": "ulb",
+  "name": "Université libre de Bruxelles",
+  "short": "ULB",
+  "type": "university",
+  "city": "Brussels"
+ },
+ {
+  "id": "uantwerpen",
+  "name": "University of Antwerp",
+  "short": "UAntwerpen",
+  "type": "university",
+  "city": "Antwerp"
+ },
+ {
+  "id": "unamur",
+  "name": "University of Namur",
+  "short": "UNamur",
+  "type": "university",
+  "city": "Namur"
+ },
+ {
+  "id": "uzbrussel",
+  "name": "UZ Brussel",
+  "short": "UZ Brussel",
+  "type": "medical",
+  "city": "Jette"
+ },
+ {
+  "id": "uzleuven",
+  "name": "UZ Leuven (University Hospitals Leuven)",
+  "short": "UZ Leuven",
+  "type": "medical",
+  "city": "Leuven"
+ },
+ {
+  "id": "vib",
+  "name": "VIB (Vlaams Instituut voor Biotechnologie)",
+  "short": "VIB",
+  "type": "research",
+  "city": "Ghent"
+ },
+ {
+  "id": "vito",
+  "name": "VITO (Flemish Institute for Technological Research)",
+  "short": "VITO",
+  "type": "research",
+  "city": "Mol"
+ },
+ {
+  "id": "vub",
+  "name": "Vrije Universiteit Brussel",
+  "short": "VUB",
+  "type": "university",
+  "city": "Brussels"
+ }
+]

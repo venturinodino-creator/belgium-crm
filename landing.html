@@ -1311,9 +1311,28 @@ function lbRenderChips(){
 }
 
 // Sort by score descending
-const sorted = [...INSTITUTIONS].sort((a,b)=>(SCORES[b.id]||70)-(SCORES[a.id]||70));
+let sorted = [...INSTITUTIONS].sort((a,b)=>(SCORES[b.id]||70)-(SCORES[a.id]||70));
 renderList(sorted);
 lbRenderChips();
+
+// The board's institution list lives in data/institutions.json, exported from
+// the CRM daily. Row-level security hides crm_institutions from anonymous
+// callers, so the page cannot read the table itself — and the inline list
+// above, being a hand-maintained copy, had drifted behind the app. Fetch the
+// shared file and re-render; the inline list stays as the offline fallback.
+(async function loadSharedInstitutions() {
+  try {
+    const res = await fetch('data/institutions.json?t=' + Date.now());
+    if (!res.ok) return;
+    const rows = await res.json();
+    if (!Array.isArray(rows) || !rows.length) return;
+    INSTITUTIONS.length = 0;
+    rows.forEach(r => INSTITUTIONS.push(r));
+    sorted = [...INSTITUTIONS].sort((a, b) => (SCORES[b.id] || 70) - (SCORES[a.id] || 70));
+    lbRenderChips();
+    lbApply();
+  } catch (e) { /* keep the inline list */ }
+})();
 const _lbD = document.getElementById('lb-date');
 if (_lbD) _lbD.textContent = new Date().toISOString().slice(0, 10);
 
