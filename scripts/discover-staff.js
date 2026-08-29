@@ -82,6 +82,9 @@ const strip = s => decodeEntities(
 
 function cleanRole(raw) {
   let r = strip(raw);
+  // Directories often follow the title with a labelled prose block; keep the
+  // title and drop the essay.
+  r = r.split(/\b(?:job responsibilities|responsibilities|ansvarsområder|arbejdsområder|taken|functie|takenpakket)\b/i)[0];
   // Phone numbers frequently sit in the cell next to the role and get swept up.
   r = r.replace(/\+?\d[\d\s().\/-]{6,}\d/g, ' ');
   // Directory pages often run several people together in one blob; cut at the
@@ -96,9 +99,32 @@ function cleanRole(raw) {
   return r.trim();
 }
 
+// Section titles and unit names ("Library Staff", "Special Collections",
+// "Campus Middelheim") are capitalised like names and otherwise sail through
+// the heuristic below, so they are rejected explicitly.
+const NON_PERSON_RE = /\b(?:staff|team|library|libraries|biblioth\w*|department|departement|afdeling|service|services|desk|office|campus|collection|collections|collectie|contact|support|management|group|unit|centre|center|faculty|faculteit|university|universiteit|helpdesk|information|loan|heritage|archive|archives)\b/i;
+
+// Dutch and Belgian directories decorate names heavily — "Drs. Y. (Youssef)
+// Achahbar", "Dr. ir. Marianne Renkema", "Wenneke Meerstadt MA". Left as-is the
+// first name would be stored as "Dr.", so strip the ornaments and prefer the
+// spelled-out given name over its initial.
+const TITLE_PREFIX_RE  = /^(?:d(?:r|rs)|prof|ir|ing|mr|mrs|ms|mw|dhr|em|hon)\.?\s+/i;
+const DEGREE_SUFFIX_RE = /[\s,]+(?:ma|msc|bsc|mba|phd|md|llm|ba|bs|mkb)\.?$/i;
+
+function normalizePersonName(raw) {
+  let n = strip(raw), prev;
+  do { prev = n; n = n.replace(TITLE_PREFIX_RE, ''); } while (n !== prev);
+  do { prev = n; n = n.replace(DEGREE_SUFFIX_RE, ''); } while (n !== prev);
+  n = n.replace(/\b(?:[A-ZÀ-Þ]\.\s*)+\(([^)]+)\)/g, '$1'); // "Y. (Youssef)" -> "Youssef"
+  n = n.replace(/\s*\([^)]*\)\s*/g, ' ');                   // drop other parentheticals
+  n = n.replace(/\b(?:[A-ZÀ-Þ]\.){1,4}\s*/g, '');           // drop leftover initials
+  return n.replace(/\s+/g, ' ').trim();
+}
+
 function looksLikePersonName(n) {
   if (!n || n.length > 60) return false;
   if (/[@\d]|https?:/.test(n)) return false;
+  if (NON_PERSON_RE.test(n)) return false;
   const words = n.split(/\s+/).filter(Boolean);
   if (words.length < 2 || words.length > 5) return false;
   // at least two capitalised words (handles "van Daele", "De Wilde")
@@ -114,7 +140,14 @@ function extractPeople(html) {
   const found = new Map(); // key -> person, dedup within a page
 
   const add = (name, role, email) => {
-    name = strip(name); role = cleanRole(role); email = (email || '').trim().toLowerCase();
+    name = normalizePersonName(name); role = cleanRole(role); email = (email || '').trim().toLowerCase();
+    // Some directories print "Role: Name" rather than "Name: Role". A title such
+    // as "Team leader Front desk" passes the name heuristic on capitalisation
+    // alone, so swap whenever the supposed name reads as a role and the
+    // supposed role reads as a person.
+    if (role && looksLikePersonName(role) && DECISION_MAKER_RE.test(name) && !DECISION_MAKER_RE.test(role)) {
+      const t = name; name = role; role = t;
+    }
     if (!looksLikePersonName(name)) return;
     const key = (email || name).toLowerCase();
     const prev = found.get(key);
@@ -141,6 +174,65 @@ function extractPeople(html) {
   const anchorRe = /<a[^>]*href=["']mailto:([^"'?]+)["'][^>]*>([\s\S]*?)<\/a>([\s\S]{0,120})/gi;
   let m;
   while ((m = anchorRe.exec(html))) add(m[2], m[3].split(/<a\b/i)[0], m[1]);
+
+  // 2b. card-style markup puts the person BEFORE the anchor:
+  //     <span class="card__title">Name</span> Role<br><a mailto>. Look behind
+  //     each mailto for the nearest heading-ish element; the text between it
+  //     and the anchor is the role.
+  const mailtoIdxRe = /<a[^>]*href=["']mailto:([^"'?]+)["']/gi;
+  while ((m = mailtoIdxRe.exec(html))) {
+    let behind = html.slice(Math.max(0, m.index - 500), m.index);
+    // Never look back past the end of the previous entry, or a card whose own
+    // name is unreadable would silently borrow the person above it.
+    const bound = Math.max(behind.lastIndexOf('</li>'), behind.lastIndexOf('</article>'), behind.lastIndexOf('</tr>'));
+    if (bound !== -1) behind = behind.slice(bound);
+    // Collect every short text element before the address. The name is not
+    // reliably the last one — UvA puts the role in a <p> between the name and
+    // the address — so take the last element that actually reads as a person,
+    // and treat what follows it as the role.
+    // Inner markup is allowed: directories often wrap the name in a link to a
+    // profile page (<strong><a …>Name</a></strong>), so match non-greedily and
+    // strip rather than requiring a bare text node.
+    //
+    // Each tag is scanned in its own pass. A single combined pass lets an outer
+    // <span> consume the <strong> inside it, yielding "Minna Giesel Head of
+    // Section" as one blob — name and role welded together.
+    const els = [];
+    for (const tag of ['strong', 'b', 'span', 'div', 'p', 'h2', 'h3', 'h4', 'h5']) {
+      const re = new RegExp(`<${tag}[^>]*>([\\s\\S]{3,140}?)</${tag}>`, 'gi');
+      let e;
+      while ((e = re.exec(behind))) els.push({ index: e.index, length: e[0].length, text: strip(e[1]) });
+    }
+    // Prefer the tightest element that reads as a person: the innermost element
+    // holds the name alone, outer ones drag the role in with it.
+    const cands = els.filter(e => looksLikePersonName(normalizePersonName(e.text)));
+    if (!cands.length) continue;
+    cands.sort((a, b) => a.text.length - b.text.length || b.index - a.index);
+    const nameEl = cands[0];
+    const after = behind.slice(nameEl.index + nameEl.length);
+    // The role is usually the first line after the name; anything beyond the
+    // next <br> is job description, phone numbers and other noise.
+    const firstLine = after.split(/<br\s*\/?>/i).map(strip).find(Boolean) || '';
+    let role = cleanRole(firstLine) || cleanRole(after);
+    // Prefer a following element that reads as a role over raw trailing text.
+    if (!DECISION_MAKER_RE.test(role)) {
+      const roleEl = els
+        .filter(e => e.index > nameEl.index)
+        .sort((a, b) => a.index - b.index)
+        .map(e => cleanRole(e.text))
+        .find(t => t && DECISION_MAKER_RE.test(t));
+      if (roleEl) role = roleEl;
+    }
+    // Card layouts often carry no inline role at all, putting it in the section
+    // heading above instead ("Publishing Support department head").
+    if (!role) {
+      const wide = html.slice(Math.max(0, m.index - 3000), m.index);
+      const heads = [...wide.matchAll(/<h[2-4][^>]*>([\s\S]{0,90}?)<\/h[2-4]>/gi)].map(h => strip(h[1]));
+      const senior = heads.reverse().find(h => DECISION_MAKER_RE.test(h));
+      if (senior) role = cleanRole(senior);
+    }
+    add(nameEl.text, role, m[1]);
+  }
 
   // 3. "Name – Role" / "Name, Role" pairs in list items and headings, for
   //    directories that publish a shared inbox instead of personal addresses
@@ -173,6 +265,25 @@ function constructEmail(name, domain) {
   const f = slugifyNamePart(parts[0]);
   const l = slugifyNamePart(parts.slice(1).join(''));
   return f && l ? `${f}.${l}@${domain}` : '';
+}
+
+/**
+ * A published address whose local part shares nothing with the surname is the
+ * signature of a mis-paired card — the extractor having taken one person's name
+ * and the next person's address. Cheap to detect and worth refusing, since the
+ * whole point of this scan is a queue you can trust. Constructed addresses are
+ * derived from the name, so they always agree and are exempt.
+ */
+function emailMatchesName(email, name) {
+  const local = String(email).split('@')[0].toLowerCase();
+  const surname = slugifyNamePart(String(name).split(/\s+/).pop());
+  if (surname.length < 4) return true; // too short to judge
+  // Some institutions (notably the Danish ones) issue initials-style addresses
+  // — misv@kb.dk for Michael Svendsen — which cannot contain the surname at
+  // all. Only judge addresses long enough to have encoded it.
+  if (slugifyNamePart(local).length <= 6) return true;
+  const stem = surname.slice(0, 5);
+  return local.includes(stem) || slugifyNamePart(local).includes(stem);
 }
 
 // ── Supabase ───────────────────────────────────────────────────────────────
@@ -279,6 +390,10 @@ async function main() {
           const last = parts.slice(1).join(' ');
           const email = p.email || constructEmail(p.name, src.emailDomain);
           if (!email) continue;
+          if (p.email && !emailMatchesName(p.email, p.name)) {
+            if (VERBOSE) console.log(`      drop  ${p.name} — published address ${p.email} does not match the name (likely mis-paired)`);
+            continue;
+          }
           const el = email.toLowerCase();
           const nl = `${first} ${last}`.toLowerCase();
           if (seenEmail.has(el) || seenName.has(nl)) continue;
