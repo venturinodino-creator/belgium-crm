@@ -4263,22 +4263,26 @@ const CX_SENIOR_TITLE_RE = /\b(?:research|library|libraries|faculty|department|d
 function cxIsSeniorRole(c) { return CX_SENIOR_TITLE_RE.test(c.title || ''); }
 function cxPriority(c) { return cxIsSeniorRole(c) ? 'high' : (c.priority || 'medium'); }
 
-// How much weight a title carries, for ordering by Priority. The four roles
-// that decide a subscription lead, in that order; anything else falls back to
+// How much weight a title carries, for ordering by Priority. Library
+// leadership leads as a block — a head of a library service is a person you
+// talk to about a subscription, whatever their level — then research
+// directors, then department and faculty heads. Anything else falls back to
 // the priority already recorded against the contact.
-//   0 research or library director   1 department or faculty head
-//   2 other senior role              3 recorded high
-//   4 recorded medium                5 recorded low
+//   0 any library leadership         1 research director or dean
+//   2 department or faculty head     3 other senior role
+//   4 recorded high                  5 recorded medium   6 recorded low
+const CX_LIBRARY_LEAD_RE = /\b(?:librar\w*|biblioth\w*)\b[^;|]{0,30}\b(?:director|directeur|head|hoofd|chief|manager|lead|teamlead|coordinator|co[oö]rdinator|dean)\b|\b(?:director|directeur|head|hoofd|chief|manager|lead|teamlead|coordinator|co[oö]rdinator|dean)\b[^;|]{0,30}\b(?:librar\w*|biblioth\w*)\b|\b(?:university|chief|head)\s+librarian\b|\bhoofdbibliothecaris\b/i;
 const CX_DIRECTOR_RE = /\b(?:director|directeur|directie|dean|decaan)\b[^;|]{0,30}\b(?:research|onderzoek|librar\w*|biblioth\w*)\b|\b(?:research|onderzoek|librar\w*|biblioth\w*)\b[^;|]{0,30}\b(?:director|directeur|dean|decaan)\b|\b(?:university|chief|head)\s+librarian\b|\bhoofdbibliothecaris\b/i;
 const CX_HEAD_RE = /\b(?:department|departement|afdeling|faculty|faculteit|school|dept\.?)\b[^;|]{0,30}\b(?:head|hoofd|chair|lead|dean|decaan|manager)\b|\b(?:head|hoofd|chair|dean|decaan|vice-?dean|manager)\b[^;|]{0,30}\b(?:department|departement|afdeling|faculty|faculteit|school)\b/i;
 
 function cxRoleRank(c) {
   const title = (c && c.title) || '';
-  if (CX_DIRECTOR_RE.test(title)) return 0;
-  if (CX_HEAD_RE.test(title)) return 1;
-  if (cxIsSeniorRole(c)) return 2;
+  if (CX_LIBRARY_LEAD_RE.test(title)) return 0;
+  if (CX_DIRECTOR_RE.test(title)) return 1;
+  if (CX_HEAD_RE.test(title)) return 2;
+  if (cxIsSeniorRole(c)) return 3;
   const p = (c && c.priority) || 'medium';
-  return p === 'high' ? 3 : p === 'low' ? 5 : 4;
+  return p === 'high' ? 4 : p === 'low' ? 6 : 5;
 }
 
 
