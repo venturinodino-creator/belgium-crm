@@ -630,6 +630,49 @@
     text-decoration: none;
     font-weight: 600;
   }
+
+  /* ── Territory board — matches the signed-in dashboard ── */
+  .lb-filters { display:flex; gap:6px; flex-wrap:wrap; margin:0 0 12px; }
+  .lb-chip {
+    font-family:inherit; font-size:11px; font-weight:600; padding:5px 11px; border-radius:20px;
+    cursor:pointer; background:rgba(255,255,255,.03); border:1px solid var(--border);
+    color:var(--muted); transition:all .15s; display:inline-flex; align-items:center; gap:6px;
+  }
+  .lb-chip:hover { color:var(--text); border-color:rgba(255,255,255,.22); }
+  .lb-chip[aria-pressed="true"] { background:rgba(0,245,196,.10); border-color:rgba(0,245,196,.42); color:var(--accent); }
+  .lb-chip:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .lb-chip i { width:7px; height:7px; border-radius:2px; display:block; }
+
+  .lb-board {
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(104px,1fr)); gap:7px;
+    /* rows must size to their content: with max-height set, a grid will
+       otherwise squeeze every auto row to fit the cap and clip the tiles */
+    grid-auto-rows:min-content; align-content:start;
+    max-height:340px; overflow-y:auto; padding-right:2px;
+    scrollbar-width:thin; scrollbar-color:var(--border) transparent;
+  }
+  .lb-board::-webkit-scrollbar { width:4px; }
+  .lb-board::-webkit-scrollbar-track { background:transparent; }
+  .lb-board::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+
+  .lb-tile {
+    position:relative; display:block; text-decoration:none; overflow:hidden;
+    border:1px solid var(--border); border-radius:10px; background:rgba(255,255,255,.02);
+    padding:9px 10px 10px;
+    transition:transform .18s cubic-bezier(.22,1,.36,1), border-color .18s, background .18s, box-shadow .18s, opacity .2s;
+    animation:lbTileIn .4s cubic-bezier(.22,1,.36,1) both;
+  }
+  @keyframes lbTileIn { from{opacity:0;transform:translateY(6px) scale(.97)} to{opacity:1;transform:none} }
+  .lb-tile::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--tc); opacity:.85; transition:width .18s; }
+  .lb-tile:hover { transform:translateY(-3px); border-color:var(--tc); background:rgba(255,255,255,.05); box-shadow:0 10px 24px rgba(0,0,0,.4); }
+  .lb-tile:hover::before { width:5px; }
+  .lb-tile:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .lb-tile.dim { display:none; }
+  .lb-code { display:block; font-size:12px; font-weight:800; color:var(--text); letter-spacing:-.02em; line-height:1.15; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .lb-city { display:block; font-size:9.5px; color:var(--muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .lb-score { display:block; margin-top:7px; font-size:9.5px; font-weight:800; letter-spacing:.02em; }
+  .lb-empty { grid-column:1/-1; text-align:center; padding:24px; color:var(--muted); font-size:13px; }
+  @media (prefers-reduced-motion:reduce){ .lb-tile{animation:none} }
 </style>
 </head>
 <body>
@@ -700,7 +743,8 @@
 
     <div class="live-label"><span class="live-dot"></span> Live coverage</div>
 
-    <div class="inst-list" id="inst-list">
+    <div class="lb-filters" id="lb-filters"></div>
+    <div class="lb-board" id="inst-list">
       <!-- populated by JS -->
     </div>
 
@@ -718,7 +762,7 @@
     <div>
       Research CRM · v2
       <span class="sep">/</span>
-      Data current 2026-07-29
+      Data current <span id="lb-date"></span>
       <span class="sep">/</span>
       <span class="status-dot"></span>All systems operational
     </div>
@@ -1202,42 +1246,78 @@ function scoreRing(score, r, g, b){
   </svg><span class="score-val">${score}</span>`;
 }
 
+// ── Territory board ─────────────────────────────────────────────────────────
+// Same shape as the signed-in dashboard: one tile per institution, a colour
+// per type, filterable. Tiles deep-link straight into the CRM.
+const LB_TYPE = {
+  university: { label:'Universities', hex:'#6366f1' },
+  medical:    { label:'Medical',      hex:'#ef4444' },
+  research:   { label:'Research',     hex:'#00f5c4' },
+  ngo:        { label:'NGO',          hex:'#a855f7' },
+};
+let _lbType = 'all', _lbQuery = '';
+
+function lbScoreColor(s) {
+  return s >= 90 ? '#00f5c4' : s >= 80 ? '#38bdf8' : s >= 70 ? '#fbbf24' : 'var(--muted)';
+}
+
 function renderList(list){
   const el = document.getElementById('inst-list');
   if(!list.length){
-    el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px">No institutions match</div>';
+    el.innerHTML = '<div class="lb-empty">No institutions match</div>';
     return;
   }
-  el.innerHTML = list.map(inst => {
+  el.innerHTML = list.map((inst, n) => {
     const score = SCORES[inst.id] || 70;
-    const badge = BADGE_CLASS[inst.type] || 'badge-research';
-    const label = BADGE_LABEL[inst.type] || inst.type;
-    return `<a class="inst-row" href="index.html?view=detail&inst=${encodeURIComponent(inst.id)}" title="View ${inst.name} in CRM">
-      <div class="score-ring">${scoreRing(score)}</div>
-      <div class="inst-info">
-        <div class="inst-name">${inst.name}</div>
-        <div class="inst-meta">${inst.short} · ${inst.city}</div>
-      </div>
-      <span class="inst-badge ${badge}">${label}</span>
-    </a>`;
+    const hex = (LB_TYPE[inst.type] || {}).hex || '#64748b';
+    return `<a class="lb-tile" href="index.html?view=detail&inst=${encodeURIComponent(inst.id)}"
+        title="${inst.name} — ${inst.city}"
+        style="--tc:${hex};animation-delay:${Math.min(n * 9, 320)}ms">
+        <span class="lb-code">${inst.short || inst.name}</span>
+        <span class="lb-city">${inst.city}</span>
+        <span class="lb-score" style="color:${lbScoreColor(score)}">${score}</span>
+      </a>`;
   }).join('');
+}
+
+function lbApply(){
+  const q = _lbQuery.trim().toLowerCase();
+  const list = sorted.filter(i => {
+    if (_lbType !== 'all' && i.type !== _lbType) return false;
+    if (!q) return true;
+    return i.name.toLowerCase().includes(q) || i.short.toLowerCase().includes(q)
+        || i.city.toLowerCase().includes(q) || i.type.toLowerCase().includes(q);
+  });
+  renderList(list);
+}
+
+function lbSetType(t){
+  _lbType = t;
+  document.querySelectorAll('.lb-chip').forEach(c => c.setAttribute('aria-pressed', String(c.dataset.t === t)));
+  lbApply();
+}
+
+function lbRenderChips(){
+  const box = document.getElementById('lb-filters');
+  if (!box) return;
+  const counts = {};
+  INSTITUTIONS.forEach(i => counts[i.type] = (counts[i.type] || 0) + 1);
+  const chips = [{ t:'all', label:`All ${INSTITUTIONS.length}` }].concat(
+    Object.entries(LB_TYPE).filter(([k]) => counts[k])
+      .map(([k, v]) => ({ t:k, label:`${v.label} ${counts[k]}`, hex:v.hex })));
+  box.innerHTML = chips.map(c =>
+    `<button class="lb-chip" data-t="${c.t}" aria-pressed="${c.t === _lbType}" onclick="lbSetType('${c.t}')">
+       ${c.hex ? `<i style="background:${c.hex}"></i>` : ''}${c.label}</button>`).join('');
 }
 
 // Sort by score descending
 const sorted = [...INSTITUTIONS].sort((a,b)=>(SCORES[b.id]||70)-(SCORES[a.id]||70));
 renderList(sorted);
+lbRenderChips();
+const _lbD = document.getElementById('lb-date');
+if (_lbD) _lbD.textContent = new Date().toISOString().slice(0, 10);
 
-function filterList(q){
-  q = q.trim().toLowerCase();
-  if(!q){ renderList(sorted); return; }
-  const filtered = sorted.filter(i =>
-    i.name.toLowerCase().includes(q) ||
-    i.short.toLowerCase().includes(q) ||
-    i.city.toLowerCase().includes(q) ||
-    i.type.toLowerCase().includes(q)
-  );
-  renderList(filtered);
-}
+function filterList(q){ _lbQuery = q || ''; lbApply(); }
 
 function setSearch(val){
   document.getElementById('search-input').value = val;
