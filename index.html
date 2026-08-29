@@ -1684,7 +1684,7 @@ async function runOpenAlexSync() {
     result.style.background = '#fff5f5';
     result.style.borderColor = '#feb2b2';
     result.style.color = 'var(--danger)';
-    result.innerHTML = ` <strong>Sync failed:</strong> ${err.message}. Make sure you are connected to the internet and try again.`;
+    result.innerHTML = ` <strong>Sync failed:</strong> ${esc(err.message)}. Make sure you are connected to the internet and try again.`;
     document.getElementById('sync-footer').innerHTML = '<button class="btn btn-outline" onclick="closeModal(\'modal-sync\')">Close</button>';
     document.getElementById('sync-footer').style.display = 'flex';
   }
@@ -7689,10 +7689,10 @@ function render4GU() {
           <div class="alog-entry-icon">${icons[a.type]||'•'}</div>
           <div style="flex:1;min-width:0">
             <div style="display:flex;justify-content:space-between;align-items:center">
-              <span style="color:#e2e8f0;font-size:13px;font-weight:500;text-transform:capitalize">${a.type}</span>
-              <span style="color:#475569;font-size:11px">${a.date}</span>
+              <span style="color:#e2e8f0;font-size:13px;font-weight:500;text-transform:capitalize">${esc(a.type)}</span>
+              <span style="color:#475569;font-size:11px">${esc(a.date)}</span>
             </div>
-            ${a.summary ? `<div style="color:#94a3b8;font-size:12px;margin-top:3px;white-space:pre-wrap">${a.summary}</div>` : ''}
+            ${a.summary ? `<div style="color:#94a3b8;font-size:12px;margin-top:3px;white-space:pre-wrap">${esc(a.summary)}</div>` : ''}
           </div>
         </div>`).join('');
   }
