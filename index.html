@@ -4160,11 +4160,21 @@ function renderDetail() {
   // Same ordering as the Contacts page: the people who sign for a
   // subscription — research and library directors, department and faculty
   // heads — sit at the top, then everyone else alphabetically.
-  const PRIO_RANK = { high: 0, medium: 1, low: 2 };
+  const _ds = state.detailSort || (state.detailSort = { col: 'priority', dir: 1 });
   const sortedContacts = contacts.slice().sort((a, b) => {
-    const r = (PRIO_RANK[cxPriority(a)] ?? 3) - (PRIO_RANK[cxPriority(b)] ?? 3);
-    return r !== 0 ? r : (a.last || '').localeCompare(b.last || '');
+    let r;
+    if (_ds.col === 'priority') r = cxRoleRank(a) - cxRoleRank(b);
+    else if (_ds.col === 'dept') r = (a.dept || '').localeCompare(b.dept || '');
+    else r = (a.last || '').localeCompare(b.last || '');
+    if (r === 0) r = (a.last || '').localeCompare(b.last || '');
+    return _ds.dir * r;
   });
+  function dth(label, col) {
+    const on = _ds.col === col;
+    const arrow = on ? (_ds.dir === 1 ? ' &#9650;' : ' &#9660;') : '';
+    return `<th onclick="sortDetail('${col}')" style="cursor:pointer" title="Sort by ${label}">${label}${arrow}</th>`;
+  }
+
 
   const contactRows = sortedContacts.length ? sortedContacts.map(c=>{
     const col = avatarColor(c.first+c.last);
@@ -4236,7 +4246,7 @@ function renderDetail() {
     <div class="table-wrap">
       <table>
         <thead><tr>
-          <th>Name</th><th>Department</th><th>Email</th><th>Priority</th><th>Quality</th><th>Actions</th>
+          ${dth('Name','last')}${dth('Department','dept')}<th>Email</th>${dth('Priority','priority')}<th>Quality</th><th>Actions</th>
         </tr></thead>
         <tbody>${contactRows}</tbody>
       </table>
@@ -4252,6 +4262,25 @@ let _contactExpanded = new Set();
 const CX_SENIOR_TITLE_RE = /\b(?:research|library|libraries|faculty|department|dept\.?|collection|acquisitions?)\b[^,;|]{0,30}\b(?:director|manager|head|lead|dean|officer)\b|\b(?:director|head|dean)\b[^,;|]{0,30}\b(?:research|library|libraries|faculty|department|collection)\b/i;
 function cxIsSeniorRole(c) { return CX_SENIOR_TITLE_RE.test(c.title || ''); }
 function cxPriority(c) { return cxIsSeniorRole(c) ? 'high' : (c.priority || 'medium'); }
+
+// How much weight a title carries, for ordering by Priority. The four roles
+// that decide a subscription lead, in that order; anything else falls back to
+// the priority already recorded against the contact.
+//   0 research or library director   1 department or faculty head
+//   2 other senior role              3 recorded high
+//   4 recorded medium                5 recorded low
+const CX_DIRECTOR_RE = /\b(?:director|directeur|directie|dean|decaan)\b[^;|]{0,30}\b(?:research|onderzoek|librar\w*|biblioth\w*)\b|\b(?:research|onderzoek|librar\w*|biblioth\w*)\b[^;|]{0,30}\b(?:director|directeur|dean|decaan)\b|\b(?:university|chief|head)\s+librarian\b|\bhoofdbibliothecaris\b/i;
+const CX_HEAD_RE = /\b(?:department|departement|afdeling|faculty|faculteit|school|dept\.?)\b[^;|]{0,30}\b(?:head|hoofd|chair|lead|dean|decaan|manager)\b|\b(?:head|hoofd|chair|dean|decaan|vice-?dean|manager)\b[^;|]{0,30}\b(?:department|departement|afdeling|faculty|faculteit|school)\b/i;
+
+function cxRoleRank(c) {
+  const title = (c && c.title) || '';
+  if (CX_DIRECTOR_RE.test(title)) return 0;
+  if (CX_HEAD_RE.test(title)) return 1;
+  if (cxIsSeniorRole(c)) return 2;
+  const p = (c && c.priority) || 'medium';
+  return p === 'high' ? 3 : p === 'low' ? 5 : 4;
+}
+
 
 const CX_PRIORITY_META = {
   high:   {label:'High',   bg:'rgba(239,68,68,.10)',  fg:'#fca5a5', bd:'rgba(239,68,68,.35)'},
@@ -4404,7 +4433,8 @@ function renderContacts() {
   const {col, dir} = state.contactSort;
   contacts = contacts.slice().sort((a,b)=>{
     if(col==='priority') {
-      const r = (PRIO_RANK[cxPriority(a)] ?? 3) - (PRIO_RANK[cxPriority(b)] ?? 3);
+      // Same ranking the institution profile uses, so the two agree.
+      const r = cxRoleRank(a) - cxRoleRank(b);
       return dir * (r !== 0 ? r : (a.last||'').localeCompare(b.last||''));
     }
     let av=a[col]||'', bv=b[col]||'';
@@ -4440,6 +4470,12 @@ function renderContacts() {
       <div class="pg"><span>Showing ${total?((state.contactPage-1)*PER_PAGE+1):0}-${Math.min(state.contactPage*PER_PAGE,total)} of ${total}</span>
         <div class="pg-btns">${pgButtons}</div></div>
     </div>`;
+}
+
+function sortDetail(col) {
+  const s = state.detailSort || (state.detailSort = { col: 'priority', dir: 1 });
+  if (s.col === col) s.dir *= -1; else { s.col = col; s.dir = 1; }
+  renderDetail();
 }
 
 function sortContacts(col) {
