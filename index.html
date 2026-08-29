@@ -3107,18 +3107,21 @@ function dshHeroLead() {
     .filter(x => x.days >= 0 && x.days <= 21)
     .sort((a, b) => a.days - b.days)[0];
 
-  // Today's news leads: it is the freshest thing on the page, and the rungs
-  // below it can be weeks old. Set at render time and again once the news
-  // scan resolves, since the count arrives asynchronously.
-  if (_dshNewsToday > 0) return {
-    html: `<span class="lead">${_dshNewsToday} ${_dshNewsToday === 1 ? 'story' : 'stories'}</span> broke in your territory today.`,
-    sub: 'From the research news scan',
-    cta: { label: 'Read the news', view: 'news' },
-  };
+  // A tender that actually opened is the only thing that outranks the day’s
+  // news — it is rarer, time-bound, and the reason the board exists. Every
+  // other rung (an import, a deadline, money already on the board) can be
+  // weeks old, so it waits behind the news.
   if (launched.length) return {
     html: `<span class="lead">${launched.length} new tender${launched.length === 1 ? '' : 's'}</span> opened this fortnight.`,
     sub: launched[0].title || launched[0].institution || 'New opportunity',
     cta: { label: 'See the opportunities', view: 'rfp' },
+  };
+  // Set at render time and again once the news scan resolves, since the
+  // count arrives asynchronously.
+  if (_dshNewsToday > 0) return {
+    html: `<span class="lead">${_dshNewsToday} ${_dshNewsToday === 1 ? 'story' : 'stories'}</span> broke in your territory today.`,
+    sub: 'From the research news scan',
+    cta: { label: 'Read the news', view: 'news' },
   };
   if (arrived.length) return {
     html: `<span class="lead">${arrived.length} new opportunit${arrived.length === 1 ? 'y' : 'ies'}</span> landed on your board.`,
