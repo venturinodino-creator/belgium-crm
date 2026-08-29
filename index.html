@@ -217,7 +217,9 @@ tbody td{padding:9px 14px;vertical-align:middle;color:var(--text)}
 .dh-info h2{font-size:17px;font-weight:700;color:var(--text2);margin-top:2px;letter-spacing:-.2px}
 .dh-info .short{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px}
 /*  DASHBOARD  */
-.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+.dash-grid .dash-widget.w-wide{grid-column:span 2}
+@media(max-width:1250px){.dash-grid{grid-template-columns:1fr 1fr}}
 /*  DRAGGABLE WIDGETS  */
 .dash-widget{transition:box-shadow .15s,opacity .15s;user-select:none}
 .dash-widget.dragging{opacity:.35;box-shadow:0 0 0 2px #6366f1}
@@ -893,7 +895,7 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
   animation: pulse-dot 2.4s ease-in-out infinite;
 }
 
-.main { margin-left: 220px !important; }
+.main { margin-left: var(--sw) !important; }
 
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; transform: scale(1); }
@@ -925,7 +927,212 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
     .cm-proof-link:hover { background:#dbeafe; }
     .cm-legend { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:14px; padding:12px 16px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:10px; }
     .cm-legend-item { display:inline-flex; align-items:center; gap:6px; font-size:11px; color:#94a3b8; }
-  </style>
+  
+/* ══ Dashboard: hero, territory board, command palette ══════════════════════
+   All new classes are dsh- prefixed so nothing collides with the existing
+   sheet. Widgets keep using .card/.dash-widget so drag-to-reorder still works. */
+
+.dsh-eyebrow{
+  font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.dsh-pulse{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:dshPulse 2.4s infinite}
+@keyframes dshPulse{
+  0%{box-shadow:0 0 0 0 rgba(0,245,196,.55)}
+  70%{box-shadow:0 0 0 7px rgba(0,245,196,0)}
+  100%{box-shadow:0 0 0 0 rgba(0,245,196,0)}
+}
+.dsh-dot{width:3px;height:3px;border-radius:50%;background:var(--muted);opacity:.6;flex-shrink:0}
+
+.dsh-hero{
+  position:relative;overflow:hidden;border:1px solid var(--border);border-radius:16px;
+  background:
+    radial-gradient(1100px 340px at 12% -40%, rgba(0,245,196,.10), transparent 62%),
+    radial-gradient(760px 320px at 88% -10%, rgba(139,92,246,.12), transparent 60%),
+    var(--card);
+  padding:24px 26px 22px;margin-bottom:14px;
+}
+.dsh-hero-top{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:22px 32px}
+@media(max-width:1000px){.dsh-hero-top{grid-template-columns:minmax(0,1fr)}}
+.dsh-synth{
+  margin-top:13px;font-size:clamp(24px,2.9vw,37px);line-height:1.08;
+  font-weight:800;letter-spacing:-.03em;color:var(--text2);max-width:20ch;
+}
+.dsh-synth .lead{color:var(--accent)}
+.dsh-sub{margin-top:11px;font-size:12.5px;color:var(--muted2);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.dsh-sub b{color:var(--text2);font-weight:700}
+.dsh-actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:16px}
+
+.dsh-cta{
+  display:inline-flex;align-items:center;gap:8px;white-space:nowrap;
+  padding:10px 17px;border-radius:10px;border:none;cursor:pointer;
+  font-family:inherit;font-size:12.5px;font-weight:700;letter-spacing:-.01em;
+  background:linear-gradient(135deg,var(--accent),#38bdf8);color:#04141f;
+  box-shadow:0 6px 22px rgba(0,245,196,.22);
+  transition:transform .16s cubic-bezier(.22,1,.36,1),box-shadow .16s;
+}
+.dsh-cta:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,245,196,.34)}
+.dsh-cta:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.dsh-ghost{
+  display:inline-flex;align-items:center;gap:7px;padding:10px 14px;border-radius:10px;
+  border:1px solid var(--border2);background:transparent;color:var(--muted2);
+  font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;
+}
+.dsh-ghost:hover{border-color:rgba(255,255,255,.24);color:var(--text2)}
+.dsh-ghost:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.dsh-ledger{display:flex;flex-direction:column;gap:2px;flex-shrink:0}
+.dsh-lrow{
+  display:grid;grid-template-columns:auto 1fr;align-items:baseline;gap:13px;
+  padding:8px 11px;border-radius:9px;cursor:pointer;background:none;border:none;
+  font-family:inherit;text-align:left;transition:background .15s;width:100%;
+}
+.dsh-lrow:hover{background:rgba(255,255,255,.04)}
+.dsh-lrow:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.dsh-ln{font-size:25px;font-weight:800;color:var(--text2);letter-spacing:-.035em;line-height:1;min-width:54px;text-align:right;font-variant-numeric:tabular-nums}
+.dsh-ll{display:block;font-size:10px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--muted2);line-height:1}
+.dsh-ls{display:block;font-size:10px;color:var(--muted);margin-top:4px;font-weight:500;line-height:1.3}
+.dsh-lrow:hover .dsh-ln{color:var(--accent)}
+
+.dsh-meter{margin-top:18px;padding-top:16px;border-top:1px solid var(--border)}
+.dsh-mbar{display:flex;height:8px;border-radius:5px;overflow:hidden;gap:2px}
+.dsh-seg{height:100%;border-radius:2px;cursor:pointer;border:none;padding:0;transition:filter .16s,transform .16s;transform-origin:center bottom}
+.dsh-seg:hover{filter:brightness(1.35);transform:scaleY(1.5)}
+.dsh-mkey{display:flex;gap:16px;flex-wrap:wrap;margin-top:11px}
+.dsh-key{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted2);background:none;border:none;cursor:pointer;font-family:inherit;padding:0}
+.dsh-key:hover{color:var(--text2)}
+.dsh-key i{width:8px;height:8px;border-radius:2px;display:block;flex-shrink:0}
+.dsh-key b{color:var(--text2);font-weight:700}
+
+/* ── momentum ─────────────────────────────────────────────── */
+.dsh-delta{
+  display:inline-flex;align-items:center;font-size:9.5px;font-weight:800;
+  padding:2px 6px;border-radius:20px;background:rgba(0,245,196,.11);color:var(--accent);
+  vertical-align:middle;font-variant-numeric:tabular-nums;
+}
+.dsh-delta.down{background:rgba(255,255,255,.05);color:var(--muted)}
+.dsh-since{
+  display:inline-flex;align-items:center;font-size:10px;font-weight:600;color:var(--muted);
+  padding:3px 9px;border-radius:20px;background:rgba(255,255,255,.04);border:1px solid var(--border);
+}
+.dsh-new{
+  font-size:8.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--accent);background:rgba(0,245,196,.12);padding:2px 6px;border-radius:5px;flex-shrink:0;
+}
+
+/* ── territory board ──────────────────────────────────────── */
+.dsh-panel{border:1px solid var(--border);border-radius:16px;background:var(--card);padding:20px 22px;margin-bottom:14px}
+.dsh-phead{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap}
+.dsh-ptitle{font-size:12.5px;font-weight:800;color:var(--text2);letter-spacing:-.01em}
+.dsh-pnote{font-size:11px;color:var(--muted)}
+.dsh-pnote b{color:#fbbf24;font-weight:700}
+.dsh-filters{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 16px}
+.dsh-chip{
+  font-family:inherit;font-size:11px;font-weight:600;padding:6px 11px;border-radius:20px;cursor:pointer;
+  background:rgba(255,255,255,.03);border:1px solid var(--border2);color:var(--muted);
+  transition:all .15s;display:inline-flex;align-items:center;gap:6px;
+}
+.dsh-chip:hover{color:var(--text2);border-color:rgba(255,255,255,.22)}
+.dsh-chip[aria-pressed="true"]{background:rgba(0,245,196,.10);border-color:rgba(0,245,196,.42);color:var(--accent)}
+.dsh-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.dsh-chip i{width:7px;height:7px;border-radius:2px;display:block}
+
+.dsh-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+.dsh-tile{
+  position:relative;text-align:left;cursor:pointer;font-family:inherit;
+  border:1px solid var(--border2);border-radius:11px;background:rgba(255,255,255,.02);
+  padding:10px 11px 11px;overflow:hidden;
+  transition:transform .18s cubic-bezier(.22,1,.36,1),border-color .18s,background .18s,box-shadow .18s,opacity .2s;
+  animation:dshTileIn .42s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes dshTileIn{from{opacity:0;transform:translateY(7px) scale(.97)}to{opacity:1;transform:none}}
+.dsh-tile::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--tc);opacity:.85;transition:width .18s}
+.dsh-tile:hover{transform:translateY(-3px);border-color:var(--tc);background:rgba(255,255,255,.05);box-shadow:0 10px 26px rgba(0,0,0,.42)}
+.dsh-tile:hover::before{width:5px}
+.dsh-tile:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.dsh-tile.dim{opacity:.18;pointer-events:none;filter:saturate(.3)}
+/* these are spans inside a button, so they need blockifying or the name and
+   city run together on one line */
+.dsh-code{display:block;font-size:12.5px;font-weight:800;color:var(--text2);letter-spacing:-.02em;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dsh-city{display:block;font-size:9.5px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dsh-marks{display:flex;gap:4px;margin-top:9px;min-height:6px;align-items:center}
+.dsh-mark{width:6px;height:6px;border-radius:50%}
+.dsh-untracked{background:rgba(255,255,255,.012)}
+.dsh-untracked .dsh-code{color:var(--muted2)}
+.dsh-untracked .dsh-marks::after{
+  content:'';width:22px;height:2px;border-radius:2px;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.16) 0 3px,transparent 3px 6px);
+}
+
+.dsh-tip{
+  position:fixed;z-index:160;pointer-events:none;opacity:0;transform:translateY(4px);
+  transition:opacity .13s,transform .13s;background:rgba(10,16,28,.97);
+  border:1px solid var(--border2);border-radius:10px;padding:10px 12px;
+  box-shadow:0 16px 40px rgba(0,0,0,.6);max-width:250px;
+}
+.dsh-tip.on{opacity:1;transform:none}
+.dsh-tip h4{font-size:12.5px;color:var(--text2);font-weight:700;margin-bottom:2px}
+.dsh-tip p{font-size:10.5px;color:var(--muted);margin-bottom:7px}
+.dsh-trow{display:flex;justify-content:space-between;gap:14px;font-size:10.5px;padding:2px 0}
+.dsh-trow span{color:var(--muted)}
+
+/* ── posture gauges + mini tiles (inside widgets) ─────────── */
+.dsh-gauge{display:flex;flex-direction:column;gap:10px}
+.dsh-grow{display:grid;grid-template-columns:1fr auto;gap:7px;align-items:center}
+.dsh-glabel{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--muted2);font-weight:600}
+.dsh-glabel i{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dsh-gtrack{display:block;grid-column:1/-1;height:6px;border-radius:4px;background:rgba(255,255,255,.06);overflow:hidden}
+.dsh-gfill{display:block;height:100%;border-radius:4px;width:0;transition:width 1s cubic-bezier(.22,1,.36,1)}
+.dsh-gval{font-size:12px;font-weight:800;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.dsh-mini{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:13px}
+.dsh-minic{
+  background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:10px;
+  padding:10px 11px;cursor:pointer;transition:all .15s;font-family:inherit;text-align:left;
+}
+.dsh-minic:hover{background:rgba(255,255,255,.055);border-color:var(--border2);transform:translateY(-2px)}
+.dsh-minin{font-size:19px;font-weight:800;color:var(--text2);letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.dsh-minil{font-size:9.5px;color:var(--muted);margin-top:4px;font-weight:600;letter-spacing:.04em}
+
+/* ── command palette ──────────────────────────────────────── */
+.dsh-kbd{
+  display:inline-flex;align-items:center;padding:2px 6px;border-radius:5px;
+  background:rgba(255,255,255,.07);border:1px solid var(--border2);
+  font-size:9.5px;font-weight:700;color:var(--muted2);font-family:inherit;
+}
+.dsh-scrim{
+  position:fixed;inset:0;z-index:300;background:rgba(4,8,16,.72);backdrop-filter:blur(4px);
+  display:none;align-items:flex-start;justify-content:center;padding:12vh 20px 20px;
+}
+.dsh-scrim.on{display:flex}
+.dsh-pal{
+  width:min(600px,100%);background:#0e1728;border:1px solid var(--border2);border-radius:16px;
+  box-shadow:0 30px 80px rgba(0,0,0,.7);overflow:hidden;
+  animation:dshPalIn .18s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes dshPalIn{from{opacity:0;transform:translateY(-8px) scale(.985)}to{opacity:1;transform:none}}
+.dsh-palin{display:flex;align-items:center;gap:11px;padding:14px 16px;border-bottom:1px solid var(--border)}
+.dsh-palin input{flex:1;background:none;border:none;outline:none;color:var(--text2);font-family:inherit;font-size:15px;font-weight:500}
+.dsh-palin input::placeholder{color:var(--muted)}
+.dsh-pallist{max-height:min(420px,52vh);overflow-y:auto;padding:6px}
+.dsh-palgroup{font-size:9.5px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);padding:9px 10px 5px}
+.dsh-palitem{
+  display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border-radius:9px;
+  background:none;border:none;cursor:pointer;font-family:inherit;text-align:left;color:var(--text);
+}
+.dsh-palitem[aria-selected="true"]{background:rgba(0,245,196,.10);outline:1px solid rgba(0,245,196,.28)}
+.dsh-palico{width:26px;height:26px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:800;color:#fff}
+.dsh-palt{flex:1;min-width:0}
+.dsh-palt b{display:block;font-size:12.5px;font-weight:600;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dsh-palt span{display:block;font-size:10.5px;color:var(--muted);margin-top:1px}
+.dsh-palt mark{background:rgba(0,245,196,.22);color:var(--accent);border-radius:2px;padding:0 1px}
+.dsh-palfoot{display:flex;gap:13px;padding:9px 14px;border-top:1px solid var(--border);font-size:9.5px;color:var(--muted);align-items:center;flex-wrap:wrap}
+.dsh-palempty{padding:28px 16px;text-align:center;color:var(--muted);font-size:12.5px}
+
+@media (prefers-reduced-motion:reduce){
+  .dsh-tile,.dsh-gfill,.dsh-pal,.dsh-pulse{animation:none!important;transition:none!important}
+}
+
+</style>
   <link rel="stylesheet" href="animations.css">
 </head>
 <body>
@@ -2749,60 +2956,8 @@ function applyRoleUI() {
 }
 
 //  DASHBOARD 
-function renderDashboard() {
-  document.getElementById('page-title').textContent = 'Dashboard';
-  document.getElementById('page-sub').textContent = 'Overview of your Belgium research network';
-  document.getElementById('topbar-actions').innerHTML = '';
-
-  const inst = state.institutions;
-  const cont = state.contacts;
-  const byType = {};
-  const typeCounts = {};
-  inst.forEach(i=>{ byType[i.type]=(byType[i.type]||0)+1; });
-  cont.forEach(c=>{ const t=getInst(c.instId).type||'unknown'; typeCounts[t]=(typeCounts[t]||0)+1; });
-
-  const activeC = cont.filter(c=>c.status==='active').length;
-  const highP = cont.filter(c=>c.priority==='high').length;
-  const verified = cont.filter(c=>c.quality==='verified').length;
-
-  const _typeMax = Math.max(...Object.values(byType), 1);
-  const _typeBarColors = {university:'#6366f1,#818cf8', medical:'#ef4444,#f87171', research:'#00f5c4,#38bdf8', ngo:'#a855f7,#c084fc'};
-  const _typeBg = {university:'rgba(99,102,241,.13)', medical:'rgba(239,68,68,.11)', research:'rgba(0,245,196,.10)', ngo:'rgba(168,85,247,.11)'};
-  const _typeBd = {university:'rgba(99,102,241,.25)', medical:'rgba(239,68,68,.22)', research:'rgba(0,245,196,.22)', ngo:'rgba(168,85,247,.22)'};
-  const _typeTotal2 = Object.values(byType).reduce((a,b)=>a+b,0)||1;
-  const typeRows = Object.entries(TYPE_LABEL).map(([k,v])=>{
-    const n = byType[k]||0;
-    const w = Math.round(n/_typeMax*100);
-    const pct = Math.round(n/_typeTotal2*100);
-    const barColors = _typeBarColors[k]||'#64748b,#94a3b8';
-    const bg = _typeBg[k]||'rgba(255,255,255,.06)';
-    const bd = _typeBd[k]||'rgba(255,255,255,.12)';
-    return `<div class="bk-row" onclick="state.instType='${k}';state.instPage=1;nav('institutions')" title="View ${v.replace(' Inst.','')} institutions">
-      <div style="width:36px;height:36px;border-radius:9px;background:${bg};border:1px solid ${bd};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${TYPE_ICON[k]}</div>
-      <div style="flex:1;min-width:0">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-          <span style="font-size:12.5px;font-weight:600;color:#f1f5f9">${v.replace(' Inst.','')}</span>
-          <span style="font-size:11px;color:rgba(255,255,255,.32)">${pct}%</span>
-        </div>
-        <div class="bk-bar"><div class="bk-fill" style="width:${w}%;background:linear-gradient(90deg,${barColors})"></div></div>
-      </div>
-      <div style="font-size:18px;font-weight:800;color:#f8fafc;letter-spacing:-1px;min-width:24px;text-align:right;flex-shrink:0">${n}</div>
-    </div>`;
-  }).join('');
-
-
-  const highPrioity = cont.filter(c=>c.priority==='high').slice(0,5);
-  const hpRows = highPrioity.map(c=>{
-    const inst = getInst(c.instId);
-    const col = avatarColor(c.first+c.last);
-    return `<div class="recent-row" style="cursor:pointer" onclick="nav('contacts')">
-      <div class="av" style="background:${col}">${initials(c.first,c.last)}</div>
-      <div class="ri"><h4>${esc(c.first)} ${esc(c.last)}</h4><p>${esc(inst.name||'')}</p></div>
-      <span class="badge b-${c.status}">${c.status}</span>
-    </div>`;
-  }).join('') || '<p style="font-size:13px;color:var(--muted);padding:12px 0">No high-priority contacts yet.</p>';
-
-  const AGENTS = [
+const DSH_REGION_SUB = "Overview of your Belgium research network";
+const DSH_AGENTS = [
     {
       id: 'agent-discovery', name: 'Contact Discovery', icon: '👤',
       status: 'active', cadence: 'Daily · 07:00 UTC · GitHub Actions', source: 'OpenAlex API',
@@ -2834,61 +2989,521 @@ function renderDashboard() {
       statusEl: null, view: 'summary', workflow: 'daily-summary.yml',
     },
   ];
-  const agentRows = AGENTS.map(a=>{
-    const live = a.status === 'active';
-    const dot = live ? '#4ade80' : 'rgba(255,255,255,.3)';
-    const badgeBg = live ? 'rgba(74,222,128,.12)' : 'rgba(255,255,255,.05)';
-    const badgeColor = live ? '#4ade80' : 'var(--muted)';
-    const badgeLabel = live ? 'Active' : 'Manual';
-    const btnId = `run-btn-${a.id}`;
-    return `<div class="recent-row" style="cursor:pointer" onclick="nav('${a.view}')">
-      <div class="av" style="background:rgba(255,255,255,.06);position:relative">${a.icon}<span style="position:absolute;bottom:-1px;right:-1px;width:9px;height:9px;border-radius:50%;background:${dot};border:1.5px solid var(--card,#111a2e);box-shadow:0 0 6px ${dot}"></span></div>
-      <div class="ri"><h4>${esc(a.name)}</h4><p>${esc(a.source)} · ${esc(a.cadence)}${a.statusEl ? ` · <span id="${a.statusEl}">checking…</span>` : ''}</p></div>
-      <button class="btn btn-xs btn-outline" id="${btnId}" onclick="event.stopPropagation(); runAgentNow('${a.workflow}','${btnId}','${esc(a.name)}')" title="Triggers this agent's GitHub Actions workflow immediately, right from the CRM">Run now</button>
-      <span class="badge" style="background:${badgeBg};color:${badgeColor};border-color:${badgeColor}33">${badgeLabel}</span>
+
+//  DASHBOARD — hero, territory board, momentum, command palette
+// Sits above the existing widget grid, which keeps its own drag-to-reorder.
+
+const DSH_TYPE = {
+  university: { label:'Universities', hex:'#6366f1' },
+  medical:    { label:'Medical',      hex:'#ef4444' },
+  research:   { label:'Research',     hex:'#00f5c4' },
+  ngo:        { label:'NGO',          hex:'#a855f7' },
+};
+
+// Competitive posture for one institution, read off the subscription matrix.
+function dshPosture(id) {
+  const c = (window.COMP_DATA || {})[id];
+  if (!c) return null;
+  return {
+    scopus: c.scopus === 'yes',
+    wos: c.wos === 'yes' || c.wos === 'likely',
+    open: !!c.openalexTier || c.openalex === 'free',
+  };
+}
+
+// ── Momentum ────────────────────────────────────────────────
+// Each visit stores the headline figures; the next visit diffs against them so
+// the page can say what moved, not only what is.
+const DSH_SNAP_KEY = 'crm_dash_snapshot';
+let _dshSnap = null;
+function dshLoadSnapshot() {
+  try { _dshSnap = JSON.parse(localStorage.getItem(DSH_SNAP_KEY)); } catch(e) { _dshSnap = null; }
+}
+function dshSaveSnapshot(f) {
+  try { localStorage.setItem(DSH_SNAP_KEY, JSON.stringify({ at: Date.now(), f })); } catch(e){}
+}
+function dshDelta(key, value) {
+  if (!_dshSnap || !_dshSnap.f || typeof _dshSnap.f[key] !== 'number' || typeof value !== 'number') return '';
+  const d = value - _dshSnap.f[key];
+  if (!d) return '';
+  return `<span class="dsh-delta${d < 0 ? ' down' : ''}">${d > 0 ? '+' : ''}${d}</span>`;
+}
+function dshRelTime(ts) {
+  const h = Math.round((Date.now() - ts) / 36e5);
+  if (h < 1) return 'just now';
+  if (h < 24) return h + 'h ago';
+  const d = Math.round(h / 24);
+  return d === 1 ? 'yesterday' : d + ' days ago';
+}
+
+// ── Hero headline ───────────────────────────────────────────
+// Chosen from a priority ladder rather than pinned to one metric, so the page
+// still leads with something true when a given count happens to be zero.
+let _dshPending = null; // filled in asynchronously by loadPendingCount
+function dshHeroLead() {
+  const insts = state.institutions || [];
+  const untracked = insts.filter(i => !(window.COMP_DATA || {})[i.id]).length;
+
+  let tender = null;
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    tender = (getRFPs() || [])
+      .filter(r => r.deadline && !['won','lost'].includes(r.status))
+      .map(r => ({ r, days: daysBetween(today, r.deadline) }))
+      .filter(x => x.days >= 0 && x.days <= 21)
+      .sort((a, b) => a.days - b.days)[0];
+  } catch(e) {}
+
+  if (tender) return {
+    html: `A tender closes in <span class="lead">${tender.days === 0 ? 'today' : tender.days + ' days'}</span>.`,
+    sub: esc(tender.r.title || tender.r.institution || 'Open tender'),
+    cta: { label:'Open the tender', view:'rfp' },
+  };
+  if (_dshPending > 0) return {
+    html: `<span class="lead">${_dshPending} contact${_dshPending === 1 ? '' : 's'}</span> waiting for your review.`,
+    sub: 'Found by the Contact Discovery agent',
+    cta: { label:'Review new contacts', view:'pending' },
+  };
+  if (untracked > 0) return {
+    html: `<span class="lead">${untracked} institutions</span> have no subscription intel.`,
+    sub: `Out of ${insts.length} in your territory`,
+    cta: { label:'Start filling the gaps', view:'institutions' },
+  };
+  return {
+    html: `Everything is <span class="lead">up to date</span>.`,
+    sub: 'Nothing needs you right now',
+    cta: { label:'Browse institutions', view:'institutions' },
+  };
+}
+function dshRenderLead() {
+  const synth = document.getElementById('dsh-synth');
+  if (!synth) return;
+  const lead = dshHeroLead();
+  synth.innerHTML = lead.html;
+  const subEl = document.getElementById('dsh-lead-sub');
+  if (subEl) subEl.textContent = lead.sub;
+  const cta = document.getElementById('dsh-cta');
+  if (cta) {
+    cta.innerHTML = lead.cta.label +
+      ' <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+    cta.onclick = () => nav(lead.cta.view);
+  }
+}
+
+// ── Territory board ─────────────────────────────────────────
+let _dshFilter = 'all';
+function dshSetFilter(id) {
+  _dshFilter = id;
+  document.querySelectorAll('.dsh-chip').forEach(c =>
+    c.setAttribute('aria-pressed', String(c.dataset.f === id)));
+  document.querySelectorAll('.dsh-tile').forEach(t => {
+    const show = id === 'all'
+      || (id === 'untracked' ? t.dataset.tracked === '0' : t.dataset.type === id);
+    t.classList.toggle('dim', !show);
+  });
+}
+function dshBoardHtml() {
+  const insts = state.institutions || [];
+  const counts = {};
+  insts.forEach(i => counts[i.type] = (counts[i.type] || 0) + 1);
+  const untracked = insts.filter(i => !dshPosture(i.id)).length;
+
+  const chips = [{ id:'all', label:`All ${insts.length}` }]
+    .concat(Object.entries(DSH_TYPE).filter(([k]) => counts[k])
+      .map(([k, t]) => ({ id:k, label:t.label, hex:t.hex })))
+    .concat(untracked ? [{ id:'untracked', label:`Untracked ${untracked}`, hex:'#fbbf24' }] : []);
+
+  const tiles = insts.map((i, n) => {
+    const hex = (DSH_TYPE[i.type] || {}).hex || '#64748b';
+    const p = dshPosture(i.id);
+    const marks = p ? [
+      p.scopus ? '<span class="dsh-mark" style="background:var(--accent)"></span>' : '',
+      p.wos ? '<span class="dsh-mark" style="background:#a78bfa"></span>' : '',
+      p.open ? '<span class="dsh-mark" style="background:#fbbf24"></span>' : '',
+    ].join('') : '';
+    return `<button class="dsh-tile${p ? '' : ' dsh-untracked'}" data-id="${esc(i.id)}" data-type="${esc(i.type||'')}"
+        data-tracked="${p ? 1 : 0}" style="--tc:${hex};animation-delay:${Math.min(n * 10, 400)}ms"
+        onclick="nav('detail',{instId:'${esc(i.id)}'})">
+        <span class="dsh-code">${esc(i.short || i.name)}</span>
+        <span class="dsh-city">${esc(i.city || '')}</span>
+        <span class="dsh-marks">${marks}</span>
+      </button>`;
+  }).join('');
+
+  return `<div class="dsh-panel">
+    <div class="dsh-phead">
+      <span class="dsh-ptitle">Your territory</span>
+      <span class="dsh-pnote">${untracked ? `<b>${untracked}</b> of ${insts.length} have no subscription intel yet` : `all ${insts.length} tracked`}</span>
+    </div>
+    <div class="dsh-filters">${chips.map(c =>
+      `<button class="dsh-chip" data-f="${c.id}" aria-pressed="${c.id === _dshFilter}" onclick="dshSetFilter('${c.id}')">
+        ${c.hex ? `<i style="background:${c.hex}"></i>` : ''}${esc(c.label)}</button>`).join('')}</div>
+    <div class="dsh-grid" id="dsh-grid">${tiles}</div>
+  </div>`;
+}
+
+function dshInitTooltip() {
+  const grid = document.getElementById('dsh-grid');
+  if (!grid) return;
+  let tip = document.getElementById('dsh-tip');
+  if (!tip) {
+    tip = document.createElement('div');
+    tip.id = 'dsh-tip'; tip.className = 'dsh-tip'; tip.setAttribute('role', 'tooltip');
+    document.body.appendChild(tip);
+  }
+  const canHover = matchMedia('(hover: hover)').matches;
+  const hide = () => tip.classList.remove('on');
+  addEventListener('scroll', hide, { passive: true });
+  addEventListener('resize', hide);
+  grid.addEventListener('mouseout', hide);
+  grid.addEventListener('mouseover', e => {
+    if (!canHover) return;
+    const t = e.target.closest('.dsh-tile'); if (!t) return;
+    const i = (state.institutions || []).find(x => x.id === t.dataset.id); if (!i) return;
+    const c = (window.COMP_DATA || {})[i.id];
+    const row = (k, v, col) => `<div class="dsh-trow"><span>${k}</span><b style="color:${col}">${v}</b></div>`;
+    tip.innerHTML = `<h4>${esc(i.name)}</h4><p>${esc(i.city || '')} · ${esc((DSH_TYPE[i.type]||{}).label || i.type || '')}</p>` +
+      (c ? [
+        row('Scopus', c.scopus === 'yes' ? 'Active' : '—', c.scopus === 'yes' ? 'var(--accent)' : 'var(--muted)'),
+        row('Web of Science', c.wos === 'yes' ? 'Active' : c.wos === 'likely' ? 'Likely' : c.wos === 'no' ? 'None' : 'Unknown',
+            (c.wos === 'yes' || c.wos === 'likely') ? '#a78bfa' : 'var(--muted)'),
+        row('OpenAlex', esc(c.openalexTier || 'Free API'), '#fbbf24'),
+        c.scopusRenewal ? row('Renewal', esc(c.scopusRenewal), '#f97316') : '',
+      ].join('') : '<div class="dsh-trow"><span>No subscription intel yet</span></div>');
+    const r = t.getBoundingClientRect();
+    tip.style.left = Math.min(r.left, innerWidth - 265) + 'px';
+    tip.style.top = (r.bottom + 9) + 'px';
+    tip.classList.add('on');
+  });
+}
+
+// Grow bars to their real width. Not gated behind requestAnimationFrame, which
+// browsers pause in background tabs — that would leave every bar stuck at zero
+// for anyone whose dashboard loads in an unfocused tab.
+function dshGrowBars() {
+  document.querySelectorAll('.dsh-gfill,.bk-fill').forEach(el => {
+    if (el.dataset.w) el.style.width = el.dataset.w + '%';
+  });
+}
+
+// ── Command palette ─────────────────────────────────────────
+const DSH_PAGES = [
+  ['Dashboard','dashboard'],['Institutions','institutions'],['Contacts','contacts'],
+  ['New Contacts','pending'],['Competitor Matrix','subscriptions'],['LeapSpace Insights','ai-insights'],
+  ['RFP Opps','rfp'],['Map','map'],['News','news'],['Daily Digest','digest'],['Summary','summary'],
+];
+let _dshPalResults = [], _dshPalCursor = 0, _dshPalLastFocus = null;
+
+function dshPalItems() {
+  const items = [];
+  (state.institutions || []).forEach(i => items.push({
+    kind:'Institutions', label:i.name, hint:[i.short, i.city].filter(Boolean).join(' · '),
+    ico:(i.short || i.name || '').slice(0,3), bg:(DSH_TYPE[i.type]||{}).hex || '#64748b',
+    go:() => nav('detail', { instId:i.id }), hay:`${i.name} ${i.short||''} ${i.city||''}`.toLowerCase(),
+  }));
+  (state.contacts || []).slice(0, 400).forEach(c => {
+    const inst = getInst(c.instId);
+    const nm = `${c.first||''} ${c.last||''}`.trim();
+    if (!nm) return;
+    items.push({
+      kind:'Contacts', label:nm, hint:[c.title, inst.short || inst.name].filter(Boolean).join(' · '),
+      ico:initials(c.first, c.last), bg:avatarColor(nm),
+      go:() => { state.contactSearch = nm; nav('contacts'); },
+      hay:`${nm} ${c.title||''} ${inst.name||''}`.toLowerCase(),
+    });
+  });
+  DSH_PAGES.forEach(([n, v]) => items.push({
+    kind:'Pages', label:n, hint:'Go to page', ico:'▦', bg:'rgba(255,255,255,.09)',
+    go:() => nav(v), hay:n.toLowerCase(),
+  }));
+  return items;
+}
+
+function dshPalSearch(q) {
+  const all = dshPalItems();
+  q = (q || '').trim().toLowerCase();
+  if (!q) return all.filter(x => x.kind === 'Pages').slice(0, 6);
+  const ranked = all.map(x => {
+      const l = x.label.toLowerCase();
+      const score = l.startsWith(q) ? 0 : l.includes(q) ? 1 : x.hay.includes(q) ? 2 : 99;
+      return { x, score };
+    }).filter(r => r.score < 99)
+    .sort((a, b) => a.score - b.score || a.x.label.length - b.x.label.length)
+    .slice(0, 24);
+  // Keep each kind contiguous so a group heading never prints twice.
+  const order = [], buckets = new Map();
+  ranked.forEach(r => {
+    if (!buckets.has(r.x.kind)) { buckets.set(r.x.kind, []); order.push(r.x.kind); }
+    buckets.get(r.x.kind).push(r.x);
+  });
+  return order.reduce((a, k) => a.concat(buckets.get(k)), []);
+}
+
+function dshPalRender() {
+  const input = document.getElementById('dsh-pal-input');
+  const list = document.getElementById('dsh-pal-list');
+  if (!input || !list) return;
+  const q = input.value.trim().toLowerCase();
+  _dshPalResults = dshPalSearch(input.value);
+  _dshPalCursor = Math.min(_dshPalCursor, Math.max(0, _dshPalResults.length - 1));
+  const cnt = document.getElementById('dsh-pal-count');
+  if (cnt) cnt.textContent = _dshPalResults.length ? `${_dshPalResults.length} result${_dshPalResults.length > 1 ? 's' : ''}` : '';
+  if (!_dshPalResults.length) {
+    list.innerHTML = `<div class="dsh-palempty">Nothing matches “${esc(input.value)}”.</div>`;
+    return;
+  }
+  const mark = (text) => {
+    const i = text.toLowerCase().indexOf(q);
+    if (!q || i === -1) return esc(text);
+    return esc(text.slice(0, i)) + '<mark>' + esc(text.slice(i, i + q.length)) + '</mark>' + esc(text.slice(i + q.length));
+  };
+  let html = '', last = null;
+  _dshPalResults.forEach((r, i) => {
+    if (r.kind !== last) { html += `<div class="dsh-palgroup">${r.kind}</div>`; last = r.kind; }
+    html += `<button class="dsh-palitem" role="option" id="dsh-opt-${i}" data-i="${i}" aria-selected="${i === _dshPalCursor}">
+      <span class="dsh-palico" style="background:${r.bg}">${esc(r.ico)}</span>
+      <span class="dsh-palt"><b>${mark(r.label)}</b><span>${esc(r.hint || '')}</span></span>
+    </button>`;
+  });
+  list.innerHTML = html;
+  input.setAttribute('aria-activedescendant', 'dsh-opt-' + _dshPalCursor);
+}
+
+function dshPalMove(step) {
+  if (!_dshPalResults.length) return;
+  _dshPalCursor = (_dshPalCursor + step + _dshPalResults.length) % _dshPalResults.length;
+  document.querySelectorAll('.dsh-palitem').forEach(el =>
+    el.setAttribute('aria-selected', String(+el.dataset.i === _dshPalCursor)));
+  const sel = document.querySelector(`.dsh-palitem[data-i="${_dshPalCursor}"]`);
+  if (sel) sel.scrollIntoView({ block:'nearest' });
+}
+function dshPalOpen() {
+  const scrim = document.getElementById('dsh-scrim');
+  if (!scrim) return;
+  _dshPalLastFocus = document.activeElement;
+  scrim.classList.add('on');
+  const input = document.getElementById('dsh-pal-input');
+  input.value = ''; _dshPalCursor = 0; dshPalRender(); input.focus();
+}
+function dshPalClose() {
+  const scrim = document.getElementById('dsh-scrim');
+  if (scrim) scrim.classList.remove('on');
+  if (_dshPalLastFocus && _dshPalLastFocus.focus) _dshPalLastFocus.focus();
+}
+function dshPalChoose(i) {
+  const r = _dshPalResults[i];
+  dshPalClose();
+  if (r) r.go();
+}
+
+// The palette lives outside #content so it survives view changes, and its key
+// handler is installed once for the life of the page.
+function dshEnsurePalette() {
+  if (document.getElementById('dsh-scrim')) return;
+  const el = document.createElement('div');
+  el.id = 'dsh-scrim'; el.className = 'dsh-scrim';
+  el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true');
+  el.setAttribute('aria-label', 'Jump to anything');
+  el.innerHTML = `<div class="dsh-pal">
+    <div class="dsh-palin">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="dsh-pal-input" type="text" placeholder="Search institutions, contacts and pages…" autocomplete="off" spellcheck="false" aria-controls="dsh-pal-list">
+      <span class="dsh-kbd">esc</span>
+    </div>
+    <div class="dsh-pallist" id="dsh-pal-list" role="listbox" aria-label="Results"></div>
+    <div class="dsh-palfoot">
+      <span><span class="dsh-kbd">↑</span> <span class="dsh-kbd">↓</span> navigate</span>
+      <span><span class="dsh-kbd">↵</span> open</span>
+      <span id="dsh-pal-count" style="margin-left:auto"></span>
+    </div>
+  </div>`;
+  document.body.appendChild(el);
+
+  el.addEventListener('mousedown', e => { if (e.target === el) dshPalClose(); });
+  el.querySelector('#dsh-pal-input').addEventListener('input', () => { _dshPalCursor = 0; dshPalRender(); });
+  el.querySelector('#dsh-pal-list').addEventListener('click', e => {
+    const b = e.target.closest('.dsh-palitem');
+    if (b) dshPalChoose(+b.dataset.i);
+  });
+
+  addEventListener('keydown', e => {
+    const open = el.classList.contains('on');
+    if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault(); open ? dshPalClose() : dshPalOpen(); return;
+    }
+    if (!open) return;
+    if (e.key === 'Escape') { e.preventDefault(); dshPalClose(); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); dshPalMove(1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); dshPalMove(-1); }
+    else if (e.key === 'Enter') { e.preventDefault(); dshPalChoose(_dshPalCursor); }
+  });
+}
+
+function renderDashboard() {
+  document.getElementById('page-title').textContent = 'Dashboard';
+  document.getElementById('page-sub').textContent = DSH_REGION_SUB;
+  document.getElementById('topbar-actions').innerHTML = '';
+
+  const inst = state.institutions;
+  const cont = state.contacts;
+  const byType = {};
+  inst.forEach(i => { byType[i.type] = (byType[i.type] || 0) + 1; });
+
+  const activeC = cont.filter(c => c.status === 'active').length;
+  const highP = cont.filter(c => c.priority === 'high').length;
+  const tracked = inst.filter(i => (window.COMP_DATA || {})[i.id]).length;
+  const untracked = inst.length - tracked;
+
+  // ── momentum: diff against the last visit, then store this one ──
+  dshLoadSnapshot();
+  const figures = { institutions: inst.length, contacts: cont.length, tracked };
+  const sinceHtml = _dshSnap
+    ? `<span class="dsh-dot"></span><span class="dsh-since">last opened ${dshRelTime(_dshSnap.at)}</span>`
+    : `<span class="dsh-dot"></span><span class="dsh-since">first visit · baseline saved</span>`;
+
+  // ── institutions-by-type rows (kept from the original dashboard) ──
+  const _typeMax = Math.max(...Object.values(byType), 1);
+  const _typeTotal = Object.values(byType).reduce((a, b) => a + b, 0) || 1;
+  const _typeBarColors = { university:'#6366f1,#818cf8', medical:'#ef4444,#f87171', research:'#00f5c4,#38bdf8', ngo:'#a855f7,#c084fc' };
+  const _typeBg = { university:'rgba(99,102,241,.13)', medical:'rgba(239,68,68,.11)', research:'rgba(0,245,196,.10)', ngo:'rgba(168,85,247,.11)' };
+  const _typeBd = { university:'rgba(99,102,241,.25)', medical:'rgba(239,68,68,.22)', research:'rgba(0,245,196,.22)', ngo:'rgba(168,85,247,.22)' };
+  const typeRows = Object.entries(TYPE_LABEL).map(([k, v]) => {
+    const n = byType[k] || 0;
+    return `<div class="bk-row" onclick="state.instType='${k}';state.instPage=1;nav('institutions')" title="View ${v.replace(' Inst.','')} institutions">
+      <div style="width:36px;height:36px;border-radius:9px;background:${_typeBg[k]||'rgba(255,255,255,.06)'};border:1px solid ${_typeBd[k]||'rgba(255,255,255,.12)'};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${TYPE_ICON[k]||''}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:12.5px;font-weight:600;color:#f1f5f9">${v.replace(' Inst.','')}</span>
+          <span style="font-size:11px;color:rgba(255,255,255,.32)">${Math.round(n/_typeTotal*100)}%</span>
+        </div>
+        <div class="bk-bar"><div class="bk-fill" data-w="${Math.round(n/_typeMax*100)}" style="width:0;background:linear-gradient(90deg,${_typeBarColors[k]||'#64748b,#94a3b8'})"></div></div>
+      </div>
+      <div style="font-size:18px;font-weight:800;color:#f8fafc;letter-spacing:-1px;min-width:24px;text-align:right;flex-shrink:0">${n}</div>
     </div>`;
   }).join('');
 
-  // Stat card definitions — order persisted in localStorage be_crm_stat_order
-  const _statCards = {
-    'sc-institutions': `<div class="stat-card" data-sc-id="sc-institutions" draggable="true" onclick="nav('institutions')" title="View all institutions">
-        <div class="stat-icon-box purple"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg></div>
-        <div class="stat-text"><div class="stat-label">Institutions</div><div class="stat-value">${inst.length}</div><div class="stat-sub">${byType.university||0} universities · ${byType.medical||0} medical · ${byType.research||0} research</div></div>
-      </div>`,
-    'sc-contacts': `<div class="stat-card" data-sc-id="sc-contacts" draggable="true" onclick="nav('contacts')" title="View all contacts">
-        <div class="stat-icon-box teal"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-        <div class="stat-text"><div class="stat-label">Contacts</div><div class="stat-value">${cont.length}</div><div class="stat-sub">${activeC} active · ${highP} high priority</div></div>
-      </div>`,
-    'sc-pending': `<div class="stat-card" data-sc-id="sc-pending" draggable="true" onclick="nav('pending')" title="Review AI-discovered contacts" style="border-color:rgba(168,85,247,.25)">
-        <div class="stat-icon-box" style="background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.25)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#a855f7" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg></div>
-        <div class="stat-text"><div class="stat-label">New Contacts Today</div><div class="stat-value" id="pending-count">—</div><div class="stat-sub" id="pending-sub">Awaiting review</div></div>
-      </div>`,
-    'sc-news': `<div class="stat-card" data-sc-id="sc-news" draggable="true" onclick="nav('news')" title="View Belgium research news" style="border-color:rgba(59,130,246,.25)">
-        <div class="stat-icon-box" style="background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.25)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#3b82f6" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg></div>
-        <div class="stat-text"><div class="stat-label">News</div><div class="stat-value" id="news-count">—</div><div class="stat-sub" id="news-sub">Loading…</div></div>
-      </div>`,
-  };
-  const _defaultStatOrder = ['sc-institutions','sc-contacts','sc-pending','sc-news'];
-  let _statOrder; try { _statOrder = JSON.parse(localStorage.getItem('be_crm_stat_order')); if(!Array.isArray(_statOrder)||!_statOrder.length) _statOrder=null; } catch(e){ _statOrder=null; }
-  _statOrder = (_statOrder||[]).filter(id=>_statCards[id]);
-  if(_statOrder.length < _defaultStatOrder.length) { _defaultStatOrder.forEach(id=>{ if(!_statOrder.includes(id)) _statOrder.push(id); }); }
-  const statCardsHtml = _statOrder.map(id => _statCards[id]||'').join('');
-
-  document.getElementById('content').innerHTML = `
-    <div class="stats-grid" id="stats-grid-drag">${statCardsHtml}</div>
-
-    <div class="dash-grid" id="dash-widget-grid">
-      ${buildDashWidgets(typeRows, hpRows, agentRows)}
+  const hpRows = cont.filter(c => c.priority === 'high').slice(0, 5).map(c => {
+    const i2 = getInst(c.instId);
+    return `<div class="recent-row" style="cursor:pointer" onclick="nav('contacts')">
+      <div class="av" style="background:${avatarColor(c.first + c.last)}">${initials(c.first, c.last)}</div>
+      <div class="ri"><h4>${esc(c.first)} ${esc(c.last)}</h4><p>${esc(i2.name || '')}</p></div>
+      <span class="badge b-${c.status}">${c.status}</span>
     </div>`;
+  }).join('') || '<p style="font-size:13px;color:var(--muted);padding:12px 0">No high-priority contacts yet.</p>';
+
+  const agentRows = DSH_AGENTS.map(a => {
+    const btnId = 'run-btn-' + a.id;
+    return `<div class="recent-row" style="cursor:pointer" onclick="nav('${a.view}')">
+      <div class="av" style="background:rgba(255,255,255,.06);position:relative">${a.icon}<span style="position:absolute;bottom:-1px;right:-1px;width:9px;height:9px;border-radius:50%;background:#4ade80;border:1.5px solid var(--card,#111a2e);box-shadow:0 0 6px #4ade80"></span></div>
+      <div class="ri"><h4>${esc(a.name)}</h4><p>${esc(a.source)} · ${esc(a.cadence)}${a.statusEl ? ` · <span id="${a.statusEl}">checking…</span>` : ''}</p></div>
+      <button class="btn btn-xs btn-outline" id="${btnId}" onclick="event.stopPropagation(); runAgentNow('${a.workflow}','${btnId}','${esc(a.name)}')" title="Runs this agent's workflow now">Run now</button>
+      <span class="badge" style="background:rgba(74,222,128,.12);color:#4ade80;border-color:#4ade8033">Active</span>
+    </div>`;
+  }).join('');
+
+  // ── subscription posture, from the matrix ──
+  const T = tracked || 1;
+  const nScopus = inst.filter(i => (dshPosture(i.id) || {}).scopus).length;
+  const nWos = inst.filter(i => (dshPosture(i.id) || {}).wos).length;
+  const nOpen = inst.filter(i => (dshPosture(i.id) || {}).open).length;
+  const postureRows = [
+    { k:'Scopus active', n:nScopus, hex:'#00f5c4' },
+    { k:'Web of Science', n:nWos, hex:'#a78bfa' },
+    { k:'OpenAlex adoption', n:nOpen, hex:'#fbbf24' },
+  ].map(g => `<div class="dsh-grow">
+      <span class="dsh-glabel"><i style="background:${g.hex}"></i>${g.k}</span>
+      <span class="dsh-gval" style="color:${g.hex}">${g.n}<span style="color:var(--muted);font-weight:600">/${tracked}</span></span>
+      <span class="dsh-gtrack"><span class="dsh-gfill" data-w="${Math.round(g.n / T * 100)}" style="background:${g.hex}"></span></span>
+    </div>`).join('');
+
+  // ── renewal watch, grouped by the date on record ──
+  const renewals = {};
+  inst.forEach(i => {
+    const r = ((window.COMP_DATA || {})[i.id] || {}).scopusRenewal;
+    if (r) (renewals[r] = renewals[r] || []).push(i.short || i.name);
+  });
+  const renewalRows = Object.entries(renewals)
+    .sort((a, b) => b[1].length - a[1].length)
+    .map(([when, list]) => `<div class="recent-row" style="cursor:pointer" onclick="nav('subscriptions')">
+        <div class="av" style="background:rgba(249,115,22,.12);color:#f97316">⏰</div>
+        <div class="ri"><h4>${esc(when)} · ${list.length} renewal${list.length > 1 ? 's' : ''}</h4><p>${esc(list.slice(0,4).join(', '))}${list.length > 4 ? ` +${list.length - 4} more` : ''}</p></div>
+      </div>`).join('')
+    || '<p style="font-size:12px;color:var(--muted);padding:10px 0">No dated renewals on record.</p>';
+
+  const hero = `<div class="dsh-hero">
+    <div class="dsh-hero-top">
+      <div style="min-width:0">
+        <div class="dsh-eyebrow">
+          <span class="dsh-pulse"></span>
+          <span>${new Date().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' })}</span>
+          <span class="dsh-dot"></span>
+          <span>${DSH_AGENTS.length} agents</span>
+          ${sinceHtml}
+        </div>
+        <h2 class="dsh-synth" id="dsh-synth">—</h2>
+        <div class="dsh-sub">
+          <span id="dsh-lead-sub"></span>
+          <span class="dsh-dot"></span>
+          <span><b>${tracked}</b>/<b>${inst.length}</b> tracked ${dshDelta('tracked', tracked)}</span>
+          ${untracked ? `<span class="dsh-dot"></span><span><b>${untracked}</b> still blank</span>` : ''}
+        </div>
+        <div class="dsh-actions">
+          <button class="dsh-cta" id="dsh-cta">—</button>
+          <button class="dsh-ghost" onclick="nav('digest')">See what changed today</button>
+          <button class="dsh-ghost" onclick="dshPalOpen()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Jump to anything <span class="dsh-kbd">${/Mac|iPhone|iPad/.test(navigator.platform) ? '⌘K' : 'Ctrl K'}</span>
+          </button>
+        </div>
+      </div>
+      <div class="dsh-ledger">
+        <button class="dsh-lrow" onclick="nav('institutions')">
+          <span class="dsh-ln">${inst.length}</span>
+          <span><span class="dsh-ll">Institutions ${dshDelta('institutions', inst.length)}</span>
+            <span class="dsh-ls">${byType.university||0} universities · ${byType.medical||0} medical · ${byType.research||0} research</span></span>
+        </button>
+        <button class="dsh-lrow" onclick="nav('contacts')">
+          <span class="dsh-ln">${cont.length}</span>
+          <span><span class="dsh-ll">Contacts ${dshDelta('contacts', cont.length)}</span>
+            <span class="dsh-ls">${activeC} active · ${highP} high priority</span></span>
+        </button>
+        <button class="dsh-lrow" onclick="nav('pending')">
+          <span class="dsh-ln" id="pending-count">—</span>
+          <span><span class="dsh-ll">New contacts</span><span class="dsh-ls" id="pending-sub">Awaiting review</span></span>
+        </button>
+        <button class="dsh-lrow" onclick="nav('news')">
+          <span class="dsh-ln" id="news-count">—</span>
+          <span><span class="dsh-ll">News</span><span class="dsh-ls" id="news-sub">Loading…</span></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="dsh-meter">
+      <div class="dsh-mbar">${Object.entries(DSH_TYPE).filter(([k]) => byType[k]).map(([k, t]) =>
+        `<button class="dsh-seg" style="flex:${byType[k]};background:${t.hex}" title="${t.label}: ${byType[k]}" aria-label="${t.label}: ${byType[k]}" onclick="dshSetFilter('${k}')"></button>`).join('')}</div>
+      <div class="dsh-mkey">${Object.entries(DSH_TYPE).filter(([k]) => byType[k]).map(([k, t]) =>
+        `<button class="dsh-key" onclick="dshSetFilter('${k}')"><i style="background:${t.hex}"></i>${t.label} <b>${byType[k]}</b></button>`).join('')}</div>
+    </div>
+  </div>`;
+
+  document.getElementById('content').innerHTML =
+    hero + dshBoardHtml() +
+    `<div class="dash-grid" id="dash-widget-grid">${buildDashWidgets(typeRows, hpRows, agentRows, postureRows, renewalRows, tracked, untracked)}</div>`;
+
+  dshSaveSnapshot(figures);
+  dshEnsurePalette();
+  dshInitTooltip();
+  dshRenderLead();
+  dshSetFilter(_dshFilter);
   initDashDrag();
-  initStatCardDrag();
-  // Load pending contacts count
   loadPendingCount();
   loadNewsCount();
   loadAttentionFeed();
   initDashMiniMap();
   syncAgentStatus();
+  setTimeout(dshGrowBars, 80);
 }
+
 
 // "Needs Your Attention" widget — merges three signals that otherwise live on
 // three separate tabs (News, RFP Opps, institution Account Info) into one
@@ -2999,7 +3614,7 @@ function syncAgentStatus() {
 let _scDragSrc = null;
 function initStatCardDrag() {
   const grid = document.getElementById('stats-grid-drag');
-  if (!grid) return;
+  if (!grid) return; // stat cards were replaced by the hero ledger
   const cards = grid.querySelectorAll('.stat-card[data-sc-id]');
   cards.forEach(card => {
     card.addEventListener('dragstart', e => {
@@ -3038,7 +3653,7 @@ function initStatCardDrag() {
   });
 }
 
-const DASH_WIDGET_DEFAULT_ORDER = ['w-attention','w-types','w-highprio','w-map','w-agents'];
+const DASH_WIDGET_DEFAULT_ORDER = ['w-attention','w-posture','w-types','w-highprio','w-renewals','w-agents','w-map'];
 function getDashWidgetOrder() {
   let order;
   try { order = JSON.parse(localStorage.getItem('be_crm_widget_order')); if(!Array.isArray(order)||!order.length) order=null; }
@@ -3051,15 +3666,27 @@ function saveDashWidgetOrder(order) {
   localStorage.setItem('be_crm_widget_order', JSON.stringify(order));
 }
 
-function buildDashWidgets(typeRows, hpRows, agentRows) {
+function buildDashWidgets(typeRows, hpRows, agentRows, postureRows, renewalRows, tracked, untracked) {
   const handle = '';
   const _td2 = new Date().toISOString().slice(0,10);
   const WIDGETS = {
-    'w-attention': `<div class="card dash-widget" data-widget-id="w-attention" draggable="true">
+    'w-attention': `<div class="card dash-widget w-wide" data-widget-id="w-attention" draggable="true">
       <div class="card-header"><span class="card-title">Needs Your Attention</span><span id="attn-count"></span>${handle}</div>
       <div id="attn-feed-body" style="display:flex;flex-direction:column;gap:2px">
         <div style="padding:20px 0;text-align:center;color:var(--muted);font-size:12px">Loading…</div>
       </div>
+    </div>`,
+    'w-posture': `<div class="card dash-widget" data-widget-id="w-posture" draggable="true">
+      <div class="card-header"><span class="card-title">Subscription posture</span><button class="btn btn-xs btn-outline" onclick="event.stopPropagation();nav('subscriptions')">Matrix</button></div>
+      <div class="dsh-gauge">${postureRows}</div>
+      <div class="dsh-mini">
+        <button class="dsh-minic" onclick="nav('subscriptions')"><div class="dsh-minin" style="color:var(--accent)">${tracked}</div><div class="dsh-minil">TRACKED</div></button>
+        <button class="dsh-minic" onclick="nav('institutions')"><div class="dsh-minin" style="color:#fbbf24">${untracked}</div><div class="dsh-minil">NO INTEL YET</div></button>
+      </div>
+    </div>`,
+    'w-renewals': `<div class="card dash-widget" data-widget-id="w-renewals" draggable="true">
+      <div class="card-header"><span class="card-title">Renewal watch</span></div>
+      ${renewalRows}
     </div>`,
     'w-types': `<div class="card dash-widget" data-widget-id="w-types" draggable="true">
       <div class="card-header"><span class="card-title">Institutions by Type</span>${handle}</div>
@@ -3069,7 +3696,7 @@ function buildDashWidgets(typeRows, hpRows, agentRows) {
       <div class="card-header"><span class="card-title">High Priority Contacts</span>${handle}</div>
       ${hpRows}
     </div>`,
-    'w-agents': `<div class="card dash-widget" data-widget-id="w-agents" draggable="true">
+    'w-agents': `<div class="card dash-widget w-wide" data-widget-id="w-agents" draggable="true">
       <div class="card-header"><span class="card-title">Agents Working For You</span>${handle}</div>
       ${agentRows}
     </div>`,
@@ -6941,6 +7568,7 @@ async function loadPendingCount() {
     const sub = document.getElementById('pending-sub');
     if (el) el.textContent = count;
     if (sub) sub.textContent = count === 0 ? 'No new contacts' : count === 1 ? '1 awaiting review' : count + ' awaiting review';
+    if (typeof _dshPending !== 'undefined') { _dshPending = count; if (typeof dshRenderLead === 'function') dshRenderLead(); }
     const badge = document.getElementById('nav-pending-badge');
     if (badge) { badge.textContent = count; badge.style.display = count > 0 ? 'inline-block' : 'none'; }
   } catch(e) { console.error('loadPendingCount:', e); }
