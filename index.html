@@ -1132,6 +1132,71 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
   .dsh-tile,.dsh-gfill,.dsh-pal,.dsh-pulse{animation:none!important;transition:none!important}
 }
 
+
+/* Institution analytics panel */
+.ia-card{margin-bottom:16px}
+.ia-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.ia-wide{grid-column:1/-1}
+@media(max-width:1100px){.ia-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){.ia-grid{grid-template-columns:1fr}}
+.ia-panel{background:rgba(255,255,255,.022);border:1px solid var(--border);border-radius:11px;padding:13px 14px;min-width:0}
+.ia-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:11px;font-weight:800;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--muted2);margin-bottom:11px}
+.ia-h b{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:none;letter-spacing:0}
+.ia-empty{font-size:11.5px;color:var(--muted);padding:6px 0}
+
+/* role mix */
+.ia-bar{display:flex;height:9px;border-radius:5px;overflow:hidden;gap:2px;margin-bottom:11px}
+.ia-seg{height:100%;border:none;padding:0;border-radius:2px;cursor:pointer;transition:opacity .15s,transform .15s;transform-origin:bottom}
+.ia-seg:hover{transform:scaleY(1.45)}
+.ia-seg[aria-pressed="true"]{outline:1px solid #fff6;outline-offset:1px}
+.ia-keys{display:flex;flex-direction:column;gap:5px}
+.ia-key{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted2);background:none;border:none;
+  cursor:pointer;font-family:inherit;padding:2px 0;text-align:left;transition:color .15s}
+.ia-key:hover{color:var(--text2)}
+.ia-key[aria-pressed="true"]{color:var(--accent);font-weight:700}
+.ia-key i{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.ia-key b{margin-left:auto;color:var(--text2);font-weight:700}
+
+/* departments */
+.ia-rows{display:flex;flex-direction:column;gap:6px}
+.ia-row{display:grid;grid-template-columns:1fr 70px 24px;align-items:center;gap:9px;background:none;border:none;
+  cursor:pointer;font-family:inherit;padding:2px 0;text-align:left;transition:opacity .15s}
+.ia-row:hover{opacity:.8}
+.ia-row[aria-pressed="true"] .ia-row-l{color:var(--accent);font-weight:700}
+.ia-row-l{font-size:11.5px;color:var(--muted2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ia-row-l em{font-style:normal;font-size:9.5px;color:#fbbf24;background:rgba(251,191,36,.12);padding:1px 5px;border-radius:8px}
+.ia-row-bar{height:5px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden;display:block}
+.ia-row-bar span{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,#00f5c4,#38bdf8)}
+.ia-row-n{font-size:12px;font-weight:800;color:var(--text2);text-align:right;font-variant-numeric:tabular-nums}
+
+/* contactability */
+.ia-mini{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.ia-tile{background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:10px;padding:10px 11px;
+  cursor:pointer;font-family:inherit;text-align:left;transition:all .15s}
+.ia-tile:hover{background:rgba(255,255,255,.055);transform:translateY(-2px)}
+.ia-tile[aria-pressed="true"]{border-color:rgba(0,245,196,.45);background:rgba(0,245,196,.07)}
+.ia-tile-n{display:block;font-size:21px;font-weight:800;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.ia-tile-l{display:block;font-size:10.5px;font-weight:700;color:var(--muted2);margin-top:5px}
+.ia-tile-s{display:block;font-size:9.5px;color:var(--muted);margin-top:2px}
+.ia-flag{margin-top:10px;font-size:10.5px;color:#fbbf24;background:rgba(251,191,36,.09);
+  border:1px solid rgba(251,191,36,.22);border-radius:8px;padding:6px 9px;line-height:1.45}
+
+/* posture */
+.ia-prods{display:flex;gap:8px;flex-wrap:wrap}
+.ia-prod{border:1px solid;border-radius:10px;padding:8px 11px;min-width:118px;background:rgba(255,255,255,.02)}
+.ia-prod-n{display:block;font-size:11.5px;font-weight:700;color:var(--text2)}
+.ia-prod-n i{color:var(--accent);font-style:normal;margin-left:3px}
+.ia-prod-s{display:block;font-size:11px;font-weight:800;margin-top:3px}
+.ia-prod-r{display:block;font-size:9.5px;color:var(--muted);margin-top:2px}
+.ia-prod-p{display:inline-block;font-size:9.5px;color:var(--info);margin-top:3px;text-decoration:none}
+.ia-prod-p:hover{text-decoration:underline}
+
+.ia-clear{background:rgba(0,245,196,.10);border:1px solid rgba(0,245,196,.4);color:var(--accent);
+  border-radius:20px;padding:4px 11px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+.ia-clear span{margin-left:6px;opacity:.7}
+.ia-clear:hover{background:rgba(0,245,196,.18)}
+
 </style>
   <link rel="stylesheet" href="animations.css">
 </head>
@@ -2926,6 +2991,7 @@ function navUrlFor(view, instId) {
 }
 
 function nav(view, extra={}, fromHistory=false) {
+  if (view !== 'detail' || (extra.instId && extra.instId !== state.detailInstId)) window.IA_FILTER = null;
   state.view = view;
   if(extra.instId) state.detailInstId = extra.instId;
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
@@ -4125,6 +4191,189 @@ function renderInstitutions() {
 }
 
 //  INSTITUTION DETAIL 
+/* ═══════════════════════════════════════════════════════════════════════════
+   Institution analytics — a panel above the contact table.
+
+   Everything here is computed from data the CRM already holds. Two things it
+   deliberately does not show: an engagement timeline and a "last contacted"
+   trend, because no contact carries a lastContact date and the interaction
+   log is empty, so both would be an empty axis pretending to be a chart.
+
+   The segments are controls: clicking one filters the table beneath.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+window.IA_FILTER = null;   // {kind:'role'|'dept'|'quality'|'email', value}
+
+const IA_TIERS = [
+  { r: 0, label: 'Library leadership', hex: '#00f5c4' },
+  { r: 1, label: 'Research directors', hex: '#38bdf8' },
+  { r: 2, label: 'Dept & faculty heads', hex: '#818cf8' },
+  { r: 3, label: 'Other senior',        hex: '#a78bfa' },
+  { r: 4, label: 'Flagged high',        hex: '#fbbf24' },
+  { r: 5, label: 'Researchers & staff', hex: '#64748b' },
+];
+
+function iaSetFilter(kind, value) {
+  const f = window.IA_FILTER;
+  window.IA_FILTER = (f && f.kind === kind && String(f.value) === String(value)) ? null : { kind, value };
+  renderDetail();
+}
+function iaClearFilter() { window.IA_FILTER = null; renderDetail(); }
+
+function iaMatches(c) {
+  const f = window.IA_FILTER;
+  if (!f) return true;
+  if (f.kind === 'role') return cxRoleRank(c) === Number(f.value);
+  if (f.kind === 'dept') return (c.dept || '—') === f.value;
+  if (f.kind === 'quality') return c.quality === f.value;
+  if (f.kind === 'email') return f.value === 'missing' ? !c.email : !!c.email;
+  return true;
+}
+
+// Normalises the department label so "University Library" and "Utrecht
+// University Library" are not counted as two different places.
+function iaDeptKey(d) {
+  return String(d || '—').toLowerCase()
+    .replace(/\b(utrecht|delft|groningen|leiden|amsterdam|rug|tu)\b/g, '')
+    .replace(/\(.*?\)/g, '').replace(/\s+/g, ' ').trim();
+}
+
+function iaAnalyticsHtml(inst, contacts) {
+  const n = contacts.length || 1;
+  const f = window.IA_FILTER;
+
+  // ── role mix ───────────────────────────────────────────────────────────
+  const tierCounts = {};
+  contacts.forEach(c => { const r = cxRoleRank(c); tierCounts[r] = (tierCounts[r] || 0) + 1; });
+  const tiers = IA_TIERS.filter(t => tierCounts[t.r]);
+  const decisionMakers = contacts.filter(c => cxRoleRank(c) <= 2).length;
+
+  const roleBar = tiers.map(t => {
+    const on = f && f.kind === 'role' && Number(f.value) === t.r;
+    return `<button class="ia-seg" title="${t.label}: ${tierCounts[t.r]}"
+      aria-pressed="${!!on}" onclick="iaSetFilter('role',${t.r})"
+      style="flex:${tierCounts[t.r]};background:${t.hex};opacity:${f && !on ? .28 : 1}"></button>`;
+  }).join('');
+
+  const roleKey = tiers.map(t => {
+    const on = f && f.kind === 'role' && Number(f.value) === t.r;
+    return `<button class="ia-key" onclick="iaSetFilter('role',${t.r})" aria-pressed="${!!on}">
+      <i style="background:${t.hex}"></i>${t.label} <b>${tierCounts[t.r]}</b></button>`;
+  }).join('');
+
+  // ── departments, merged on a normalised key ────────────────────────────
+  const deptMap = {};
+  contacts.forEach(c => {
+    const k = iaDeptKey(c.dept);
+    (deptMap[k] = deptMap[k] || { label: c.dept || '—', n: 0, variants: new Set() });
+    deptMap[k].n++; deptMap[k].variants.add(c.dept || '—');
+  });
+  const depts = Object.values(deptMap).sort((a, b) => b.n - a.n).slice(0, 7);
+  const deptMax = Math.max(...depts.map(d => d.n), 1);
+  const deptRows = depts.map(d => {
+    const on = f && f.kind === 'dept' && d.variants.has(f.value);
+    return `<button class="ia-row" onclick="iaSetFilter('dept',${jsStr([...d.variants][0])})" aria-pressed="${!!on}">
+      <span class="ia-row-l">${esc(d.label)}${d.variants.size > 1 ? ` <em title="Also stored as: ${esc([...d.variants].join(', '))}">+${d.variants.size - 1} spelling</em>` : ''}</span>
+      <span class="ia-row-bar"><span style="width:${Math.round(d.n / deptMax * 100)}%"></span></span>
+      <span class="ia-row-n">${d.n}</span>
+    </button>`;
+  }).join('');
+
+  // ── contactability ─────────────────────────────────────────────────────
+  const verified = contacts.filter(c => c.quality === 'verified').length;
+  const noEmail = contacts.filter(c => !c.email).length;
+
+  // ── data quality: same person recorded twice ───────────────────────────
+  const seen = {}, dupes = [];
+  contacts.forEach(c => {
+    const k = `${(c.first || '').toLowerCase()} ${(c.last || '').toLowerCase()}`.trim();
+    if (seen[k]) { if (!dupes.includes(k)) dupes.push(k); } else seen[k] = 1;
+  });
+
+  // ── subscription posture ───────────────────────────────────────────────
+  const cd = (window.COMP_DATA || {})[inst.id] || {};
+  const PRODUCTS = [
+    { k: 'scopus', label: 'Scopus', ours: true },
+    { k: 'scival', label: 'SciVal', ours: true },
+    { k: 'pure',   label: 'Pure',   ours: true },
+    { k: 'wos',    label: 'Web of Science' },
+    { k: 'dimensions', label: 'Dimensions' },
+    { k: 'converis',   label: 'Converis' },
+    { k: 'symplectic', label: 'Symplectic' },
+  ];
+  const STATE = {
+    yes:       { t: 'Active',    c: '#4ade80', bg: 'rgba(74,222,128,.12)' },
+    likely:    { t: 'Likely',    c: '#60a5fa', bg: 'rgba(96,165,250,.12)' },
+    expiring:  { t: 'Expiring',  c: '#fb923c', bg: 'rgba(251,146,60,.14)' },
+    cancelled: { t: 'Cancelled', c: '#f87171', bg: 'rgba(248,113,113,.14)' },
+    no:        { t: 'None',      c: 'var(--muted)', bg: 'rgba(255,255,255,.04)' },
+    unknown:   { t: 'Unknown',   c: 'var(--muted)', bg: 'rgba(255,255,255,.04)' },
+    free:      { t: 'Free API',  c: '#fbbf24', bg: 'rgba(251,191,36,.12)' },
+  };
+  const posture = PRODUCTS.filter(p => cd[p.k]).map(p => {
+    const st = STATE[cd[p.k]] || STATE.unknown;
+    const renewal = cd[p.k + 'Renewal'];
+    const proof = cd[p.k + 'Proof'] || (p.k === 'wos' ? cd.proofWos : '');
+    return `<div class="ia-prod" style="background:${st.bg};border-color:${st.c}33">
+      <span class="ia-prod-n">${p.label}${p.ours ? '<i title="Elsevier product">•</i>' : ''}</span>
+      <span class="ia-prod-s" style="color:${st.c}">${st.t}</span>
+      ${renewal ? `<span class="ia-prod-r">${esc(renewal)}</span>` : ''}
+      ${proof ? `<a class="ia-prod-p" href="${esc(proof)}" target="_blank" rel="noopener" title="Source">source</a>` : ''}
+    </div>`;
+  }).join('');
+  const oaTier = cd.openalexTier ? `${cd.openalexTier}${cd.openalexFee ? ' · ' + cd.openalexFee : ''}` : 'Free API';
+
+  const filterChip = f ? `<button class="ia-clear" onclick="iaClearFilter()">
+      Showing ${f.kind === 'role' ? (IA_TIERS.find(t => t.r === Number(f.value)) || {}).label
+              : f.kind === 'dept' ? esc(f.value)
+              : f.kind === 'quality' ? f.value
+              : f.value === 'missing' ? 'contacts without an email' : 'contacts with an email'}
+      <span>&times;</span></button>` : '';
+
+  return `<div class="card ia-card">
+    <div class="card-header" style="margin-bottom:14px">
+      <span class="card-title">Who is here, and what they hold</span>
+      ${filterChip}
+    </div>
+
+    <div class="ia-grid">
+      <div class="ia-panel">
+        <div class="ia-h">Role mix
+          <b>${decisionMakers} decision-maker${decisionMakers === 1 ? '' : 's'} of ${contacts.length}</b></div>
+        <div class="ia-bar">${roleBar}</div>
+        <div class="ia-keys">${roleKey}</div>
+      </div>
+
+      <div class="ia-panel">
+        <div class="ia-h">Departments <b>${Object.keys(deptMap).length} distinct</b></div>
+        <div class="ia-rows">${deptRows || '<p class="ia-empty">No departments recorded.</p>'}</div>
+      </div>
+
+      <div class="ia-panel">
+        <div class="ia-h">Contactability</div>
+        <div class="ia-mini">
+          <button class="ia-tile" onclick="iaSetFilter('quality','verified')" aria-pressed="${!!(f && f.kind === 'quality' && f.value === 'verified')}">
+            <span class="ia-tile-n" style="color:#4ade80">${verified}</span>
+            <span class="ia-tile-l">Verified</span>
+            <span class="ia-tile-s">${Math.round(verified / n * 100)}% of the list</span>
+          </button>
+          <button class="ia-tile" onclick="iaSetFilter('email','missing')" aria-pressed="${!!(f && f.kind === 'email' && f.value === 'missing')}">
+            <span class="ia-tile-n" style="color:${noEmail ? '#fb923c' : '#4ade80'}">${noEmail}</span>
+            <span class="ia-tile-l">No email</span>
+            <span class="ia-tile-s">${noEmail ? 'cannot be reached yet' : 'everyone reachable'}</span>
+          </button>
+        </div>
+        ${dupes.length ? `<p class="ia-flag">⚠ ${dupes.length} name${dupes.length === 1 ? '' : 's'} recorded twice — ${esc(dupes.slice(0, 2).map(d => d.replace(/\b\w/g, m => m.toUpperCase())).join(', '))}${dupes.length > 2 ? '…' : ''}</p>` : ''}
+      </div>
+
+      <div class="ia-panel ia-wide">
+        <div class="ia-h">Subscription posture <b>OpenAlex: ${esc(oaTier)}</b></div>
+        <div class="ia-prods">${posture || '<p class="ia-empty">No subscription intelligence recorded for this institution yet.</p>'}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
 function renderDetail() {
   const inst = getInst(state.detailInstId);
   if(!inst.id) { nav('institutions'); return; }
@@ -4161,7 +4410,8 @@ function renderDetail() {
   // subscription — research and library directors, department and faculty
   // heads — sit at the top, then everyone else alphabetically.
   const _ds = state.detailSort || (state.detailSort = { col: 'priority', dir: 1 });
-  const sortedContacts = contacts.slice().sort((a, b) => {
+  // The analytics panel's segments act as filters on this table.
+  const sortedContacts = contacts.filter(iaMatches).sort((a, b) => {
     let r;
     if (_ds.col === 'priority') r = cxRoleRank(a) - cxRoleRank(b);
     else if (_ds.col === 'dept') r = (a.dept || '').localeCompare(b.dept || '');
@@ -4237,6 +4487,8 @@ function renderDetail() {
       ${statsHtml}
     </div>
     ${_rfHtml}
+
+    ${iaAnalyticsHtml(inst, contacts)}
 
     <div class="card-header" style="margin-bottom:12px">
       <span class="card-title">Contacts at ${esc(inst.short||inst.name)}</span>
