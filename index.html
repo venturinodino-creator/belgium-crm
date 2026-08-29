@@ -3107,6 +3107,14 @@ function dshHeroLead() {
     .filter(x => x.days >= 0 && x.days <= 21)
     .sort((a, b) => a.days - b.days)[0];
 
+  // Today's news leads: it is the freshest thing on the page, and the rungs
+  // below it can be weeks old. Set at render time and again once the news
+  // scan resolves, since the count arrives asynchronously.
+  if (_dshNewsToday > 0) return {
+    html: `<span class="lead">${_dshNewsToday} ${_dshNewsToday === 1 ? 'story' : 'stories'}</span> broke in your territory today.`,
+    sub: 'From the research news scan',
+    cta: { label: 'Read the news', view: 'news' },
+  };
   if (launched.length) return {
     html: `<span class="lead">${launched.length} new tender${launched.length === 1 ? '' : 's'}</span> opened this fortnight.`,
     sub: launched[0].title || launched[0].institution || 'New opportunity',
@@ -3136,11 +3144,6 @@ function dshHeroLead() {
     html: `<span class="lead">${_dshPending} new contact${_dshPending === 1 ? '' : 's'}</span> found for you.`,
     sub: 'Discovered overnight by the contact agent',
     cta: { label: 'Review them', view: 'pending' },
-  };
-  if (_dshNewsToday > 0) return {
-    html: `<span class="lead">${_dshNewsToday} ${_dshNewsToday === 1 ? 'story' : 'stories'}</span> broke in your territory today.`,
-    sub: 'From the research news scan',
-    cta: { label: 'Read the news', view: 'news' },
   };
   return {
     html: `Your territory is <span class="lead">up to date</span>.`,
