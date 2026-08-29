@@ -198,10 +198,28 @@ function makeId(url) {
   return 'news-' + Math.abs(hash).toString(36);
 }
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+// Missing &nbsp; here was the root cause of a real production bug: Google
+// News RSS descriptions are routinely just the title repeated with an
+// &nbsp;&nbsp; separator before the source name (e.g. "Some Headline&nbsp;
+// &nbsp;HPCwire"), and with &nbsp; undecoded that literal entity text made
+// it all the way into the UI on any article that didn't get an AI-written
+// bottomLine before its first render (a real gap — see the backfill
+// comment above main()). Also covers a handful of other named entities
+// that show up in real feed text (smart quotes, dashes, ellipsis) plus
+// numeric entities generally, so this doesn't need extending again for
+// the next one some other feed happens to use.
 function decodeEntities(s) {
   return String(s || '')
     .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'").replace(/&apos;/g, "'").replace(/&amp;/g, '&');
+    .replace(/&#39;/g, "'").replace(/&apos;/g, "'")
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&mdash;/g, '—').replace(/&ndash;/g, '–')
+    .replace(/&hellip;/g, '…')
+    .replace(/&lsquo;/g, '‘').replace(/&rsquo;/g, '’')
+    .replace(/&ldquo;/g, '“').replace(/&rdquo;/g, '”')
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+    .replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(parseInt(dec, 10)))
+    .replace(/&amp;/g, '&');
 }
 function stripCdata(s) {
   const m = String(s || '').match(/<!\[CDATA\[([\s\S]*?)\]\]>/);
@@ -639,7 +657,12 @@ async function main() {
         freshCandidates.push({
           id: makeId(item.link),
           title: String(item.title).slice(0, 200),
-          description: String(item.description || '').replace(/<[^>]*>/g, '').slice(0, 400),
+          // item.description is already entity-decoded (parseRssItems runs
+          // it through stripCdata -> decodeEntities), but &nbsp;&nbsp; runs
+          // decode to two literal spaces — collapse those before slicing so
+          // a raw-description fallback (an article not yet backfilled with
+          // an AI-written bottomLine) never shows doubled whitespace.
+          description: String(item.description || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().slice(0, 400),
           institution: job.inst,
           category: category.key,
           categoryLabel: category.label,
