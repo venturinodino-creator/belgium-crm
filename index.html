@@ -217,8 +217,12 @@ tbody td{padding:9px 14px;vertical-align:middle;color:var(--text)}
 .dh-info h2{font-size:17px;font-weight:700;color:var(--text2);margin-top:2px;letter-spacing:-.2px}
 .dh-info .short{font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px}
 /*  DASHBOARD  */
-.dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+.dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px;
+  grid-auto-rows:8px;align-items:start;grid-auto-flow:row dense}
 .dash-grid .dash-widget.w-wide{grid-column:span 2}
+/* Until the row spans are measured, a card occupies one 8px row and the grid
+   would flash as a stack of slivers. */
+.dash-grid:not(.laid-out) .dash-widget{grid-row:span 40}
 @media(max-width:1250px){.dash-grid{grid-template-columns:1fr 1fr}}
 /*  DRAGGABLE WIDGETS  */
 .dash-widget{transition:box-shadow .15s,opacity .15s;user-select:none}
@@ -3325,6 +3329,44 @@ function dshInitTooltip() {
 // Grow bars to their real width. Not gated behind requestAnimationFrame, which
 // browsers pause in background tabs — that would leave every bar stuck at zero
 // for anyone whose dashboard loads in an unfocused tab.
+// Give every widget a row span matching its own height, so cards pack tightly
+// instead of every row inheriting the height of the tallest card in it.
+// Re-runs whenever a card's content changes, which matters because the
+// attention feed, agent statuses and map all arrive after the first paint.
+let _dshRO = null;
+function dshLayoutWidgets() {
+  const grid = document.getElementById('dash-widget-grid');
+  if (!grid) return;
+  const cs = getComputedStyle(grid);
+  const row = parseFloat(cs.gridAutoRows) || 8;
+  const gap = parseFloat(cs.rowGap) || 14;
+  grid.querySelectorAll('.dash-widget').forEach(w => {
+    const h = w.getBoundingClientRect().height;
+    if (!h) return;
+    w.style.gridRowEnd = 'span ' + Math.max(1, Math.ceil((h + gap) / (row + gap)));
+  });
+  grid.classList.add('laid-out');
+}
+
+function dshWatchWidgets() {
+  const grid = document.getElementById('dash-widget-grid');
+  if (!grid || typeof ResizeObserver === 'undefined') { dshLayoutWidgets(); return; }
+  if (_dshRO) _dshRO.disconnect();
+  let queued = false;
+  _dshRO = new ResizeObserver(() => {
+    if (queued) return;
+    queued = true;
+    setTimeout(() => { queued = false; dshLayoutWidgets(); }, 40);
+  });
+  grid.querySelectorAll('.dash-widget').forEach(w => _dshRO.observe(w));
+  dshLayoutWidgets();
+  // The attention feed, news counts, agent statuses and map all land after the
+  // first paint, and the observer has proved unreliable for at least the
+  // attention card, so re-measure on a short schedule as well.
+  [250, 800, 1800].forEach(ms => setTimeout(dshLayoutWidgets, ms));
+}
+addEventListener('resize', () => dshLayoutWidgets());
+
 function dshGrowBars() {
   document.querySelectorAll('.dsh-gfill,.bk-fill').forEach(el => {
     if (el.dataset.w) el.style.width = el.dataset.w + '%';
@@ -3647,6 +3689,7 @@ function renderDashboard() {
   initDashMiniMap();
   syncAgentStatus();
   setTimeout(dshGrowBars, 80);
+  dshWatchWidgets();
 }
 
 
