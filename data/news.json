@@ -10,6 +10,30 @@
     "sourceName": "TMX Newsfile",
     "publishedDate": "2026-08-26",
     "foundDate": "2026-08-28",
-    "autoDiscovered": true
+    "autoDiscovered": true,
+    "bottomLine": "Creed Digital launches AI-powered search strategies to help businesses adapt to digital change, signaling rising competitive pressure on discovery and research tools.",
+    "keyFindings": [
+      "Creed Digital has introduced new AI search strategies designed to help organizations navigate evolving digital landscapes.",
+      "The announcement emphasizes AI-assisted search as a differentiator for business adaptation and decision-making.",
+      "Positioning suggests growing market demand for intelligent search and discovery solutions beyond traditional platforms.",
+      "The move reflects broader industry trend of embedding AI into research and information discovery workflows."
+    ],
+    "whyItMatters": "Belgian research institutions and universities are evaluating AI-enhanced discovery tools; Elsevier must demonstrate how LeapSpace's integrated AI (literature search, author discovery, writing coach) outperforms point solutions like Creed Digital's offering in speed, accuracy, and institutional ROI.",
+    "impact": {
+      "novelty": 2,
+      "commercial": 3,
+      "threat": 2,
+      "urgency": 3
+    },
+    "entities": [
+      "Creed Digital",
+      "TMX Newsfile"
+    ],
+    "actionItems": [
+      "Request full product details from Creed Digital to assess specific AI capabilities, accuracy metrics, and target customer segments in Belgium.",
+      "Prepare competitive comparison of LeapSpace AI features (literature search, claim-checking, deep reports) versus Creed Digital for sales conversations.",
+      "Identify which Belgian institutions may be Creed Digital prospects and prioritize outreach to demonstrate LeapSpace's integrated advantage."
+    ],
+    "sourceType": "secondary"
   }
 ]
