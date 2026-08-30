@@ -58,7 +58,7 @@
  {
   "id": "fondationcontrelecancer",
   "name": "Fondation contre le Cancer / Stichting tegen Kanker",
-  "short": "Fondation contre le Cancer",
+  "short": "FCC",
   "type": "ngo",
   "city": "Brussels"
  },
@@ -121,14 +121,14 @@
  {
   "id": "kbf",
   "name": "King Baudouin Foundation",
-  "short": "King Baudouin Fdn",
+  "short": "KBF",
   "type": "ngo",
   "city": "Brussels"
  },
  {
   "id": "kotk",
   "name": "Kom op tegen Kanker",
-  "short": "Kom op tegen Kanker",
+  "short": "KOTK",
   "type": "ngo",
   "city": "Brussels"
  },
