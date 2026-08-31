@@ -1,0 +1,112 @@
+[
+  {
+    "first": "Rik",
+    "last": "van Daele",
+    "title": "Departement head",
+    "dept": "Library & Research Support",
+    "instId": "uantwerpen",
+    "instName": "University of Antwerp",
+    "email": "rik.vandaele@uantwerpen.be",
+    "constructed": false,
+    "source": "https://www.uantwerpen.be/en/library/contact/"
+  },
+  {
+    "first": "Veronique",
+    "last": "Rega",
+    "title": "Deputy head of department Wander - Library automation",
+    "dept": "Library & Research Support",
+    "instId": "uantwerpen",
+    "instName": "University of Antwerp",
+    "email": "veronique.rega@uantwerpen.be",
+    "constructed": false,
+    "source": "https://www.uantwerpen.be/en/library/contact/"
+  },
+  {
+    "first": "Bruno",
+    "last": "Vandermeulen",
+    "title": "Head of Service",
+    "dept": "Library & Research Support",
+    "instId": "kuleuven",
+    "instName": "KU Leuven",
+    "email": "bruno.vandermeulen@kuleuven.be",
+    "constructed": true,
+    "source": "https://bib.kuleuven.be/english/about/contact"
+  },
+  {
+    "first": "Roel",
+    "last": "Vuegen",
+    "title": "Teamlead",
+    "dept": "Library & Research Support",
+    "instId": "kuleuven",
+    "instName": "KU Leuven",
+    "email": "roel.vuegen@kuleuven.be",
+    "constructed": true,
+    "source": "https://bib.kuleuven.be/english/about/contact"
+  },
+  {
+    "first": "Karen",
+    "last": "Van Hove",
+    "title": "Teamlead",
+    "dept": "Library & Research Support",
+    "instId": "kuleuven",
+    "instName": "KU Leuven",
+    "email": "karen.vanhove@kuleuven.be",
+    "constructed": true,
+    "source": "https://bib.kuleuven.be/english/about/contact"
+  },
+  {
+    "first": "Laura",
+    "last": "Narli",
+    "title": "Teamlead",
+    "dept": "Library & Research Support",
+    "instId": "kuleuven",
+    "instName": "KU Leuven",
+    "email": "laura.narli@kuleuven.be",
+    "constructed": true,
+    "source": "https://bib.kuleuven.be/english/about/contact"
+  },
+  {
+    "first": "Jo",
+    "last": "Rademakers",
+    "title": "Head of Service",
+    "dept": "Library & Research Support",
+    "instId": "kuleuven",
+    "instName": "KU Leuven",
+    "email": "jo.rademakers@kuleuven.be",
+    "constructed": true,
+    "source": "https://bib.kuleuven.be/english/about/contact"
+  },
+  {
+    "first": "Johan",
+    "last": "Philips",
+    "title": "Head of Service",
+    "dept": "Library & Research Support",
+    "instId": "kuleuven",
+    "instName": "KU Leuven",
+    "email": "johan.philips@kuleuven.be",
+    "constructed": true,
+    "source": "https://bib.kuleuven.be/english/about/contact"
+  },
+  {
+    "first": "Hanne",
+    "last": "Heirman",
+    "title": "Head of Service",
+    "dept": "Library & Research Support",
+    "instId": "kuleuven",
+    "instName": "KU Leuven",
+    "email": "hanne.heirman@kuleuven.be",
+    "constructed": true,
+    "source": "https://bib.kuleuven.be/english/about/contact"
+  },
+  {
+    "first": "Hilde",
+    "last": "Van Kiel",
+    "title": "Head of Service",
+    "dept": "Library & Research Support",
+    "instId": "kuleuven",
+    "instName": "KU Leuven",
+    "email": "hilde.vankiel@kuleuven.be",
+    "constructed": true,
+    "source": "https://bib.kuleuven.be/english/about/contact"
+  }
+]
