@@ -38,6 +38,17 @@ from datetime import datetime, timedelta, timezone
 
 import matplotlib
 matplotlib.use('Agg')
+# This report never needs an actual formula rendered, but every tender title,
+# news headline, and deal name it draws is real-world text that can contain a
+# '$' — and matplotlib's default mathtext parser treats any two '$' as a math
+# expression to parse, raising an uncaught ParseException on '$$...$$' or an
+# unmatched brace/subscript in between (e.g. a scraped tender mentioning two
+# dollar amounts, or a name with an underscore next to a '$'). That exception
+# was previously fatal to the whole script — one bad string anywhere in the
+# day's data would silently kill the entire report with no output at all.
+# Disabling mathtext parsing entirely makes every '$' render as a literal
+# character, which is exactly what a CRM report wants.
+matplotlib.rcParams['text.parse_math'] = False
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.patches import FancyBboxPatch, PathPatch
