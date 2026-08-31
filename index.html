@@ -4953,16 +4953,15 @@ async function saveInstitution() {
     website: document.getElementById('mi-website').value.trim(),
     description: document.getElementById('mi-desc').value.trim(),
   };
+  const isEdit = !!state.editInstId;
   let savedInst;
-  if(state.editInstId) {
+  if(isEdit) {
     const idx = state.institutions.findIndex(i=>i.id===state.editInstId);
     if(idx>=0) { state.institutions[idx] = {...state.institutions[idx], ...data}; savedInst = state.institutions[idx]; }
-    toast('Institution updated','ok');
   } else {
     data.id = uid();
     state.institutions.push(data);
     savedInst = data;
-    toast('Institution added','ok');
   }
   // Save competitor data
   if(state.editInstId) {
@@ -4985,7 +4984,22 @@ async function saveInstitution() {
     });
     localStorage.setItem('be_crm_comp_data', JSON.stringify(window.COMP_DATA));
   }
-  save(); try { await supaUpsertInst(savedInst); syncBadge(true); } catch(e){ console.error(e); syncBadge(true,'err'); } closeModal('modal-inst'); render();
+  save();
+  let synced = true;
+  try { await supaUpsertInst(savedInst); syncBadge(true); } catch(e){ console.error(e); syncBadge(true,'err'); synced = false; }
+  closeModal('modal-inst'); render();
+  // The toast used to unconditionally say "updated"/"added" the moment local
+  // state changed, even when the Supabase write in the try/catch above then
+  // failed — silently misreporting success while only a small badge showed
+  // otherwise. It now reflects what actually happened: there's no retry
+  // queue, so a failed sync only survives in this browser/tab until the next
+  // reload — at which point load() re-reads from Supabase and this edit,
+  // never having reached it, is gone. The toast needs to say so plainly
+  // rather than imply it's safely saved.
+  toast(
+    synced ? (isEdit ? 'Institution updated' : 'Institution added') : 'Not saved to the shared database — retry before reloading or this change will be lost',
+    synced ? 'ok' : 'err'
+  );
 }
 
 function confirmDeleteInst(id) {
@@ -5074,10 +5088,19 @@ async function saveContact() {
     state.contacts.push(savedContact);
   }
   save();
-  try { await supaUpsertContact(savedContact); syncBadge(true); } catch(e){ console.error(e); syncBadge(true,'err'); }
+  let synced = true;
+  try { await supaUpsertContact(savedContact); syncBadge(true); } catch(e){ console.error(e); syncBadge(true,'err'); synced = false; }
   closeModal('modal-contact');
   render();
-  toast(id ? 'Contact updated' : 'Contact added', 'ok');
+  // Used to unconditionally claim success the moment local state changed,
+  // even when the Supabase write above then failed — the only sign of
+  // trouble was a small badge easy to miss. There's no retry queue, so a
+  // failed sync only survives in this browser/tab until the next reload —
+  // at which point load() re-reads from Supabase and this edit is gone.
+  toast(
+    synced ? (id ? 'Contact updated' : 'Contact added') : 'Not saved to the shared database — retry before reloading or this change will be lost',
+    synced ? 'ok' : 'err'
+  );
 }
 function confirmDeleteContact(id) {
   const c = state.contacts.find(x=>x.id===id)||{};
