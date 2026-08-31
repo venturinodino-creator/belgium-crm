@@ -1173,6 +1173,14 @@ function lbScoreColor(s) {
   return s >= 90 ? '#00f5c4' : s >= 80 ? '#38bdf8' : s >= 70 ? '#fbbf24' : 'var(--muted)';
 }
 
+// This page is public and unauthenticated — inst.name/short/city come from
+// data/institutions.json, which mirrors crm_institutions' admin-editable
+// fields. A compromised or careless admin session entering markup into an
+// institution's name would otherwise execute for every anonymous visitor,
+// not just signed-in CRM staff, so this gets the same esc() treatment as
+// every dynamic render in the main app.
+function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
 function renderList(list){
   const el = document.getElementById('inst-list');
   if(!list.length){
@@ -1183,13 +1191,13 @@ function renderList(list){
     const score = SCORES[inst.id] || 70;
     const badge = BADGE_CLASS[inst.type] || 'badge-research';
     const label = BADGE_LABEL[inst.type] || inst.type;
-    return `<a class="inst-row" href="index.html?view=detail&inst=${encodeURIComponent(inst.id)}" title="View ${inst.name} in CRM">
+    return `<a class="inst-row" href="index.html?view=detail&inst=${encodeURIComponent(inst.id)}" title="View ${esc(inst.name)} in CRM">
       <div class="score-ring">${scoreRing(score)}</div>
       <div class="inst-info">
-        <div class="inst-name">${inst.name}</div>
-        <div class="inst-meta">${inst.short} · ${inst.city}</div>
+        <div class="inst-name">${esc(inst.name)}</div>
+        <div class="inst-meta">${esc(inst.short)} · ${esc(inst.city)}</div>
       </div>
-      <span class="inst-badge ${badge}">${label}</span>
+      <span class="inst-badge ${badge}">${esc(label)}</span>
     </a>`;
   }).join('');
 }
