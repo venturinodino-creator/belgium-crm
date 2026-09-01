@@ -4750,15 +4750,27 @@ const ORG_TIER_LABEL = {
   2: 'Dean / Director', 3: 'Vice-Dean / Deputy Director',
   4: 'Manager / Coordinator', 5: 'Officer / Specialist', 6: 'Other',
 };
-const ORG_QUAL_RE = /\b(?:vice|deputy|associate|assistant)\b/i;
-const ORG_TOP_NOUN_RE = /\b(?:rector(?:\s+magnificus)?|chancellor|director[-\s]+general|general[-\s]+director|general\s*(?:&|and)?\s*scientific\s+director|chief\s+executive\s+officer|ceo|executive\s+director|executive\s+chairman|chair\s+of\s+the\s+executive\s+board|president)\b/i;
-const ORG_DIR_NOUN_RE = /\b(?:dean|institute\s+director|scientific\s+director|medical\s+director|managing\s+director|domain\s+chair|chief\s+scientist|chief\s+\w+\s+officer|head\s+of\s+department|department\s+head|director)\b/i;
+// Belgium's Walloon institutions publish titles in French, where the
+// qualifying word often follows the noun instead of preceding it —
+// "Directeur Général Adjoint" (Deputy Director General) puts "Adjoint"
+// after, unlike English's "Deputy Director General". orgNounQualification
+// checks a short window on both sides of each noun match, but the
+// look-ahead stops at the first punctuation/conjunction so an unrelated
+// later title in the same string can't leak in as a false qualifier — e.g.
+// "Dean & Vice Chair (Research)" must still read as an unqualified Dean,
+// not get pulled down by "Vice" three words later.
+const ORG_QUAL_RE = /\b(?:vice|deputy|associate|assistant|adjoint\w*)\b/i;
+const ORG_TOP_NOUN_RE = /\b(?:rector(?:\s+magnificus)?|chancellor|director[-\s]+general|general[-\s]+director|general\s*(?:&|and)?\s*scientific\s+director|chief\s+executive\s+officer|ceo|executive\s+director|executive\s+chairman|chair\s+of\s+the\s+executive\s+board|president|direct(?:eur|rice)\s+g[ée]n[ée]ral\w*|pr[ée]sident\w*)\b/i;
+const ORG_DIR_NOUN_RE = /\b(?:dean|institute\s+director|scientific\s+director|medical\s+director|managing\s+director|domain\s+chair|chief\s+scientist|chief\s+\w+\s+officer|head\s+of\s+department|department\s+head|director|direct(?:eur|rice)|chef)\b/i;
 function orgNounQualification(t, nounRe) {
   const re = new RegExp(nounRe.source, 'gi');
   let m, found = false, sawUnqualified = false;
   while ((m = re.exec(t))) {
     found = true;
-    if (!ORG_QUAL_RE.test(t.slice(Math.max(0, m.index - 20), m.index))) { sawUnqualified = true; break; }
+    const before = t.slice(Math.max(0, m.index - 20), m.index);
+    const afterMatch = t.slice(m.index + m[0].length).match(/^\s*([^,&()/–—-]{0,20})/);
+    const after = afterMatch ? afterMatch[1] : '';
+    if (!ORG_QUAL_RE.test(before) && !ORG_QUAL_RE.test(after)) { sawUnqualified = true; break; }
   }
   return found ? (sawUnqualified ? 'unqualified' : 'qualified') : null;
 }
