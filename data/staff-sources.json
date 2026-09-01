@@ -7,7 +7,10 @@
       "instName": "University of Antwerp",
       "emailDomain": "uantwerpen.be",
       "urls": [
-        "https://www.uantwerpen.be/en/library/contact/"
+        "https://www.uantwerpen.be/en/library/contact/",
+        "https://www.uantwerpen.be/en/research/policy/riva/grantsoffice/",
+        "https://www.uantwerpen.be/en/research/policy/riva/who-is-who/research-affairs-office/",
+        "https://www.uantwerpen.be/en/research/info-for-companies/impact/staff/"
       ]
     },
     {
@@ -16,7 +19,10 @@
       "emailDomain": "kuleuven.be",
       "urls": [
         "https://bib.kuleuven.be/english/rbib/about/contact",
-        "https://bib.kuleuven.be/english/about/contact"
+        "https://bib.kuleuven.be/english/about/contact",
+        "https://research.kuleuven.be/en/contact/team",
+        "https://lrd.kuleuven.be/",
+        "https://ai.kuleuven.be/about-leuven-ai"
       ]
     },
     {
@@ -24,7 +30,316 @@
       "instName": "Ghent University",
       "emailDomain": "ugent.be",
       "urls": [
-        "https://www.ugent.be/we/en/faculty/faculty-offices/library/team.htm"
+        "https://www.ugent.be/we/en/faculty/faculty-offices/library/team.htm",
+        "https://www.ugent.be/en/research/funding/eu-int/euteam-extern.htm",
+        "https://techtransfer.ugent.be/nl/contacteer-licensing-team",
+        "https://ai.ugent.be/people/"
+      ]
+    },
+    {
+      "instId": "uhasselt",
+      "instName": "Hasselt University",
+      "emailDomain": "uhasselt.be",
+      "urls": [
+        "https://www.uhasselt.be/en/research/directorate-research-library-and-internationalisation/team-contact",
+        "https://www.uhasselt.be/en/info-for/tech-transfer-office/team-and-contact",
+        "https://www.uhasselt.be/en/aparte-sites-uhasselt-en/ai-hasselt-university"
+      ]
+    },
+    {
+      "instId": "uclouvain",
+      "instName": "UCLouvain",
+      "emailDomain": "uclouvain.be",
+      "urls": [
+        "https://uclouvain.be/fr/chercher/ltto/equipe-ltto.html",
+        "https://www.uclouvain.be/fr/recherche/equipe-adre",
+        "https://uclouvain.be/fr/bibliotheques/bst/contacts-et-acces"
+      ]
+    },
+    {
+      "instId": "uliege",
+      "instName": "Université de Liège",
+      "emailDomain": "uliege.be",
+      "urls": [
+        "https://lib.uliege.be/fr/gouvernance",
+        "https://www.recherche.uliege.be/cms/c_9110968/fr/administration-de-la-recherche"
+      ]
+    },
+    {
+      "instId": "umons",
+      "instName": "Université de Mons",
+      "emailDomain": "umons.ac.be",
+      "urls": [
+        "https://web.umons.ac.be/fr/universite/lumons-en-bref/structure-de-luniversite/administration/direction-archives-bibliotheques-dab/",
+        "https://web.umons.ac.be/fr/universite/lumons-en-bref/structure-de-luniversite/administration/direction-administration-valorisation-de-recherche-avre/",
+        "https://web.umons.ac.be/en/university/university-governance/university-management-team/"
+      ]
+    },
+    {
+      "instId": "ulb",
+      "instName": "Université libre de Bruxelles",
+      "emailDomain": "ulb.be",
+      "urls": [
+        "https://www.ulb.be/en/innovation-and-business-services/service-technology-transfer-tto",
+        "https://bib.ulb.be/en/contacts",
+        "https://www.ulb.be/fr/gouvernance/organigramme"
+      ]
+    },
+    {
+      "instId": "unamur",
+      "instName": "University of Namur",
+      "emailDomain": "unamur.be",
+      "urls": [
+        "https://www.unamur.be/en/entite/university-library-moretus-plantin",
+        "https://www.unamur.be/en/research/adre/contact"
+      ]
+    },
+    {
+      "instId": "vub",
+      "instName": "Vrije Universiteit Brussel",
+      "emailDomain": "vub.be",
+      "urls": [
+        "https://www.vub.be/en/news/peter-verbist-appointed-director-university-library-and-learning-innovation-centre",
+        "https://www.vubtechtransfer.be/about-us/staff",
+        "https://www.vub.be/en/vub-research/become-researcher-vub/research-funding/research-funding-innovation-support-services/get-know-research-funding-europe-office"
+      ]
+    },
+    {
+      "instId": "bruegel",
+      "instName": "Bruegel",
+      "emailDomain": "bruegel.org",
+      "urls": [
+        "https://www.bruegel.org/about/staff"
+      ]
+    },
+    {
+      "instId": "egmont",
+      "instName": "Egmont Institute",
+      "emailDomain": "egmontinstitute.be",
+      "urls": [
+        "https://egmontinstitute.be/staff/"
+      ]
+    },
+    {
+      "instId": "flandersmake",
+      "instName": "Flanders Make",
+      "emailDomain": "flandersmake.be",
+      "urls": [
+        "https://www.flandersmake.be/en/about-us/board-directors"
+      ]
+    },
+    {
+      "instId": "imec",
+      "instName": "imec",
+      "emailDomain": "imec-int.com",
+      "urls": [
+        "https://www.imec-int.com/en/organization/management-team",
+        "https://aistack.imec-int.com/about",
+        "https://www.imec-int.com/en/organization/board-of-directors"
+      ]
+    },
+    {
+      "instId": "solvay",
+      "instName": "International Solvay Institutes for Physics and Chemistry",
+      "emailDomain": "solvayinstitutes.be",
+      "urls": [
+        "https://solvayinstitutes.be/home/mission/management/"
+      ]
+    },
+    {
+      "instId": "itinera",
+      "instName": "Itinera Institute",
+      "emailDomain": "itinerainstitute.org",
+      "urls": [
+        "https://www.itinera.team/en/team",
+        "https://www.itinera.team/en/over-itinera/raad-van-bestuur"
+      ]
+    },
+    {
+      "instId": "royalacademiesbelgium",
+      "instName": "Royal Academies for Science and the Arts of Belgium",
+      "emailDomain": "academieroyale.be",
+      "urls": [
+        "https://academieroyale.be/fr/contact/",
+        "https://academieroyale.be/fr/membres-3521"
+      ]
+    },
+    {
+      "instId": "bira",
+      "instName": "Royal Belgian Institute for Space Aeronomy",
+      "emailDomain": "aeronomie.be",
+      "urls": [
+        "https://www.aeronomie.be/en/organisational-chart",
+        "https://www.aeronomie.be/en/news/2024/ann-carine-vandaele-bira-iasbs-new-director-general"
+      ]
+    },
+    {
+      "instId": "rbins",
+      "instName": "Royal Belgian Institute of Natural Sciences",
+      "emailDomain": "naturalsciences.be",
+      "urls": [
+        "https://www.naturalsciences.be/en/about-us/governance/management-commission",
+        "https://www.naturalsciences.be/en/about-us/missions-vision/research-office"
+      ]
+    },
+    {
+      "instId": "rmi",
+      "instName": "Royal Meteorological Institute of Belgium",
+      "emailDomain": "meteo.be",
+      "urls": [
+        "https://www.meteo.be/en/about-us/team"
+      ]
+    },
+    {
+      "instId": "rob",
+      "instName": "Royal Observatory of Belgium",
+      "emailDomain": "astro.oma.be",
+      "urls": [
+        "https://www.astro.oma.be/fr/informations/propos-de-lobservatoire/"
+      ]
+    },
+    {
+      "instId": "sciensano",
+      "instName": "Sciensano",
+      "emailDomain": "sciensano.be",
+      "urls": [
+        "https://www.sciensano.be/en/about-sciensano/sciensanos-organogram/managing-director",
+        "https://www.sciensano.be/en/about-sciensano/advisory-committees/management-board"
+      ]
+    },
+    {
+      "instId": "vib",
+      "instName": "VIB (Vlaams Instituut voor Biotechnologie)",
+      "emailDomain": "vib.be",
+      "urls": [
+        "https://vib.be/en/about/management-structure",
+        "https://vib.be/en/about/management-structure/board-directors"
+      ]
+    },
+    {
+      "instId": "vito",
+      "instName": "VITO (Flemish Institute for Technological Research)",
+      "emailDomain": "vito.be",
+      "urls": [
+        "https://vito.be/en/about-vito/board-executive-committee"
+      ]
+    },
+    {
+      "instId": "uza",
+      "instName": "Antwerp University Hospital",
+      "emailDomain": "uza.be",
+      "urls": [
+        "https://www.uza.be/nl/organisatie-en-structuur",
+        "https://www.uza.be/nl/jaarverslagen/jaarverslag-2025/management"
+      ]
+    },
+    {
+      "instId": "chuliege",
+      "instName": "CHU de Liège",
+      "emailDomain": "chuliege.be",
+      "urls": [
+        "https://www.chuliege.be/jcms/c2_17338840/comite-directeur/accueil"
+      ]
+    },
+    {
+      "instId": "chunamur",
+      "instName": "CHU UCL Namur (Godinne)",
+      "emailDomain": "chuuclnamur.be",
+      "urls": [
+        "https://www.chuuclnamur.be/nos-comites-et-instances/"
+      ]
+    },
+    {
+      "instId": "saintluc",
+      "instName": "Cliniques universitaires Saint-Luc",
+      "emailDomain": "saintluc.be",
+      "urls": [
+        "https://saintluc.be/fr/organigramme"
+      ]
+    },
+    {
+      "instId": "uzgent",
+      "instName": "Ghent University Hospital",
+      "emailDomain": "uzgent.be",
+      "urls": [
+        "https://www.uzgent.be/nl/over-uz-gent/organisatie/bestuur/directiecomite-van-het-uz-gent"
+      ]
+    },
+    {
+      "instId": "erasme",
+      "instName": "Hôpital Erasme",
+      "emailDomain": "hopitalerasme.be",
+      "urls": [
+        "https://www.erasme.be/fr/organisation-et-instances"
+      ]
+    },
+    {
+      "instId": "bordet",
+      "instName": "Institut Jules Bordet",
+      "emailDomain": "bordet.be",
+      "urls": [
+        "https://www.bordet.be/fr/organisation-institut-jules-bordet"
+      ]
+    },
+    {
+      "instId": "uzbrussel",
+      "instName": "UZ Brussel",
+      "emailDomain": "uzbrussel.be",
+      "urls": [
+        "https://www.uzbrussel.be/directiecomite",
+        "https://www.uzbrussel.be/bestuurscollege"
+      ]
+    },
+    {
+      "instId": "uzleuven",
+      "instName": "UZ Leuven",
+      "emailDomain": "uzleuven.be",
+      "urls": [
+        "https://www.uzleuven.be/nl/over-ons/directiecomite",
+        "https://www.uzleuven.be/nl/over-ons/bestuurscomite"
+      ]
+    },
+    {
+      "instId": "fnrs",
+      "instName": "F.R.S.-FNRS",
+      "emailDomain": "frs-fnrs.be",
+      "urls": [
+        "https://www.frs-fnrs.be/fr/contacts",
+        "https://www.frs-fnrs.be/fr/propos/gouvernance-et-fonds-specialises"
+      ]
+    },
+    {
+      "instId": "fondationcontrelecancer",
+      "instName": "Fondation contre le Cancer / Stichting tegen Kanker",
+      "emailDomain": "cancer.be",
+      "urls": [
+        "https://cancer.be/qui-sommes-nous/"
+      ]
+    },
+    {
+      "instId": "kbf",
+      "instName": "King Baudouin Foundation",
+      "emailDomain": "kbs-frb.be",
+      "urls": [
+        "https://kbs-frb.be/en/executive-staff",
+        "https://kbs-frb.be/en/governance"
+      ]
+    },
+    {
+      "instId": "kotk",
+      "instName": "Kom op tegen Kanker",
+      "emailDomain": "komoptegenkanker.be",
+      "urls": [
+        "https://www.komoptegenkanker.be/wie-is-wie"
+      ]
+    },
+    {
+      "instId": "fwo",
+      "instName": "Research Foundation – Flanders",
+      "emailDomain": "fwo.be",
+      "urls": [
+        "https://www.fwo.be/en/contact/fwo-administration/",
+        "https://www.fwo.be/en/about-fwo/organisation/"
       ]
     }
   ]
