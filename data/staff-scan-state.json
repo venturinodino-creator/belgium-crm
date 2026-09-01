@@ -1,6 +1,128 @@
 {
-  "lastRun": "2026-08-31T15:14:35.970Z",
-  "lastAddedCount": 10,
-  "sources": 3,
-  "issues": []
+  "lastRun": "2026-09-01T19:04:11.898Z",
+  "lastAddedCount": 60,
+  "sources": 38,
+  "issues": [
+    {
+      "instId": "uantwerpen",
+      "url": "https://www.uantwerpen.be/en/research/info-for-companies/impact/staff/",
+      "error": "HTTP 404"
+    },
+    {
+      "instId": "uclouvain",
+      "url": "https://uclouvain.be/fr/chercher/ltto/equipe-ltto.html",
+      "error": "HTTP 404"
+    },
+    {
+      "instId": "uclouvain",
+      "url": "https://www.uclouvain.be/fr/recherche/equipe-adre",
+      "error": "HTTP 404"
+    },
+    {
+      "instId": "umons",
+      "url": "https://web.umons.ac.be/fr/universite/lumons-en-bref/structure-de-luniversite/administration/direction-archives-bibliotheques-dab/",
+      "error": "fetch failed"
+    },
+    {
+      "instId": "umons",
+      "url": "https://web.umons.ac.be/fr/universite/lumons-en-bref/structure-de-luniversite/administration/direction-administration-valorisation-de-recherche-avre/",
+      "error": "fetch failed"
+    },
+    {
+      "instId": "umons",
+      "url": "https://web.umons.ac.be/en/university/university-governance/university-management-team/",
+      "error": "fetch failed"
+    },
+    {
+      "instId": "umons",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "unamur",
+      "url": "https://www.unamur.be/en/entite/university-library-moretus-plantin",
+      "error": "HTTP 404"
+    },
+    {
+      "instId": "bruegel",
+      "url": "https://www.bruegel.org/about/staff",
+      "error": "HTTP 403"
+    },
+    {
+      "instId": "bruegel",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "itinera",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "royalacademiesbelgium",
+      "url": "https://academieroyale.be/fr/contact/",
+      "error": "fetch failed"
+    },
+    {
+      "instId": "royalacademiesbelgium",
+      "url": "https://academieroyale.be/fr/membres-3521",
+      "error": "fetch failed"
+    },
+    {
+      "instId": "royalacademiesbelgium",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "rbins",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "rob",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "sciensano",
+      "url": "https://www.sciensano.be/en/about-sciensano/sciensanos-organogram/managing-director",
+      "error": "This operation was aborted"
+    },
+    {
+      "instId": "sciensano",
+      "url": "https://www.sciensano.be/en/about-sciensano/advisory-committees/management-board",
+      "error": "This operation was aborted"
+    },
+    {
+      "instId": "sciensano",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "chuliege",
+      "url": "https://www.chuliege.be/jcms/c2_17338840/comite-directeur/accueil",
+      "error": "HTTP 404"
+    },
+    {
+      "instId": "chuliege",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "erasme",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "uzleuven",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "fondationcontrelecancer",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "kbf",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "kotk",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "fwo",
+      "note": "no people extracted"
+    }
+  ]
 }
