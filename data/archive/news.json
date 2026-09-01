@@ -1,5 +1,40 @@
 [
   {
+    "id": "news-sz93qe",
+    "title": "Local AI Registry Launches First Public Registry of AI Business Recommendations - TMX Newsfile",
+    "description": "Local AI Registry Launches First Public Registry of AI Business Recommendations&nbsp;&nbsp;TMX Newsfile",
+    "institution": "Google",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMiywFBVV95cUxNeF95QjdyVzRJVDJKMnJibTdRbnV5MWpWMXdOckhQTGFsVHM0OENXMmhmMWdVLUYwVURfNlc2RVNocUxzX0FPSkRFRGNZdjRfZ3BFUkIyNzNNZ1JwWEZsbkxjeTBYSlpVQjRXWmh2bGhycWV6X3UxU1BCZXRwNUdtbC02YWlMQlFVVkc5QnFqWU1WT0VMRGhQRDVJMEs3MFNfczMzaXBtLWZEeDBrVk1JT25vY0FNZTdFb2ZFWkxqNWlSRG8zcU5lNVpjbw?oc=5",
+    "sourceName": "TMX Newsfile",
+    "publishedDate": "2026-08-25",
+    "foundDate": "2026-08-29",
+    "autoDiscovered": true,
+    "bottomLine": "First public registry of AI business recommendations launches, signaling fragmentation and competition in AI recommendation and discovery ecosystems.",
+    "keyFindings": [
+      "Local AI Registry debuts as a public directory of AI business tools and recommendations, aiming to help organizations discover relevant AI solutions.",
+      "The registry addresses the growing fragmentation of AI tool discovery, competing with aggregators and platforms that help match needs to solutions.",
+      "This reflects rising demand for AI tool curation and recommendation, suggesting organizations struggle to navigate the crowded AI landscape."
+    ],
+    "whyItMatters": "Belgian research institutions are increasingly confused about which AI and discovery tools to adopt. Elsevier should position Scopus and LeapSpace as unified, vetted alternatives to fragmented registries, emphasizing expertise curation and research-specific intelligence over generic AI marketplace discovery.",
+    "impact": {
+      "novelty": 2,
+      "commercial": 2,
+      "threat": 2,
+      "urgency": 2
+    },
+    "entities": [
+      "Local AI Registry",
+      "TMX Newsfile"
+    ],
+    "actionItems": [
+      "Monitor Local AI Registry adoption and coverage of competing research discovery tools (Dimensions, OpenAlex, Semantic Scholar) to track positioning.",
+      "Clarify to prospects how Scopus and LeapSpace integrate research discovery, AI assistance, and institutional governance in one platform versus fragmented registries."
+    ],
+    "sourceType": "secondary"
+  },
+  {
     "id": "news-zfu3uv",
     "title": "OpenAI lance un ChatGPT «pour les adolescents», voulant les protéger sans leur restreindre l’accès - Le Devoir",
     "description": "OpenAI lance un ChatGPT «pour les adolescents», voulant les protéger sans leur restreindre l’accès&nbsp;&nbsp;Le Devoir",

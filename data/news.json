@@ -10,20 +10,30 @@
     "sourceName": "OpenAI",
     "publishedDate": "2026-08-26",
     "foundDate": "2026-08-30",
-    "autoDiscovered": true
-  },
-  {
-    "id": "news-sz93qe",
-    "title": "Local AI Registry Launches First Public Registry of AI Business Recommendations - TMX Newsfile",
-    "description": "Local AI Registry Launches First Public Registry of AI Business Recommendations&nbsp;&nbsp;TMX Newsfile",
-    "institution": "Google",
-    "category": "competitor_announcements",
-    "categoryLabel": "Competitor Announcements",
-    "url": "https://news.google.com/rss/articles/CBMiywFBVV95cUxNeF95QjdyVzRJVDJKMnJibTdRbnV5MWpWMXdOckhQTGFsVHM0OENXMmhmMWdVLUYwVURfNlc2RVNocUxzX0FPSkRFRGNZdjRfZ3BFUkIyNzNNZ1JwWEZsbkxjeTBYSlpVQjRXWmh2bGhycWV6X3UxU1BCZXRwNUdtbC02YWlMQlFVVkc5QnFqWU1WT0VMRGhQRDVJMEs3MFNfczMzaXBtLWZEeDBrVk1JT25vY0FNZTdFb2ZFWkxqNWlSRG8zcU5lNVpjbw?oc=5",
-    "sourceName": "TMX Newsfile",
-    "publishedDate": "2026-08-25",
-    "foundDate": "2026-08-29",
-    "autoDiscovered": true
+    "autoDiscovered": true,
+    "bottomLine": "OpenAI launches ChatGPT for Teens with safety guardrails, positioning generalist AI as a learning tool for younger researchers and students.",
+    "keyFindings": [
+      "ChatGPT for Teens is a new product variant with age-appropriate protections and features designed specifically for educational use.",
+      "The tool includes built-in safety measures and content filtering to protect minors while enabling learning and research assistance.",
+      "OpenAI frames this as backing institutional learning, directly competing for adoption in school and university environments."
+    ],
+    "whyItMatters": "Belgian universities and secondary institutions now face pressure to adopt or regulate free generalist AI tools. Elsevier must emphasize how curated, discipline-specific tools like LeapSpace offer institutional control, citation integrity, and research quality that ChatGPT lacks.",
+    "impact": {
+      "novelty": 2,
+      "commercial": 4,
+      "threat": 4,
+      "urgency": 4
+    },
+    "entities": [
+      "OpenAI",
+      "ChatGPT for Teens",
+      "ChatGPT"
+    ],
+    "actionItems": [
+      "Map adoption of ChatGPT for Teens across target Belgian institutions and identify institutional concerns about AI governance in research.",
+      "Develop messaging positioning LeapSpace as the research-grade alternative with institutional control, verified sources, and compliance."
+    ],
+    "sourceType": "primary"
   },
   {
     "id": "news-rcmnbj",
