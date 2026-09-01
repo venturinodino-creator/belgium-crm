@@ -4761,7 +4761,11 @@ const ORG_TIER_LABEL = {
 // not get pulled down by "Vice" three words later.
 const ORG_QUAL_RE = /\b(?:vice|deputy|associate|assistant|adjoint\w*)\b/i;
 const ORG_TOP_NOUN_RE = /\b(?:rector(?:\s+magnificus)?|chancellor|director[-\s]+general|general[-\s]+director|general\s*(?:&|and)?\s*scientific\s+director|chief\s+executive\s+officer|ceo|executive\s+director|executive\s+chairman|chair\s+of\s+the\s+executive\s+board|president|direct(?:eur|rice)\s+g[ée]n[ée]ral\w*|pr[ée]sident\w*)\b/i;
-const ORG_DIR_NOUN_RE = /\b(?:dean|institute\s+director|scientific\s+director|medical\s+director|managing\s+director|domain\s+chair|chief\s+scientist|chief\s+\w+\s+officer|head\s+of\s+department|department\s+head|director|direct(?:eur|rice)|chef)\b/i;
+// "chef" is checked as a suffix (no leading \b) rather than folded into the
+// bare-word group above it, since Danish compounds it directly onto the
+// noun with no space — "Udviklingschef" (development chief) — the same
+// reasoning already applied to discover-staff.js's DECISION_MAKER_RE.
+const ORG_DIR_NOUN_RE = /\b(?:dean|institute\s+director|scientific\s+director|medical\s+director|managing\s+director|domain\s+chair|chief\s+scientist|chief\s+\w+\s+officer|head\s+of\s+department|department\s+head|director|direct(?:eur|rice))\b|chef\b/i;
 function orgNounQualification(t, nounRe) {
   const re = new RegExp(nounRe.source, 'gi');
   let m, found = false, sawUnqualified = false;
@@ -4784,7 +4788,11 @@ function orgRank(title) {
   if (dir === 'unqualified') return 2;
   if (dir === 'qualified') return 3;
   if (/\bvp\b|\bportfolio\s+holder\b/i.test(t)) return 3;
-  if (/\bhead\s+of\b|\bteam\s*lead(er)?\b|\bmanager\b|\bco[oö]rdinator\b|\bgroup\s+leader\b|\bprincipal\s+investigator\b|\bprogram(me)?\s+lead\b/i.test(t)) return 4;
+  // "leder" (Danish, suffix-matched like "chef" above — Projektleder,
+  // Programleder) and "responsable" (French — a manager/lead role, e.g.
+  // FNRS's funding-office staff) sit at the same tier as an English
+  // manager/coordinator/team-lead.
+  if (/leder\b/i.test(t) || /\bresponsable\b|\bhead\s+of\b|\bteam\s*lead(er)?\b|\bmanager\b|\bco[oö]rdinator\b|\bgroup\s+leader\b|\bprincipal\s+investigator\b|\bprogram(me)?\s+lead\b/i.test(t)) return 4;
   if (/\bofficer\b|\bspecialist\b|\badvisor\b|\bconsultant\b|\banalyst\b|\blibrarian\b|\bassistant\b|\bresearcher\b|\bpostdoc(?:toral)?\b|\bphysician\b|\bnurse\b|\bfellow\b/i.test(t)) return 5;
   return 6;
 }
