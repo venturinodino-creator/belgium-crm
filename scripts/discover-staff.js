@@ -82,10 +82,29 @@ function isDecisionMaker(role) {
 }
 
 // ── HTML helpers ───────────────────────────────────────────────────────────
+// A named-entity allowlist for the accented Latin letters that actually turn
+// up in Dutch/Danish/French institution markup (found via real runs: DTU's
+// pages render "Ø" as the numeric &#216; rather than raw UTF-8, and CBS
+// hyphenates long words with &shy; — a soft hyphen that should disappear
+// entirely, not print as a literal character). Numeric refs (&#216; and
+// &#xD8;) are decoded generically via String.fromCodePoint rather than
+// entry-by-entry, since a fixed list can never anticipate every one a page
+// might use.
+const NAMED_ENTITIES = {
+  shy: '', nbsp: ' ', amp: '&', apos: "'", quot: '"', lt: '<', gt: '>',
+  rsquo: '’', lsquo: '‘', rdquo: '”', ldquo: '“',
+  ndash: '–', mdash: '—',
+  oslash: 'ø', Oslash: 'Ø', aring: 'å', Aring: 'Å',
+  aelig: 'æ', AElig: 'Æ', eacute: 'é', Eacute: 'É',
+  egrave: 'è', Egrave: 'È', uuml: 'ü', Uuml: 'Ü',
+  ouml: 'ö', Ouml: 'Ö', auml: 'ä', Auml: 'Ä',
+  ccedil: 'ç', Ccedil: 'Ç',
+};
 function decodeEntities(s) {
   return String(s)
-    .replace(/&nbsp;|&#160;/g, ' ').replace(/&amp;/g, '&').replace(/&#39;|&#8217;|&rsquo;/g, "'")
-    .replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
+    .replace(/&#(\d+);/g, (_, dec) => String.fromCodePoint(parseInt(dec, 10)))
+    .replace(/&([a-zA-Z]+);/g, (m, name) => (name in NAMED_ENTITIES ? NAMED_ENTITIES[name] : m))
     .replace(/[​‎‏]/g, '');
 }
 // Drops complete tags, then any dangling partial tag left by slicing a fixed
