@@ -4765,7 +4765,9 @@ const ORG_TOP_NOUN_RE = /\b(?:rector(?:\s+magnificus)?|chancellor|director[-\s]+
 // bare-word group above it, since Danish compounds it directly onto the
 // noun with no space — "Udviklingschef" (development chief) — the same
 // reasoning already applied to discover-staff.js's DECISION_MAKER_RE.
-const ORG_DIR_NOUN_RE = /\b(?:dean|institute\s+director|scientific\s+director|medical\s+director|managing\s+director|domain\s+chair|chief\s+scientist|chief\s+\w+\s+officer|head\s+of\s+department|department\s+head|director|direct(?:eur|rice))\b|chef\b/i;
+// "decaan" is Dutch for dean (Belgian Flemish institutions); "departement"
+// (extra e) is correct Dutch spelling of "department", not a typo.
+const ORG_DIR_NOUN_RE = /\b(?:dean|decaan|institute\s+director|scientific\s+director|medical\s+director|managing\s+director|domain\s+chair|chief\s+scientist|chief\s+\w+\s+officer|head\s+of\s+departe?ment|departe?ment\s+head|director|direct(?:eur|rice))\b|chef\b/i;
 function orgNounQualification(t, nounRe) {
   const re = new RegExp(nounRe.source, 'gi');
   let m, found = false, sawUnqualified = false;
@@ -4791,8 +4793,9 @@ function orgRank(title) {
   // "leder" (Danish, suffix-matched like "chef" above — Projektleder,
   // Programleder) and "responsable" (French — a manager/lead role, e.g.
   // FNRS's funding-office staff) sit at the same tier as an English
-  // manager/coordinator/team-lead.
-  if (/leder\b/i.test(t) || /\bresponsable\b|\bhead\s+of\b|\bteam\s*lead(er)?\b|\bmanager\b|\bco[oö]rdinator\b|\bgroup\s+leader\b|\bprincipal\s+investigator\b|\bprogram(me)?\s+lead\b/i.test(t)) return 4;
+  // manager/coordinator/team-lead. Bare "lead" (as in Amsterdam UMC's
+  // "Domain Lead Research Grant Support") sits here too.
+  if (/leder\b/i.test(t) || /\bresponsable\b|\bhead\s+of\b|\bteam\s*lead(er)?\b|\bmanager\b|\bco[oö]rdinator\b|\bgroup\s+leader\b|\bprincipal\s+investigator\b|\bprogram(me)?\s+lead\b|\blead\b/i.test(t)) return 4;
   if (/\bofficer\b|\bspecialist\b|\badvisor\b|\bconsultant\b|\banalyst\b|\blibrarian\b|\bassistant\b|\bresearcher\b|\bpostdoc(?:toral)?\b|\bphysician\b|\bnurse\b|\bfellow\b/i.test(t)) return 5;
   return 6;
 }
