@@ -47,14 +47,29 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 //
 // Seniority words are accepted on their own here, without needing a nearby
 // "library"/"research" word. That would be far too loose in general, but this
-// rule is only ever applied to the curated library and research-support
-// directories in staff-sources.json — on those pages a bare "Teamlead" or
-// "Departement head" already means the library one. EXCLUDE_RE below carries
-// the weight of keeping juniors and service desks out.
+// rule is only ever applied to the curated directories in staff-sources.json
+// — on those pages a bare "Teamlead" or "Departement head" already means the
+// relevant one (library, research support, funding, impact, policy, AI…).
+// EXCLUDE_RE below carries the weight of keeping juniors and service desks
+// out. Includes French ("responsable") and Danish ("leder"/"chef"/
+// "direktør") equivalents alongside the Dutch ones, since staff-sources.json
+// now spans institutions across all three regions/languages, and a bare
+// "Lead" for AI/data leads and guild leads who don't carry a "manager" or
+// "director" title.
+//
+// Danish compounds a seniority word onto the noun with no space —
+// "Forskningschef" (research chief), "Bibliotekschef" (library director),
+// "Afdelingsleder" (department head), "Institutleder" (institute head) — so
+// chef/leder/direktør are matched as a suffix (no leading \b) rather than a
+// whole word; verified against common EN/NL/FR words for false positives
+// (mischief, leader, header, reader, chief, render, tender, etc. — none
+// match) before relying on it.
 const DECISION_MAKER_RE = new RegExp([
   '\\b(?:director|directeur|direct(?:ie|rice)|head|hoofd|chief|manager|coordinator|co[oö]rdinator',
-  '|teamlead|team\\s?leader|teamleider|dean|decaan|kabinetschef',
+  '|teamlead|team\\s?leader|teamleider|lead|dean|decaan|kabinetschef',
+  '|responsable',
   '|head\\s+librarian|hoofdbibliothecaris|university\\s+librarian|chief\\s+librarian|bibliothecaris)\\b',
+  '|(?:chef|leder|direkt[oø]r)\\b',
 ].join(''), 'i');
 
 // Roles that look senior but are not buyers — filtered out to keep the queue clean.
