@@ -7822,8 +7822,15 @@ async function loadDigestNews() {
   const listEl = document.getElementById('digest-news-list');
   const countEl = document.getElementById('digest-news-count');
   try {
-    const res = await fetch('data/news.json?t=' + Date.now());
-    const data = res.ok ? await res.json() : [];
+    const [newsRes, overviewRes, jobsRes] = await Promise.all([
+      fetch('data/news.json?t=' + Date.now()),
+      fetch('data/news-overview.json?t=' + Date.now()),
+      fetch('data/competitor-jobs.json?t=' + Date.now()),
+    ]);
+    const data = newsRes.ok ? await newsRes.json() : [];
+    const overview = overviewRes.ok ? await overviewRes.json() : null;
+    const jobsData = jobsRes.ok ? await jobsRes.json() : [];
+    const hiringTotal = Array.isArray(jobsData) ? jobsData.length : 0;
     const dismissed = getDismissedNewsIds();
     const seenIds = new Set();
     const articles = (Array.isArray(data) ? data : [])
@@ -7836,12 +7843,16 @@ async function loadDigestNews() {
       return;
     }
 
+    // The AI-synthesized cross-article overview (Overview, Key Findings, Why
+    // It Matters, Impact, Action Items) — same card as the News Summary
+    // modal, just surfaced directly in the digest instead of behind a click.
+    const overviewCardHtml = buildOverviewCardHtml(overview, articles, hiringTotal);
     const summaryHtml = digestSummaryHtml(articles);
     const shown = window.DIGEST_CAT
       ? articles.filter(a => (a.categoryLabel || (NEWS_CATEGORIES[a.category] || {}).label) === window.DIGEST_CAT)
       : articles;
 
-    listEl.innerHTML = summaryHtml + shown.slice(0, 100).map(a => {
+    listEl.innerHTML = overviewCardHtml + summaryHtml + shown.slice(0, 100).map(a => {
       const cat = NEWS_CATEGORIES[a.category] || { label: a.categoryLabel || 'News', color: '#64748b' };
       // Most entries repeat their headline as the description; printing it
       // again just doubles every row, so it is dropped when that happens.
