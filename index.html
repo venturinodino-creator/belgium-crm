@@ -619,6 +619,7 @@ thead th {
   border-bottom: 1px solid var(--border) !important;
 }
 thead th:hover { color: rgba(255,255,255,.7) !important; }
+thead th.sort-active { background: rgba(0,245,196,.14) !important; color: var(--text) !important; }
 tbody tr { border-bottom: 1px solid rgba(255,255,255,.04) !important; transition: background .12s !important; }
 tbody tr:hover { background: rgba(0,245,196,.025) !important; }
 tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !important; }
@@ -4244,7 +4245,15 @@ function sortInstList(list, sortState, getVal) {
 }
 function sortArrow(field, sortState) {
   if (sortState.field !== field) return '';
-  return sortState.dir === 'asc' ? ' <span style="opacity:.6">&#9650;</span>' : ' <span style="opacity:.6">&#9660;</span>';
+  return sortState.dir === 'asc' ? ' <span style="color:var(--accent)">&#9650;</span>' : ' <span style="color:var(--accent)">&#9660;</span>';
+}
+// Class (not inline style — thead th has !important rules an inline style
+// can't win against) marking the currently-sorted header with a clear
+// background/color highlight, so it's obvious a header click changed the
+// sort even when the resulting row order looks similar to the previous one
+// (e.g. several institutions sharing both an early name and the same city).
+function sortThStyle(field, sortState) {
+  return sortState.field === field ? ' sort-active' : '';
 }
 function toggleSort(sortState, field, rerender) {
   if (sortState.field === field) { sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc'; }
@@ -4341,11 +4350,11 @@ function renderInstitutions() {
       <div class="table-wrap">
         <table>
           <thead><tr>
-            <th style="cursor:pointer;user-select:none" onclick="toggleSort(state.instSort,'name',renderInstitutions)">Institution${sortArrow('name',state.instSort)}</th>
-            <th style="cursor:pointer;user-select:none" onclick="toggleSort(state.instSort,'type',renderInstitutions)">Type${sortArrow('type',state.instSort)}</th>
-            <th style="cursor:pointer;user-select:none" onclick="toggleSort(state.instSort,'city',renderInstitutions)">City${sortArrow('city',state.instSort)}</th>
-            <th style="cursor:pointer;user-select:none" onclick="toggleSort(state.instSort,'founded',renderInstitutions)">Founded${sortArrow('founded',state.instSort)}</th>
-            <th style="cursor:pointer;user-select:none" onclick="toggleSort(state.instSort,'contacts',renderInstitutions)">Contacts${sortArrow('contacts',state.instSort)}</th>
+            <th class="sortable-th${sortThStyle('name',state.instSort)}" onclick="toggleSort(state.instSort,'name',renderInstitutions)">Institution${sortArrow('name',state.instSort)}</th>
+            <th class="sortable-th${sortThStyle('type',state.instSort)}" onclick="toggleSort(state.instSort,'type',renderInstitutions)">Type${sortArrow('type',state.instSort)}</th>
+            <th class="sortable-th${sortThStyle('city',state.instSort)}" onclick="toggleSort(state.instSort,'city',renderInstitutions)">City${sortArrow('city',state.instSort)}</th>
+            <th class="sortable-th${sortThStyle('founded',state.instSort)}" onclick="toggleSort(state.instSort,'founded',renderInstitutions)">Founded${sortArrow('founded',state.instSort)}</th>
+            <th class="sortable-th${sortThStyle('contacts',state.instSort)}" onclick="toggleSort(state.instSort,'contacts',renderInstitutions)">Contacts${sortArrow('contacts',state.instSort)}</th>
             <th>Actions</th>
           </tr></thead>
           <tbody>${rows}</tbody>
@@ -4463,11 +4472,11 @@ function renderWhiteSpace() {
       <div class="table-wrap">
         <table>
           <thead><tr>
-            <th style="cursor:pointer;user-select:none" onclick="toggleSort(state.wsSort,'name',renderWhiteSpace)">Institution${sortArrow('name',state.wsSort)}</th>
-            <th style="cursor:pointer;user-select:none" onclick="toggleSort(state.wsSort,'type',renderWhiteSpace)">Type${sortArrow('type',state.wsSort)}</th>
-            <th style="cursor:pointer;user-select:none" onclick="toggleSort(state.wsSort,'pure',renderWhiteSpace)">Pure status${sortArrow('pure',state.wsSort)}</th>
-            <th style="cursor:pointer;user-select:none" onclick="toggleSort(state.wsSort,'city',renderWhiteSpace)">City${sortArrow('city',state.wsSort)}</th>
-            <th style="cursor:pointer;user-select:none" onclick="toggleSort(state.wsSort,'contacts',renderWhiteSpace)">Contacts${sortArrow('contacts',state.wsSort)}</th>
+            <th class="sortable-th${sortThStyle('name',state.wsSort)}" onclick="toggleSort(state.wsSort,'name',renderWhiteSpace)">Institution${sortArrow('name',state.wsSort)}</th>
+            <th class="sortable-th${sortThStyle('type',state.wsSort)}" onclick="toggleSort(state.wsSort,'type',renderWhiteSpace)">Type${sortArrow('type',state.wsSort)}</th>
+            <th class="sortable-th${sortThStyle('pure',state.wsSort)}" onclick="toggleSort(state.wsSort,'pure',renderWhiteSpace)">Pure status${sortArrow('pure',state.wsSort)}</th>
+            <th class="sortable-th${sortThStyle('city',state.wsSort)}" onclick="toggleSort(state.wsSort,'city',renderWhiteSpace)">City${sortArrow('city',state.wsSort)}</th>
+            <th class="sortable-th${sortThStyle('contacts',state.wsSort)}" onclick="toggleSort(state.wsSort,'contacts',renderWhiteSpace)">Contacts${sortArrow('contacts',state.wsSort)}</th>
             <th>Actions</th>
           </tr></thead>
           <tbody>${rows}</tbody>
