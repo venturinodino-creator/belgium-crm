@@ -98,7 +98,7 @@ const SUPPORT_TITLE_RE = /\b(technical support (analyst|specialist|engineer|repr
 const SERVICE_TITLE_RE = /\b(customer service (representative|rep|associate|agent)|licen[cs]e administrator|licen[cs]ing administrator)\b/i;
 const TRAINING_TITLE_RE = /\b(training specialist|customer education (manager|specialist|lead)|training (manager|lead|coordinator))\b/i;
 const ANALYTICS_TITLE_RE = /\b(usage (&|and) reporting analyst|usage analyst|reporting analyst|usage \& reporting)\b/i;
-const MARKETING_TITLE_RE = /\b(product marketing manager|market development manager)\b/i;
+const MARKETING_TITLE_RE = /\b(product marketing (manager|director|lead)|market development manager|field marketing (manager|director|specialist|lead)|customer marketing (manager|director))\b/i;
 
 // Once a title matches one of the role families above, exclude it if it's
 // clearly scoped to a business line that doesn't compete with Elsevier's
@@ -226,12 +226,17 @@ async function fetchSmartRecruiters(company, companyId) {
 // -- Pinpoint: GET https://<slug>.pinpointhq.com/postings.json
 async function fetchPinpoint(company, slug) {
   const data = await fetchJSON(`https://${slug}.pinpointhq.com/postings.json`);
-  const list = Array.isArray(data) ? data : (data.postings || data.jobs || []);
+  // Confirmed live shape (2026-09-02): { data: [...] }, not { postings }
+  // or { jobs } — those two were guessed at build time and never actually
+  // matched, so this fetch silently returned zero jobs on every run.
+  const list = Array.isArray(data) ? data : (data.data || data.postings || data.jobs || []);
   return list.map(p => ({
     company,
     title: String(p.title || '').trim(),
     location: (p.location && (p.location.name || p.location)) || p.location_name || '',
-    department: (p.department && (p.department.name || p.department)) || '',
+    // Confirmed live shape: department lives at job.department.name, not a
+    // top-level field — the old fallback always came back blank.
+    department: (p.job && p.job.department && p.job.department.name) || (p.department && (p.department.name || p.department)) || '',
     url: p.url || p.absolute_url || '',
     postedDate: toISODate(p.published_at || p.created_at),
     source: 'Pinpoint',
