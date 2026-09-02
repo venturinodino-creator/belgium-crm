@@ -1270,6 +1270,9 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
     <div class="nav-item" data-view="institutions" onclick="nav('institutions')">
       <div class="nav-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div> Institutions
     </div>
+    <div class="nav-item" data-view="whitespace" onclick="nav('whitespace')" title="Universities with no active Pure subscription">
+      <div class="nav-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></div> White Space
+    </div>
     <div class="nav-item" data-view="map" onclick="nav('map')">
       <div class="nav-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></div> Map
     </div>
@@ -1598,6 +1601,8 @@ let state = {
   instPage: 1,
   instSearch: '',
   instType: '',
+  wsView: 'grid', // grid | table — White Space (universities without Pure)
+  wsSearch: '',
   contactSearch: '',
   contactInst: '',
   contactPriority: '',
@@ -3095,6 +3100,7 @@ function render() {
   const views = {
     dashboard: renderDashboard,
     institutions: renderInstitutions,
+    whitespace: renderWhiteSpace,
     contacts: renderContacts,
     pending: renderPendingContacts,
     detail: renderDetail,
@@ -4292,6 +4298,98 @@ function renderInstitutions() {
           <thead><tr>
             <th>Institution</th><th>Type</th><th>City</th><th>Founded</th><th>Contacts</th><th>Actions</th>
           </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  }
+}
+
+//  WHITE SPACE — universities with no active Pure subscription, i.e. outreach
+// targets. Same precedence the Competitor Matrix uses for a product's status
+// (a manual edit beats the researched COMP_DATA, which beats a live
+// crm_institutions row, which falls back to 'unknown') so this list agrees
+// with the Matrix rather than reading a separate, possibly stale copy.
+function getProductStatus(instId, key) {
+  const ov = (window.matrixOverrides || {})[instId]?.[key];
+  if (ov) return ov;
+  const cd = (window.COMP_DATA || {})[instId];
+  if (cd && cd[key]) return cd[key];
+  const cp = (state.compProducts || []).find(p => p.instId === instId);
+  if (cp && cp[key]) return cp[key];
+  return 'unknown';
+}
+const WS_PURE_STATUS = {
+  no:       { label: 'No Pure',    color: '#f87171' },
+  cancelled:{ label: 'Cancelled',  color: '#f87171' },
+  unknown:  { label: 'Unknown',    color: '#fbbf24' },
+};
+
+function renderWhiteSpace() {
+  document.getElementById('page-title').textContent = 'White Space';
+  document.getElementById('page-sub').textContent = 'Universities with no active Pure subscription — outreach targets';
+  document.getElementById('topbar-actions').innerHTML = `
+    <div class="view-toggle">
+      <button class="vt-btn ${state.wsView==='grid'?'active':''}" onclick="state.wsView='grid';renderWhiteSpace()"> Grid</button>
+      <button class="vt-btn ${state.wsView==='table'?'active':''}" onclick="state.wsView='table';renderWhiteSpace()"> Table</button>
+    </div>`;
+
+  const insts = state.institutions.filter(i => {
+    if (i.type !== 'university') return false;
+    const pureStatus = getProductStatus(i.id, 'pure');
+    if (!(pureStatus in WS_PURE_STATUS)) return false; // yes/likely/expiring already have or probably have Pure
+    if (state.wsSearch && !`${i.name} ${i.short} ${i.city}`.toLowerCase().includes(state.wsSearch.toLowerCase())) return false;
+    return true;
+  }).sort((a, b) => a.name.localeCompare(b.name));
+
+  const toolbar = `
+    <div class="toolbar">
+      <div class="search-wrap"><span class="search-icon"></span>
+        <input id="ws-search-input" placeholder="Search universities..." value="${esc(state.wsSearch)}"
+          oninput="state.wsSearch=this.value;renderWhiteSpace()">
+      </div>
+      <span style="font-size:12px;color:var(--muted)">${insts.length} target${insts.length!==1?'s':''}</span>
+    </div>`;
+
+  if (!insts.length) {
+    document.getElementById('content').innerHTML = toolbar + `<div class="empty"><div class="ei"></div><h3>No white space right now</h3><p>Every tracked university either has Pure or is likely/expiring. Try adjusting your search.</p></div>`;
+    return;
+  }
+
+  if (state.wsView === 'grid') {
+    const cards = insts.map(i => {
+      const cc = contactsForInst(i.id).length;
+      const st = WS_PURE_STATUS[getProductStatus(i.id, 'pure')];
+      return `<div class="ic" onclick="nav('detail',{instId:'${i.id}'})">
+        <div class="ic-head">
+          <div class="ic-icon ${i.type}">${TYPE_ICON[i.type]||''}</div>
+          <span class="badge" style="font-size:10px;background:${st.color}22;color:${st.color};border:1px solid ${st.color}55">${esc(st.label)}</span>
+        </div>
+        <h3>${esc(i.name)}</h3>
+        ${i.short?`<div class="short">${esc(i.short)}</div>`:''}
+        <div class="city"><span style="display:inline-flex;vertical-align:middle;margin-right:3px;opacity:.55"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>${esc(i.city)}${i.founded?' · Est. '+i.founded:''}</div>
+        ${i.researchDirector?`<div style="font-size:11px;color:var(--muted);margin-top:6px;display:flex;align-items:center;gap:4px"><span style="font-weight:600;color:var(--text2)">${esc(i.researchDirector)}</span></div>`:''}
+        <div class="ic-footer">
+          <span><span style="opacity:.6;display:inline-flex;margin-right:3px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>${cc} contact${cc!==1?'s':''}</span>
+        </div>
+      </div>`;
+    }).join('');
+    document.getElementById('content').innerHTML = toolbar + `<div class="inst-grid">${cards}</div>`;
+  } else {
+    const rows = insts.map(i => {
+      const cc = contactsForInst(i.id).length;
+      const st = WS_PURE_STATUS[getProductStatus(i.id, 'pure')];
+      return `<tr onclick="nav('detail',{instId:'${i.id}'})">
+        <td><div class="name-cell"><span style="font-size:18px">${TYPE_ICON[i.type]||''}</span><div><div style="font-weight:600">${esc(i.name)}</div><div style="font-size:11px;color:var(--muted)">${esc(i.short||'')}</div></div></div></td>
+        <td><span class="badge" style="background:${st.color}22;color:${st.color};border:1px solid ${st.color}55">${esc(st.label)}</span></td>
+        <td>${esc(i.city)}</td>
+        <td>${cc} contact${cc!==1?'s':''}</td>
+        <td onclick="event.stopPropagation()" style="white-space:nowrap">${i.website?`<a class="ext-link" href="${esc(safeHref(i.website))}" target="_blank"> Website</a>`:''}</td>
+      </tr>`;
+    }).join('');
+    document.getElementById('content').innerHTML = toolbar + `
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Institution</th><th>Pure status</th><th>City</th><th>Contacts</th><th>Actions</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       </div>`;
