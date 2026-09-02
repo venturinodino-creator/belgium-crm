@@ -1614,8 +1614,10 @@ let state = {
   instPage: 1,
   instSearch: '',
   instType: '',
+  instSort: { field: 'type', dir: 'asc' }, // Institutions table column sort
   wsView: 'grid', // grid | table — White Space (universities without Pure)
   wsSearch: '',
+  wsSort: { field: 'type', dir: 'asc' }, // White Space table column sort
   contactSearch: '',
   contactInst: '',
   contactPriority: '',
@@ -4227,6 +4229,38 @@ function initDashMiniMap() {
 }
 
 //  INSTITUTIONS 
+// Shared column-sort helpers for the Institutions and White Space tables.
+// `getVal(inst, field)` resolves a field to a comparable value per table
+// (they support different columns, e.g. White Space's 'pure' status vs
+// Institutions' 'founded' year), sortState is {field, dir}.
+function sortInstList(list, sortState, getVal) {
+  const mult = sortState.dir === 'asc' ? 1 : -1;
+  return list.slice().sort((a, b) => {
+    const av = getVal(a, sortState.field), bv = getVal(b, sortState.field);
+    if (av < bv) return -1 * mult;
+    if (av > bv) return 1 * mult;
+    return a.name.localeCompare(b.name);
+  });
+}
+function sortArrow(field, sortState) {
+  if (sortState.field !== field) return '';
+  return sortState.dir === 'asc' ? ' <span style="opacity:.6">&#9650;</span>' : ' <span style="opacity:.6">&#9660;</span>';
+}
+function toggleSort(sortState, field, rerender) {
+  if (sortState.field === field) { sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc'; }
+  else { sortState.field = field; sortState.dir = 'asc'; }
+  rerender();
+}
+
+const INST_TYPE_ORDER = {university:0, medical:1, research:2, ngo:3};
+function instSortVal(i, field) {
+  if (field === 'type') return INST_TYPE_ORDER[i.type] ?? 9;
+  if (field === 'founded') return parseInt(i.founded) || 0;
+  if (field === 'contacts') return contactsForInst(i.id).length;
+  if (field === 'city') return (i.city || '').toLowerCase();
+  return (i.name || '').toLowerCase();
+}
+
 function renderInstitutions() {
   document.getElementById('page-title').textContent = 'Institutions';
   document.getElementById('page-sub').textContent = `${state.institutions.length} institutions in your network`;
@@ -4237,15 +4271,12 @@ function renderInstitutions() {
     </div>
     <button class="btn btn-primary" data-admin-only onclick="openAddInstitution()">+ Add Institution</button>`;
 
-  const _typeOrder = {university:0, medical:1, research:2, ngo:3};
   let insts = state.institutions.filter(i=>{
     if(state.instSearch && !`${i.name} ${i.short} ${i.city} ${i.description}`.toLowerCase().includes(state.instSearch.toLowerCase())) return false;
     if(state.instType && i.type!==state.instType) return false;
     return true;
-  }).sort((a,b)=>{
-    const td = (_typeOrder[a.type]??9) - (_typeOrder[b.type]??9);
-    return td !== 0 ? td : a.name.localeCompare(b.name);
   });
+  insts = sortInstList(insts, state.instSort, instSortVal);
 
   const toolbar = `
     <div class="toolbar">
@@ -4310,7 +4341,12 @@ function renderInstitutions() {
       <div class="table-wrap">
         <table>
           <thead><tr>
-            <th>Institution</th><th>Type</th><th>City</th><th>Founded</th><th>Contacts</th><th>Actions</th>
+            <th style="cursor:pointer;user-select:none" onclick="toggleSort(state.instSort,'name',renderInstitutions)">Institution${sortArrow('name',state.instSort)}</th>
+            <th style="cursor:pointer;user-select:none" onclick="toggleSort(state.instSort,'type',renderInstitutions)">Type${sortArrow('type',state.instSort)}</th>
+            <th style="cursor:pointer;user-select:none" onclick="toggleSort(state.instSort,'city',renderInstitutions)">City${sortArrow('city',state.instSort)}</th>
+            <th style="cursor:pointer;user-select:none" onclick="toggleSort(state.instSort,'founded',renderInstitutions)">Founded${sortArrow('founded',state.instSort)}</th>
+            <th style="cursor:pointer;user-select:none" onclick="toggleSort(state.instSort,'contacts',renderInstitutions)">Contacts${sortArrow('contacts',state.instSort)}</th>
+            <th>Actions</th>
           </tr></thead>
           <tbody>${rows}</tbody>
         </table>
@@ -4351,6 +4387,12 @@ const WS_ELIGIBLE_TYPES = ['university', 'medical', 'research', 'ngo'];
 // target list stays a real prospect list rather than noise.
 const WS_EXCLUDE_IDS = new Set(['royalacademiesbelgium', 'fwo', 'fnrs', 'kbf', 'kotk', 'fondationcontrelecancer']);
 
+const WS_PURE_SORT_ORDER = {no:0, cancelled:1, unknown:2};
+function wsSortVal(i, field) {
+  if (field === 'pure') return WS_PURE_SORT_ORDER[getProductStatus(i.id, 'pure')] ?? 9;
+  return instSortVal(i, field);
+}
+
 function renderWhiteSpace() {
   document.getElementById('page-title').textContent = 'White Space';
   document.getElementById('page-sub').textContent = 'Universities, medical centres, research institutes and NGOs with no active Pure subscription — outreach targets';
@@ -4360,14 +4402,15 @@ function renderWhiteSpace() {
       <button class="vt-btn ${state.wsView==='table'?'active':''}" onclick="state.wsView='table';renderWhiteSpace()"> Table</button>
     </div>`;
 
-  const insts = state.institutions.filter(i => {
+  let insts = state.institutions.filter(i => {
     if (!WS_ELIGIBLE_TYPES.includes(i.type)) return false;
     if (WS_EXCLUDE_IDS.has(i.id)) return false;
     const pureStatus = getProductStatus(i.id, 'pure');
     if (!(pureStatus in WS_PURE_STATUS)) return false; // yes/likely/expiring already have or probably have Pure
     if (state.wsSearch && !`${i.name} ${i.short} ${i.city}`.toLowerCase().includes(state.wsSearch.toLowerCase())) return false;
     return true;
-  }).sort((a, b) => a.name.localeCompare(b.name));
+  });
+  insts = sortInstList(insts, state.wsSort, wsSortVal);
 
   const toolbar = `
     <div class="toolbar">
@@ -4419,7 +4462,14 @@ function renderWhiteSpace() {
     document.getElementById('content').innerHTML = toolbar + `
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Institution</th><th>Type</th><th>Pure status</th><th>City</th><th>Contacts</th><th>Actions</th></tr></thead>
+          <thead><tr>
+            <th style="cursor:pointer;user-select:none" onclick="toggleSort(state.wsSort,'name',renderWhiteSpace)">Institution${sortArrow('name',state.wsSort)}</th>
+            <th style="cursor:pointer;user-select:none" onclick="toggleSort(state.wsSort,'type',renderWhiteSpace)">Type${sortArrow('type',state.wsSort)}</th>
+            <th style="cursor:pointer;user-select:none" onclick="toggleSort(state.wsSort,'pure',renderWhiteSpace)">Pure status${sortArrow('pure',state.wsSort)}</th>
+            <th style="cursor:pointer;user-select:none" onclick="toggleSort(state.wsSort,'city',renderWhiteSpace)">City${sortArrow('city',state.wsSort)}</th>
+            <th style="cursor:pointer;user-select:none" onclick="toggleSort(state.wsSort,'contacts',renderWhiteSpace)">Contacts${sortArrow('contacts',state.wsSort)}</th>
+            <th>Actions</th>
+          </tr></thead>
           <tbody>${rows}</tbody>
         </table>
       </div>`;
