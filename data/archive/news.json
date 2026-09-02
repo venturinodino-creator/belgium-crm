@@ -1,5 +1,78 @@
 [
   {
+    "id": "news-rcmnbj",
+    "title": "Creed Digital Launches New AI Search Strategies, Helping Businesses Evolve Alongside the Changing Digital Landscape - TMX Newsfile",
+    "description": "Creed Digital Launches New AI Search Strategies, Helping Businesses Evolve Alongside the Changing Digital Landscape TMX Newsfile",
+    "institution": "Google",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMi-wFBVV95cUxOd29ONTMwbFNjdnk4S1J4bmo4Q09tNlljald5dVZNN0hZWVRrUHJrbVBwLUxtWmVLaGZ3aEplSUh4V2JJNWZhQkJta1VYUndYV2lKVmpTcjZ3Ym1RYjVYVVJJd0d5WlZPRE5xXzJnTE5TTDN3Sm1jS3pWWkhqdWxyUFVxbFZ3V2ZKTm1FUkI4emdSdkozVkxWdG9DeHZmRU5yaE55U0tHSzZKeGVzWTJGLWI4TkpZU3E2WGp1TmYtVS00ZjRkTzF1VVd1RUVWMUp2eU81QzZaUDdDWHNadURVOVpwQ0pqYkhod3c4MmxNZXVtWlcyTEI2SDRTbw?oc=5",
+    "sourceName": "TMX Newsfile",
+    "publishedDate": "2026-08-26",
+    "foundDate": "2026-08-28",
+    "autoDiscovered": true,
+    "bottomLine": "Creed Digital launches AI-powered search strategies to help businesses adapt to digital change, signaling rising competitive pressure on discovery and research tools.",
+    "keyFindings": [
+      "Creed Digital has introduced new AI search strategies designed to help organizations navigate evolving digital landscapes.",
+      "The announcement emphasizes AI-assisted search as a differentiator for business adaptation and decision-making.",
+      "Positioning suggests growing market demand for intelligent search and discovery solutions beyond traditional platforms.",
+      "The move reflects broader industry trend of embedding AI into research and information discovery workflows."
+    ],
+    "whyItMatters": "Belgian research institutions and universities are evaluating AI-enhanced discovery tools; Elsevier must demonstrate how LeapSpace's integrated AI (literature search, author discovery, writing coach) outperforms point solutions like Creed Digital's offering in speed, accuracy, and institutional ROI.",
+    "impact": {
+      "novelty": 2,
+      "commercial": 3,
+      "threat": 2,
+      "urgency": 3
+    },
+    "entities": [
+      "Creed Digital",
+      "TMX Newsfile"
+    ],
+    "actionItems": [
+      "Request full product details from Creed Digital to assess specific AI capabilities, accuracy metrics, and target customer segments in Belgium.",
+      "Prepare competitive comparison of LeapSpace AI features (literature search, claim-checking, deep reports) versus Creed Digital for sales conversations.",
+      "Identify which Belgian institutions may be Creed Digital prospects and prioritize outreach to demonstrate LeapSpace's integrated advantage."
+    ],
+    "sourceType": "secondary"
+  },
+  {
+    "id": "news-x1ad6f",
+    "title": "Introducing ChatGPT for Teens: Built for learning, backed by protections - OpenAI",
+    "description": "Introducing ChatGPT for Teens: Built for learning, backed by protections&nbsp;&nbsp;OpenAI",
+    "institution": "OpenAI",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMiXkFVX3lxTFBIQ1pjYWJYejVacE9KNWNGZ1NkWkZjUmZhcEZiT3NfTXYzTWtjTEloWFlaNWRTZ0sxMkFUQWtFTXhIcGNFZjEtczRHbkdqaHgyODBYdG5EbWxicEU5UEE?oc=5",
+    "sourceName": "OpenAI",
+    "publishedDate": "2026-08-26",
+    "foundDate": "2026-08-30",
+    "autoDiscovered": true,
+    "bottomLine": "OpenAI launches ChatGPT for Teens with safety guardrails, positioning generalist AI as a learning tool for younger researchers and students.",
+    "keyFindings": [
+      "ChatGPT for Teens is a new product variant with age-appropriate protections and features designed specifically for educational use.",
+      "The tool includes built-in safety measures and content filtering to protect minors while enabling learning and research assistance.",
+      "OpenAI frames this as backing institutional learning, directly competing for adoption in school and university environments."
+    ],
+    "whyItMatters": "Belgian universities and secondary institutions now face pressure to adopt or regulate free generalist AI tools. Elsevier must emphasize how curated, discipline-specific tools like LeapSpace offer institutional control, citation integrity, and research quality that ChatGPT lacks.",
+    "impact": {
+      "novelty": 2,
+      "commercial": 4,
+      "threat": 4,
+      "urgency": 4
+    },
+    "entities": [
+      "OpenAI",
+      "ChatGPT for Teens",
+      "ChatGPT"
+    ],
+    "actionItems": [
+      "Map adoption of ChatGPT for Teens across target Belgian institutions and identify institutional concerns about AI governance in research.",
+      "Develop messaging positioning LeapSpace as the research-grade alternative with institutional control, verified sources, and compliance."
+    ],
+    "sourceType": "primary"
+  },
+  {
     "id": "news-sz93qe",
     "title": "Local AI Registry Launches First Public Registry of AI Business Recommendations - TMX Newsfile",
     "description": "Local AI Registry Launches First Public Registry of AI Business Recommendations&nbsp;&nbsp;TMX Newsfile",
