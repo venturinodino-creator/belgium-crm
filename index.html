@@ -4327,16 +4327,22 @@ const WS_PURE_STATUS = {
   unknown:  { label: 'Unknown',    color: '#fbbf24' },
 };
 
-// Pure is sold into research-active institutions generally, not just
-// universities — a university medical centre or research hospital with its
-// own research output is just as much a Pure prospect. Kept as an explicit
-// whitelist (not "everything but ngo/research") since a research institute
-// or NGO isn't a realistic Pure buyer the same way.
-const WS_ELIGIBLE_TYPES = ['university', 'medical'];
+// Pure is sold into any research-active organisation, not just universities —
+// a medical centre, an independent research institute, or a research-producing
+// NGO with its own publication output is just as much a Pure prospect.
+const WS_ELIGIBLE_TYPES = ['university', 'medical', 'research', 'ngo'];
+
+// A handful of tracked "research"/"ngo"-typed entries are funders or a
+// coordinating academy rather than organisations that publish their own
+// research output — they show up nowhere as a Pure (or any CRIS) customer
+// because they were never a CRIS candidate to begin with, not because
+// they're an overlooked sales target. Excluded from White Space so the
+// target list stays a real prospect list rather than noise.
+const WS_EXCLUDE_IDS = new Set(['royalacademiesbelgium', 'fwo', 'fnrs', 'kbf', 'kotk', 'fondationcontrelecancer']);
 
 function renderWhiteSpace() {
   document.getElementById('page-title').textContent = 'White Space';
-  document.getElementById('page-sub').textContent = 'Universities and medical centres with no active Pure subscription — outreach targets';
+  document.getElementById('page-sub').textContent = 'Universities, medical centres, research institutes and NGOs with no active Pure subscription — outreach targets';
   document.getElementById('topbar-actions').innerHTML = `
     <div class="view-toggle">
       <button class="vt-btn ${state.wsView==='grid'?'active':''}" onclick="state.wsView='grid';renderWhiteSpace()"> Grid</button>
@@ -4345,6 +4351,7 @@ function renderWhiteSpace() {
 
   const insts = state.institutions.filter(i => {
     if (!WS_ELIGIBLE_TYPES.includes(i.type)) return false;
+    if (WS_EXCLUDE_IDS.has(i.id)) return false;
     const pureStatus = getProductStatus(i.id, 'pure');
     if (!(pureStatus in WS_PURE_STATUS)) return false; // yes/likely/expiring already have or probably have Pure
     if (state.wsSearch && !`${i.name} ${i.short} ${i.city}`.toLowerCase().includes(state.wsSearch.toLowerCase())) return false;
@@ -4361,7 +4368,7 @@ function renderWhiteSpace() {
     </div>`;
 
   if (!insts.length) {
-    document.getElementById('content').innerHTML = toolbar + `<div class="empty"><div class="ei"></div><h3>No white space right now</h3><p>Every tracked university and medical centre either has Pure or is likely/expiring. Try adjusting your search.</p></div>`;
+    document.getElementById('content').innerHTML = toolbar + `<div class="empty"><div class="ei"></div><h3>No white space right now</h3><p>Every tracked institution either has Pure or is likely/expiring. Try adjusting your search.</p></div>`;
     return;
   }
 
@@ -4415,7 +4422,7 @@ function renderWhiteSpace() {
 function updateWhiteSpaceBadge() {
   const badge = document.getElementById('nav-whitespace-badge');
   if (!badge) return;
-  const count = state.institutions.filter(i => WS_ELIGIBLE_TYPES.includes(i.type) && getProductStatus(i.id, 'pure') in WS_PURE_STATUS).length;
+  const count = state.institutions.filter(i => WS_ELIGIBLE_TYPES.includes(i.type) && !WS_EXCLUDE_IDS.has(i.id) && getProductStatus(i.id, 'pure') in WS_PURE_STATUS).length;
   badge.textContent = count;
   badge.style.display = count > 0 ? 'inline-block' : 'none';
 }
@@ -6636,6 +6643,25 @@ if (!window.COMP_DATA) {
       dimensions:'unknown', converis:'unknown', symplectic:'unknown',
       proofWos: '', proofOpenalex: '',
     },
+    imec:                  { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'no',pureRenewal:'',pureProof:'https://imec-publications.be/', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
+    vib:                   { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'no',pureRenewal:'',pureProof:'https://biblio.ugent.be/organization/VIB', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
+    flandersmake:          { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'no',pureRenewal:'',pureProof:'https://www.researchportal.be/en/organisation/flandersmakekuleuven-ma', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
+    sciensano:             { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'no',pureRenewal:'',pureProof:'https://www.belspo.be/belspo/openscience/pub_orfeo_en.stm', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
+    rbins:                 { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'no',pureRenewal:'',pureProof:'https://biblio.naturalsciences.be/rbins-publications', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
+    rmi:                   { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'no',pureRenewal:'',pureProof:'https://orfeo.belnet.be/handle/internal/9', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
+    rob:                   { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'no',pureRenewal:'',pureProof:'https://orfeo.belnet.be/handle/internal/3937', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
+    solvay:                { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'no',pureRenewal:'',pureProof:'https://cevipol.phisoc.ulb.be/en/di-fusion', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
+    vito:                  { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'unknown',pureRenewal:'',pureProof:'https://vito.be/', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
+    royalacademiesbelgium: { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'unknown',pureRenewal:'',pureProof:'https://researchportal.vub.be/en/activities/koninklijke-vlaamse-academie-van-belgi%C3%AB-voor-wetenschappen-en-kun-7', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
+    bira:                  { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'no',pureRenewal:'',pureProof:'https://www.aeronomie.be/en/publications', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
+    egmont:                { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'no',pureRenewal:'',pureProof:'https://researchportal.vub.be/en/activities/egmont-the-royal-institute-for-international-relations-external-o/', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
+    bruegel:               { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'unknown',pureRenewal:'',pureProof:'https://www.bruegel.org/publications', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
+    itinera:               { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'unknown',pureRenewal:'',pureProof:'https://www.itinerainstitute.org/en/itinera-analysis/', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
+    fwo:                   { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'unknown',pureRenewal:'',pureProof:'https://www.fwo.be/en/about-fwo/who-is-fwo/', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
+    fnrs:                  { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'unknown',pureRenewal:'',pureProof:'https://www.frs-fnrs.be/en/our-commitments/open-science', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
+    kbf:                   { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'unknown',pureRenewal:'',pureProof:'https://kbs-frb.be/en/publications-and-data', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
+    kotk:                  { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'unknown',pureRenewal:'',pureProof:'https://www.komoptegenkanker.be/wat-we-doen/onderzoek-en-zorg-financieren', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
+    fondationcontrelecancer: { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'unknown',pureRenewal:'',pureProof:'https://www.scientifyresearch.org/funder/fondation-contre-le-cancer-stichting-tegen-kanker/', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
   };
 }
 // Merge any localStorage overrides into COMP_DATA
