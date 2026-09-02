@@ -33,6 +33,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'fs';
 
 const DATA_FILE = 'data/news.json';
 const OVERVIEW_FILE = 'data/news-overview.json';
+const OVERVIEW_TODAY_FILE = 'data/news-overview-today.json';
 const STATE_FILE = 'data/news-scan-state.json';
 const ARCHIVE_FILE = 'data/archive/news.json';
 const ARCHIVE_AGE_DAYS = 7;
@@ -726,6 +727,22 @@ async function main() {
     overviewGenerated = true;
   } else {
     console.log('[news-scan] Overview generation skipped or failed — leaving the previous overview file in place.');
+  }
+
+  // A second, today-only overview for the Daily Digest — the News page shows
+  // the full ~7-day live feed (weekly, via ARCHIVE_AGE_DAYS above) and gets
+  // the whole-period overview; the digest is meant for "what happened today"
+  // at a glance, so it needs its own narrower synthesis rather than reusing
+  // the week-wide one, which would reference stories from earlier in the
+  // week alongside today's.
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayArticles = trimmed.filter(a => (a.publishedDate || a.foundDate) === todayStr);
+  console.log(`[news-scan] Generating today-only overview (${todayArticles.length} of ${trimmed.length} live articles are from today)...`);
+  const todayOverview = await generateOverview(todayArticles);
+  if (todayOverview) {
+    saveJSON(OVERVIEW_TODAY_FILE, todayOverview);
+  } else {
+    console.log('[news-scan] Today-only overview generation skipped or failed — leaving the previous file in place.');
   }
 
   saveJSON(STATE_FILE, {

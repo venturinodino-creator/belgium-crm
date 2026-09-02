@@ -30,6 +30,7 @@ jobs:
           git config user.name "GitHub Actions"
           git add data/news.json data/news-scan-state.json
           [ -f data/news-overview.json ] && git add data/news-overview.json
+          [ -f data/news-overview-today.json ] && git add data/news-overview-today.json
           [ -f data/archive/news.json ] && git add data/archive/news.json
           if git diff --staged --quiet; then
             echo "Nothing to commit"

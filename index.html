@@ -7818,13 +7818,24 @@ function digestFilterCat(label) {
   loadDigestNews();
 }
 
+// The News page shows the full ~7-day live feed (weekly, via news-scan.js's
+// ARCHIVE_AGE_DAYS) so nothing scrolls out of view before someone's had a
+// chance to see it. The digest is a different job — "what happened today"
+// at a glance — so it's scoped to just today's articles (by publishedDate,
+// falling back to foundDate for the rare article Google News left undated)
+// rather than reusing the same week-wide list.
+function digestIsToday(a) {
+  const today = new Date().toISOString().slice(0, 10);
+  return (a.publishedDate || a.foundDate) === today;
+}
+
 async function loadDigestNews() {
   const listEl = document.getElementById('digest-news-list');
   const countEl = document.getElementById('digest-news-count');
   try {
     const [newsRes, overviewRes, jobsRes] = await Promise.all([
       fetch('data/news.json?t=' + Date.now()),
-      fetch('data/news-overview.json?t=' + Date.now()),
+      fetch('data/news-overview-today.json?t=' + Date.now()),
       fetch('data/competitor-jobs.json?t=' + Date.now()),
     ]);
     const data = newsRes.ok ? await newsRes.json() : [];
@@ -7835,17 +7846,20 @@ async function loadDigestNews() {
     const seenIds = new Set();
     const articles = (Array.isArray(data) ? data : [])
       .filter(a => !seenIds.has(a.id) && seenIds.add(a.id))
-      .filter(a => !dismissed.includes(a.id));
+      .filter(a => !dismissed.includes(a.id))
+      .filter(digestIsToday);
 
-    if (countEl) countEl.textContent = `${articles.length} article${articles.length === 1 ? '' : 's'} in live feed`;
+    if (countEl) countEl.textContent = `${articles.length} article${articles.length === 1 ? '' : 's'} today`;
     if (!articles.length) {
-      listEl.innerHTML = `<div style="padding:20px;text-align:center;font-size:12px;color:var(--muted)">No articles in the live feed yet.</div>`;
+      listEl.innerHTML = `<div style="padding:20px;text-align:center;font-size:12px;color:var(--muted)">No articles from today yet — check the News page for the full week's feed.</div>`;
       return;
     }
 
     // The AI-synthesized cross-article overview (Overview, Key Findings, Why
     // It Matters, Impact, Action Items) — same card as the News Summary
-    // modal, just surfaced directly in the digest instead of behind a click.
+    // modal, just surfaced directly in the digest instead of behind a click,
+    // and scoped to today only (data/news-overview-today.json) rather than
+    // the week-wide data/news-overview.json the News page uses.
     const overviewCardHtml = buildOverviewCardHtml(overview, articles, hiringTotal);
     const summaryHtml = digestSummaryHtml(articles);
     const shown = window.DIGEST_CAT
