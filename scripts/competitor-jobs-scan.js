@@ -89,16 +89,24 @@ const NL_LOCATION_RE = /netherlands|nederland|amsterdam|utrecht|rotterdam|the ha
 // Everything else (engineering, core product/eng management, finance, HR,
 // editorial, etc.) is excluded entirely rather than tagged "other" — a role
 // that doesn't match one of these is not shown.
-const SAM_TITLE_RE = /\b(strategic account (manager|director|executive)|senior account (manager|executive)|key account (manager|director)|enterprise account (manager|executive)|account (manager|executive|director)|regional sales (manager|director))\b/i;
-const CSM_TITLE_RE = /\b(customer success (manager|director|lead)|client success (manager|director)|customer success)\b/i;
-const CHANNEL_TITLE_RE = /\b(channel (manager|director|sales|partnerships?)|partner(ship)? (manager|director|lead)|alliance(s)? (manager|director)|business development (manager|director))\b/i;
-const PRESALES_TITLE_RE = /\b(customer consultant|solutions? consultant|pre-?sales (consultant|engineer|manager))\b/i;
-const IMPLEMENTATION_TITLE_RE = /\b(implementation (manager|specialist|consultant|lead)|onboarding (specialist|manager|lead|consultant))\b/i;
-const SUPPORT_TITLE_RE = /\b(technical support (analyst|specialist|engineer|representative)|product support (specialist|analyst|engineer)|support analyst)\b/i;
-const SERVICE_TITLE_RE = /\b(customer service (representative|rep|associate|agent)|licen[cs]e administrator|licen[cs]ing administrator)\b/i;
-const TRAINING_TITLE_RE = /\b(training specialist|customer education (manager|specialist|lead)|training (manager|lead|coordinator))\b/i;
+// All of these match the bare noun phrase (or an explicit reversed-order
+// alternative) rather than a fixed "noun + level-word" suffix — confirmed
+// live that real titles put the level word before the department just as
+// often as after ("Director, Field Marketing" vs "Field Marketing
+// Director"), and a fixed-suffix-only regex was silently dropping real
+// matches in every single category tested. Each bare phrase was checked
+// against real non-GTM titles (engineering, research, finance, HR) pulled
+// from live ATS data to confirm it doesn't over-match.
+const SAM_TITLE_RE = /\b(strategic account(s)?|key account(s)?|enterprise account(s)?|senior account(s)?|regional sales|account (manager|executive|director))\b/i;
+const CSM_TITLE_RE = /\b(customer success|client success)\b/i;
+const CHANNEL_TITLE_RE = /\b(channel (manager|director|sales|partnerships?)|partnership(s)?|alliance(s)?|business development)\b/i;
+const PRESALES_TITLE_RE = /\b(customer consultant|solutions? consult(ant|ing)|pre-?sales)\b/i;
+const IMPLEMENTATION_TITLE_RE = /\b(implementation|onboarding)\b/i;
+const SUPPORT_TITLE_RE = /\b(technical support|product support|support analyst)\b/i;
+const SERVICE_TITLE_RE = /\b(customer service|licen[cs]e administrator|licen[cs]ing administrator)\b/i;
+const TRAINING_TITLE_RE = /\b(training specialist|customer education|training (manager|lead|coordinator|director)|(manager|lead|coordinator|director)[,\s]+(of\s+)?training)\b/i;
 const ANALYTICS_TITLE_RE = /\b(usage (&|and) reporting analyst|usage analyst|reporting analyst|usage \& reporting)\b/i;
-const MARKETING_TITLE_RE = /\b(product marketing (manager|director|lead)|market development manager|field marketing (manager|director|specialist|lead)|customer marketing (manager|director))\b/i;
+const MARKETING_TITLE_RE = /\b(product marketing|market development manager|field marketing|customer marketing)\b/i;
 
 // Once a title matches one of the role families above, exclude it if it's
 // clearly scoped to a business line that doesn't compete with Elsevier's
