@@ -1,6 +1,6 @@
 {
-  "lastRun": "2026-09-02T12:23:28.751Z",
-  "totalOpenRoles": 0,
+  "lastRun": "2026-09-02T12:25:11.570Z",
+  "totalOpenRoles": 1,
   "perCompanyCounts": {
     "Digital Science": {
       "total": 7,
@@ -12,7 +12,7 @@
     },
     "Clarivate": {
       "total": 171,
-      "nl": 0
+      "nl": 1
     }
   },
   "errors": {},
