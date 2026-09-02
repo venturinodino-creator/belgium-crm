@@ -1270,7 +1270,7 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
     <div class="nav-item" data-view="institutions" onclick="nav('institutions')">
       <div class="nav-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div> Institutions
     </div>
-    <div class="nav-item" data-view="whitespace" onclick="nav('whitespace')" title="Universities with no active Pure subscription" style="position:relative">
+    <div class="nav-item" data-view="whitespace" onclick="nav('whitespace')" title="Universities and medical centres with no active Pure subscription" style="position:relative">
       <div class="nav-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></div>
       <span style="flex:1">White Space</span>
       <span id="nav-whitespace-badge" style="display:none;background:#fb923c;color:#fff;border-radius:99px;font-size:10px;font-weight:700;padding:1px 6px;min-width:18px;text-align:center"></span>
@@ -4327,9 +4327,16 @@ const WS_PURE_STATUS = {
   unknown:  { label: 'Unknown',    color: '#fbbf24' },
 };
 
+// Pure is sold into research-active institutions generally, not just
+// universities — a university medical centre or research hospital with its
+// own research output is just as much a Pure prospect. Kept as an explicit
+// whitelist (not "everything but ngo/research") since a research institute
+// or NGO isn't a realistic Pure buyer the same way.
+const WS_ELIGIBLE_TYPES = ['university', 'medical'];
+
 function renderWhiteSpace() {
   document.getElementById('page-title').textContent = 'White Space';
-  document.getElementById('page-sub').textContent = 'Universities with no active Pure subscription — outreach targets';
+  document.getElementById('page-sub').textContent = 'Universities and medical centres with no active Pure subscription — outreach targets';
   document.getElementById('topbar-actions').innerHTML = `
     <div class="view-toggle">
       <button class="vt-btn ${state.wsView==='grid'?'active':''}" onclick="state.wsView='grid';renderWhiteSpace()"> Grid</button>
@@ -4337,7 +4344,7 @@ function renderWhiteSpace() {
     </div>`;
 
   const insts = state.institutions.filter(i => {
-    if (i.type !== 'university') return false;
+    if (!WS_ELIGIBLE_TYPES.includes(i.type)) return false;
     const pureStatus = getProductStatus(i.id, 'pure');
     if (!(pureStatus in WS_PURE_STATUS)) return false; // yes/likely/expiring already have or probably have Pure
     if (state.wsSearch && !`${i.name} ${i.short} ${i.city}`.toLowerCase().includes(state.wsSearch.toLowerCase())) return false;
@@ -4347,14 +4354,14 @@ function renderWhiteSpace() {
   const toolbar = `
     <div class="toolbar">
       <div class="search-wrap"><span class="search-icon"></span>
-        <input id="ws-search-input" placeholder="Search universities..." value="${esc(state.wsSearch)}"
+        <input id="ws-search-input" placeholder="Search institutions..." value="${esc(state.wsSearch)}"
           oninput="state.wsSearch=this.value;renderWhiteSpace()">
       </div>
       <span style="font-size:12px;color:var(--muted)">${insts.length} target${insts.length!==1?'s':''}</span>
     </div>`;
 
   if (!insts.length) {
-    document.getElementById('content').innerHTML = toolbar + `<div class="empty"><div class="ei"></div><h3>No white space right now</h3><p>Every tracked university either has Pure or is likely/expiring. Try adjusting your search.</p></div>`;
+    document.getElementById('content').innerHTML = toolbar + `<div class="empty"><div class="ei"></div><h3>No white space right now</h3><p>Every tracked university and medical centre either has Pure or is likely/expiring. Try adjusting your search.</p></div>`;
     return;
   }
 
@@ -4365,6 +4372,7 @@ function renderWhiteSpace() {
       return `<div class="ic" onclick="nav('detail',{instId:'${i.id}'})">
         <div class="ic-head">
           <div class="ic-icon ${i.type}">${TYPE_ICON[i.type]||''}</div>
+          <span class="badge b-${i.type}" style="font-size:10px">${TYPE_LABEL[i.type]||i.type}</span>
           <span class="badge" style="font-size:10px;background:${st.color}22;color:${st.color};border:1px solid ${st.color}55">${esc(st.label)}</span>
         </div>
         <h3>${esc(i.name)}</h3>
@@ -4383,6 +4391,7 @@ function renderWhiteSpace() {
       const st = WS_PURE_STATUS[getProductStatus(i.id, 'pure')];
       return `<tr onclick="nav('detail',{instId:'${i.id}'})">
         <td><div class="name-cell"><span style="font-size:18px">${TYPE_ICON[i.type]||''}</span><div><div style="font-weight:600">${esc(i.name)}</div><div style="font-size:11px;color:var(--muted)">${esc(i.short||'')}</div></div></div></td>
+        <td><span class="badge b-${i.type}">${TYPE_LABEL[i.type]||i.type}</span></td>
         <td><span class="badge" style="background:${st.color}22;color:${st.color};border:1px solid ${st.color}55">${esc(st.label)}</span></td>
         <td>${esc(i.city)}</td>
         <td>${cc} contact${cc!==1?'s':''}</td>
@@ -4392,7 +4401,7 @@ function renderWhiteSpace() {
     document.getElementById('content').innerHTML = toolbar + `
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Institution</th><th>Pure status</th><th>City</th><th>Contacts</th><th>Actions</th></tr></thead>
+          <thead><tr><th>Institution</th><th>Type</th><th>Pure status</th><th>City</th><th>Contacts</th><th>Actions</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       </div>`;
@@ -4406,7 +4415,7 @@ function renderWhiteSpace() {
 function updateWhiteSpaceBadge() {
   const badge = document.getElementById('nav-whitespace-badge');
   if (!badge) return;
-  const count = state.institutions.filter(i => i.type === 'university' && getProductStatus(i.id, 'pure') in WS_PURE_STATUS).length;
+  const count = state.institutions.filter(i => WS_ELIGIBLE_TYPES.includes(i.type) && getProductStatus(i.id, 'pure') in WS_PURE_STATUS).length;
   badge.textContent = count;
   badge.style.display = count > 0 ? 'inline-block' : 'none';
 }
