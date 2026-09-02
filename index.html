@@ -6988,7 +6988,7 @@ function renderSubscriptionMatrix() {
     </button>
   </div>`;
 
-  const allInsts = ['uva','vu','eur','uu','leiden','rug','ru','tudelft','tue','ut','tiu','um','wur','ou']
+  const allInsts = ['kuleuven','ugent','uantwerpen','vub','uhasselt','uclouvain','uliege','ulb','unamur','umons']
     .map(id=>state.institutions.find(i=>i.id===id)).filter(Boolean);
 
   function getStatus(instId, key) {
