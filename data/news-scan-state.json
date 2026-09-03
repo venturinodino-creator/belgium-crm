@@ -1,15 +1,15 @@
 {
-  "lastRun": "2026-09-02T12:49:32.538Z",
+  "lastRun": "2026-09-03T12:06:03.807Z",
   "lastAddedCount": 0,
   "lastCandidateCount": 1,
   "lastArchivedCount": 0,
-  "lastBackfilledCount": 0,
+  "lastBackfilledCount": 2,
   "lastOverviewGenerated": true,
   "candidateCounts": {
-    "ai_adoption": 92,
-    "funding": 25,
-    "policy": 3,
-    "competitor_announcements": 114
+    "ai_adoption": 67,
+    "funding": 18,
+    "policy": 2,
+    "competitor_announcements": 40
   },
   "source": "Google News RSS (discovery) + Claude Haiku (Elsevier-relevance filter + overview synthesis)"
 }

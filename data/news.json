@@ -10,7 +10,35 @@
     "sourceName": "Unite.AI",
     "publishedDate": "2026-09-01",
     "foundDate": "2026-09-02",
-    "autoDiscovered": true
+    "autoDiscovered": true,
+    "bottomLine": "Anthropic launches enterprise AI safeguards with customer-controlled data retention, raising stakes for secure research infrastructure adoption.",
+    "keyFindings": [
+      "Anthropic introduces Enterprise Frontier Safeguards for customer data ownership and control in AI-assisted research workflows.",
+      "Data retention policies now customer-controlled, addressing regulatory and privacy concerns for institutional deployments.",
+      "Enterprise offering targets organizations seeking compliance-first AI tools for sensitive research and sensitive operations.",
+      "Move positions Anthropic as a trusted alternative to consumer AI platforms in regulated institutional environments."
+    ],
+    "whyItMatters": "Belgian universities and medical centres prioritizing GDPR and data sovereignty will see this as a competitive pressure point—LeapSpace must clarify its own data governance and sovereignty guarantees to remain viable for institutions handling sensitive research data.",
+    "impact": {
+      "novelty": 3,
+      "commercial": 4,
+      "threat": 4,
+      "urgency": 4
+    },
+    "entities": [
+      "Anthropic",
+      "Enterprise Frontier Safeguards",
+      "Claude",
+      "Unite.AI",
+      "GDPR",
+      "Customer-controlled data retention"
+    ],
+    "actionItems": [
+      "Audit and document LeapSpace's data residency, retention, and deletion policies for Belgian/EU institutions; prepare comparison sheet vs. Anthropic.",
+      "Prepare use-case story showing Scopus + LeapSpace compliance advantage for medical centres handling patient-linked research metadata.",
+      "Schedule discovery calls with Vlaams universities IT/compliance leads to identify data governance concerns blocking AI workspace adoption."
+    ],
+    "sourceType": "secondary"
   },
   {
     "id": "news-um8rf3",
@@ -23,6 +51,33 @@
     "sourceName": "Unite.AI",
     "publishedDate": "2026-08-31",
     "foundDate": "2026-09-02",
-    "autoDiscovered": true
+    "autoDiscovered": true,
+    "bottomLine": "U.S. Department of War deploys OpenAI's ChatGPT Mil on GenAI.mil, signalling defence sector's shift to vendor-specific AI platforms over research discovery tools.",
+    "keyFindings": [
+      "U.S. military now operates ChatGPT Mil on dedicated GenAI.mil platform for defence and operational applications.",
+      "Deployment reflects government preference for narrowly-scoped, vendor-locked AI tools over broader research infrastructure.",
+      "Move suggests institutional adoption of AI assistants for non-discovery use cases: drafting, analysis, decision support.",
+      "Defence sector adoption validates market demand for domain-specific, high-security AI products; research tools face relegation."
+    ],
+    "whyItMatters": "Belgian defence research institutes and EU-funded security research consortia will face pressure to adopt similar vendor-specific AI tools; ScienceDirect/Scopus/LeapSpace must differentiate on scholarly integrity, multi-source aggregation, and non-proprietary metadata to avoid commoditization in a vendor-locked market.",
+    "impact": {
+      "novelty": 2,
+      "commercial": 3,
+      "threat": 3,
+      "urgency": 3
+    },
+    "entities": [
+      "OpenAI",
+      "U.S. Department of War",
+      "ChatGPT Mil",
+      "GenAI.mil",
+      "United States military"
+    ],
+    "actionItems": [
+      "Research Belgian defence research contracts (e.g., with FN Herstal, Thales, EU Common Foreign and Security Policy institutes) to identify AI procurement opportunities.",
+      "Develop messaging on how Scopus + LeapSpace enable multi-vendor AI integration without lock-in, appealing to EU defence funding governance.",
+      "Monitor EU AI Act compliance requirements for defence research; position Elsevier as a neutral, auditable alternative to vendor-specific platforms."
+    ],
+    "sourceType": "secondary"
   }
 ]
