@@ -91,9 +91,10 @@
       "p10",
       "p11",
       "p12",
-      "p13"
+      "p13",
+      "p14"
     ],
-    "kuleuven_page": 14,
+    "kuleuven_page": 15,
     "ugent_oa_id": "https://openalex.org/I32597200",
     "ugent": [
       "p1",
@@ -108,9 +109,10 @@
       "p10",
       "p11",
       "p12",
-      "p13"
+      "p13",
+      "p14"
     ],
-    "ugent_page": 14,
+    "ugent_page": 15,
     "uantwerpen_oa_id": "https://openalex.org/I149213910",
     "uantwerpen": [
       "p1",
@@ -125,9 +127,10 @@
       "p10",
       "p11",
       "p12",
-      "p13"
+      "p13",
+      "p14"
     ],
-    "uantwerpen_page": 14,
+    "uantwerpen_page": 15,
     "vub_oa_id": "https://openalex.org/I13469542",
     "vub": [
       "p1",
@@ -142,9 +145,10 @@
       "p10",
       "p11",
       "p12",
-      "p13"
+      "p13",
+      "p14"
     ],
-    "vub_page": 14,
+    "vub_page": 15,
     "uhasselt_oa_id": "https://openalex.org/I878454856",
     "uhasselt": [
       "p1",
@@ -159,9 +163,10 @@
       "p10",
       "p11",
       "p12",
-      "p13"
+      "p13",
+      "p14"
     ],
-    "uhasselt_page": 14,
+    "uhasselt_page": 15,
     "uclouvain_oa_id": "https://openalex.org/I95674353",
     "uclouvain": [
       "p1",
@@ -176,9 +181,10 @@
       "p10",
       "p11",
       "p12",
-      "p13"
+      "p13",
+      "p14"
     ],
-    "uclouvain_page": 14,
+    "uclouvain_page": 15,
     "uliege_oa_id": "https://openalex.org/I157674565",
     "uliege": [
       "p1",
@@ -193,13 +199,14 @@
       "p10",
       "p11",
       "p12",
-      "p13"
+      "p13",
+      "p14"
     ],
-    "uliege_page": 14
+    "uliege_page": 15
   },
-  "lastRun": "2026-09-03T12:02:14.693Z",
+  "lastRun": "2026-09-04T12:04:07.654Z",
   "lastTypes": [
     "university"
   ],
-  "lastAddedCount": 19
+  "lastAddedCount": 21
 }
