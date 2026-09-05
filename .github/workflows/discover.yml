@@ -1,8 +1,14 @@
 name: Daily Contact Discovery
 
+# Schedule disabled 2026-09-05: this scans OpenAlex, which only ever returns
+# paper authors — there's no title/role field to filter on, so every contact
+# it finds gets a hardcoded "Researcher" title. The CRM's target shifted to
+# leadership roles only (department heads, directors, grant managers,
+# AI guild/leadership teams). Belgium doesn't have a leadership-focused
+# staff-directory scraper yet (see netherlands-crm/scripts/discover-staff.js
+# for the model to port) — kept as workflow_dispatch only until one exists,
+# rather than deleted, so this can still be run manually if ever needed.
 on:
-  schedule:
-    - cron: '0 7 * * *'
   workflow_dispatch:
 
 permissions:
