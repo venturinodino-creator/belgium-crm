@@ -1,14 +1,16 @@
-name: Weekly Decision-Maker Discovery
+name: Daily Decision-Maker Discovery
 
-# Companion to discover.yml. That scan reads OpenAlex and can only ever return
-# researchers; this one reads the institution library/research-support staff
-# directories listed in data/staff-sources.json, so the review queue also gets
-# the people who actually hold subscription budgets. Staff pages change far
-# more slowly than publication records, so this runs weekly rather than daily.
+# Companion to discover.yml (now workflow_dispatch-only — see its own header).
+# That scan reads OpenAlex and can only ever return researchers; this one
+# reads the institution library/research-support/AI-guild staff directories
+# listed in data/staff-sources.json, so the review queue gets the people who
+# actually hold subscription budgets and AI-strategy influence instead.
+# Runs daily to be the CRM's primary "New Contacts" source now that plain
+# researcher contacts are no longer wanted.
 
 on:
   schedule:
-    - cron: '30 7 * * 1'
+    - cron: '30 7 * * *'
   workflow_dispatch:
 
 permissions:

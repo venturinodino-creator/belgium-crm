@@ -75,8 +75,17 @@ const DECISION_MAKER_RE = new RegExp([
 // Roles that look senior but are not buyers — filtered out to keep the queue clean.
 const EXCLUDE_RE = /\b(?:student|intern|trainee|volunteer|assistant|assistent|front\s?office|desk|helpdesk|receptio)\b/i;
 
+// Named AI/data groups — an institution's "AI Guild", "AI Leadership Team",
+// "AI Taskforce"/"AI Working Group"/"Centre/Center of Excellence" etc. is
+// itself the target, independent of the seniority-word check above: being on
+// that named roster is the signal, even for a member with no "director"/
+// "head"/"lead" in their own title. DECISION_MAKER_RE alone would drop a
+// plain "Member, AI Guild" — this catches it instead.
+const AI_GROUP_RE = /\bAI\b[\s\-,:]{0,3}(?:guild|leadership\s+team|task\s?force|working\s+group|steering\s+(?:group|committee)|centre?\s+of\s+excellence|\bcoe\b)|(?:guild|leadership\s+team|task\s?force|working\s+group|steering\s+(?:group|committee)|centre?\s+of\s+excellence)[\s\-,:]{0,3}\bAI\b/i;
+
 function isDecisionMaker(role) {
   if (!role) return false;
+  if (AI_GROUP_RE.test(role)) return true;
   if (EXCLUDE_RE.test(role)) return false;
   return DECISION_MAKER_RE.test(role);
 }
@@ -284,6 +293,23 @@ function extractPeople(html) {
     const swap = looksLikePersonName(bb) && (!looksLikePersonName(a) || DECISION_MAKER_RE.test(a));
     if (swap) add(bb, a, '');
     else add(a, bb, '');
+  }
+
+  // 4. Adjacent heading pairs — a common team-page card layout (verified
+  //    live on the Netherlands eScience Center's team page, 2026-09-05) with
+  //    no mailto link and no punctuation between name and role at all, so
+  //    neither pass above can split it: role and name each get their own
+  //    heading tag, back-to-back —
+  //    "<h6>Research Software Engineer</h6><h4>Carsten Schnober</h4>" — with
+  //    no comma/dash/colon for method 3's regex to anchor on. Whichever
+  //    heading actually reads as a person is the name; the other is the
+  //    role, in either order (some templates put the name heading first).
+  const headingPairRe = /<h[2-6][^>]*>([\s\S]{2,90}?)<\/h[2-6]>\s*<h[2-6][^>]*>([\s\S]{2,90}?)<\/h[2-6]>/gi;
+  let hp;
+  while ((hp = headingPairRe.exec(html))) {
+    const a = strip(hp[1]), b = strip(hp[2]);
+    if (looksLikePersonName(normalizePersonName(a)) && !looksLikePersonName(normalizePersonName(b))) add(a, b, '');
+    else if (looksLikePersonName(normalizePersonName(b)) && !looksLikePersonName(normalizePersonName(a))) add(b, a, '');
   }
 
   return [...found.values()];

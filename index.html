@@ -3152,9 +3152,9 @@ function applyRoleUI() {
 const DSH_REGION_SUB = "Overview of your Belgium research network";
 const DSH_AGENTS = [
     {
-      id: 'agent-discovery', name: 'Contact Discovery', icon: '👤',
-      status: 'active', cadence: 'Daily · 07:00 UTC · GitHub Actions', source: 'OpenAlex API',
-      statusEl: 'agent-discovery-lastrun', view: 'pending', workflow: 'discover.yml',
+      id: 'agent-discovery', name: 'Leadership Contact Discovery', icon: '👤',
+      status: 'active', cadence: 'Daily · 07:30 UTC · GitHub Actions', source: 'Institution staff directories',
+      statusEl: 'agent-discovery-lastrun', view: 'pending', workflow: 'discover-staff.yml',
     },
     {
       id: 'agent-tenders', name: 'Tender / RFP Scraper', icon: '📄',
@@ -3880,7 +3880,7 @@ function _syncAgentFrom(elId, jsonPath, extra) {
     .catch(() => { el.textContent = 'status unavailable'; });
 }
 function syncAgentStatus() {
-  _syncAgentFrom('agent-discovery-lastrun', 'data/discovery-state.json');
+  _syncAgentFrom('agent-discovery-lastrun', 'data/staff-scan-state.json', d => d.lastAddedCount != null ? ` · +${d.lastAddedCount}` : '');
   _syncAgentFrom('agent-tenders-lastrun', 'data/tenders-scan-state.json', d => d.lastNewCount ? ` · +${d.lastNewCount}` : '');
   _syncAgentFrom('agent-openalex-subs-lastrun', 'data/openalex-scan-state.json', d => d.error === 'missing_api_key' ? ' · needs ANTHROPIC_API_KEY' : d.lastAddedCount ? ` · +${d.lastAddedCount}` : '');
   _syncAgentFrom('agent-news-lastrun', 'data/news-scan-state.json', d => d.error === 'missing_api_key' ? ' · needs ANTHROPIC_API_KEY' : d.lastAddedCount ? ` · +${d.lastAddedCount}` : '');
@@ -9199,10 +9199,17 @@ async function deletePendingContact(id, btn) {
   loadPendingCount();
 }
 
-// Dispatches discover.yml right now, polls until it finishes (real runs take
-// ~1-2 min), then refreshes the Supabase-backed pending list. Needs a GitHub
-// token via the same "Run now" flow used on the Agents page — if none is
-// saved yet, prompts for one and resumes automatically once it's saved.
+// Dispatches discover-staff.yml right now, polls until it finishes (real runs
+// take a couple minutes across all tracked institution staff pages), then
+// refreshes the Supabase-backed pending list. Needs a GitHub token via the
+// same "Run now" flow used on the Agents page — if none is saved yet,
+// prompts for one and resumes automatically once it's saved. Was
+// discover.yml (the OpenAlex author scraper) until 2026-09-05 — that scan
+// only ever finds paper authors with a hardcoded "Researcher" title (OpenAlex
+// has no title/role field to filter on), and the CRM's target shifted to
+// leadership roles only (department heads, directors, grant managers, AI
+// guild/leadership teams), which is what discover-staff.js's staff-directory
+// scan actually finds.
 let _discoveryInFlight = false;
 function _pollWorkflowRun(workflow, token, since) {
   const deadline = Date.now() + 4 * 60 * 1000; // 4 min ceiling
@@ -9231,9 +9238,9 @@ async function runContactDiscovery() {
 
   _discoveryInFlight = true;
   const since = Date.now();
-  toast('Scraping now — this takes about 1-2 minutes…', 'ok');
+  toast('Scraping leadership contacts now — this takes a couple minutes…', 'ok');
   try {
-    const res = await fetch(`https://api.github.com/repos/${GH_AGENTS_REPO}/actions/workflows/discover.yml/dispatches`, {
+    const res = await fetch(`https://api.github.com/repos/${GH_AGENTS_REPO}/actions/workflows/discover-staff.yml/dispatches`, {
       method: 'POST',
       headers: {
         'Authorization': 'Bearer ' + token,
@@ -9250,7 +9257,7 @@ async function runContactDiscovery() {
       return;
     }
     if (res.status !== 204) throw new Error('GitHub rejected the trigger (HTTP ' + res.status + ')');
-    const ok = await _pollWorkflowRun('discover.yml', token, since);
+    const ok = await _pollWorkflowRun('discover-staff.yml', token, since);
     if (!ok) { toast('Scrape timed out or failed — check the Actions tab', 'err'); return; }
     if (typeof loadPendingCount === 'function') await loadPendingCount();
     if (typeof renderPendingContacts === 'function' && state.view === 'pending') await renderPendingContacts();
