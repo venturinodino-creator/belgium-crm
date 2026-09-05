@@ -10,7 +10,31 @@
     "sourceName": "Brief IA",
     "publishedDate": "2026-09-03",
     "foundDate": "2026-09-04",
-    "autoDiscovered": true
+    "autoDiscovered": true,
+    "bottomLine": "OpenAI flags security concerns in Anthropic's Astra model regarding opaque recurrence mechanisms and potential vulnerabilities.",
+    "keyFindings": [
+      "OpenAI has publicly raised concerns about Astra's 'opaque recurrence' — unclear internal mechanisms that may hide vulnerabilities.",
+      "The concerns center on transparency and interpretability of how Astra processes and retains information across sessions.",
+      "This represents a competitive move by OpenAI to question rival Anthropic's safety and reliability claims in enterprise contexts."
+    ],
+    "whyItMatters": "Belgian universities and research institutes evaluating AI-assisted research platforms (like LeapSpace) need assurance that underlying LLM providers meet security and transparency standards; Scopus/ScienceDirect can position trustworthy, vetted-source integration as differentiator against less-transparent AI competitors.",
+    "impact": {
+      "novelty": 2,
+      "commercial": 3,
+      "threat": 2,
+      "urgency": 2
+    },
+    "entities": [
+      "OpenAI",
+      "Anthropic",
+      "Astra"
+    ],
+    "actionItems": [
+      "Audit LeapSpace's LLM transparency and safety certifications to position against these emerging trust concerns.",
+      "Prepare talking points for Flemish/Walloon institutions on Elsevier's AI governance and third-party security reviews.",
+      "Monitor OpenAI vs. Anthropic competitive claims to align Elsevier messaging with institutional procurement risk priorities."
+    ],
+    "sourceType": "secondary"
   },
   {
     "id": "news-ryj6cr",
@@ -23,7 +47,31 @@
     "sourceName": "Sud Ouest",
     "publishedDate": "2026-09-03",
     "foundDate": "2026-09-04",
-    "autoDiscovered": true
+    "autoDiscovered": true,
+    "bottomLine": "OpenAI reportedly launches GPT-6 with advanced autonomous capabilities including potential cybersecurity and system-penetration functionalities.",
+    "keyFindings": [
+      "GPT-6 is described as OpenAI's most powerful and autonomous model yet, with unrestricted capabilities.",
+      "French reporting suggests GPT-6 can penetrate or 'hack' solidly protected computer systems — raising significant security and ethical questions.",
+      "The framing emphasizes autonomous decision-making and reduced human oversight compared to prior GPT versions."
+    ],
+    "whyItMatters": "Belgian research institutions and medical centres using AI-assisted research tools face regulatory and ethical scrutiny under GDPR and emerging AI Act; Elsevier must clearly communicate how ScienceDirect/Scopus/LeapSpace isolate research workflows from unrestricted autonomous AI, maintaining data integrity and compliance.",
+    "impact": {
+      "novelty": 3,
+      "commercial": 4,
+      "threat": 4,
+      "urgency": 4
+    },
+    "entities": [
+      "OpenAI",
+      "GPT-6",
+      "Sud Ouest"
+    ],
+    "actionItems": [
+      "Verify accuracy of GPT-6 cybersecurity claims and prepare compliance/risk mitigation documentation for Belgian compliance officers.",
+      "Design messaging emphasizing LeapSpace's sandboxed, audit-logged research environment vs. open-ended autonomous AI risks.",
+      "Proactively reach out to Université Libre de Bruxelles (ULB) and KU Leuven procurement teams to discuss AI governance."
+    ],
+    "sourceType": "secondary"
   },
   {
     "id": "news-x7wqpz",
@@ -36,7 +84,31 @@
     "sourceName": "TradingView",
     "publishedDate": "2026-09-01",
     "foundDate": "2026-09-04",
-    "autoDiscovered": true
+    "autoDiscovered": true,
+    "bottomLine": "Anthropic rolls back data retention policy following customer backlash, then launches new Claude models with refined privacy guardrails.",
+    "keyFindings": [
+      "Anthropic reversed a data retention policy after institutional customers objected to longer data storage windows.",
+      "The rollback signals customer demand for stricter data minimization and privacy-by-design in enterprise AI tools.",
+      "New Claude models accompanied the policy shift, suggesting Anthropic is repositioning on privacy and compliance as competitive advantage."
+    ],
+    "whyItMatters": "European research institutions (especially under GDPR Article 5 — data minimization) will view Anthropic's policy reversal as validation of privacy concerns; Elsevier can reinforce that ScienceDirect/Scopus/LeapSpace maintain native EU data residency and strict retention policies, making them safer for sensitive research metadata.",
+    "impact": {
+      "novelty": 2,
+      "commercial": 3,
+      "threat": 3,
+      "urgency": 3
+    },
+    "entities": [
+      "Anthropic",
+      "Claude",
+      "Data retention policy"
+    ],
+    "actionItems": [
+      "Audit and document Elsevier's data retention, residency, and GDPR compliance across ScienceDirect/Scopus/LeapSpace for Belgian institution RFPs.",
+      "Develop case study or white paper on how Elsevier's EU data practices compare to US-based AI rivals facing similar rollbacks.",
+      "Flag Anthropic's policy reversal as proof-point in competitive pitches: 'Even leading AI labs are tightening privacy after customer pushback.'"
+    ],
+    "sourceType": "secondary"
   },
   {
     "id": "news-8of6hx",
@@ -49,7 +121,31 @@
     "sourceName": "unite.ai",
     "publishedDate": "2026-09-03",
     "foundDate": "2026-09-04",
-    "autoDiscovered": true
+    "autoDiscovered": true,
+    "bottomLine": "Google DeepMind releases WeatherNext 3 with hourly forecasts at 5-km resolution, advancing climate and weather-prediction research capabilities.",
+    "keyFindings": [
+      "WeatherNext 3 provides hyper-localized weather predictions at 5-kilometre spatial resolution and hourly temporal granularity.",
+      "This capability is relevant to climate science, environmental research, and agricultural studies conducted at Belgian universities.",
+      "Google DeepMind's focus on environmental ML models represents competition for Elsevier in hosting/surfacing cutting-edge research tools and datasets."
+    ],
+    "whyItMatters": "Belgian climate, environmental, and agricultural research communities (e.g., Vrije Universiteit Brussel, Ghent University) now have direct access to Google's proprietary weather models; Scopus/LeapSpace must curate and link related published research, funding, and collaborators to position Elsevier as the scholarly context layer, not just indexer.",
+    "impact": {
+      "novelty": 3,
+      "commercial": 2,
+      "threat": 2,
+      "urgency": 2
+    },
+    "entities": [
+      "Google DeepMind",
+      "WeatherNext 3",
+      "Climate research"
+    ],
+    "actionItems": [
+      "Map published weather/climate research in Scopus linked to WeatherNext 3 and similar DeepMind outputs for bundled discovery pitches.",
+      "Explore partnerships with Belgian environmental institutes to integrate weather datasets with ScienceDirect literature on climate adaptation.",
+      "Monitor whether Google integrates research citations into WeatherNext outputs; if so, position Scopus as the scholarly validation layer."
+    ],
+    "sourceType": "secondary"
   },
   {
     "id": "news-8lrv35",
@@ -62,7 +158,29 @@
     "sourceName": "coinbase.com",
     "publishedDate": "2026-08-30",
     "foundDate": "2026-09-04",
-    "autoDiscovered": true
+    "autoDiscovered": true,
+    "bottomLine": "Speculation about Google's release timeline for Gemini 3.5 Pro, reflecting ongoing uncertainty around Google's generative AI roadmap and product velocity.",
+    "keyFindings": [
+      "The article is speculative commentary on when Google will release Gemini 3.5 Pro, not an official announcement.",
+      "No confirmed release date or feature set is disclosed; discussion centers on competitive timing vs. OpenAI and Anthropic.",
+      "The piece highlights how Google's AI product cadence and transparency are subjects of market speculation and analyst debate."
+    ],
+    "whyItMatters": "For Belgian research institutions evaluating AI-assisted research tools, Google's uncertain roadmap and lack of transparency (compared to announced models from OpenAI/Anthropic) reduce confidence in long-term product stability; Elsevier can position ScienceDirect/Scopus/LeapSpace as vendor-agnostic, not dependent on any single LLM provider's unpredictable release cycles.",
+    "impact": {
+      "novelty": 1,
+      "commercial": 1,
+      "threat": 1,
+      "urgency": 1
+    },
+    "entities": [
+      "Google",
+      "Gemini 3.5 Pro"
+    ],
+    "actionItems": [
+      "Monitor official Google AI announcements; avoid over-relying on speculation in competitive pitches.",
+      "Highlight Elsevier's multi-model LLM strategy for LeapSpace (not locked into single vendor) in risk-conscious institutional conversations."
+    ],
+    "sourceType": "secondary"
   },
   {
     "id": "news-9mo1n4",
@@ -75,7 +193,31 @@
     "sourceName": "unite.ai",
     "publishedDate": "2026-09-02",
     "foundDate": "2026-09-04",
-    "autoDiscovered": true
+    "autoDiscovered": true,
+    "bottomLine": "Google launches Gemini 3.8 Flash with cybersecurity-specific variant, advancing AI capabilities for threat detection and security research applications.",
+    "keyFindings": [
+      "Gemini 3.8 Flash is released with a specialized cybersecurity variant optimized for threat detection and security use cases.",
+      "The model targets enterprise and research security teams needing rapid, focused AI inference for vulnerability assessment and incident response.",
+      "Variant models indicate Google's strategy to differentiate LLMs by vertical (security, healthcare, science) rather than one-size-fits-all approaches."
+    ],
+    "whyItMatters": "Belgian cybersecurity research groups (e.g., KU Leuven's DistriNet, imec) and medical institutions (UZ Gent, UZ Leuven) need secure, compliant AI tools; Elsevier can emphasize how ScienceDirect/Scopus/LeapSpace integrate threat intelligence literature, funded research, and researcher networks without exposing institutional data to external AI systems like Google's open Gemini.",
+    "impact": {
+      "novelty": 2,
+      "commercial": 2,
+      "threat": 2,
+      "urgency": 2
+    },
+    "entities": [
+      "Google",
+      "Gemini 3.8 Flash",
+      "Cybersecurity variant"
+    ],
+    "actionItems": [
+      "Identify Belgian cybersecurity and medical research centres; develop specialized LeapSpace messaging on researcher safety and institutional data isolation.",
+      "Prepare comparison of LeapSpace's internal threat-intelligence literature indexing vs. external GenAI tools that could leak institutional queries.",
+      "Monitor Gemini variants for domain-specific research applications; consider similar specialty configurations for LeapSpace (e.g., health-research, policy-analysis modes)."
+    ],
+    "sourceType": "secondary"
   },
   {
     "id": "news-hvy087",

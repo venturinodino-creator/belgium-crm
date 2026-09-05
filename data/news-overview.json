@@ -1,35 +1,34 @@
 {
-  "generatedAt": "2026-09-03T12:06:03.806Z",
-  "articleCount": 2,
-  "headline": "Enterprise AI Security & Defence Sector Lock-In Reshape Research Infrastructure Landscape",
-  "bottomLine": "Enterprise AI vendors are fragmenting the research discovery market via sector-specific, data-controlled platforms; Belgian institutions must choose between open research tools and proprietary vendor ecosystems before market consolidation…",
+  "generatedAt": "2026-09-05T11:17:26.105Z",
+  "articleCount": 8,
+  "headline": "AI Arms Race Intensifies: Privacy, Security, and Defense Deployments Reshape Research Infrastructure Market",
+  "bottomLine": "Enterprise AI vendors are rapidly consolidating around privacy-first models, cybersecurity capabilities, and defense-sector partnerships, forcing research platforms to compete on secure data governance and domain-specific AI rather than…",
   "keyFindings": [
-    "Anthropic's enterprise safeguards and customer-controlled data retention signal that secure, compliant AI infrastructure is now table-stakes for institutional adoption—research platforms must compete…",
-    "U.S. defence sector's deployment of vendor-specific AI platforms (ChatGPT Mil) over general research tools indicates critical sectors are fragmenting into closed ecosystems, reducing discoverability…",
-    "Enterprise AI vendors are establishing direct institutional relationships and compliance frameworks faster than traditional research platforms can adapt, creating a two-tier market: open discovery…",
-    "Belgian research institutions face urgent competitive pressure to adopt AI-enhanced discovery and secure research workspaces or risk data isolation and reduced access to funded research, particularly…"
+    "Anthropic and Google are racing to embed enterprise data-governance and cybersecurity features into foundation models, signaling that privacy-by-design and customer-controlled data retention are now…",
+    "Defense and government sectors are fast-adopting vendor-specific AI platforms (ChatGPT Mil, GenAI.mil) over general research discovery tools, fragmenting the unified research intelligence market and…",
+    "Competing generative AI models (GPT-6, Gemini 3.8 Flash, Claude) are simultaneously advancing autonomous capabilities and facing public security/privacy scrutiny, raising compliance and governance…",
+    "Weather and climate prediction (WeatherNext 3) and domain-specific AI variants are emerging as high-value research verticals, but depend on secure, institutional data governance—a competitive…"
   ],
-  "whyItMatters": "Elsevier's integrated ScienceDirect/Scopus/LeapSpace ecosystem now competes not just on search quality but on enterprise security, data governance, and sector-specific compliance. Anthropic and OpenAI's moves show that vendors controlling data retention and deploying into regulated sectors (defence, healthcare) are capturing institutional lock-in.",
+  "whyItMatters": "Belgian research institutions are facing pressure to adopt AI-assisted discovery and writing tools, but the market is fragmenting around privacy, security, and sector-specific deployments. Elsevier's LeapSpace must compete on institutional data control, compliance transparency, and deep integration with domain research (climate, defense, health) rather than generic AI chat.",
   "impact": {
     "novelty": 4,
     "commercial": 4,
-    "threat": 4,
+    "threat": 5,
     "urgency": 5
   },
   "entities": [
-    "Anthropic",
     "OpenAI",
-    "U.S. Department of War",
-    "GenAI.mil",
-    "ChatGPT Mil",
-    "Elsevier (ScienceDirect/Scopus/LeapSpace)",
-    "Belgian research institutions",
-    "Enterprise AI platforms"
+    "Anthropic",
+    "Google DeepMind",
+    "Claude",
+    "GPT-6",
+    "Gemini 3.8 Flash",
+    "WeatherNext 3",
+    "U.S. Department of War"
   ],
   "actionItems": [
-    "Audit and document LeapSpace's data retention, encryption, and compliance certifications (GDPR, sector-specific standards) against Anthropic/OpenAI claims; prepare one-pager comparing security…",
-    "Identify and map defence, healthcare, and regulated research clusters within Belgium; develop targeted messaging on how Scopus+LeapSpace prevent vendor lock-in while meeting compliance requirements…",
-    "Schedule stakeholder interviews with 3–5 Belgian research directors to understand current or planned use of enterprise AI tools and gaps in discovery/security; identify where LeapSpace can position…",
-    "Prepare case studies or pilots demonstrating LeapSpace's AI-assisted discovery in regulated contexts (e.g., clinical research, dual-use research); benchmark against competitor offerings and publish…"
+    "Map Belgian institutional compliance requirements (GDPR, sector-specific regulations) and document LeapSpace's data residency, retention, and customer-control guarantees relative to Anthropic…",
+    "Identify high-value research verticals (climate, health, defense-adjacent) where domain-specific AI + secure data governance can differentiate ScienceDirect/Scopus from general-purpose competitors;…",
+    "Audit LeapSpace's security posture and autonomous AI capabilities for potential vulnerabilities (e.g., opaque recurrence, system-penetration risks) flagged in competitor announcements; prepare…"
   ]
 }
