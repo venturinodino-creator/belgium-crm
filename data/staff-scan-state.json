@@ -1,22 +1,62 @@
 {
-  "lastRun": "2026-09-01T19:04:11.898Z",
+  "lastRun": "2026-09-06T11:46:14.870Z",
   "lastAddedCount": 60,
   "sources": 38,
   "issues": [
     {
-      "instId": "uantwerpen",
-      "url": "https://www.uantwerpen.be/en/research/info-for-companies/impact/staff/",
-      "error": "HTTP 404"
+      "instId": "vib",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "solvay",
+      "url": "https://solvayinstitutes.be/home/mission/board-of-directors/",
+      "error": "HTTP 429"
+    },
+    {
+      "instId": "royalacademiesbelgium",
+      "url": "https://academieroyale.be/fr/l-academie-royale-collegium-presentation-bureau/",
+      "error": "fetch failed"
+    },
+    {
+      "instId": "bruegel",
+      "url": "https://www.bruegel.org/about/board-and-scientific-council",
+      "error": "HTTP 403"
+    },
+    {
+      "instId": "bruegel",
+      "url": "https://www.bruegel.org/our-researchers",
+      "error": "HTTP 403"
+    },
+    {
+      "instId": "bruegel",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "itinera",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "vub",
+      "note": "no people extracted"
     },
     {
       "instId": "uclouvain",
-      "url": "https://uclouvain.be/fr/chercher/ltto/equipe-ltto.html",
-      "error": "HTTP 404"
+      "url": "https://uclouvain.be/fr/bibliotheques/service-central-des-bibliotheques",
+      "error": "fetch failed"
     },
     {
       "instId": "uclouvain",
-      "url": "https://www.uclouvain.be/fr/recherche/equipe-adre",
-      "error": "HTTP 404"
+      "url": "https://uclouvain.be/en/research/funding",
+      "error": "fetch failed"
+    },
+    {
+      "instId": "uclouvain",
+      "url": "https://uclouvain.be/en/research-institutes/icteam/data-science-and-artificial-intelligence",
+      "error": "fetch failed"
+    },
+    {
+      "instId": "uclouvain",
+      "note": "no people extracted"
     },
     {
       "instId": "umons",
@@ -38,82 +78,16 @@
       "note": "no people extracted"
     },
     {
-      "instId": "unamur",
-      "url": "https://www.unamur.be/en/entite/university-library-moretus-plantin",
-      "error": "HTTP 404"
-    },
-    {
-      "instId": "bruegel",
-      "url": "https://www.bruegel.org/about/staff",
-      "error": "HTTP 403"
-    },
-    {
-      "instId": "bruegel",
-      "note": "no people extracted"
-    },
-    {
-      "instId": "itinera",
-      "note": "no people extracted"
-    },
-    {
-      "instId": "royalacademiesbelgium",
-      "url": "https://academieroyale.be/fr/contact/",
-      "error": "fetch failed"
-    },
-    {
-      "instId": "royalacademiesbelgium",
-      "url": "https://academieroyale.be/fr/membres-3521",
-      "error": "fetch failed"
-    },
-    {
-      "instId": "royalacademiesbelgium",
-      "note": "no people extracted"
-    },
-    {
-      "instId": "rbins",
-      "note": "no people extracted"
-    },
-    {
-      "instId": "rob",
-      "note": "no people extracted"
-    },
-    {
-      "instId": "sciensano",
-      "url": "https://www.sciensano.be/en/about-sciensano/sciensanos-organogram/managing-director",
-      "error": "This operation was aborted"
-    },
-    {
-      "instId": "sciensano",
-      "url": "https://www.sciensano.be/en/about-sciensano/advisory-committees/management-board",
-      "error": "This operation was aborted"
-    },
-    {
-      "instId": "sciensano",
-      "note": "no people extracted"
-    },
-    {
-      "instId": "chuliege",
-      "url": "https://www.chuliege.be/jcms/c2_17338840/comite-directeur/accueil",
-      "error": "HTTP 404"
-    },
-    {
-      "instId": "chuliege",
-      "note": "no people extracted"
-    },
-    {
-      "instId": "erasme",
-      "note": "no people extracted"
-    },
-    {
       "instId": "uzleuven",
       "note": "no people extracted"
     },
     {
-      "instId": "fondationcontrelecancer",
-      "note": "no people extracted"
+      "instId": "uza",
+      "url": "https://www.uza.be/nl/organisatie-en-structuur",
+      "error": "HTTP 429"
     },
     {
-      "instId": "kbf",
+      "instId": "uza",
       "note": "no people extracted"
     },
     {
@@ -121,7 +95,7 @@
       "note": "no people extracted"
     },
     {
-      "instId": "fwo",
+      "instId": "fondationcontrelecancer",
       "note": "no people extracted"
     }
   ]
