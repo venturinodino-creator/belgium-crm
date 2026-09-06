@@ -1,5 +1,40 @@
 [
   {
+    "id": "news-8lrv35",
+    "title": "When will Google release Gemini 3.5 Pro? - coinbase.com",
+    "description": "When will Google release Gemini 3.5 Pro?&nbsp;&nbsp;coinbase.com",
+    "institution": "Google",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMic0FVX3lxTE5zTmNwZFNYQmdDcFJ6QWV0VnhGRkRlOEdwN0EwcmplTkdFSXRtMC12YWN3S3BnNUxYN1BnYy0tQ0pWZFpxSmY2MFA1VjM0ZG5yeVpRRHoyM1dDeWR0cFJLOWlBMzN2V2o2b2JNZTlGemIxMGc?oc=5",
+    "sourceName": "coinbase.com",
+    "publishedDate": "2026-08-30",
+    "foundDate": "2026-09-04",
+    "autoDiscovered": true,
+    "bottomLine": "Speculation about Google's release timeline for Gemini 3.5 Pro, reflecting ongoing uncertainty around Google's generative AI roadmap and product velocity.",
+    "keyFindings": [
+      "The article is speculative commentary on when Google will release Gemini 3.5 Pro, not an official announcement.",
+      "No confirmed release date or feature set is disclosed; discussion centers on competitive timing vs. OpenAI and Anthropic.",
+      "The piece highlights how Google's AI product cadence and transparency are subjects of market speculation and analyst debate."
+    ],
+    "whyItMatters": "For Belgian research institutions evaluating AI-assisted research tools, Google's uncertain roadmap and lack of transparency (compared to announced models from OpenAI/Anthropic) reduce confidence in long-term product stability; Elsevier can position ScienceDirect/Scopus/LeapSpace as vendor-agnostic, not dependent on any single LLM provider's unpredictable release cycles.",
+    "impact": {
+      "novelty": 1,
+      "commercial": 1,
+      "threat": 1,
+      "urgency": 1
+    },
+    "entities": [
+      "Google",
+      "Gemini 3.5 Pro"
+    ],
+    "actionItems": [
+      "Monitor official Google AI announcements; avoid over-relying on speculation in competitive pitches.",
+      "Highlight Elsevier's multi-model LLM strategy for LeapSpace (not locked into single vendor) in risk-conscious institutional conversations."
+    ],
+    "sourceType": "secondary"
+  },
+  {
     "id": "news-rcmnbj",
     "title": "Creed Digital Launches New AI Search Strategies, Helping Businesses Evolve Alongside the Changing Digital Landscape - TMX Newsfile",
     "description": "Creed Digital Launches New AI Search Strategies, Helping Businesses Evolve Alongside the Changing Digital Landscape TMX Newsfile",

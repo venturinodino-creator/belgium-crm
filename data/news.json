@@ -1,40 +1,16 @@
 [
   {
-    "id": "news-z91kx2",
-    "title": "OpenAI: Concerns Over Astra's \"Opaque Recurrence\" - Brief IA",
-    "description": "OpenAI: Concerns Over Astra's \"Opaque Recurrence\"&nbsp;&nbsp;Brief IA",
+    "id": "news-bm0lco",
+    "title": "OpenAI s’engage à hauteur de 1 milliard de dollars pour la cybersécurité de première ligne, lance le projet pilote MS‑ISAC - Unite.AI",
+    "description": "OpenAI s’engage à hauteur de 1 milliard de dollars pour la cybersécurité de première ligne, lance le projet pilote MS‑ISAC&nbsp;&nbsp;Unite.AI",
     "institution": "OpenAI",
     "category": "competitor_announcements",
     "categoryLabel": "Competitor Announcements",
-    "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxNZUJVQ2ZFRVFuYnBYNlJGZXdid2dCeEJWQ0NrMlFEVUtyNmpKMzQ0OXNwS2RKWmlFTEdteG5EQzlaNGdoRl9FOEpQajRaWndGaHJrNXpKbGVPemlZSlVUQXdQSW1pdGF0U2dfQUQ0bkJieU5pd2piZUlWTXZJLTQzbkkyZ2RuVG81X1ZWcFZ3?oc=5",
-    "sourceName": "Brief IA",
-    "publishedDate": "2026-09-03",
-    "foundDate": "2026-09-04",
-    "autoDiscovered": true,
-    "bottomLine": "OpenAI flags security concerns in Anthropic's Astra model regarding opaque recurrence mechanisms and potential vulnerabilities.",
-    "keyFindings": [
-      "OpenAI has publicly raised concerns about Astra's 'opaque recurrence' — unclear internal mechanisms that may hide vulnerabilities.",
-      "The concerns center on transparency and interpretability of how Astra processes and retains information across sessions.",
-      "This represents a competitive move by OpenAI to question rival Anthropic's safety and reliability claims in enterprise contexts."
-    ],
-    "whyItMatters": "Belgian universities and research institutes evaluating AI-assisted research platforms (like LeapSpace) need assurance that underlying LLM providers meet security and transparency standards; Scopus/ScienceDirect can position trustworthy, vetted-source integration as differentiator against less-transparent AI competitors.",
-    "impact": {
-      "novelty": 2,
-      "commercial": 3,
-      "threat": 2,
-      "urgency": 2
-    },
-    "entities": [
-      "OpenAI",
-      "Anthropic",
-      "Astra"
-    ],
-    "actionItems": [
-      "Audit LeapSpace's LLM transparency and safety certifications to position against these emerging trust concerns.",
-      "Prepare talking points for Flemish/Walloon institutions on Elsevier's AI governance and third-party security reviews.",
-      "Monitor OpenAI vs. Anthropic competitive claims to align Elsevier messaging with institutional procurement risk priorities."
-    ],
-    "sourceType": "secondary"
+    "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQd1kxdi1xMi0yMTlGMWNyRUU1VnV1aWg5RThhS0ttWTNROFZUbmpWbTJWN0NJY0pkMUhYbGVtcWY5VkMxR2YwWWFlMWFfYVFxTno1QmFVZFNmLW5mQWkycnEySlk1bUlkcmxOdVUtR0NVRHc1b2JxOXd3aDdiWkxqbDI0aHpHYTM1NGNJZDU4NFo4aHBRSG93?oc=5",
+    "sourceName": "Unite.AI",
+    "publishedDate": "2026-09-04",
+    "foundDate": "2026-09-06",
+    "autoDiscovered": true
   },
   {
     "id": "news-ryj6cr",
@@ -70,6 +46,108 @@
       "Verify accuracy of GPT-6 cybersecurity claims and prepare compliance/risk mitigation documentation for Belgian compliance officers.",
       "Design messaging emphasizing LeapSpace's sandboxed, audit-logged research environment vs. open-ended autonomous AI risks.",
       "Proactively reach out to Université Libre de Bruxelles (ULB) and KU Leuven procurement teams to discuss AI governance."
+    ],
+    "sourceType": "secondary"
+  },
+  {
+    "id": "news-4zcwni",
+    "title": "OpenAI Launches GPT-6 Astra, a Leap in Office Productivity and Cybersecurity - Brief IA",
+    "description": "OpenAI Launches GPT-6 Astra, a Leap in Office Productivity and Cybersecurity&nbsp;&nbsp;Brief IA",
+    "institution": "OpenAI",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxNRWhzTUdUN3hDUll5WEJWSWJ4REt3c2lsRk5VdVVaQ0dBREFMTDc2R2k1dkcwbUpUQ0hUVDNQQ1p1QWlYWWdqSW12QUZZNWl5ZXBHWm1peWp3QXA5Tmt4TG82a1JlYmdGSlRMaXdXd1U1cjNTUUlVWWRqd2NmUWRDclJ6VVB5R09tY2U0dVRYbEVJc0d4aEItTmtQUjZtQQ?oc=5",
+    "sourceName": "Brief IA",
+    "publishedDate": "2026-09-05",
+    "foundDate": "2026-09-06",
+    "autoDiscovered": true
+  },
+  {
+    "id": "news-o9emj9",
+    "title": "OpenAI Launches GPT-6 Astra As AI Race Intensifies — Calls It A ‘Generational Leap’ - TradingView",
+    "description": "OpenAI Launches GPT-6 Astra As AI Race Intensifies — Calls It A ‘Generational Leap’&nbsp;&nbsp;TradingView",
+    "institution": "OpenAI",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxPbVVfdHNoZjM1dVJJUmF0V3J1WldaSHRZcGluVk5tV3ZvV2V6OGZCcEtxQl9xMUZ4UEd1eGhrNHF3NWlsaXFHVEtVOWdzVHUycWdRanhqbXB3LVRBZ2NJUUhsUW9zdTlLZlhGZFFoWk5tR1lfX3hrVHBaMG5xYURGVFQ3dXBIVGNlRUJRb1ZCejJjUkQwUFppd1BLX0Q1UnNHaWdCNmItZll6ZURyNXJndlhZWFZ3cXo2T0l0YTlOQ2R6MUtJQ1MzSnIya0tDaFhaRUY1bHJn?oc=5",
+    "sourceName": "TradingView",
+    "publishedDate": "2026-09-03",
+    "foundDate": "2026-09-06",
+    "autoDiscovered": true
+  },
+  {
+    "id": "news-xruff",
+    "title": "MentionOS AI Launches an Autonomous AEO Agent That Analyzes What ChatGPT, Gemini, and Other LLMs Say About Brands, Then Helps Get Them Mentioned - TMX Newsfile",
+    "description": "MentionOS AI Launches an Autonomous AEO Agent That Analyzes What ChatGPT, Gemini, and Other LLMs Say About Brands, Then Helps Get Them Mentioned&nbsp;&nbsp;TMX Newsfile",
+    "institution": "Google",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMingJBVV95cUxOWXdWdk9Ed2tMM0NzSEhnWnJzYW9lWWVFbGVQMVZSZ0gzRzh4cVRIdGdUZzAzTTZGSWxqM3ctaUMwMzBFeUpCSU5XalhtbnE2ZGcwTTRUQ0tvcU03cnVQXzJKOXJocTBuNzd1aTBoVnFOakVLeVZSVGpIMzF6ZUlMdGxlbnFacDh4dTgzYjBJN1ZMN1kweWJaR01PS1JMZXI2RlNzTy00ZDljSGlVcVh3T1p4YXBpd2dRZWFya2xha20zUlRfRGpOYjNiNVhfLVRmN2dzSUJ3enBabTNSQldXSGtILWhXNHo2Z3djWUxjQW5KUm1QQkd4VWVKS0tzX3I2OTFseFY4cW5lMWVLUU5nU3dHVU96VEx1UFdpckNn?oc=5",
+    "sourceName": "TMX Newsfile",
+    "publishedDate": "2026-09-04",
+    "foundDate": "2026-09-06",
+    "autoDiscovered": true
+  },
+  {
+    "id": "news-b7a1fl",
+    "title": "Anthropic Launches Claude 5.1 with Reduced Safeguards and Lower Prices - Brief IA",
+    "description": "Anthropic Launches Claude 5.1 with Reduced Safeguards and Lower Prices&nbsp;&nbsp;Brief IA",
+    "institution": "Google",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQaWhta0JlWkVkR0FjcWpGbTBvcFd2ZVdsbHNXSXJ0UXh3VXRBTFZsUlBfZVVUSWJ1alN4T3ZFT25zZTV5bFM3bE4zRjlJdGw0cHVTTzN4NDZOVExuS2xzVE52LXl0QmZpYUp3SHlvdVhFQmMtd3VDM3VZSTg0UkpaNU5wZnFXQnRWVzd5Sm43YkFpQnF1LUZTaUtlOFZxbXZWODY2Mw?oc=5",
+    "sourceName": "Brief IA",
+    "publishedDate": "2026-09-02",
+    "foundDate": "2026-09-06",
+    "autoDiscovered": true
+  },
+  {
+    "id": "news-wwfdcg",
+    "title": "AI Week: Security, Chips, and Models Amid Incidents and Releases - Brief IA",
+    "description": "AI Week: Security, Chips, and Models Amid Incidents and Releases&nbsp;&nbsp;Brief IA",
+    "institution": "Google",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxOMDlQRDNkWTM0bnNBYTUzSHdnS1NCSGQ4M1BUbjViLUNlSEhMZFBpNDB3elNaMGNpTkZycmZFSGFBMzRRSWNMMUhxbDBQcml3UEdXdHJiMHNieXRYaExGVTZxRzVCTVBHUUlwSkhURTBpUk40VTZ3S19mZ0drQVlYWE9mMVVjaUFuMDlwYldfQ0N1V1BxOFg4NHJEemlUZw?oc=5",
+    "sourceName": "Brief IA",
+    "publishedDate": "2026-09-03",
+    "foundDate": "2026-09-06",
+    "autoDiscovered": true
+  },
+  {
+    "id": "news-z91kx2",
+    "title": "OpenAI: Concerns Over Astra's \"Opaque Recurrence\" - Brief IA",
+    "description": "OpenAI: Concerns Over Astra's \"Opaque Recurrence\"&nbsp;&nbsp;Brief IA",
+    "institution": "OpenAI",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxNZUJVQ2ZFRVFuYnBYNlJGZXdid2dCeEJWQ0NrMlFEVUtyNmpKMzQ0OXNwS2RKWmlFTEdteG5EQzlaNGdoRl9FOEpQajRaWndGaHJrNXpKbGVPemlZSlVUQXdQSW1pdGF0U2dfQUQ0bkJieU5pd2piZUlWTXZJLTQzbkkyZ2RuVG81X1ZWcFZ3?oc=5",
+    "sourceName": "Brief IA",
+    "publishedDate": "2026-09-03",
+    "foundDate": "2026-09-04",
+    "autoDiscovered": true,
+    "bottomLine": "OpenAI flags security concerns in Anthropic's Astra model regarding opaque recurrence mechanisms and potential vulnerabilities.",
+    "keyFindings": [
+      "OpenAI has publicly raised concerns about Astra's 'opaque recurrence' — unclear internal mechanisms that may hide vulnerabilities.",
+      "The concerns center on transparency and interpretability of how Astra processes and retains information across sessions.",
+      "This represents a competitive move by OpenAI to question rival Anthropic's safety and reliability claims in enterprise contexts."
+    ],
+    "whyItMatters": "Belgian universities and research institutes evaluating AI-assisted research platforms (like LeapSpace) need assurance that underlying LLM providers meet security and transparency standards; Scopus/ScienceDirect can position trustworthy, vetted-source integration as differentiator against less-transparent AI competitors.",
+    "impact": {
+      "novelty": 2,
+      "commercial": 3,
+      "threat": 2,
+      "urgency": 2
+    },
+    "entities": [
+      "OpenAI",
+      "Anthropic",
+      "Astra"
+    ],
+    "actionItems": [
+      "Audit LeapSpace's LLM transparency and safety certifications to position against these emerging trust concerns.",
+      "Prepare talking points for Flemish/Walloon institutions on Elsevier's AI governance and third-party security reviews.",
+      "Monitor OpenAI vs. Anthropic competitive claims to align Elsevier messaging with institutional procurement risk priorities."
     ],
     "sourceType": "secondary"
   },
@@ -144,41 +222,6 @@
       "Map published weather/climate research in Scopus linked to WeatherNext 3 and similar DeepMind outputs for bundled discovery pitches.",
       "Explore partnerships with Belgian environmental institutes to integrate weather datasets with ScienceDirect literature on climate adaptation.",
       "Monitor whether Google integrates research citations into WeatherNext outputs; if so, position Scopus as the scholarly validation layer."
-    ],
-    "sourceType": "secondary"
-  },
-  {
-    "id": "news-8lrv35",
-    "title": "When will Google release Gemini 3.5 Pro? - coinbase.com",
-    "description": "When will Google release Gemini 3.5 Pro?&nbsp;&nbsp;coinbase.com",
-    "institution": "Google",
-    "category": "competitor_announcements",
-    "categoryLabel": "Competitor Announcements",
-    "url": "https://news.google.com/rss/articles/CBMic0FVX3lxTE5zTmNwZFNYQmdDcFJ6QWV0VnhGRkRlOEdwN0EwcmplTkdFSXRtMC12YWN3S3BnNUxYN1BnYy0tQ0pWZFpxSmY2MFA1VjM0ZG5yeVpRRHoyM1dDeWR0cFJLOWlBMzN2V2o2b2JNZTlGemIxMGc?oc=5",
-    "sourceName": "coinbase.com",
-    "publishedDate": "2026-08-30",
-    "foundDate": "2026-09-04",
-    "autoDiscovered": true,
-    "bottomLine": "Speculation about Google's release timeline for Gemini 3.5 Pro, reflecting ongoing uncertainty around Google's generative AI roadmap and product velocity.",
-    "keyFindings": [
-      "The article is speculative commentary on when Google will release Gemini 3.5 Pro, not an official announcement.",
-      "No confirmed release date or feature set is disclosed; discussion centers on competitive timing vs. OpenAI and Anthropic.",
-      "The piece highlights how Google's AI product cadence and transparency are subjects of market speculation and analyst debate."
-    ],
-    "whyItMatters": "For Belgian research institutions evaluating AI-assisted research tools, Google's uncertain roadmap and lack of transparency (compared to announced models from OpenAI/Anthropic) reduce confidence in long-term product stability; Elsevier can position ScienceDirect/Scopus/LeapSpace as vendor-agnostic, not dependent on any single LLM provider's unpredictable release cycles.",
-    "impact": {
-      "novelty": 1,
-      "commercial": 1,
-      "threat": 1,
-      "urgency": 1
-    },
-    "entities": [
-      "Google",
-      "Gemini 3.5 Pro"
-    ],
-    "actionItems": [
-      "Monitor official Google AI announcements; avoid over-relying on speculation in competitive pitches.",
-      "Highlight Elsevier's multi-model LLM strategy for LeapSpace (not locked into single vendor) in risk-conscious institutional conversations."
     ],
     "sourceType": "secondary"
   },
