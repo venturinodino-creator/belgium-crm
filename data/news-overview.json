@@ -1,16 +1,15 @@
 {
-  "generatedAt": "2026-09-06T11:39:50.196Z",
-  "articleCount": 13,
-  "headline": "AI Giants Race to Enterprise Dominance Amid Security Wars and Capability Leaps",
-  "bottomLine": "OpenAI, Anthropic, and Google are competing fiercely on advanced models, enterprise data controls, and security features while defence/government sectors lock into vendor-specific platforms, signalling a shift away from neutral research…",
+  "generatedAt": "2026-09-07T13:30:28.234Z",
+  "articleCount": 15,
+  "headline": "AI Arms Race Pivots to Enterprise Trust: Agentic Systems, Data Control, Security Now Central",
+  "bottomLine": "Competitors are racing to embed autonomous AI agents into enterprise workflows while competing fiercely on data privacy, security safeguards, and cost—forcing research platforms to prove trustworthiness and integrate AI assistants that…",
   "keyFindings": [
-    "OpenAI (GPT-6 Astra), Anthropic (Claude 5.1, Enterprise Frontier Safeguards), and Google (Gemini 3.8 Flash) are all releasing high-capability models with competing enterprise security and…",
-    "Security and cybersecurity capabilities are now table-stakes differentiators: GPT-6 autonomous hacking potential, Gemini 3.8's threat-detection variants, and enterprise data-governance features are…",
-    "Government and defence procurement is moving directly to vendor AI platforms (OpenAI's ChatGPT Mil on GenAI.mil) rather than research-discovery intermediaries, reducing institutional reliance on…",
-    "Customer trust in data handling is rapidly shifting market dynamics: Anthropic's rollback of data retention and launch of customer-controlled safeguards show institutional buyers now demand explicit…",
-    "Commoditization of general-purpose LLMs is accelerating, pushing vendors toward specialized applications (weather forecasting, brand monitoring, security) and enterprise-grade compliance to justify…"
+    "OpenAI, Anthropic, and Google are releasing next-generation models (GPT-6 Astra, Claude 5.1, Gemini 3.8 Flash) with enterprise security and autonomous workflow features, signaling a shift from…",
+    "Data governance and customer-controlled retention have become competitive differentiators: Anthropic's policy rollback and new Enterprise Frontier Safeguards show institutions now demand transparent,…",
+    "Autonomous agent frameworks ('agentic AI workflows you can trust') are emerging as the next battleground; Digital Science's 2026 Catalyst Grant explicitly targets trustworthy agent systems, while…",
+    "Cybersecurity capabilities and responsible AI are now bundled into research models: OpenAI's $1B cybersecurity commitment and security-specific model variants reflect institutional demand for threat…"
   ],
-  "whyItMatters": "Belgian universities and research institutes face a critical infrastructure decision: as AI vendors consolidate market power through specialized models and enterprise lock-in (data governance, security certifications, sector-specific deployments), ScienceDirect/Scopus/LeapSpace must position as the neutral, privacy-first discovery and analytics layer that preserves institutional independence from any single AI…",
+  "whyItMatters": "Belgian research institutions evaluating ScienceDirect/Scopus/LeapSpace are now comparing not just content and citations, but AI assistant trustworthiness, data residency guarantees, and autonomous workflow safety. Competitors are aggressively positioning cost-optimized, privacy-first, security-hardened agents as research infrastructure.",
   "impact": {
     "novelty": 4,
     "commercial": 5,
@@ -21,16 +20,15 @@
     "OpenAI",
     "Anthropic",
     "Google DeepMind",
+    "Digital Science",
+    "Clarivate",
+    "Springer Nature",
     "GPT-6 Astra",
-    "Claude 5.1",
-    "Gemini 3.8 Flash",
-    "U.S. Department of War / GenAI.mil",
-    "Enterprise Frontier Safeguards"
+    "Claude 5.1"
   ],
   "actionItems": [
-    "Conduct urgent audit of Belgian institutional buyer concerns around data governance, vendor lock-in, and AI model sovereignty; benchmark Elsevier's transparency against Anthropic's…",
-    "Develop and communicate a clear 'research data independence' positioning for LeapSpace: explicitly define how it preserves institutional control over research datasets and integrates with (rather…",
-    "Identify and pre-engage Belgian defence research centres, government labs, and top-tier universities currently evaluating enterprise AI platforms; position Scopus/ScienceDirect as the trusted…",
-    "Fast-track competitive win/loss analysis on lost deals to OpenAI/Anthropic enterprise offerings in past 6 months; isolate whether losses were driven by capability gaps, pricing, or data-governance…"
+    "Audit LeapSpace's autonomous agent transparency and data-residency messaging against Anthropic Enterprise Frontier Safeguards and OpenAI's security commitments; prepare competitive positioning doc…",
+    "Identify and schedule pilots with 2–3 major Belgian universities or hospital networks to demonstrate LeapSpace's trustworthy AI workflows, focusing on researcher adoption friction vs.",
+    "Commission or refresh security/compliance certification (SOC 2, GDPR audit trail, customer data control) for LeapSpace and ScienceDirect to match competitor messaging; ensure sales collateral…"
   ]
 }
