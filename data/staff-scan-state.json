@@ -1,5 +1,5 @@
 {
-  "lastRun": "2026-09-06T11:46:14.870Z",
+  "lastRun": "2026-09-07T13:40:13.163Z",
   "lastAddedCount": 60,
   "sources": 38,
   "issues": [
@@ -40,25 +40,6 @@
       "note": "no people extracted"
     },
     {
-      "instId": "uclouvain",
-      "url": "https://uclouvain.be/fr/bibliotheques/service-central-des-bibliotheques",
-      "error": "fetch failed"
-    },
-    {
-      "instId": "uclouvain",
-      "url": "https://uclouvain.be/en/research/funding",
-      "error": "fetch failed"
-    },
-    {
-      "instId": "uclouvain",
-      "url": "https://uclouvain.be/en/research-institutes/icteam/data-science-and-artificial-intelligence",
-      "error": "fetch failed"
-    },
-    {
-      "instId": "uclouvain",
-      "note": "no people extracted"
-    },
-    {
       "instId": "umons",
       "url": "https://web.umons.ac.be/fr/universite/lumons-en-bref/structure-de-luniversite/administration/direction-archives-bibliotheques-dab/",
       "error": "fetch failed"
@@ -79,15 +60,6 @@
     },
     {
       "instId": "uzleuven",
-      "note": "no people extracted"
-    },
-    {
-      "instId": "uza",
-      "url": "https://www.uza.be/nl/organisatie-en-structuur",
-      "error": "HTTP 429"
-    },
-    {
-      "instId": "uza",
       "note": "no people extracted"
     },
     {
