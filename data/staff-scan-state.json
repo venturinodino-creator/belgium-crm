@@ -1,6 +1,6 @@
 {
-  "lastRun": "2026-09-07T13:40:13.163Z",
-  "lastAddedCount": 60,
+  "lastRun": "2026-09-08T12:17:27.337Z",
+  "lastAddedCount": 35,
   "sources": 38,
   "issues": [
     {
@@ -60,14 +60,6 @@
     },
     {
       "instId": "uzleuven",
-      "note": "no people extracted"
-    },
-    {
-      "instId": "kotk",
-      "note": "no people extracted"
-    },
-    {
-      "instId": "fondationcontrelecancer",
       "note": "no people extracted"
     }
   ]
