@@ -1,16 +1,40 @@
 [
   {
-    "id": "news-oqtzft",
-    "title": "Anthropic's Fable 5.1: Reduced Costs and Data Control - Brief IA",
-    "description": "Anthropic's Fable 5.1: Reduced Costs and Data Control&nbsp;&nbsp;Brief IA",
-    "institution": "Anthropic",
+    "id": "news-ryj6cr",
+    "title": "Intelligence artificielle : OpenAI lance GPT-6, son modèle le plus puissant et autonome capable de pirater des systèmes informatiques solidement protégés - Sud Ouest",
+    "description": "Intelligence artificielle : OpenAI lance GPT-6, son modèle le plus puissant et autonome capable de pirater des systèmes informatiques solidement protégés&nbsp;&nbsp;Sud Ouest",
+    "institution": "OpenAI",
     "category": "competitor_announcements",
     "categoryLabel": "Competitor Announcements",
-    "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxNY1FEVUZ4ZXhpRlZmVmVYcExiYzdVUUotaVJ6cHZiTXYxWmQyZENiNWpyVkVwMmFYMVFmRjB4bC13OTBya3RKQ1NRbFQwQVNWcmdnZjN5SEhJV2VTaWJHbFVGSERhSDB4SkQ4R1RXamhUNy1MRk1hOEVrQTdWQm1USWZfaUxJUXhsTS1oQVEtVmZSbTA0ZVEzMg?oc=5",
-    "sourceName": "Brief IA",
-    "publishedDate": "2026-09-01",
-    "foundDate": "2026-09-07",
-    "autoDiscovered": true
+    "url": "https://news.google.com/rss/articles/CBMi2AJBVV95cUxNOTNwcTdKQU42cmZMbFVwWHVJb3puWXJTaTM2bUVQSGpZbzBQb1NXZjlYczItYnF4YVlFQkVFOGNCbkNPRDBPYmd4TGhoOGgxNFg2ZURGOXRvcVpLUUhGeFJKNENRLUZySVRPeFAxSGtwN3R1TF9sRVFHSGt6YkwtSkhzZGdRdFBpNG1ha1V2a3doM3BJZUlmYWZVWlNUajh1Sk8ydllwZ25VajVLbW5rTlh5U0hBcjZ2eHFDRE5uUGMxQUFXbHlHdXZCTUR5Q2xjUWVZM2NNdmMzak5odVI0WENHbVVkWTdNbmVzNXNEY3RZWkNRTWlBZ2VfczJ5S2RreEhZWDRydFdEbzB2blN6eVFhcnh5bXFJdV9vLW9aejIzaGd4bFpBTEtHdWFvZHdoR1ZrQ1BKUk5sd2J4bDlFWDI3Y2hvRmZocHVrU3h0TFMycmFPQmV",
+    "sourceName": "Sud Ouest",
+    "publishedDate": "2026-09-03",
+    "foundDate": "2026-09-04",
+    "autoDiscovered": true,
+    "bottomLine": "OpenAI reportedly launches GPT-6 with advanced autonomous capabilities including potential cybersecurity and system-penetration functionalities.",
+    "keyFindings": [
+      "GPT-6 is described as OpenAI's most powerful and autonomous model yet, with unrestricted capabilities.",
+      "French reporting suggests GPT-6 can penetrate or 'hack' solidly protected computer systems — raising significant security and ethical questions.",
+      "The framing emphasizes autonomous decision-making and reduced human oversight compared to prior GPT versions."
+    ],
+    "whyItMatters": "Belgian research institutions and medical centres using AI-assisted research tools face regulatory and ethical scrutiny under GDPR and emerging AI Act; Elsevier must clearly communicate how ScienceDirect/Scopus/LeapSpace isolate research workflows from unrestricted autonomous AI, maintaining data integrity and compliance.",
+    "impact": {
+      "novelty": 3,
+      "commercial": 4,
+      "threat": 4,
+      "urgency": 4
+    },
+    "entities": [
+      "OpenAI",
+      "GPT-6",
+      "Sud Ouest"
+    ],
+    "actionItems": [
+      "Verify accuracy of GPT-6 cybersecurity claims and prepare compliance/risk mitigation documentation for Belgian compliance officers.",
+      "Design messaging emphasizing LeapSpace's sandboxed, audit-logged research environment vs. open-ended autonomous AI risks.",
+      "Proactively reach out to Université Libre de Bruxelles (ULB) and KU Leuven procurement teams to discuss AI governance."
+    ],
+    "sourceType": "secondary"
   },
   {
     "id": "news-s2702x",
@@ -22,19 +46,6 @@
     "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPVWpXcHM1VVN3Z3RwSGlrLWNDUDhReUE3MGo0OWpWdC1aMU05QUc5OF9JTTY4ajEyeThQWlRFOWpBdnYyMHhyUDZNUjF1ckRnVUt1N09nMDJzN1I1RzEybTVXd3hEdWdpVE5CVURpcG1uNEhUeUlfeG5nT2dNZHZxclVkSGhDQ0U0UkNsUFU2RGJrOW5GeUpqMk5lXzFnQjQ?oc=5",
     "sourceName": "Brief IA",
     "publishedDate": "2026-09-05",
-    "foundDate": "2026-09-07",
-    "autoDiscovered": true
-  },
-  {
-    "id": "news-ycjmp0",
-    "title": "Digital Science's 2026 Catalyst Grant Seeks \"Agentic AI Workflows You Can Trust\" - newsfilecorp.com",
-    "description": "Digital Science's 2026 Catalyst Grant Seeks \"Agentic AI Workflows You Can Trust\"&nbsp;&nbsp;newsfilecorp.com",
-    "institution": "Digital Science",
-    "category": "competitor_announcements",
-    "categoryLabel": "Competitor Announcements",
-    "url": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxPTjAzcEFENkh4SFJZNkJSVklKaEZFUzlMcnJORnYtaGNIUTlzX0JLNTZzclZZY0pmejE3N2N4bmhBNGs2ajRoUjVRSXAzZ0VpT3dwRXpzZzJoNW5mN1J0TW4walRMY1NFYWdGR05vX01FVmRvQVdKLVFlZzhmMGJyRnEwLS1SYXRPbkJBSFZwaVp0U1ZqTURTRmhwOVBEcXdzdy0yWFluTkpiQWtmdUhnUHpVbk5JS05BN2xnc0RUZEdPTHZVcExfdg?oc=5",
-    "sourceName": "newsfilecorp.com",
-    "publishedDate": "2026-09-01",
     "foundDate": "2026-09-07",
     "autoDiscovered": true
   },
@@ -73,43 +84,6 @@
       "Audit and document Elsevier's cybersecurity certifications (ISO 27001, SOC 2, GDPR compliance) for Belgian institutions.",
       "Prepare competitive brief comparing OpenAI's security model to ScienceDirect/Scopus data protection standards.",
       "Identify if any prospect institutions are in critical-infrastructure sectors (energy, healthcare, water) to emphasize LeapSpace security."
-    ],
-    "sourceType": "secondary"
-  },
-  {
-    "id": "news-ryj6cr",
-    "title": "Intelligence artificielle : OpenAI lance GPT-6, son modèle le plus puissant et autonome capable de pirater des systèmes informatiques solidement protégés - Sud Ouest",
-    "description": "Intelligence artificielle : OpenAI lance GPT-6, son modèle le plus puissant et autonome capable de pirater des systèmes informatiques solidement protégés&nbsp;&nbsp;Sud Ouest",
-    "institution": "OpenAI",
-    "category": "competitor_announcements",
-    "categoryLabel": "Competitor Announcements",
-    "url": "https://news.google.com/rss/articles/CBMi2AJBVV95cUxNOTNwcTdKQU42cmZMbFVwWHVJb3puWXJTaTM2bUVQSGpZbzBQb1NXZjlYczItYnF4YVlFQkVFOGNCbkNPRDBPYmd4TGhoOGgxNFg2ZURGOXRvcVpLUUhGeFJKNENRLUZySVRPeFAxSGtwN3R1TF9sRVFHSGt6YkwtSkhzZGdRdFBpNG1ha1V2a3doM3BJZUlmYWZVWlNUajh1Sk8ydllwZ25VajVLbW5rTlh5U0hBcjZ2eHFDRE5uUGMxQUFXbHlHdXZCTUR5Q2xjUWVZM2NNdmMzak5odVI0WENHbVVkWTdNbmVzNXNEY3RZWkNRTWlBZ2VfczJ5S2RreEhZWDRydFdEbzB2blN6eVFhcnh5bXFJdV9vLW9aejIzaGd4bFpBTEtHdWFvZHdoR1ZrQ1BKUk5sd2J4bDlFWDI3Y2hvRmZocHVrU3h0TFMycmFPQmV",
-    "sourceName": "Sud Ouest",
-    "publishedDate": "2026-09-03",
-    "foundDate": "2026-09-04",
-    "autoDiscovered": true,
-    "bottomLine": "OpenAI reportedly launches GPT-6 with advanced autonomous capabilities including potential cybersecurity and system-penetration functionalities.",
-    "keyFindings": [
-      "GPT-6 is described as OpenAI's most powerful and autonomous model yet, with unrestricted capabilities.",
-      "French reporting suggests GPT-6 can penetrate or 'hack' solidly protected computer systems — raising significant security and ethical questions.",
-      "The framing emphasizes autonomous decision-making and reduced human oversight compared to prior GPT versions."
-    ],
-    "whyItMatters": "Belgian research institutions and medical centres using AI-assisted research tools face regulatory and ethical scrutiny under GDPR and emerging AI Act; Elsevier must clearly communicate how ScienceDirect/Scopus/LeapSpace isolate research workflows from unrestricted autonomous AI, maintaining data integrity and compliance.",
-    "impact": {
-      "novelty": 3,
-      "commercial": 4,
-      "threat": 4,
-      "urgency": 4
-    },
-    "entities": [
-      "OpenAI",
-      "GPT-6",
-      "Sud Ouest"
-    ],
-    "actionItems": [
-      "Verify accuracy of GPT-6 cybersecurity claims and prepare compliance/risk mitigation documentation for Belgian compliance officers.",
-      "Design messaging emphasizing LeapSpace's sandboxed, audit-logged research environment vs. open-ended autonomous AI risks.",
-      "Proactively reach out to Université Libre de Bruxelles (ULB) and KU Leuven procurement teams to discuss AI governance."
     ],
     "sourceType": "secondary"
   },
@@ -341,43 +315,6 @@
     "sourceType": "secondary"
   },
   {
-    "id": "news-x7wqpz",
-    "title": "Anthropic Reportedly Rolls Back Data Retention Policy After Customer Pushback — It Also Launches New Claude Models - TradingView",
-    "description": "Anthropic Reportedly Rolls Back Data Retention Policy After Customer Pushback — It Also Launches New Claude Models&nbsp;&nbsp;TradingView",
-    "institution": "Google",
-    "category": "competitor_announcements",
-    "categoryLabel": "Competitor Announcements",
-    "url": "https://news.google.com/rss/articles/CBMiggJBVV95cUxQR2Z4MDFHWDFJbGRKQ2ItalZDdW1NRzU0cktWSHk5SDBWT0xTd3I4bi1vY1locG13VU1uVjZwMHBKaVAxRHlsMDJZZG13SHRPTnhiSUlqUU1pUWQ1WXo0aS1kek1LWlBNbUVwc184WDYwZndtdGJmUWMxS0tPWW9QTkNfWm1TOU1JTVdjZGladEU1WE1CVTU0cDhhYXRpTENUODJJVXZZdDJUN2s1UzN6RHZQX25TbmdNWFRtcVR6ekdEalJ4QnRNa21BWGl1YXY1ZFE4MDRZTmg4Qk1tZUdfelctWG1ncHZtN2dlOGN5VG5oUUNubU9uRVYxUHJBS3FyRGc?oc=5",
-    "sourceName": "TradingView",
-    "publishedDate": "2026-09-01",
-    "foundDate": "2026-09-04",
-    "autoDiscovered": true,
-    "bottomLine": "Anthropic rolls back data retention policy following customer backlash, then launches new Claude models with refined privacy guardrails.",
-    "keyFindings": [
-      "Anthropic reversed a data retention policy after institutional customers objected to longer data storage windows.",
-      "The rollback signals customer demand for stricter data minimization and privacy-by-design in enterprise AI tools.",
-      "New Claude models accompanied the policy shift, suggesting Anthropic is repositioning on privacy and compliance as competitive advantage."
-    ],
-    "whyItMatters": "European research institutions (especially under GDPR Article 5 — data minimization) will view Anthropic's policy reversal as validation of privacy concerns; Elsevier can reinforce that ScienceDirect/Scopus/LeapSpace maintain native EU data residency and strict retention policies, making them safer for sensitive research metadata.",
-    "impact": {
-      "novelty": 2,
-      "commercial": 3,
-      "threat": 3,
-      "urgency": 3
-    },
-    "entities": [
-      "Anthropic",
-      "Claude",
-      "Data retention policy"
-    ],
-    "actionItems": [
-      "Audit and document Elsevier's data retention, residency, and GDPR compliance across ScienceDirect/Scopus/LeapSpace for Belgian institution RFPs.",
-      "Develop case study or white paper on how Elsevier's EU data practices compare to US-based AI rivals facing similar rollbacks.",
-      "Flag Anthropic's policy reversal as proof-point in competitive pitches: 'Even leading AI labs are tightening privacy after customer pushback.'"
-    ],
-    "sourceType": "secondary"
-  },
-  {
     "id": "news-8of6hx",
     "title": "Google DeepMind lance WeatherNext 3 avec des prévisions horaires à 5 kilomètres - unite.ai",
     "description": "Google DeepMind lance WeatherNext 3 avec des prévisions horaires à 5 kilomètres&nbsp;&nbsp;unite.ai",
@@ -448,47 +385,6 @@
       "Identify Belgian cybersecurity and medical research centres; develop specialized LeapSpace messaging on researcher safety and institutional data isolation.",
       "Prepare comparison of LeapSpace's internal threat-intelligence literature indexing vs. external GenAI tools that could leak institutional queries.",
       "Monitor Gemini variants for domain-specific research applications; consider similar specialty configurations for LeapSpace (e.g., health-research, policy-analysis modes)."
-    ],
-    "sourceType": "secondary"
-  },
-  {
-    "id": "news-hvy087",
-    "title": "Anthropic annonce les Enterprise Frontier Safeguards, données détenues par le client - Unite.AI",
-    "description": "Anthropic annonce les Enterprise Frontier Safeguards, données détenues par le client&nbsp;&nbsp;Unite.AI",
-    "institution": "Anthropic",
-    "category": "competitor_announcements",
-    "categoryLabel": "Competitor Announcements",
-    "url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxQUktLVVI4TW5kQ0dtVTBQdEZBbHU2ZVVKVTJnVXNwcnFNcGE4RWdITjN4RV91TnpjUFJCMnk1Zzl1ejJDLWpPcG5wLUIzY1F4SUtHdDVQRTRKOTIzQmd0MFlVczI2eFo3dEktOFBjanNGMERNN1M5NGNSb0xFZ0FIQ24yTnhDd2hZR3NkR0p2MUY5M2JRUDVMWE13?oc=5",
-    "sourceName": "Unite.AI",
-    "publishedDate": "2026-09-01",
-    "foundDate": "2026-09-02",
-    "autoDiscovered": true,
-    "bottomLine": "Anthropic launches enterprise AI safeguards with customer-controlled data retention, raising stakes for secure research infrastructure adoption.",
-    "keyFindings": [
-      "Anthropic introduces Enterprise Frontier Safeguards for customer data ownership and control in AI-assisted research workflows.",
-      "Data retention policies now customer-controlled, addressing regulatory and privacy concerns for institutional deployments.",
-      "Enterprise offering targets organizations seeking compliance-first AI tools for sensitive research and sensitive operations.",
-      "Move positions Anthropic as a trusted alternative to consumer AI platforms in regulated institutional environments."
-    ],
-    "whyItMatters": "Belgian universities and medical centres prioritizing GDPR and data sovereignty will see this as a competitive pressure point—LeapSpace must clarify its own data governance and sovereignty guarantees to remain viable for institutions handling sensitive research data.",
-    "impact": {
-      "novelty": 3,
-      "commercial": 4,
-      "threat": 4,
-      "urgency": 4
-    },
-    "entities": [
-      "Anthropic",
-      "Enterprise Frontier Safeguards",
-      "Claude",
-      "Unite.AI",
-      "GDPR",
-      "Customer-controlled data retention"
-    ],
-    "actionItems": [
-      "Audit and document LeapSpace's data residency, retention, and deletion policies for Belgian/EU institutions; prepare comparison sheet vs. Anthropic.",
-      "Prepare use-case story showing Scopus + LeapSpace compliance advantage for medical centres handling patient-linked research metadata.",
-      "Schedule discovery calls with Vlaams universities IT/compliance leads to identify data governance concerns blocking AI workspace adoption."
     ],
     "sourceType": "secondary"
   }

@@ -1,15 +1,15 @@
 {
-  "lastRun": "2026-09-07T13:30:28.235Z",
-  "lastAddedCount": 3,
-  "lastCandidateCount": 3,
-  "lastArchivedCount": 1,
-  "lastBackfilledCount": 6,
-  "lastOverviewGenerated": true,
+  "lastRun": "2026-09-08T12:08:52.936Z",
+  "lastAddedCount": 2,
+  "lastCandidateCount": 2,
+  "lastArchivedCount": 4,
+  "lastBackfilledCount": 0,
+  "lastOverviewGenerated": false,
   "candidateCounts": {
-    "ai_adoption": 92,
-    "funding": 29,
-    "policy": 6,
-    "competitor_announcements": 116
+    "ai_adoption": 104,
+    "funding": 32,
+    "policy": 5,
+    "competitor_announcements": 123
   },
   "source": "Google News RSS (discovery) + Claude Haiku (Elsevier-relevance filter + overview synthesis)"
 }

@@ -1,5 +1,109 @@
 [
   {
+    "id": "news-hvy087",
+    "title": "Anthropic annonce les Enterprise Frontier Safeguards, données détenues par le client - Unite.AI",
+    "description": "Anthropic annonce les Enterprise Frontier Safeguards, données détenues par le client&nbsp;&nbsp;Unite.AI",
+    "institution": "Anthropic",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxQUktLVVI4TW5kQ0dtVTBQdEZBbHU2ZVVKVTJnVXNwcnFNcGE4RWdITjN4RV91TnpjUFJCMnk1Zzl1ejJDLWpPcG5wLUIzY1F4SUtHdDVQRTRKOTIzQmd0MFlVczI2eFo3dEktOFBjanNGMERNN1M5NGNSb0xFZ0FIQ24yTnhDd2hZR3NkR0p2MUY5M2JRUDVMWE13?oc=5",
+    "sourceName": "Unite.AI",
+    "publishedDate": "2026-09-01",
+    "foundDate": "2026-09-02",
+    "autoDiscovered": true,
+    "bottomLine": "Anthropic launches enterprise AI safeguards with customer-controlled data retention, raising stakes for secure research infrastructure adoption.",
+    "keyFindings": [
+      "Anthropic introduces Enterprise Frontier Safeguards for customer data ownership and control in AI-assisted research workflows.",
+      "Data retention policies now customer-controlled, addressing regulatory and privacy concerns for institutional deployments.",
+      "Enterprise offering targets organizations seeking compliance-first AI tools for sensitive research and sensitive operations.",
+      "Move positions Anthropic as a trusted alternative to consumer AI platforms in regulated institutional environments."
+    ],
+    "whyItMatters": "Belgian universities and medical centres prioritizing GDPR and data sovereignty will see this as a competitive pressure point—LeapSpace must clarify its own data governance and sovereignty guarantees to remain viable for institutions handling sensitive research data.",
+    "impact": {
+      "novelty": 3,
+      "commercial": 4,
+      "threat": 4,
+      "urgency": 4
+    },
+    "entities": [
+      "Anthropic",
+      "Enterprise Frontier Safeguards",
+      "Claude",
+      "Unite.AI",
+      "GDPR",
+      "Customer-controlled data retention"
+    ],
+    "actionItems": [
+      "Audit and document LeapSpace's data residency, retention, and deletion policies for Belgian/EU institutions; prepare comparison sheet vs. Anthropic.",
+      "Prepare use-case story showing Scopus + LeapSpace compliance advantage for medical centres handling patient-linked research metadata.",
+      "Schedule discovery calls with Vlaams universities IT/compliance leads to identify data governance concerns blocking AI workspace adoption."
+    ],
+    "sourceType": "secondary"
+  },
+  {
+    "id": "news-x7wqpz",
+    "title": "Anthropic Reportedly Rolls Back Data Retention Policy After Customer Pushback — It Also Launches New Claude Models - TradingView",
+    "description": "Anthropic Reportedly Rolls Back Data Retention Policy After Customer Pushback — It Also Launches New Claude Models&nbsp;&nbsp;TradingView",
+    "institution": "Google",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMiggJBVV95cUxQR2Z4MDFHWDFJbGRKQ2ItalZDdW1NRzU0cktWSHk5SDBWT0xTd3I4bi1vY1locG13VU1uVjZwMHBKaVAxRHlsMDJZZG13SHRPTnhiSUlqUU1pUWQ1WXo0aS1kek1LWlBNbUVwc184WDYwZndtdGJmUWMxS0tPWW9QTkNfWm1TOU1JTVdjZGladEU1WE1CVTU0cDhhYXRpTENUODJJVXZZdDJUN2s1UzN6RHZQX25TbmdNWFRtcVR6ekdEalJ4QnRNa21BWGl1YXY1ZFE4MDRZTmg4Qk1tZUdfelctWG1ncHZtN2dlOGN5VG5oUUNubU9uRVYxUHJBS3FyRGc?oc=5",
+    "sourceName": "TradingView",
+    "publishedDate": "2026-09-01",
+    "foundDate": "2026-09-04",
+    "autoDiscovered": true,
+    "bottomLine": "Anthropic rolls back data retention policy following customer backlash, then launches new Claude models with refined privacy guardrails.",
+    "keyFindings": [
+      "Anthropic reversed a data retention policy after institutional customers objected to longer data storage windows.",
+      "The rollback signals customer demand for stricter data minimization and privacy-by-design in enterprise AI tools.",
+      "New Claude models accompanied the policy shift, suggesting Anthropic is repositioning on privacy and compliance as competitive advantage."
+    ],
+    "whyItMatters": "European research institutions (especially under GDPR Article 5 — data minimization) will view Anthropic's policy reversal as validation of privacy concerns; Elsevier can reinforce that ScienceDirect/Scopus/LeapSpace maintain native EU data residency and strict retention policies, making them safer for sensitive research metadata.",
+    "impact": {
+      "novelty": 2,
+      "commercial": 3,
+      "threat": 3,
+      "urgency": 3
+    },
+    "entities": [
+      "Anthropic",
+      "Claude",
+      "Data retention policy"
+    ],
+    "actionItems": [
+      "Audit and document Elsevier's data retention, residency, and GDPR compliance across ScienceDirect/Scopus/LeapSpace for Belgian institution RFPs.",
+      "Develop case study or white paper on how Elsevier's EU data practices compare to US-based AI rivals facing similar rollbacks.",
+      "Flag Anthropic's policy reversal as proof-point in competitive pitches: 'Even leading AI labs are tightening privacy after customer pushback.'"
+    ],
+    "sourceType": "secondary"
+  },
+  {
+    "id": "news-ycjmp0",
+    "title": "Digital Science's 2026 Catalyst Grant Seeks \"Agentic AI Workflows You Can Trust\" - newsfilecorp.com",
+    "description": "Digital Science's 2026 Catalyst Grant Seeks \"Agentic AI Workflows You Can Trust\"&nbsp;&nbsp;newsfilecorp.com",
+    "institution": "Digital Science",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxPTjAzcEFENkh4SFJZNkJSVklKaEZFUzlMcnJORnYtaGNIUTlzX0JLNTZzclZZY0pmejE3N2N4bmhBNGs2ajRoUjVRSXAzZ0VpT3dwRXpzZzJoNW5mN1J0TW4walRMY1NFYWdGR05vX01FVmRvQVdKLVFlZzhmMGJyRnEwLS1SYXRPbkJBSFZwaVp0U1ZqTURTRmhwOVBEcXdzdy0yWFluTkpiQWtmdUhnUHpVbk5JS05BN2xnc0RUZEdPTHZVcExfdg?oc=5",
+    "sourceName": "newsfilecorp.com",
+    "publishedDate": "2026-09-01",
+    "foundDate": "2026-09-07",
+    "autoDiscovered": true
+  },
+  {
+    "id": "news-oqtzft",
+    "title": "Anthropic's Fable 5.1: Reduced Costs and Data Control - Brief IA",
+    "description": "Anthropic's Fable 5.1: Reduced Costs and Data Control&nbsp;&nbsp;Brief IA",
+    "institution": "Anthropic",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxNY1FEVUZ4ZXhpRlZmVmVYcExiYzdVUUotaVJ6cHZiTXYxWmQyZENiNWpyVkVwMmFYMVFmRjB4bC13OTBya3RKQ1NRbFQwQVNWcmdnZjN5SEhJV2VTaWJHbFVGSERhSDB4SkQ4R1RXamhUNy1MRk1hOEVrQTdWQm1USWZfaUxJUXhsTS1oQVEtVmZSbTA0ZVEzMg?oc=5",
+    "sourceName": "Brief IA",
+    "publishedDate": "2026-09-01",
+    "foundDate": "2026-09-07",
+    "autoDiscovered": true
+  },
+  {
     "id": "news-um8rf3",
     "title": "Department of War lance ChatGPT Mil d’OpenAI sur GenAI.mil - Unite.AI",
     "description": "Department of War lance ChatGPT Mil d’OpenAI sur GenAI.mil&nbsp;&nbsp;Unite.AI",
