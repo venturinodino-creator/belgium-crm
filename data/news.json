@@ -37,6 +37,32 @@
     "sourceType": "secondary"
   },
   {
+    "id": "news-gpgv2p",
+    "title": "Son modèle d’IA le plus puissant | OpenAI lance GPT-6 Astra - La Presse",
+    "description": "Son modèle d’IA le plus puissant | OpenAI lance GPT-6 Astra&nbsp;&nbsp;La Presse",
+    "institution": "OpenAI",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxNNFpSUDY4VE5teUlnTnlUXy14bDVQWVpLV0pORmNnQUc2RWxmUENFVkpiZnhMcnJEUE1OajhqcDBZa21uYWVpRHJVNUtIZDQ5cEctNHlfZGJnYXlOalduWVNyTWRhQmI3NThCR3JTZjJJRlBQejF3ZDVoRk8wYlgyS1NrYm11X09fXy1KMF9iT2JtSFJfYzZneG05WFhUeGg3TG9KYnUtZ3Ffai1rNFdBT2ln?oc=5",
+    "sourceName": "La Presse",
+    "publishedDate": "2026-09-03",
+    "foundDate": "2026-09-09",
+    "autoDiscovered": true
+  },
+  {
+    "id": "news-xmtpsd",
+    "title": "OpenAI lance GPT-6 Astra : une IA avancée pour les entreprises et les particuliers - Actualités et statistiques - IndexBox",
+    "description": "OpenAI lance GPT-6 Astra : une IA avancée pour les entreprises et les particuliers - Actualités et statistiques&nbsp;&nbsp;IndexBox",
+    "institution": "OpenAI",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxQMnhKVTMtbkJxYVphbHdCelFxWW45ejJub2w1ZW5QS3dPUnE0ampNdzF2NW1uZUs0X0lEWkRKZzk3TDBiT1FTaWFQR2hSQTZoNWVESzE5UnBuTEdVb2ktY3NPQnp5S25Qc3JOcGJOb2JnRjRsVl9qVGgxMHRWN2NkNmpKV0lGZEt2eC16eExB?oc=5",
+    "sourceName": "IndexBox",
+    "publishedDate": "2026-09-03",
+    "foundDate": "2026-09-09",
+    "autoDiscovered": true
+  },
+  {
     "id": "news-s2702x",
     "title": "OpenAI Agents: Incidents and Calls for Independent Investigations - Brief IA",
     "description": "OpenAI Agents: Incidents and Calls for Independent Investigations&nbsp;&nbsp;Brief IA",
@@ -202,43 +228,6 @@
     "sourceType": "secondary"
   },
   {
-    "id": "news-b7a1fl",
-    "title": "Anthropic Launches Claude 5.1 with Reduced Safeguards and Lower Prices - Brief IA",
-    "description": "Anthropic Launches Claude 5.1 with Reduced Safeguards and Lower Prices&nbsp;&nbsp;Brief IA",
-    "institution": "Google",
-    "category": "competitor_announcements",
-    "categoryLabel": "Competitor Announcements",
-    "url": "https://news.google.com/rss/articles/CBMipAFBVV95cUxQaWhta0JlWkVkR0FjcWpGbTBvcFd2ZVdsbHNXSXJ0UXh3VXRBTFZsUlBfZVVUSWJ1alN4T3ZFT25zZTV5bFM3bE4zRjlJdGw0cHVTTzN4NDZOVExuS2xzVE52LXl0QmZpYUp3SHlvdVhFQmMtd3VDM3VZSTg0UkpaNU5wZnFXQnRWVzd5Sm43YkFpQnF1LUZTaUtlOFZxbXZWODY2Mw?oc=5",
-    "sourceName": "Brief IA",
-    "publishedDate": "2026-09-02",
-    "foundDate": "2026-09-06",
-    "autoDiscovered": true,
-    "bottomLine": "Anthropic launches Claude 5.1 with reduced safeguards and lower prices, competing aggressively on cost and accessibility.",
-    "keyFindings": [
-      "Anthropic releases Claude 5.1 with relaxed content-safety guardrails.",
-      "Significant price reduction to increase market penetration and usage.",
-      "Strategy emphasizes accessibility and user freedom over restrictive AI governance.",
-      "Direct competitive move against OpenAI's pricing and safety-first positioning."
-    ],
-    "whyItMatters": "Budget-conscious Belgian institutions may be tempted by cheaper AI tools; Elsevier must emphasize that cutting guardrails risks research integrity (misinformation, plagiarism, citation fraud), making ScienceDirect/Scopus/LeapSpace's rigorous editorial standards and built-in claim-checking essential for academic credibility.",
-    "impact": {
-      "novelty": 3,
-      "commercial": 3,
-      "threat": 3,
-      "urgency": 3
-    },
-    "entities": [
-      "Anthropic",
-      "Claude 5.1"
-    ],
-    "actionItems": [
-      "Prepare risk briefing: 'The hidden cost of unguarded AI in research—integrity failures, retracted papers, institutional liability.'",
-      "Develop ROI calculator showing how LeapSpace's guardrails (claim-checking, deep research reports) prevent costly research errors.",
-      "Pitch Elsevier's trust-by-design approach as essential for research ethics compliance in Belgian institutions."
-    ],
-    "sourceType": "secondary"
-  },
-  {
     "id": "news-wwfdcg",
     "title": "AI Week: Security, Chips, and Models Amid Incidents and Releases - Brief IA",
     "description": "AI Week: Security, Chips, and Models Amid Incidents and Releases&nbsp;&nbsp;Brief IA",
@@ -348,43 +337,6 @@
       "Map published weather/climate research in Scopus linked to WeatherNext 3 and similar DeepMind outputs for bundled discovery pitches.",
       "Explore partnerships with Belgian environmental institutes to integrate weather datasets with ScienceDirect literature on climate adaptation.",
       "Monitor whether Google integrates research citations into WeatherNext outputs; if so, position Scopus as the scholarly validation layer."
-    ],
-    "sourceType": "secondary"
-  },
-  {
-    "id": "news-9mo1n4",
-    "title": "Google lance Gemini 3.8 Flash avec variante de cybersécurité - unite.ai",
-    "description": "Google lance Gemini 3.8 Flash avec variante de cybersécurité&nbsp;&nbsp;unite.ai",
-    "institution": "Google",
-    "category": "competitor_announcements",
-    "categoryLabel": "Competitor Announcements",
-    "url": "https://news.google.com/rss/articles/CBMijAFBVV95cUxPN01VYzNnWjVtRUltUGh0QmFOVWJSX3I4MmM5NjM5dk1XNXp0ajRVaXREYnF0NklvMnNMc1M5X3dqNWNwUS1vOG5meFlTZHFwaHYzWEJxdXpfZEI2N3g3OC1yTkFuc2s0eEg5R2JHbzUyTjBCakhjYXJhLWdMZXFuN0dhek9oaVJWei13Qg?oc=5",
-    "sourceName": "unite.ai",
-    "publishedDate": "2026-09-02",
-    "foundDate": "2026-09-04",
-    "autoDiscovered": true,
-    "bottomLine": "Google launches Gemini 3.8 Flash with cybersecurity-specific variant, advancing AI capabilities for threat detection and security research applications.",
-    "keyFindings": [
-      "Gemini 3.8 Flash is released with a specialized cybersecurity variant optimized for threat detection and security use cases.",
-      "The model targets enterprise and research security teams needing rapid, focused AI inference for vulnerability assessment and incident response.",
-      "Variant models indicate Google's strategy to differentiate LLMs by vertical (security, healthcare, science) rather than one-size-fits-all approaches."
-    ],
-    "whyItMatters": "Belgian cybersecurity research groups (e.g., KU Leuven's DistriNet, imec) and medical institutions (UZ Gent, UZ Leuven) need secure, compliant AI tools; Elsevier can emphasize how ScienceDirect/Scopus/LeapSpace integrate threat intelligence literature, funded research, and researcher networks without exposing institutional data to external AI systems like Google's open Gemini.",
-    "impact": {
-      "novelty": 2,
-      "commercial": 2,
-      "threat": 2,
-      "urgency": 2
-    },
-    "entities": [
-      "Google",
-      "Gemini 3.8 Flash",
-      "Cybersecurity variant"
-    ],
-    "actionItems": [
-      "Identify Belgian cybersecurity and medical research centres; develop specialized LeapSpace messaging on researcher safety and institutional data isolation.",
-      "Prepare comparison of LeapSpace's internal threat-intelligence literature indexing vs. external GenAI tools that could leak institutional queries.",
-      "Monitor Gemini variants for domain-specific research applications; consider similar specialty configurations for LeapSpace (e.g., health-research, policy-analysis modes)."
     ],
     "sourceType": "secondary"
   }
