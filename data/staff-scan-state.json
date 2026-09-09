@@ -1,16 +1,11 @@
 {
-  "lastRun": "2026-09-08T12:17:27.337Z",
-  "lastAddedCount": 35,
+  "lastRun": "2026-09-09T12:28:46.460Z",
+  "lastAddedCount": 0,
   "sources": 38,
   "issues": [
     {
       "instId": "vib",
       "note": "no people extracted"
-    },
-    {
-      "instId": "solvay",
-      "url": "https://solvayinstitutes.be/home/mission/board-of-directors/",
-      "error": "HTTP 429"
     },
     {
       "instId": "royalacademiesbelgium",
