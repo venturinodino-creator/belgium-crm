@@ -1,17 +1,17 @@
 {
-  "lastRun": "2026-09-09T12:01:07.706Z",
+  "lastRun": "2026-09-10T11:55:18.988Z",
   "totalOpenRoles": 2,
   "perCompanyCounts": {
     "Digital Science": {
-      "total": 6,
+      "total": 2,
       "nl": 0
     },
     "Allen Institute for AI": {
-      "total": 22,
+      "total": 24,
       "nl": 0
     },
     "Clarivate": {
-      "total": 175,
+      "total": 174,
       "nl": 2
     }
   },
