@@ -1,5 +1,219 @@
 [
   {
+    "id": "news-8of6hx",
+    "title": "Google DeepMind lance WeatherNext 3 avec des prévisions horaires à 5 kilomètres - unite.ai",
+    "description": "Google DeepMind lance WeatherNext 3 avec des prévisions horaires à 5 kilomètres&nbsp;&nbsp;unite.ai",
+    "institution": "Google",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxPdV9RNFE0djVnYzQwNzBZanZ5MGVJRE5SbGdUdDMtWEZ3Smh4dl9sOEpRSTdVLXc0VEpBQjNwejZBTy1ETWdsRC1WTlYzS0VsbWs5dG52RTdNbWZMckxzS2NsTXhMZDNoTmdUaGxQSjNmQWF3cWZBSVNsY1dZa3lLUFBOV2hxZU5kVWFlZVFraldLTHFHYVpQb3BYbWU0Zw?oc=5",
+    "sourceName": "unite.ai",
+    "publishedDate": "2026-09-03",
+    "foundDate": "2026-09-04",
+    "autoDiscovered": true,
+    "bottomLine": "Google DeepMind releases WeatherNext 3 with hourly forecasts at 5-km resolution, advancing climate and weather-prediction research capabilities.",
+    "keyFindings": [
+      "WeatherNext 3 provides hyper-localized weather predictions at 5-kilometre spatial resolution and hourly temporal granularity.",
+      "This capability is relevant to climate science, environmental research, and agricultural studies conducted at Belgian universities.",
+      "Google DeepMind's focus on environmental ML models represents competition for Elsevier in hosting/surfacing cutting-edge research tools and datasets."
+    ],
+    "whyItMatters": "Belgian climate, environmental, and agricultural research communities (e.g., Vrije Universiteit Brussel, Ghent University) now have direct access to Google's proprietary weather models; Scopus/LeapSpace must curate and link related published research, funding, and collaborators to position Elsevier as the scholarly context layer, not just indexer.",
+    "impact": {
+      "novelty": 3,
+      "commercial": 2,
+      "threat": 2,
+      "urgency": 2
+    },
+    "entities": [
+      "Google DeepMind",
+      "WeatherNext 3",
+      "Climate research"
+    ],
+    "actionItems": [
+      "Map published weather/climate research in Scopus linked to WeatherNext 3 and similar DeepMind outputs for bundled discovery pitches.",
+      "Explore partnerships with Belgian environmental institutes to integrate weather datasets with ScienceDirect literature on climate adaptation.",
+      "Monitor whether Google integrates research citations into WeatherNext outputs; if so, position Scopus as the scholarly validation layer."
+    ],
+    "sourceType": "secondary"
+  },
+  {
+    "id": "news-z91kx2",
+    "title": "OpenAI: Concerns Over Astra's \"Opaque Recurrence\" - Brief IA",
+    "description": "OpenAI: Concerns Over Astra's \"Opaque Recurrence\"&nbsp;&nbsp;Brief IA",
+    "institution": "OpenAI",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxNZUJVQ2ZFRVFuYnBYNlJGZXdid2dCeEJWQ0NrMlFEVUtyNmpKMzQ0OXNwS2RKWmlFTEdteG5EQzlaNGdoRl9FOEpQajRaWndGaHJrNXpKbGVPemlZSlVUQXdQSW1pdGF0U2dfQUQ0bkJieU5pd2piZUlWTXZJLTQzbkkyZ2RuVG81X1ZWcFZ3?oc=5",
+    "sourceName": "Brief IA",
+    "publishedDate": "2026-09-03",
+    "foundDate": "2026-09-04",
+    "autoDiscovered": true,
+    "bottomLine": "OpenAI flags security concerns in Anthropic's Astra model regarding opaque recurrence mechanisms and potential vulnerabilities.",
+    "keyFindings": [
+      "OpenAI has publicly raised concerns about Astra's 'opaque recurrence' — unclear internal mechanisms that may hide vulnerabilities.",
+      "The concerns center on transparency and interpretability of how Astra processes and retains information across sessions.",
+      "This represents a competitive move by OpenAI to question rival Anthropic's safety and reliability claims in enterprise contexts."
+    ],
+    "whyItMatters": "Belgian universities and research institutes evaluating AI-assisted research platforms (like LeapSpace) need assurance that underlying LLM providers meet security and transparency standards; Scopus/ScienceDirect can position trustworthy, vetted-source integration as differentiator against less-transparent AI competitors.",
+    "impact": {
+      "novelty": 2,
+      "commercial": 3,
+      "threat": 2,
+      "urgency": 2
+    },
+    "entities": [
+      "OpenAI",
+      "Anthropic",
+      "Astra"
+    ],
+    "actionItems": [
+      "Audit LeapSpace's LLM transparency and safety certifications to position against these emerging trust concerns.",
+      "Prepare talking points for Flemish/Walloon institutions on Elsevier's AI governance and third-party security reviews.",
+      "Monitor OpenAI vs. Anthropic competitive claims to align Elsevier messaging with institutional procurement risk priorities."
+    ],
+    "sourceType": "secondary"
+  },
+  {
+    "id": "news-wwfdcg",
+    "title": "AI Week: Security, Chips, and Models Amid Incidents and Releases - Brief IA",
+    "description": "AI Week: Security, Chips, and Models Amid Incidents and Releases&nbsp;&nbsp;Brief IA",
+    "institution": "Google",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxOMDlQRDNkWTM0bnNBYTUzSHdnS1NCSGQ4M1BUbjViLUNlSEhMZFBpNDB3elNaMGNpTkZycmZFSGFBMzRRSWNMMUhxbDBQcml3UEdXdHJiMHNieXRYaExGVTZxRzVCTVBHUUlwSkhURTBpUk40VTZ3S19mZ0drQVlYWE9mMVVjaUFuMDlwYldfQ0N1V1BxOFg4NHJEemlUZw?oc=5",
+    "sourceName": "Brief IA",
+    "publishedDate": "2026-09-03",
+    "foundDate": "2026-09-06",
+    "autoDiscovered": true,
+    "bottomLine": "Weekly AI digest covering security incidents, chip advances, and model releases—signals accelerating competition across multiple fronts.",
+    "keyFindings": [
+      "Multiple AI incidents and security concerns reported alongside product launches.",
+      "Chip innovation and model capability improvements advancing in parallel.",
+      "Competitive landscape becoming more fragmented and fast-moving.",
+      "Security and safety emerge as recurring themes in enterprise AI adoption."
+    ],
+    "whyItMatters": "Belgian institutions face whiplash from rapid AI innovation; this reinforces Elsevier's value proposition: ScienceDirect/Scopus/LeapSpace integrate peer-reviewed, curated research intelligence with AI—reducing misinformation risk and ensuring institutions stay evidence-based amid vendor hype and security concerns.",
+    "impact": {
+      "novelty": 1,
+      "commercial": 3,
+      "threat": 3,
+      "urgency": 4
+    },
+    "entities": [
+      "OpenAI",
+      "Anthropic",
+      "Google Gemini",
+      "AI security ecosystem"
+    ],
+    "actionItems": [
+      "Create monthly 'AI Landscape Brief' highlighting how Elsevier tools provide stable, curated research intelligence amid vendor volatility.",
+      "Develop prospect messaging: 'In a chaotic AI market, institutions need trusted, peer-reviewed information sources—that's us.'",
+      "Use security/incident news as hook to schedule discovery calls with Belgian university CIOs and research directors."
+    ],
+    "sourceType": "secondary"
+  },
+  {
+    "id": "news-o9emj9",
+    "title": "OpenAI Launches GPT-6 Astra As AI Race Intensifies — Calls It A ‘Generational Leap’ - TradingView",
+    "description": "OpenAI Launches GPT-6 Astra As AI Race Intensifies — Calls It A ‘Generational Leap’&nbsp;&nbsp;TradingView",
+    "institution": "OpenAI",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxPbVVfdHNoZjM1dVJJUmF0V3J1WldaSHRZcGluVk5tV3ZvV2V6OGZCcEtxQl9xMUZ4UEd1eGhrNHF3NWlsaXFHVEtVOWdzVHUycWdRanhqbXB3LVRBZ2NJUUhsUW9zdTlLZlhGZFFoWk5tR1lfX3hrVHBaMG5xYURGVFQ3dXBIVGNlRUJRb1ZCejJjUkQwUFppd1BLX0Q1UnNHaWdCNmItZll6ZURyNXJndlhZWFZ3cXo2T0l0YTlOQ2R6MUtJQ1MzSnIya0tDaFhaRUY1bHJn?oc=5",
+    "sourceName": "TradingView",
+    "publishedDate": "2026-09-03",
+    "foundDate": "2026-09-06",
+    "autoDiscovered": true,
+    "bottomLine": "OpenAI calls GPT-6 Astra a 'generational leap' amid intensifying AI competition, raising stakes for all research-AI players.",
+    "keyFindings": [
+      "OpenAI markets GPT-6 Astra as a transformational capability step forward.",
+      "Launch contributes to accelerating competitive dynamics in enterprise AI.",
+      "Rhetoric emphasizes market leadership and technological differentiation.",
+      "Signals OpenAI's confidence in capturing broader enterprise and productivity segments."
+    ],
+    "whyItMatters": "Institutions evaluating AI-driven research tools now face intense vendor messaging; Elsevier must counter with evidence of superior research-domain accuracy, comprehensive citation/metadata integration, and institutional data governance that generic AI platforms cannot provide.",
+    "impact": {
+      "novelty": 2,
+      "commercial": 4,
+      "threat": 4,
+      "urgency": 4
+    },
+    "entities": [
+      "OpenAI",
+      "GPT-6 Astra",
+      "Enterprise AI market"
+    ],
+    "actionItems": [
+      "Prepare objection-handling briefing: 'Why research-grade AI requires domain-specific training, not just scale.'",
+      "Document customer success metrics (citation accuracy, research discovery speed, compliance) to counter hype claims.",
+      "Schedule competitive intelligence briefings with top Belgian university procurement teams before they evaluate GPT-6 Astra."
+    ],
+    "sourceType": "secondary"
+  },
+  {
+    "id": "news-xmtpsd",
+    "title": "OpenAI lance GPT-6 Astra : une IA avancée pour les entreprises et les particuliers - Actualités et statistiques - IndexBox",
+    "description": "OpenAI lance GPT-6 Astra : une IA avancée pour les entreprises et les particuliers - Actualités et statistiques&nbsp;&nbsp;IndexBox",
+    "institution": "OpenAI",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxQMnhKVTMtbkJxYVphbHdCelFxWW45ejJub2w1ZW5QS3dPUnE0ampNdzF2NW1uZUs0X0lEWkRKZzk3TDBiT1FTaWFQR2hSQTZoNWVESzE5UnBuTEdVb2ktY3NPQnp5S25Qc3JOcGJOb2JnRjRsVl9qVGgxMHRWN2NkNmpKV0lGZEt2eC16eExB?oc=5",
+    "sourceName": "IndexBox",
+    "publishedDate": "2026-09-03",
+    "foundDate": "2026-09-09",
+    "autoDiscovered": true
+  },
+  {
+    "id": "news-gpgv2p",
+    "title": "Son modèle d’IA le plus puissant | OpenAI lance GPT-6 Astra - La Presse",
+    "description": "Son modèle d’IA le plus puissant | OpenAI lance GPT-6 Astra&nbsp;&nbsp;La Presse",
+    "institution": "OpenAI",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxNNFpSUDY4VE5teUlnTnlUXy14bDVQWVpLV0pORmNnQUc2RWxmUENFVkpiZnhMcnJEUE1OajhqcDBZa21uYWVpRHJVNUtIZDQ5cEctNHlfZGJnYXlOalduWVNyTWRhQmI3NThCR3JTZjJJRlBQejF3ZDVoRk8wYlgyS1NrYm11X09fXy1KMF9iT2JtSFJfYzZneG05WFhUeGg3TG9KYnUtZ3Ffai1rNFdBT2ln?oc=5",
+    "sourceName": "La Presse",
+    "publishedDate": "2026-09-03",
+    "foundDate": "2026-09-09",
+    "autoDiscovered": true
+  },
+  {
+    "id": "news-ryj6cr",
+    "title": "Intelligence artificielle : OpenAI lance GPT-6, son modèle le plus puissant et autonome capable de pirater des systèmes informatiques solidement protégés - Sud Ouest",
+    "description": "Intelligence artificielle : OpenAI lance GPT-6, son modèle le plus puissant et autonome capable de pirater des systèmes informatiques solidement protégés&nbsp;&nbsp;Sud Ouest",
+    "institution": "OpenAI",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMi2AJBVV95cUxNOTNwcTdKQU42cmZMbFVwWHVJb3puWXJTaTM2bUVQSGpZbzBQb1NXZjlYczItYnF4YVlFQkVFOGNCbkNPRDBPYmd4TGhoOGgxNFg2ZURGOXRvcVpLUUhGeFJKNENRLUZySVRPeFAxSGtwN3R1TF9sRVFHSGt6YkwtSkhzZGdRdFBpNG1ha1V2a3doM3BJZUlmYWZVWlNUajh1Sk8ydllwZ25VajVLbW5rTlh5U0hBcjZ2eHFDRE5uUGMxQUFXbHlHdXZCTUR5Q2xjUWVZM2NNdmMzak5odVI0WENHbVVkWTdNbmVzNXNEY3RZWkNRTWlBZ2VfczJ5S2RreEhZWDRydFdEbzB2blN6eVFhcnh5bXFJdV9vLW9aejIzaGd4bFpBTEtHdWFvZHdoR1ZrQ1BKUk5sd2J4bDlFWDI3Y2hvRmZocHVrU3h0TFMycmFPQmV",
+    "sourceName": "Sud Ouest",
+    "publishedDate": "2026-09-03",
+    "foundDate": "2026-09-04",
+    "autoDiscovered": true,
+    "bottomLine": "OpenAI reportedly launches GPT-6 with advanced autonomous capabilities including potential cybersecurity and system-penetration functionalities.",
+    "keyFindings": [
+      "GPT-6 is described as OpenAI's most powerful and autonomous model yet, with unrestricted capabilities.",
+      "French reporting suggests GPT-6 can penetrate or 'hack' solidly protected computer systems — raising significant security and ethical questions.",
+      "The framing emphasizes autonomous decision-making and reduced human oversight compared to prior GPT versions."
+    ],
+    "whyItMatters": "Belgian research institutions and medical centres using AI-assisted research tools face regulatory and ethical scrutiny under GDPR and emerging AI Act; Elsevier must clearly communicate how ScienceDirect/Scopus/LeapSpace isolate research workflows from unrestricted autonomous AI, maintaining data integrity and compliance.",
+    "impact": {
+      "novelty": 3,
+      "commercial": 4,
+      "threat": 4,
+      "urgency": 4
+    },
+    "entities": [
+      "OpenAI",
+      "GPT-6",
+      "Sud Ouest"
+    ],
+    "actionItems": [
+      "Verify accuracy of GPT-6 cybersecurity claims and prepare compliance/risk mitigation documentation for Belgian compliance officers.",
+      "Design messaging emphasizing LeapSpace's sandboxed, audit-logged research environment vs. open-ended autonomous AI risks.",
+      "Proactively reach out to Université Libre de Bruxelles (ULB) and KU Leuven procurement teams to discuss AI governance."
+    ],
+    "sourceType": "secondary"
+  },
+  {
     "id": "news-9mo1n4",
     "title": "Google lance Gemini 3.8 Flash avec variante de cybersécurité - unite.ai",
     "description": "Google lance Gemini 3.8 Flash avec variante de cybersécurité&nbsp;&nbsp;unite.ai",
