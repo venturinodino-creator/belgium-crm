@@ -1,11 +1,16 @@
 {
-  "lastRun": "2026-09-09T12:28:46.460Z",
+  "lastRun": "2026-09-10T12:22:31.559Z",
   "lastAddedCount": 0,
   "sources": 38,
   "issues": [
     {
       "instId": "vib",
       "note": "no people extracted"
+    },
+    {
+      "instId": "solvay",
+      "url": "https://solvayinstitutes.be/home/mission/board-of-directors/",
+      "error": "HTTP 429"
     },
     {
       "instId": "royalacademiesbelgium",
@@ -55,6 +60,15 @@
     },
     {
       "instId": "uzleuven",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "uza",
+      "url": "https://www.uza.be/nl/organisatie-en-structuur",
+      "error": "HTTP 429"
+    },
+    {
+      "instId": "uza",
       "note": "no people extracted"
     }
   ]
