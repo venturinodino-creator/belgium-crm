@@ -8136,7 +8136,11 @@ function digestFilterCat(label) {
 // rather than reusing the same week-wide list.
 function digestIsToday(a) {
   const today = new Date().toISOString().slice(0, 10);
-  return (a.publishedDate || a.foundDate) === today;
+  // foundDate (when the scan discovered it), not publishedDate (what the
+  // source claims) - Google News often surfaces a story a day or two after
+  // its actual publish date, so a same-day discovery was silently missing
+  // from "today" under the old publishedDate-first check.
+  return a.foundDate === today;
 }
 
 async function loadDigestNews() {

@@ -736,7 +736,12 @@ async function main() {
   // the week-wide one, which would reference stories from earlier in the
   // week alongside today's.
   const todayStr = new Date().toISOString().slice(0, 10);
-  const todayArticles = trimmed.filter(a => (a.publishedDate || a.foundDate) === todayStr);
+  // foundDate (when this scan discovered it), not publishedDate - Google
+  // News often surfaces a story a day or two after its actual publish date,
+  // so a same-day discovery was silently missing from "today" under the old
+  // publishedDate-first check (confirmed live: a run that added new
+  // articles still produced a 0-article today-overview).
+  const todayArticles = trimmed.filter(a => a.foundDate === todayStr);
   console.log(`[news-scan] Generating today-only overview (${todayArticles.length} of ${trimmed.length} live articles are from today)...`);
   const todayOverview = await generateOverview(todayArticles);
   if (todayOverview) {
