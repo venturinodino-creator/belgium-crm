@@ -149,7 +149,22 @@ async function main() {
   const byId = new Map(entries.map(e => [e.id, e]));
 
   console.log(`[openalex-subscription-scan] Calling Claude with web search across ${BE_INSTITUTIONS.length} tracked institutions...`);
-  const response = await callClaude(entries);
+  let response;
+  try {
+    response = await callClaude(entries);
+  } catch (e) {
+    // Same graceful-degradation the other AI-dependent scans already use
+    // (see news-scan.js's callHaiku): a transient Anthropic API failure —
+    // rate limit, outage, insufficient credit — should skip this run's
+    // findings, not hard-fail the whole job. Confirmed live: this script's
+    // old behavior (an uncaught throw) silently broke OpenAlex scanning for
+    // 3 straight days (2026-09-09 through 2026-09-11) on an empty API
+    // credit balance, while news-scan and competitor-scan kept succeeding
+    // right through the same outage because they already degrade this way.
+    console.warn(`[openalex-subscription-scan] Anthropic API call failed: ${e.message} — skipping this run, no findings added. Will retry on the next scheduled run.`);
+    saveJSON(STATE_FILE, { lastRun: new Date().toISOString(), lastAddedCount: 0, error: e.message });
+    return;
+  }
 
   if (response.stop_reason === 'refusal') {
     console.log('[openalex-subscription-scan] Request was declined by safety classifiers — no results this run.');
