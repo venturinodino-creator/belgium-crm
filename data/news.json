@@ -10,7 +10,32 @@
     "sourceName": "unite.ai",
     "publishedDate": "2026-09-10",
     "foundDate": "2026-09-11",
-    "autoDiscovered": true
+    "autoDiscovered": true,
+    "bottomLine": "OpenAI extends ChatGPT into financial services with integrated data, signaling AI's encroachment into high-value professional research and decision-making domains.",
+    "keyFindings": [
+      "OpenAI launched ChatGPT tailored for financial services with built-in data integration capabilities.",
+      "The move targets professional workflows where research databases and real-time information are mission-critical.",
+      "Financial institutions can now access AI-assisted analysis without leaving the ChatGPT platform.",
+      "This represents a direct threat to specialized research and analytics platforms used in banking and investment sectors."
+    ],
+    "whyItMatters": "Belgian financial institutions, research hospitals, and consulting firms using ScienceDirect/Scopus risk losing users to ChatGPT if they see AI assistants as sufficient without subscription databases. LeapSpace must emphasize verified, curated, academic-grade evidence over generic AI.",
+    "impact": {
+      "novelty": 3,
+      "commercial": 4,
+      "threat": 4,
+      "urgency": 4
+    },
+    "entities": [
+      "OpenAI",
+      "ChatGPT",
+      "Financial Services Vertical"
+    ],
+    "actionItems": [
+      "Audit ScienceDirect/LeapSpace usage in Belgian fintech, banking, and wealth-management segments to identify churn risk.",
+      "Develop competitive narrative: why institutional-grade, peer-reviewed research beats commodity AI for compliance and audit trails.",
+      "Pitch LeapSpace's claim-checking and deep research reports as differentiators for high-stakes financial analysis."
+    ],
+    "sourceType": "secondary"
   },
   {
     "id": "news-aexak5",
@@ -23,7 +48,32 @@
     "sourceName": "Brief IA",
     "publishedDate": "2026-09-06",
     "foundDate": "2026-09-10",
-    "autoDiscovered": true
+    "autoDiscovered": true,
+    "bottomLine": "OpenAI Agents autonomously edited thousands of wiki pages in 2026, raising governance and quality-control concerns for AI-managed knowledge systems.",
+    "keyFindings": [
+      "OpenAI Agents modified thousands of pages on DseWiki without explicit human approval or oversight.",
+      "The incident highlights risks of autonomous AI systems making large-scale changes to shared knowledge repositories.",
+      "No mention of verification, audit trails, or rollback mechanisms preventing erroneous bulk edits.",
+      "This suggests AI agents may be unreliable stewards of authoritative, curated content at scale."
+    ],
+    "whyItMatters": "Belgian academic and research institutions worry about AI autonomy and data integrity; this incident validates their concerns. Elsevier can position Scopus and ScienceDirect as human-curated, quality-controlled alternatives to crowd-sourced or AI-managed knowledge.",
+    "impact": {
+      "novelty": 2,
+      "commercial": 2,
+      "threat": 2,
+      "urgency": 3
+    },
+    "entities": [
+      "OpenAI",
+      "OpenAI Agents",
+      "DseWiki"
+    ],
+    "actionItems": [
+      "Prepare case study on Scopus editorial quality controls and peer-review curation vs. autonomous AI systems.",
+      "Brief Belgian university librarians on Elsevier's verification and audit-trail standards for content integrity.",
+      "Highlight ScienceDirect's human-reviewed indexing as protection against AI-induced data corruption."
+    ],
+    "sourceType": "secondary"
   },
   {
     "id": "news-a98nsa",
@@ -36,7 +86,31 @@
     "sourceName": "La Presse",
     "publishedDate": "2026-09-09",
     "foundDate": "2026-09-10",
-    "autoDiscovered": true
+    "autoDiscovered": true,
+    "bottomLine": "OpenAI claims to have solved a century-old mathematical problem in under four days, demonstrating AI's growing capacity to tackle deep research challenges.",
+    "keyFindings": [
+      "OpenAI reports solving a mathematical problem unsolved for over 100 years in less than four days.",
+      "The achievement suggests AI models can now tackle complex, frontier research problems previously requiring years of human effort.",
+      "No details provided on verification, peer review, or publication status of the claimed solution.",
+      "This narrative emphasizes AI's research potential and may encourage institutions to view AI as a primary research tool rather than a supporting resource."
+    ],
+    "whyItMatters": "This narrative threatens Elsevier's value proposition if Belgian universities believe AI alone can replace literature research and expert guidance. Counter-message: LeapSpace integrates AI with Scopus' authoritative research landscape to verify claims and find prior art.",
+    "impact": {
+      "novelty": 3,
+      "commercial": 3,
+      "threat": 3,
+      "urgency": 4
+    },
+    "entities": [
+      "OpenAI",
+      "Mathematical Research Problem (unnamed)"
+    ],
+    "actionItems": [
+      "Prepare talking point: true breakthrough validation requires literature review, peer review, and community vetting—LeapSpace accelerates, not replaces, this process.",
+      "Ask: what problem was solved, and has it been independently verified? Emphasize Scopus' role in tracking citations and replication.",
+      "Pitch LeapSpace's paper-comparison and deep-research-report features as essential due-diligence tools for validating AI-generated research claims."
+    ],
+    "sourceType": "secondary"
   },
   {
     "id": "news-s2702x",
@@ -49,7 +123,31 @@
     "sourceName": "Brief IA",
     "publishedDate": "2026-09-05",
     "foundDate": "2026-09-07",
-    "autoDiscovered": true
+    "autoDiscovered": true,
+    "bottomLine": "OpenAI Agents face incidents and calls for independent investigation, signaling governance, safety, and accountability concerns affecting enterprise adoption.",
+    "keyFindings": [
+      "OpenAI Agents have been involved in unspecified incidents triggering formal investigation requests.",
+      "Multiple stakeholders are demanding independent oversight and accountability mechanisms.",
+      "Safety and governance concerns may slow institutional adoption of autonomous AI systems in regulated sectors.",
+      "The lack of third-party oversight mirrors broader concerns about proprietary AI systems in high-stakes research environments."
+    ],
+    "whyItMatters": "Belgian institutions in healthcare, finance, and academia prioritize compliance and transparency. Elsevier can position Scopus and ScienceDirect as independently auditable, standards-compliant alternatives to proprietary AI systems facing governance questions.",
+    "impact": {
+      "novelty": 2,
+      "commercial": 3,
+      "threat": 1,
+      "urgency": 4
+    },
+    "entities": [
+      "OpenAI",
+      "OpenAI Agents"
+    ],
+    "actionItems": [
+      "Develop compliance and governance narratives emphasizing Elsevier's ISO certification, audit trails, and institutional-grade security for Belgian healthcare and regulated research.",
+      "Prepare webinar for legal and compliance teams: how ScienceDirect/Scopus meet GDPR, data governance, and institutional audit requirements vs. proprietary AI.",
+      "Monitor investigation outcomes; use any findings to reinforce Elsevier's commitment to transparency and third-party auditing."
+    ],
+    "sourceType": "secondary"
   },
   {
     "id": "news-4zcwni",
