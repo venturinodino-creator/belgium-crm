@@ -1,26 +1,23 @@
 /**
- * competitor-jobs-scan.js — Daily scan of open roles at companies that sell
- * a product directly competing with one of Elsevier's named RI solutions
- * (Scopus, SciVal, Pure, Insight Graph, 4GU reports, Digital Commons),
- * scoped to a Belgium account manager's specific interest: go-to-market
- * and customer-facing hiring tied to that competing product line — Strategic/
- * Senior Account Management (SAM), Channel/Partnerships, and the full
- * customer-lifecycle line (Customer Success, pre-sales/solution consulting,
- * implementation/onboarding, technical/product support, customer service &
- * licence admin, training & customer education, usage/reporting analytics,
- * product marketing) — not engineering, core product/eng management,
- * editorial, finance, HR, or an unrelated business line like a diversified
- * competitor's IP/patent or clinical-regulatory arm. See classifyRole()
- * below for the exact title patterns per category.
+ * competitor-jobs-scan.js — Daily scan of open roles, based in Belgium or
+ * remote, at Elsevier's tracked competitors, scoped to a Belgium account
+ * manager's specific interest: go-to-market and customer-facing hiring —
+ * Strategic/Senior Account Management (SAM), Sales Development (SDR/BDR),
+ * Channel/Partnerships, and the full customer-lifecycle line (Customer
+ * Success, pre-sales/solution consulting, implementation/onboarding,
+ * technical/product support, customer service & licence admin, training &
+ * customer education, usage/reporting analytics, product marketing) — not
+ * engineering, core product/eng management, editorial, finance, HR, or an
+ * unrelated business line like a diversified competitor's IP/patent or
+ * clinical-regulatory arm. See classifyRole() below for the exact title
+ * patterns per category.
  *
- * Only 3 of the companies tracked elsewhere in this app (e.g. in
- * news-scan.js's Competitor Announcements) actually qualify — see SOURCES
- * below for the product-competitor mapping (Clarivate/Web of Science vs
- * Scopus, etc). Companies that are broadly "an Elsevier competitor" but
- * don't sell a Scopus/SciVal/Pure/Digital Commons-type product (OpenAI,
- * Anthropic, Elicit, SciSpace, Springer Nature, Wiley) are deliberately
- * excluded here even though they have a working ATS — see
- * NOT_PRODUCT_COMPETITOR below.
+ * Covers every company tracked elsewhere in this app as an Elsevier
+ * competitor (e.g. in news-scan.js's Competitor Announcements) that also has
+ * a usable public ATS API — see SOURCES below for the full list and what
+ * each one competes with. A handful of tracked competitors have no usable
+ * public API and can't be scanned at all (LinkedIn-only postings, static
+ * pages, session-based ATS) — see UNTRACKED_COMPANIES.
  *
  * Deliberately NOT LinkedIn: LinkedIn requires login for job search and
  * actively blocks automated access, so there is no reliable or
@@ -38,16 +35,25 @@
  *   - Workday (CXS API): requires a POST with a JSON search body — see
  *     fetchWorkday() below.
  *   - No usable public API found: scite (not hiring), Consensus (LinkedIn
- *     only), Paperguide (no formal ATS), IGI Global (email-only), IEEE
- *     (Taleo, session-based), Google (proprietary/internal API). These are
- *     listed in UNTRACKED_COMPANIES so the UI can be upfront about the gap
- *     instead of silently omitting them.
+ *     only), SciSpace (no ATS found on Ashby/Greenhouse/Lever), Paperguide
+ *     (no formal ATS), IGI Global (email-only), IEEE (Taleo, session-based),
+ *     Google (proprietary/internal API). These are listed in
+ *     UNTRACKED_COMPANIES so the UI can be upfront about the gap instead of
+ *     silently omitting them.
  *
- * Unlike news-scan.js, this does a full resync each run rather than an
- * accumulating feed: a role no longer returned by a company's ATS has
- * presumably closed, so it's dropped from the live list. foundDate is
- * preserved across runs for a role that's still open, so "open since" is
- * still visible.
+ * Like news-scan.js, this now accumulates rather than fully resyncing: a
+ * role no longer returned by a company's ATS is marked closed (status:
+ * 'closed', closedDate set) but stays visible in the live list for
+ * ARCHIVE_AGE_DAYS — only after a role has been closed for a full month
+ * does it move out to ARCHIVE_FILE. This was a deliberate fix: the old
+ * full-resync-every-run behavior dropped a role from the UI the instant a
+ * company's ATS stopped listing it (even a same-day repost gap), which
+ * both under-counted real opportunities and gave an account manager no
+ * chance to still see/reference a role they'd already started on. A role
+ * that reappears in the ATS after being marked closed is un-closed
+ * (status back to 'open', closedDate cleared) rather than treated as new.
+ * foundDate/lastSeenDate are preserved across runs for a role that's still
+ * open, so "open since"/"last confirmed" stay visible.
  *
  * salary/applicationDeadline are best-effort text extraction (see
  * extractSalary/extractDeadline) from whatever description text is
@@ -68,27 +74,57 @@ import { readFileSync, writeFileSync, mkdirSync } from 'fs';
 
 const DATA_FILE = 'data/competitor-jobs.json';
 const STATE_FILE = 'data/competitor-jobs-scan-state.json';
+const ARCHIVE_FILE = 'data/archive/competitor-jobs.json';
+// A closed role lingers in the live list for a full month before moving to
+// the archive — see the file header for why. Kept in sync with
+// news-scan.js's ARCHIVE_AGE_DAYS concept, just a longer window: a closed
+// job posting is still useful reference material for a month (was the AM
+// already in conversation with someone there?), unlike a week-old news story.
+const ARCHIVE_AGE_DAYS = 30;
 const REQUEST_TIMEOUT_MS = 20000;
 
-// Netherlands-relevant location match — Dutch city names + country
-// name/abbrev, plus EMEA/Europe-remote and the specific European hub
-// cities these companies actually staff EMEA sales/CSM/channel roles
-// out of (London, Dublin, Berlin, Paris, etc). A tracked customer-facing role
-// based in one of those hubs, or explicitly remote-EMEA, plausibly
-// covers Dutch accounts even without a Dutch city in the listing — ATS
-// location fields are almost never literally "EMEA", they name a city,
-// so the city list matters more than the EMEA/Europe tokens alone.
-const NL_LOCATION_RE = /netherlands|nederland|amsterdam|utrecht|rotterdam|the hague|den haag|eindhoven|groningen|delft|leiden|maastricht|\bnl\b|\bemea\b|remote[\s,-]*europe|europe[\s,-]*remote|london|dublin|berlin|munich|frankfurt|paris|madrid|barcelona|lisbon|stockholm|copenhagen|zurich|milan|brussels|dubai/i;
+// Belgium-or-remote location match. Deliberately not widened to "any
+// European country/city" — that surfaces roles based in London, Berlin,
+// Paris, etc that have nothing to do with Belgium specifically (confirmed
+// as a real problem on the Netherlands sibling app's identical feature). The
+// two things that actually matter here: the role is based in Belgium, or
+// it's remote (and therefore fillable from Belgium) — not "somewhere in
+// Europe" generally. A bare "EMEA"/"Europe" location with no "remote"
+// qualifier is deliberately NOT matched, since that names a whole region,
+// not Belgium. Covers both national languages (Dutch/French) plus the
+// English forms these ATSes actually use.
+const BE_CITY_COUNTRY_RE = /belgium|belgie|belgië|belgique|brussels|brussel|bruxelles|antwerp|antwerpen|ghent|\bgent\b|leuven|louvain|liege|liège|charleroi|bruges|brugge|namur|\bmons\b|hasselt|kortrijk|\bbe\b|\bbel\b/i;
 
-// Role families that matter to a sales agent tracking competitor go-to-market
-// and customer-facing headcount: Strategic/Senior Account Management,
-// Channel/Partnerships, and the full customer-lifecycle line (Customer
-// Success, pre-sales/solution consulting, implementation/onboarding,
-// technical/product support, customer service & licence admin, training &
-// customer education, usage/reporting analytics, and product marketing).
-// Everything else (engineering, core product/eng management, finance, HR,
-// editorial, etc.) is excluded entirely rather than tagged "other" — a role
-// that doesn't match one of these is not shown.
+// A bare "remote" match is not enough on its own: ATS location fields almost
+// always pair "Remote" with a specific country ("Remote, United States of
+// America", "Australia, Remote") or a closed list of specific eligible
+// countries that may not include Belgium at all — a globally-remote US or
+// Australian role, or one remote-eligible only from France/Germany/Spain/UK,
+// has nothing to do with Belgium. Only exclude on an explicit non-European
+// qualifier; a bare "Remote" with no country named, or one paired with
+// Belgium/EMEA/Europe/another EU country, still passes — see
+// isTrackedLocation() and the closed-enumerated-list check in main() for the
+// second case. Same exclusion list as the Netherlands sibling app (country
+// names, ISO codes, and major non-Europe hub cities) — this class of false
+// positive doesn't depend on which EU country is being tracked.
+const NON_EUROPE_REMOTE_RE = /united states|\bu\.?s\.?a?\.?\b|canada|australia|new zealand|\bapac\b|\blatam\b|brazil|mexico|argentina|colombia|\bindia\b|china|japan|singapore|hong kong|south korea|philippines|indonesia|vietnam|thailand|malaysia|south africa|nigeria|kenya|\buae\b|united arab emirates|saudi arabia|\bisrael\b|\bidn\b|\busa\b|\baus\b|\bnzl\b|\bcan\b|\bbra\b|\bmex\b|\bind\b|\bchn\b|\bjpn\b|\bkor\b|\bsgp\b|\bphl\b|\bvnm\b|\btha\b|\bmys\b|\bzaf\b|\bnga\b|\bken\b|\bare\b|\bsau\b|san francisco|silicon valley|new york|\bnyc\b|los angeles|chicago|boston|seattle|austin|denver|atlanta|washington,? d\.?c\.?|toronto|vancouver|montreal|sydney|melbourne|tokyo|bangalore|bengaluru|mumbai|new delhi|shanghai|beijing|shenzhen|seoul|manila|jakarta/i;
+
+function isTrackedLocation(location) {
+  const loc = location || '';
+  if (BE_CITY_COUNTRY_RE.test(loc)) return true;
+  return /\bremote\b/i.test(loc) && !NON_EUROPE_REMOTE_RE.test(loc);
+}
+
+// Role families that get their own named category, for a sales agent
+// tracking competitor go-to-market and customer-facing headcount:
+// Strategic/Senior Account Management, Sales Development (SDR/BDR outbound
+// prospecting), Renewals, Channel/Partnerships, and the full customer-
+// lifecycle line (Customer Success, pre-sales/solution consulting,
+// implementation/onboarding, technical/product support, customer service &
+// licence admin, training & customer education, usage/reporting analytics,
+// and product marketing). A role that doesn't match one of these named
+// categories is not shown — this list is deliberately the specific set of
+// roles being tracked, not a general "any hiring at a competitor" feed.
 // All of these match the bare noun phrase (or an explicit reversed-order
 // alternative) rather than a fixed "noun + level-word" suffix — confirmed
 // live that real titles put the level word before the department just as
@@ -98,9 +134,16 @@ const NL_LOCATION_RE = /netherlands|nederland|amsterdam|utrecht|rotterdam|the ha
 // against real non-GTM titles (engineering, research, finance, HR) pulled
 // from live ATS data to confirm it doesn't over-match.
 const SAM_TITLE_RE = /\b(strategic account(s)?|key account(s)?|enterprise account(s)?|senior account(s)?|regional sales|account (manager|executive|director))\b/i;
+const SDR_TITLE_RE = /\b(sales development rep(resentative)?|business development rep(resentative)?|inside sales (rep(resentative)?|executive)|sdr|bdr)\b/i;
+// Renewals is its own line of work at most of these companies (a
+// subscription/licence business needs dedicated headcount just to retain
+// existing accounts) and is a natural adjacent role for an Elsevier account
+// manager — checked before SAM so a "Renewal Account Manager" (a real,
+// observed title) lands in renewals rather than the broader SAM bucket.
+const RENEWALS_TITLE_RE = /\brenewal(s)?\s*(manager|specialist|representative|executive|account manager)\b/i;
 const CSM_TITLE_RE = /\b(customer success|client success)\b/i;
 const CHANNEL_TITLE_RE = /\b(channel (manager|director|sales|partnerships?)|partnership(s)?|alliance(s)?|business development)\b/i;
-const PRESALES_TITLE_RE = /\b(customer consultant|solutions? consult(ant|ing)|pre-?sales)\b/i;
+const PRESALES_TITLE_RE = /\b(customer consultant|solutions? consult(ant|ing)|pre-?sales|sales engineer)\b/i;
 const IMPLEMENTATION_TITLE_RE = /\b(implementation|onboarding)\b/i;
 const SUPPORT_TITLE_RE = /\b(technical support|product support|support analyst)\b/i;
 const SERVICE_TITLE_RE = /\b(customer service|licen[cs]e administrator|licen[cs]ing administrator)\b/i;
@@ -119,7 +162,12 @@ const NON_RESEARCH_VERTICAL_RE = /\b(patent|trademark|intellectual property|ip (
 function classifyRole(title, department) {
   const text = `${title} ${department || ''}`;
   if (NON_RESEARCH_VERTICAL_RE.test(text)) return null;
+  if (RENEWALS_TITLE_RE.test(title)) return 'renewals';
   if (SAM_TITLE_RE.test(title)) return 'sam';
+  // SDR/BDR checked before the broader CHANNEL "business development" match
+  // so a "Business Development Representative" — an outbound prospecting
+  // role, not a partnerships role — lands in sdr, not channel.
+  if (SDR_TITLE_RE.test(title)) return 'sdr';
   if (CSM_TITLE_RE.test(title)) return 'csm';
   if (CHANNEL_TITLE_RE.test(title)) return 'channel';
   if (PRESALES_TITLE_RE.test(title)) return 'presales';
@@ -149,6 +197,12 @@ function makeId(company, url) {
 function toISODate(d) {
   const dt = new Date(d);
   return isNaN(dt) ? null : dt.toISOString().slice(0, 10);
+}
+function isOlderThanDays(dateStr, days) {
+  if (!dateStr) return false; // no date info — keep it live rather than guess
+  const d = new Date(dateStr);
+  if (isNaN(d)) return false;
+  return (Date.now() - d.getTime()) / 86400000 > days;
 }
 
 // Best-effort text extraction — most ATS postings simply don't carry
@@ -282,9 +336,14 @@ async function fetchWorkday(company, host, tenant, site) {
         url: j.externalPath ? `${base}/${site}${j.externalPath}` : '',
         postedDate: null,
         source: 'Workday',
-        // No description in the list response — fetchWorkdayJobDescription()
-        // fills this in later, but only for jobs that survive the
-        // location/role filter, to avoid a detail fetch per posting.
+        // No description AND no reliable location in the list response —
+        // Workday's list-level locationsText is often a bare internal region
+        // code with no country ("517- Victoria", confirmed live on the
+        // Netherlands sibling app to actually be Australia) or an unhelpful
+        // "N Locations" placeholder — see fetchWorkdayJobDetail() below,
+        // called for every role-matching Workday posting (title checked
+        // first, before this fetch, so this never runs for the large
+        // majority of postings that aren't a tracked GTM role at all).
         workdayDetail: j.externalPath ? { base, tenant, site, externalPath: j.externalPath } : null,
       });
     }
@@ -295,135 +354,222 @@ async function fetchWorkday(company, host, tenant, site) {
 }
 
 // Workday CXS job-detail endpoint — GET (not POST, unlike the list search)
-// returns the full posting including its description HTML. Only called for
-// jobs that already passed the location/role filter (typically 0-a handful
-// per run), never for the full unfiltered list, since Workday's list
-// response doesn't include description text. Wrapped defensively (like
-// fetchWorkday itself) since this exact response shape wasn't confirmed
-// against live data before shipping — a shape mismatch just leaves
-// salary/deadline null for that job instead of breaking the run.
-async function fetchWorkdayJobDescription({ base, tenant, site, externalPath }) {
-  const data = await fetchJSON(`${base}/wday/cxs/${tenant}/${site}/job${externalPath}`);
-  return (data.jobPostingInfo && data.jobPostingInfo.jobDescription) || '';
+// returns the full posting: description HTML, plus a resolved location and
+// a real country descriptor that the list endpoint never provides (see the
+// comment on `workdayDetail` above). Only called for jobs whose title
+// already matched a tracked GTM role category — never for the full
+// unfiltered per-company list — so this stays a handful of calls per
+// company per run, not one per open role. externalPath from the list
+// response already starts with "/job/..." — confirmed live (2026-09-05) that
+// prepending another literal "/job" segment double-nests the path and the
+// endpoint 422s on every single request. No extra segment needed.
+async function fetchWorkdayJobDetail({ base, tenant, site, externalPath }) {
+  const data = await fetchJSON(`${base}/wday/cxs/${tenant}/${site}${externalPath}`);
+  const info = data.jobPostingInfo || {};
+  return {
+    description: info.jobDescription || '',
+    location: info.location || '',
+    country: (info.country && info.country.descriptor) || '',
+    additionalLocations: Array.isArray(info.additionalLocations) ? info.additionalLocations : [],
+  };
 }
 
-// Only companies that actually sell a product directly competing with one
-// of Elsevier's named RI solutions (Scopus, SciVal, Pure, Insight Graph,
-// 4GU reports, Digital Commons) are scanned for hiring roles — a company
-// being a broad "Elsevier competitor" (tracked elsewhere, e.g. in
-// news-scan.js's Competitor Announcements) is not enough on its own:
+// Every company already tracked elsewhere in this app as an Elsevier
+// competitor (e.g. in news-scan.js's Competitor Announcements) that also has
+// a usable public ATS API gets scanned here — this used to be narrowed
+// further to only the 3 companies selling a product that directly competes
+// with a named Elsevier RI solution (Scopus, SciVal, Pure, Insight Graph,
+// 4GU reports, Digital Commons), but that hid real, live, Belgium/remote-
+// relevant roles at companies like Anthropic simply because their core
+// product isn't a Scopus/SciVal-type tool (confirmed as a real gap on the
+// Netherlands sibling app's identical feature). Broad competitive/hiring
+// intel on any of these companies is useful regardless of exactly which
+// Elsevier product they compete with.
 //   - Clarivate: Web of Science (Scopus), InCites (SciVal), Converis (Pure)
 //   - Digital Science: Dimensions (Scopus/SciVal), Figshare (Digital
 //     Commons), Symplectic Elements (Pure)
 //   - Allen Institute for AI: Semantic Scholar (Scopus's discovery/
 //     citation-graph function)
-// Companies deliberately excluded even though they have a working ATS —
-// see NOT_PRODUCT_COMPETITOR below for why each one doesn't qualify.
+//   - Springer Nature, Wiley: publishers competing more broadly
+//   - OpenAI, Anthropic, Elicit: AI tools competing with Elsevier's
+//     AI-assisted research products
+// Endpoints below verified by hand (see git history for the research this
+// was built from; do not guess new endpoints without verifying the same
+// way) — see UNTRACKED_COMPANIES for the companies with no usable API found.
 const SOURCES = [
   { company: 'Digital Science', fetch: () => fetchPinpoint('Digital Science', 'digitalscience') },
   { company: 'Allen Institute for AI', fetch: () => fetchGreenhouse('Allen Institute for AI', 'thealleninstitute') },
   { company: 'Clarivate', fetch: () => fetchWorkday('Clarivate', 'wd3', 'clarivate', 'Clarivate_Careers') },
+  { company: 'Springer Nature', fetch: () => fetchWorkday('Springer Nature', 'wd3', 'springernature', 'SpringerNatureCareers') },
+  { company: 'Wiley', fetch: () => fetchWorkday('Wiley', 'wd1', 'wiley', 'wiley_careers') },
+  { company: 'OpenAI', fetch: () => fetchAshby('OpenAI', 'openai') },
+  { company: 'Anthropic', fetch: () => fetchGreenhouse('Anthropic', 'anthropic') },
+  { company: 'Elicit', fetch: () => fetchAshby('Elicit', 'elicit') },
 ];
 
-// Companies with no usable public API — surfaced in scan state so the UI
-// can be upfront about the gap instead of silently omitting them.
+// Companies with no usable public API found — surfaced in scan state so the
+// UI can be upfront about the gap instead of silently omitting them.
 const UNTRACKED_COMPANIES = [
   { company: 'scite', reason: 'Not currently hiring (applications by email)', url: 'https://scite.ai/jobs' },
   { company: 'Consensus', reason: 'Roles posted only to LinkedIn, no ATS board found', url: 'https://consensus.app/home/careers/' },
+  { company: 'SciSpace', reason: 'No formal careers-page ATS found (Ashby/Greenhouse/Lever all checked)', url: 'https://typeset.io/careers' },
   { company: 'Paperguide', reason: 'No formal careers page/ATS (small team, hires ad hoc via LinkedIn)', url: 'https://linkedin.com/company/paperguideai' },
   { company: 'IGI Global Scientific Publishing', reason: 'Static list, applications by email', url: 'https://www.igi-global.com/about/staff/job-opportunities/' },
   { company: 'IEEE', reason: 'Oracle Taleo, session-based, no public JSON API', url: 'https://ieee.taleo.net/careersection/2/jobsearch.ftl' },
   { company: 'Google', reason: 'Proprietary/internal API, not public', url: 'https://careers.google.com/' },
 ];
 
-// Companies that DO have a usable ATS but are excluded on purpose: nothing
-// they sell directly competes with Scopus/SciVal/Pure/Digital Commons, so
-// their tracked customer-facing hiring isn't a signal for this feature even though
-// they're tracked elsewhere as broader Elsevier competitors.
-const NOT_PRODUCT_COMPETITOR = [
-  { company: 'OpenAI', reason: "General-purpose AI platform (Claude/GPT-style API) — no discrete product competing with Scopus/SciVal/Pure/Digital Commons", url: 'https://openai.com/careers/' },
-  { company: 'Anthropic', reason: "General-purpose AI platform — no discrete product competing with Scopus/SciVal/Pure/Digital Commons", url: 'https://anthropic.com/careers' },
-  { company: 'Elicit', reason: 'AI research-assistant tool, not a Scopus/SciVal/Pure/Digital Commons-type institutional platform', url: 'https://elicit.com/careers' },
-  { company: 'SciSpace', reason: 'AI research-assistant tool, not a Scopus/SciVal/Pure/Digital Commons-type institutional platform', url: 'https://typeset.io/careers' },
-  { company: 'Springer Nature', reason: 'Publisher — no discrete analytics/CRIS/repository product competing with Scopus/SciVal/Pure/Digital Commons', url: 'https://springernature.wd3.myworkdayjobs.com/SpringerNatureCareers' },
-  { company: 'Wiley', reason: 'Publisher — no discrete analytics/CRIS/repository product competing with Scopus/SciVal/Pure/Digital Commons', url: 'https://wiley.wd1.myworkdayjobs.com/wiley_careers' },
-];
-
 async function main() {
   const existing = readJSON(DATA_FILE, []);
   const existingByKey = new Map(existing.map(j => [j.company + '|' + j.url, j]));
+  const today = new Date().toISOString().slice(0, 10);
 
-  const allJobs = [];
+  const seenThisRun = new Map(); // key -> freshly-built job record
   const perCompanyCounts = {};
   const errors = {};
 
   for (const src of SOURCES) {
     try {
       const jobs = await src.fetch();
-      perCompanyCounts[src.company] = { total: jobs.length, nl: 0 };
+      perCompanyCounts[src.company] = { total: jobs.length, beOrRemote: 0 };
       for (const j of jobs) {
         if (!j.title || !j.url) continue;
-        if (!NL_LOCATION_RE.test(j.location || '')) continue;
         const roleCategory = classifyRole(j.title, j.department);
-        if (!roleCategory) continue; // not a tracked customer-facing role in the research-solutions line
-        perCompanyCounts[src.company].nl++;
+        if (!roleCategory) continue; // excluded business vertical (patent/IP/clinical-regulatory etc) — see NON_RESEARCH_VERTICAL_RE
+
+        // Workday's list response gives no reliable location (see
+        // workdayDetail comment above) — for a role that already matches a
+        // tracked category, fetch the real detail first so the location
+        // check runs against an actual country, not a bare internal region
+        // code or an unhelpful "N Locations" placeholder. Non-Workday
+        // sources already carry a usable location string from their list
+        // fetch, so this only adds a request for Workday-sourced candidates.
+        let displayLocation = j.location;
+        let matchLocation = j.location;
+        let descriptionHtml = j.descriptionHtml || '';
+        if (j.workdayDetail) {
+          try {
+            const detail = await fetchWorkdayJobDetail(j.workdayDetail);
+            descriptionHtml = detail.description || descriptionHtml;
+            displayLocation = detail.country ? `${detail.location || j.location} — ${detail.country}` : (detail.location || j.location);
+            matchLocation = [displayLocation, ...detail.additionalLocations].filter(Boolean).join(' | ');
+
+            // additionalLocations is sometimes a CLOSED enumerated list of
+            // specific remote-eligible countries ("Remote, FRA" / "Remote,
+            // DEU" / "Remote, ESP" / "Remote, GBR") rather than an open-ended
+            // "remote, Europe" — confirmed live (2026-09-11) on a Wiley
+            // posting remote-eligible from exactly those four countries,
+            // none of which is Belgium, even though every one of them is
+            // European and so none trips NON_EUROPE_REMOTE_RE. When every
+            // remote entry names a specific country and none names Belgium,
+            // the role genuinely can't be filled from Belgium no matter how
+            // "European" the list looks overall — this overrides the
+            // generic bare-remote-not-excluded rule.
+            const remoteEntries = detail.additionalLocations.filter(l => /^remote,/i.test(l));
+            if (remoteEntries.length && remoteEntries.length === detail.additionalLocations.length
+                && !BE_CITY_COUNTRY_RE.test(displayLocation)
+                && !remoteEntries.some(l => BE_CITY_COUNTRY_RE.test(l))) {
+              matchLocation = '';
+            }
+          } catch (e) {
+            console.warn(`[competitor-jobs] Could not fetch job detail for "${j.title}" (${j.company}): ${e.message} — falling back to the list location text for this role.`);
+          }
+        }
+        if (!isTrackedLocation(matchLocation)) continue;
+        perCompanyCounts[src.company].beOrRemote++;
         const key = j.company + '|' + j.url;
         const prior = existingByKey.get(key);
 
-        // Salary/deadline extraction only runs for jobs that already passed
-        // the filters above (typically 0-a handful per run) — Greenhouse
-        // and Pinpoint already carry description text from the list fetch;
-        // Workday needs one extra per-job detail fetch since its list
-        // response has no description at all.
-        let descriptionHtml = j.descriptionHtml || '';
-        if (!descriptionHtml && j.workdayDetail) {
-          try {
-            descriptionHtml = await fetchWorkdayJobDescription(j.workdayDetail);
-          } catch (e) {
-            console.warn(`[competitor-jobs] Could not fetch job description for "${j.title}" (${j.company}): ${e.message} — salary/deadline will be unavailable for this role.`);
-          }
-        }
-
-        allJobs.push({
+        seenThisRun.set(key, {
           id: makeId(j.company, j.url),
           company: j.company,
           title: j.title.slice(0, 200),
-          location: String(j.location || '').slice(0, 150),
+          location: String(displayLocation || j.location || '').slice(0, 150),
           department: String(j.department || '').slice(0, 100),
           roleCategory,
           url: j.url.slice(0, 500),
           postedDate: j.postedDate,
-          foundDate: (prior && prior.foundDate) || new Date().toISOString().slice(0, 10),
+          foundDate: (prior && prior.foundDate) || today,
+          lastSeenDate: today,
+          status: 'open',
+          closedDate: null,
           source: j.source,
           salary: extractSalary(descriptionHtml),
           applicationDeadline: extractDeadline(descriptionHtml),
         });
       }
-      console.log(`[competitor-jobs] ${src.company}: ${jobs.length} open role(s), ${perCompanyCounts[src.company].nl} Netherlands tracked-role matches`);
+      console.log(`[competitor-jobs] ${src.company}: ${jobs.length} open role(s), ${perCompanyCounts[src.company].beOrRemote} Belgium/remote tracked-role match(es)`);
     } catch (e) {
       errors[src.company] = e.message;
       console.warn(`[competitor-jobs] ${src.company} failed: ${e.message}`);
     }
   }
 
-  allJobs.sort((a, b) => (b.postedDate || b.foundDate || '').localeCompare(a.postedDate || a.foundDate || ''));
-  saveJSON(DATA_FILE, allJobs);
+  // Merge freshly-seen roles with the existing live list rather than fully
+  // resyncing — see the file header for why. A role missing from this run's
+  // results is marked closed (or left closed if it already was) instead of
+  // being dropped outright; a role that reappears after being marked closed
+  // is un-closed. Only a company whose fetch itself failed this run (see
+  // `errors` above) is exempted from closing its existing roles, since a
+  // fetch failure means "unknown," not "confirmed gone."
+  const live = [];
+  const newlyArchived = [];
+  let newCount = 0;
+  let reopenedCount = 0;
+  let closedCount = 0;
+  for (const key of new Set([...existingByKey.keys(), ...seenThisRun.keys()])) {
+    const fresh = seenThisRun.get(key);
+    const prior = existingByKey.get(key);
+
+    if (fresh) {
+      if (!prior) newCount++;
+      else if (prior.status === 'closed') reopenedCount++;
+      live.push(fresh);
+      continue;
+    }
+
+    // No longer returned by its company's ATS this run.
+    const company = prior.company;
+    if (errors[company]) { live.push(prior); continue; } // fetch failed — treat as unknown, not closed
+    if (prior.status === 'closed') {
+      if (isOlderThanDays(prior.closedDate, ARCHIVE_AGE_DAYS)) { newlyArchived.push(prior); continue; }
+      live.push(prior);
+    } else {
+      closedCount++;
+      live.push({ ...prior, status: 'closed', closedDate: today });
+    }
+  }
+
+  if (newlyArchived.length) {
+    const archive = readJSON(ARCHIVE_FILE, []);
+    const archivedIds = new Set(archive.map(a => a.id));
+    for (const a of newlyArchived) if (!archivedIds.has(a.id)) archive.unshift(a);
+    saveJSON(ARCHIVE_FILE, archive);
+  }
+
+  live.sort((a, b) => (b.postedDate || b.foundDate || '').localeCompare(a.postedDate || a.foundDate || ''));
+  saveJSON(DATA_FILE, live);
 
   saveJSON(STATE_FILE, {
     lastRun: new Date().toISOString(),
-    totalOpenRoles: allJobs.length,
+    totalOpenRoles: live.filter(j => j.status !== 'closed').length,
+    totalListed: live.length,
+    newCount,
+    reopenedCount,
+    closedCount,
+    archivedCount: newlyArchived.length,
     perCompanyCounts,
     errors,
-    untracked: [...UNTRACKED_COMPANIES, ...NOT_PRODUCT_COMPETITOR],
+    untracked: UNTRACKED_COMPANIES,
     source: 'Company career-page ATS APIs (Greenhouse/Ashby/SmartRecruiters/Pinpoint/Workday) — not LinkedIn, see file header',
   });
-  console.log(`[competitor-jobs] Done — ${allJobs.length} Netherlands tracked customer-facing role(s) across ${SOURCES.length - Object.keys(errors).length}/${SOURCES.length} tracked companies.`);
+  console.log(`[competitor-jobs] Done — ${live.length} Belgium/remote tracked role(s) listed (${newCount} new, ${reopenedCount} reopened, ${closedCount} newly closed, ${newlyArchived.length} archived) across ${SOURCES.length - Object.keys(errors).length}/${SOURCES.length} tracked companies.`);
 }
 
 main().catch(e => {
   console.error('[competitor-jobs] Failed:', e.message);
   try {
-    saveJSON(STATE_FILE, { lastRun: new Date().toISOString(), totalOpenRoles: 0, error: e.message, untracked: [...UNTRACKED_COMPANIES, ...NOT_PRODUCT_COMPETITOR] });
+    saveJSON(STATE_FILE, { lastRun: new Date().toISOString(), totalOpenRoles: 0, error: e.message, untracked: UNTRACKED_COMPANIES });
   } catch { /* ignore */ }
   process.exit(1);
 });

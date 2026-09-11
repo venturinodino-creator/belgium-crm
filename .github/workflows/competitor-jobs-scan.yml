@@ -27,6 +27,7 @@ jobs:
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
           git add data/competitor-jobs.json data/competitor-jobs-scan-state.json
+          [ -f data/archive/competitor-jobs.json ] && git add data/archive/competitor-jobs.json
           if git diff --staged --quiet; then
             echo "Nothing to commit"
             exit 0

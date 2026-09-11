@@ -2463,7 +2463,10 @@ async function showNewsSummaryModal() {
     articles = (Array.isArray(newsData) ? newsData : [])
       .filter(a => !seenIds.has(a.id) && seenIds.add(a.id))
       .filter(a => !dismissed.includes(a.id));
-    jobs = Array.isArray(jobsData) ? jobsData : [];
+    // Closed roles linger in this file for a month (see
+    // scripts/competitor-jobs-scan.js) — this modal's tiles/list are titled
+    // "Open Roles", so only still-open ones count here.
+    jobs = (Array.isArray(jobsData) ? jobsData : []).filter(j => j.status !== 'closed');
     overview = overviewRes.ok ? await overviewRes.json() : null;
   } catch (e) {
     if (body) body.innerHTML = `<div class="news-empty">Could not load news data.</div>`;
@@ -5766,7 +5769,7 @@ function renderHiringSidebarLegend() {
       <div id="news-scan-status"><p style="font-size:12px;color:var(--muted)">Loading…</p></div>
     </div>
     <div class="news-archive-card">
-      <h4 title="Companies not scanned for roles — either no public careers-page API, or their business has no product line that directly competes with Scopus/SciVal/Pure/Digital Commons">Not Shown</h4>
+      <h4 title="Companies not scanned for roles — no public careers-page API found (LinkedIn-only, static page, or session-based ATS)">Not Shown</h4>
       <div id="news-hiring-untracked"><p style="font-size:12px;color:var(--muted)">Loading…</p></div>
     </div>`;
 }
@@ -5779,6 +5782,8 @@ const HIRING_COMPANIES = [
 ];
 const HIRING_CATEGORIES = {
   sam:            { label: 'Strategic Account Mgmt',   color: '#059669' },
+  sdr:            { label: 'Sales Development (SDR)',  color: '#0ea5e9' },
+  renewals:       { label: 'Renewals',                 color: '#be123c' },
   csm:            { label: 'Customer Success',         color: '#1d4ed8' },
   channel:        { label: 'Channel & Partnerships',   color: '#d97706' },
   presales:       { label: 'Pre-Sales Consultant',     color: '#7c3aed' },
@@ -5846,7 +5851,7 @@ function renderHiringFeed() {
     feed.innerHTML = `<div class="news-empty">
       <div style="font-size:32px;margin-bottom:10px">­</div>
       No open customer-facing roles tracked right now.<br>
-      <small>Scoped to Belgium and EMEA-hub (London, Dublin, Berlin, Paris, remote-EMEA, etc.) hiring tied to each competitor's research-solutions line — Strategic Account Mgmt, Channel & Partnerships, and the full customer lifecycle (Customer Success, Pre-Sales, Implementation/Onboarding, Support, Customer Service, Training, Usage & Reporting, Product Marketing). The daily scan runs at 07:00 UTC — check back after that, or run it manually from the button above.</small>
+      <small>Scoped to roles based in Belgium, or remote roles a Belgium-based hire is actually eligible for (a remote posting restricted to specific other countries doesn't count), at each tracked competitor, in Strategic Account Mgmt, Sales Development (SDR), Renewals, Channel & Partnerships, or the full customer lifecycle (Customer Success, Pre-Sales, Implementation/Onboarding, Support, Customer Service, Training, Usage & Reporting, Product Marketing). A role stays listed for a month after a company stops posting it (marked "Closed") before moving to the archive. The daily scan runs at 07:00 UTC — check back after that, or run it manually from the button above.</small>
     </div>`;
     return;
   }
@@ -5854,10 +5859,12 @@ function renderHiringFeed() {
   feed.innerHTML = sorted.slice(0, 100).map(j => {
     const cat = HIRING_CATEGORIES[j.roleCategory] || { label: 'Other', color: '#64748b' };
     const hrefUrl = esc(safeHref(j.url));
-    return `<div class="news-card" onclick="${safeOpenUrlOnclick(j.url)}">
+    const isClosed = j.status === 'closed';
+    return `<div class="news-card" style="${isClosed ? 'opacity:.6' : ''}" onclick="${safeOpenUrlOnclick(j.url)}">
       <div class="news-card-top">
         <span class="news-source-badge" style="background:#f8717122;color:#f87171">${esc(j.company || '')}</span>
         <span class="news-topic-tag" style="background:${cat.color}22;color:${cat.color}">${esc(cat.label)}</span>
+        ${isClosed ? `<span class="news-topic-tag" style="background:#64748b22;color:#64748b" title="No longer posted by the company as of ${esc(j.closedDate || '')} — kept visible for reference, moves to the archive after a month closed">Closed</span>` : ''}
         <span class="news-date">${esc(j.postedDate || j.foundDate || '')}</span>
       </div>
       <h3>${esc(j.title || '')}</h3>
@@ -5877,8 +5884,10 @@ async function renderHiringScanStatus() {
     const res = await fetch('data/competitor-jobs-scan-state.json?t=' + Date.now());
     const state = res.ok ? await res.json() : null;
     if (!state || !state.lastRun) { el.innerHTML = '<p style="font-size:12px;color:var(--muted)">No scan recorded yet.</p>'; return; }
+    const closedVisible = (state.totalListed || 0) - (state.totalOpenRoles || 0);
     el.innerHTML = `<p style="font-size:12px;color:var(--text)">Last scan: <strong>${_relativeTime(state.lastRun)}</strong></p>
-      <p style="font-size:12px;color:var(--muted);margin-top:3px">${state.totalOpenRoles || 0} open role${state.totalOpenRoles === 1 ? '' : 's'} tracked</p>
+      <p style="font-size:12px;color:var(--muted);margin-top:3px">${state.totalOpenRoles || 0} open role${state.totalOpenRoles === 1 ? '' : 's'} tracked${closedVisible > 0 ? `, ${closedVisible} recently closed (still shown)` : ''}</p>
+      ${state.archivedCount ? `<p style="font-size:11px;color:var(--muted);margin-top:3px">${state.archivedCount} moved to archive this run (closed a month+ ago)</p>` : ''}
       ${state.error ? `<p style="font-size:11px;color:#f87171;margin-top:6px">${esc(state.error)}</p>` : ''}`;
 
     const untrackedEl = document.getElementById('news-hiring-untracked');
@@ -8142,7 +8151,7 @@ async function loadDigestNews() {
     const data = newsRes.ok ? await newsRes.json() : [];
     const overview = overviewRes.ok ? await overviewRes.json() : null;
     const jobsData = jobsRes.ok ? await jobsRes.json() : [];
-    const hiringTotal = Array.isArray(jobsData) ? jobsData.length : 0;
+    const hiringTotal = (Array.isArray(jobsData) ? jobsData : []).filter(j => j.status !== 'closed').length;
     const dismissed = getDismissedNewsIds();
     const seenIds = new Set();
     const articles = (Array.isArray(data) ? data : [])
@@ -8195,7 +8204,7 @@ async function loadDigestHiring() {
   try {
     const res = await fetch('data/competitor-jobs.json?t=' + Date.now());
     const data = res.ok ? await res.json() : [];
-    const jobs = Array.isArray(data) ? data : [];
+    const jobs = (Array.isArray(data) ? data : []).filter(j => j.status !== 'closed');
 
     if (countEl) countEl.textContent = `${jobs.length} open role${jobs.length === 1 ? '' : 's'}`;
     if (!jobs.length) {
