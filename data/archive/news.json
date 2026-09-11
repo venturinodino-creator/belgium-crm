@@ -1,5 +1,95 @@
 [
   {
+    "id": "news-xruff",
+    "title": "MentionOS AI Launches an Autonomous AEO Agent That Analyzes What ChatGPT, Gemini, and Other LLMs Say About Brands, Then Helps Get Them Mentioned - TMX Newsfile",
+    "description": "MentionOS AI Launches an Autonomous AEO Agent That Analyzes What ChatGPT, Gemini, and Other LLMs Say About Brands, Then Helps Get Them Mentioned&nbsp;&nbsp;TMX Newsfile",
+    "institution": "Google",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMingJBVV95cUxOWXdWdk9Ed2tMM0NzSEhnWnJzYW9lWWVFbGVQMVZSZ0gzRzh4cVRIdGdUZzAzTTZGSWxqM3ctaUMwMzBFeUpCSU5XalhtbnE2ZGcwTTRUQ0tvcU03cnVQXzJKOXJocTBuNzd1aTBoVnFOakVLeVZSVGpIMzF6ZUlMdGxlbnFacDh4dTgzYjBJN1ZMN1kweWJaR01PS1JMZXI2RlNzTy00ZDljSGlVcVh3T1p4YXBpd2dRZWFya2xha20zUlRfRGpOYjNiNVhfLVRmN2dzSUJ3enBabTNSQldXSGtILWhXNHo2Z3djWUxjQW5KUm1QQkd4VWVKS0tzX3I2OTFseFY4cW5lMWVLUU5nU3dHVU96VEx1UFdpckNn?oc=5",
+    "sourceName": "TMX Newsfile",
+    "publishedDate": "2026-09-04",
+    "foundDate": "2026-09-06",
+    "autoDiscovered": true,
+    "bottomLine": "MentionOS AI launches autonomous agent monitoring LLM brand mentions—a niche but expanding competitive vector in AI-driven brand intelligence.",
+    "keyFindings": [
+      "MentionOS AI introduces autonomous agent analyzing what major LLMs (ChatGPT, Gemini) say about brands.",
+      "Agent helps organisations influence their LLM-generated mentions and AEO (AI Engine Optimization).",
+      "Represents emerging category: AI-native brand monitoring and reputation management.",
+      "Targets companies concerned about how LLMs shape their public perception."
+    ],
+    "whyItMatters": "While not a direct research-tool competitor, this signals broader trend: LLMs are becoming primary information sources; Elsevier must ensure ScienceDirect and Scopus are embedded in major LLM training and retrieval pipelines, or institutional researchers may cite competitor sources by default.",
+    "impact": {
+      "novelty": 3,
+      "commercial": 2,
+      "threat": 2,
+      "urgency": 2
+    },
+    "entities": [
+      "MentionOS AI",
+      "ChatGPT",
+      "Gemini",
+      "LLM-based information retrieval"
+    ],
+    "actionItems": [
+      "Audit whether ScienceDirect and Scopus are adequately represented in major LLM training datasets and retrieval systems.",
+      "Explore partnerships with leading LLM providers to ensure Elsevier content surfaces as authoritative in AI-assisted research.",
+      "Monitor Belgian institutional adoption of LLM-based research tools and advocate for Scopus/ScienceDirect integration."
+    ],
+    "sourceType": "secondary"
+  },
+  {
+    "id": "news-bm0lco",
+    "title": "OpenAI s’engage à hauteur de 1 milliard de dollars pour la cybersécurité de première ligne, lance le projet pilote MS‑ISAC - Unite.AI",
+    "description": "OpenAI s’engage à hauteur de 1 milliard de dollars pour la cybersécurité de première ligne, lance le projet pilote MS‑ISAC&nbsp;&nbsp;Unite.AI",
+    "institution": "OpenAI",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQd1kxdi1xMi0yMTlGMWNyRUU1VnV1aWg5RThhS0ttWTNROFZUbmpWbTJWN0NJY0pkMUhYbGVtcWY5VkMxR2YwWWFlMWFfYVFxTno1QmFVZFNmLW5mQWkycnEySlk1bUlkcmxOdVUtR0NVRHc1b2JxOXd3aDdiWkxqbDI0aHpHYTM1NGNJZDU4NFo4aHBRSG93?oc=5",
+    "sourceName": "Unite.AI",
+    "publishedDate": "2026-09-04",
+    "foundDate": "2026-09-06",
+    "autoDiscovered": true,
+    "bottomLine": "OpenAI commits $1B to cybersecurity infrastructure via MS-ISAC pilot, signaling major enterprise security focus.",
+    "keyFindings": [
+      "OpenAI pledges $1 billion specifically for front-line cybersecurity initiatives.",
+      "MS-ISAC pilot project launched to strengthen critical infrastructure protection.",
+      "Investment reflects OpenAI's strategic pivot toward enterprise trust and security.",
+      "Initiative targets multi-sector cybersecurity resilience across government and private sectors."
+    ],
+    "whyItMatters": "Belgian research institutions and hospitals depend on secure digital infrastructure; this OpenAI move raises the bar for AI vendors' security commitments, making Elsevier's compliance and data-protection credibility a key competitive differentiator in institutional pitches.",
+    "impact": {
+      "novelty": 2,
+      "commercial": 3,
+      "threat": 3,
+      "urgency": 3
+    },
+    "entities": [
+      "OpenAI",
+      "MS-ISAC",
+      "United States government/critical infrastructure"
+    ],
+    "actionItems": [
+      "Audit and document Elsevier's cybersecurity certifications (ISO 27001, SOC 2, GDPR compliance) for Belgian institutions.",
+      "Prepare competitive brief comparing OpenAI's security model to ScienceDirect/Scopus data protection standards.",
+      "Identify if any prospect institutions are in critical-infrastructure sectors (energy, healthcare, water) to emphasize LeapSpace security."
+    ],
+    "sourceType": "secondary"
+  },
+  {
+    "id": "news-ajakgd",
+    "title": "Actualités par ACCESS Newswire sur TradingView, 2026-08-31 - TradingView",
+    "description": "Actualités par ACCESS Newswire sur TradingView, 2026-08-31&nbsp;&nbsp;TradingView",
+    "institution": "Google",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTFB0Y0ZCem9TemxDaDZ4QXo5YWI1bDltUDdKcTllZTIyN0tQNG83aFFJT2tBWUFyaHBGZlFiWGpCbDZnVzVodUtsLVUxYW1LVmJtZFIwVlNtN01mMVJndTFhRjJXMEpLc01IZV9abmhDbXFnTkM4NTZzMGYzdTVoSG8?oc=5",
+    "sourceName": "TradingView",
+    "publishedDate": "2026-08-31",
+    "foundDate": "2026-09-11",
+    "autoDiscovered": true
+  },
+  {
     "id": "news-8of6hx",
     "title": "Google DeepMind lance WeatherNext 3 avec des prévisions horaires à 5 kilomètres - unite.ai",
     "description": "Google DeepMind lance WeatherNext 3 avec des prévisions horaires à 5 kilomètres&nbsp;&nbsp;unite.ai",
