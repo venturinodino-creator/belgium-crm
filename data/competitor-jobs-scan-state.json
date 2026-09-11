@@ -1,7 +1,7 @@
 {
-  "lastRun": "2026-09-11T16:38:22.580Z",
+  "lastRun": "2026-09-11T18:47:24.702Z",
   "totalOpenRoles": 2,
-  "totalListed": 3,
+  "totalListed": 4,
   "newCount": 0,
   "reopenedCount": 0,
   "closedCount": 0,
@@ -24,15 +24,15 @@
       "beOrRemote": 0
     },
     "Wiley": {
-      "total": 74,
+      "total": 75,
       "beOrRemote": 0
     },
     "OpenAI": {
-      "total": 785,
+      "total": 784,
       "beOrRemote": 1
     },
     "Anthropic": {
-      "total": 596,
+      "total": 595,
       "beOrRemote": 0
     },
     "Elicit": {
