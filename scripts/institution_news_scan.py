@@ -59,6 +59,12 @@ SOURCES = [
 
 MAX_STORED   = 400
 REQUEST_WAIT = 0.6
+# Every source below was checked against its robots.txt on 2026-09-12 and is
+# allowed for this user agent. DTU declares Crawl-delay: 10, which is the
+# strictest among them; RETRY_WAIT is set to honour it, since a retry is the
+# only case where this scan hits the same host twice in one run. Each source
+# is otherwise fetched exactly once per day.
+RETRY_WAIT   = 10
 UA = "Mozilla/5.0 (compatible; research-crm-newsscan/1.0; +https://github.com/venturinodino-creator)"
 
 # ── Signal vocabulary ────────────────────────────────────────────────────────
@@ -153,19 +159,33 @@ def is_signal(title: str, summary: str = "") -> tuple:
 
 # ── Fetching ─────────────────────────────────────────────────────────────────
 
-def fetch(url: str) -> str:
+def fetch(url: str, label: str = "", attempts: int = 2) -> tuple:
+    """Returns (body, error). Retries once, because a single transient failure
+    should not silently remove a source from the day's coverage.
+
+    Errors name the source and go to STDOUT, not stderr. GitHub Actions logs
+    the two streams in separate blocks, so a bare "error: ..." on stderr
+    cannot be matched to the source that produced it — which is exactly what
+    happened when SURF became unreachable from the runners and the only clue
+    was a sourcesReached count of 7/8.
+    """
     req = urllib.request.Request(url, headers={
         "User-Agent": UA,
         "Accept": "application/rss+xml,application/atom+xml,application/xml,text/html;q=0.9",
     })
-    try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            return resp.read(600000).decode("utf-8", "replace")
-    except urllib.error.HTTPError as e:
-        print(f"    HTTP {e.code}", file=sys.stderr)
-    except Exception as e:
-        print(f"    error: {e}", file=sys.stderr)
-    return ""
+    err = ""
+    for attempt in range(1, attempts + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                return resp.read(600000).decode("utf-8", "replace"), ""
+        except urllib.error.HTTPError as e:
+            err = f"HTTP {e.code}"
+        except Exception as e:
+            err = str(e)
+        if attempt < attempts:
+            time.sleep(RETRY_WAIT)
+    print(f"     ! UNREACHABLE {label or url}: {err}")
+    return "", err
 
 
 def parse_feed(body: str, base: str) -> list:
@@ -288,11 +308,14 @@ def main():
     print(f"  Stored announcements: {len(stored)} | URLs already seen: {len(seen)}")
 
     new_items, scanned, reached = [], 0, 0
+    failed = []
 
     for src in SOURCES:
         print(f"  {src['institution']} ({src['type']})")
-        body = fetch(src["url"])
+        body, err = fetch(src["url"], src["institution"])
         if not body:
+            failed.append({"institution": src["institution"],
+                           "url": src["url"], "error": err})
             continue
         reached += 1
         items = parse_feed(body, src["url"]) if src["type"] == "feed" \
@@ -320,6 +343,16 @@ def main():
         time.sleep(REQUEST_WAIT)
 
     print(f"  Sources reached: {reached}/{len(SOURCES)} | items examined: {scanned}")
+    if failed:
+        print(f"  UNREACHABLE ({len(failed)}): "
+              + "; ".join(f"{f['institution']} [{f['error'][:50]}]" for f in failed))
+        # A GitHub Actions warning annotation, so a source that has quietly
+        # died shows on the run summary instead of only in the log body.
+        if os.environ.get("GITHUB_ACTIONS"):
+            names = ", ".join(f["institution"] for f in failed)
+            print(f"::warning::{len(failed)} of {len(SOURCES)} {COUNTRY} news "
+                  f"sources unreachable this run: {names}. Coverage is reduced "
+                  f"until they recover; a source failing every day needs its URL checked.")
 
     if new_items:
         stored = new_items + stored
@@ -340,6 +373,9 @@ def main():
         "sourcesReached": reached,
         "sourcesTotal": len(SOURCES),
         "itemsExamined": scanned,
+        # Persisted so a source that has been dead for weeks is visible in the
+        # committed data, not just in one run's log that later ages out.
+        "failedSources": failed,
         # Capped so the state file cannot grow without bound; the oldest URLs
         # fall off, and anything that old has long since left its feed anyway.
         "seenUrls": sorted(seen)[-4000:],

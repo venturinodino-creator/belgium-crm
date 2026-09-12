@@ -1,8 +1,9 @@
 {
-  "lastRun": "2026-09-12T09:13:05.525867Z",
+  "lastRun": "2026-09-12T09:27:14.428460Z",
   "lastNewCount": 0,
   "sourcesReached": 4,
   "sourcesTotal": 4,
   "itemsExamined": 61,
+  "failedSources": [],
   "seenUrls": []
 }
