@@ -35,7 +35,14 @@ jobs:
         run: |
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
-          git add data/institution-news.json data/institution-news-state.json
+          # Stage only what exists. The scan writes institution-news.json on
+          # every run now, but naming a missing path here aborts the whole job
+          # with exit 128 — which is exactly how the first Denmark and Belgium
+          # runs failed, on a scan that had worked perfectly and simply had
+          # nothing to report.
+          for f in data/institution-news.json data/institution-news-state.json; do
+            [ -f "$f" ] && git add "$f"
+          done
           if git diff --staged --quiet; then
             echo "Nothing to commit"
             exit 0
