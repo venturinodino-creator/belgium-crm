@@ -6351,6 +6351,12 @@ const RFP_STATUSES = {
   lost:       { label: 'Lost',         color: '#ef4444', bg: 'rgba(239,68,68,.15)'   },
 };
 
+// A tender whose status isn't one of the five above is shown as Monitoring,
+// so it has to count and sort as Monitoring too — otherwise it renders
+// inside the Monitoring group but sorts below Lost. (crm_tenders currently
+// holds rows with status 'closed'.)
+const rfpStatusKey = s => RFP_STATUSES[s] ? s : 'identified';
+
 function refreshTenders() {
   const btn = document.getElementById('refresh-tenders-btn');
   if (btn) { btn.textContent = '↻ Refreshing...'; btn.disabled = true; }
@@ -6418,7 +6424,7 @@ function renderRFPOpps() {
 
   // Summary stats
   const counts = {won:0, lost:0, inprogress:0, identified:0, submitted:0};
-  rfps.forEach(r => { if (counts[r.status] !== undefined) counts[r.status]++; else counts.identified++; });
+  rfps.forEach(r => { counts[rfpStatusKey(r.status)]++; });
   // CRIS leads the row: it is the one count that says what kind of tender is in
   // play rather than where it sits in the pipeline.
   const crisCount = rfps.filter(isCrisTender).length;
@@ -6451,7 +6457,7 @@ function renderRFPOpps() {
       case 'published': return r.publishedDate ? new Date(r.publishedDate).getTime() : -Infinity;
       case 'value':     return Number(r.value) || 0;
       case 'notes':     return (r.notes || '').toLowerCase();
-      case 'status':    return RFP_SORT_ORDER[r.status] ?? 5;
+      case 'status':    return RFP_SORT_ORDER[rfpStatusKey(r.status)];
       default:          return (r.title || '').toLowerCase();
     }
   };
@@ -6471,7 +6477,7 @@ function renderRFPOpps() {
 
   const fmtDate = d => d ? new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
   const rows = sortedRfps.map((r,i) => {
-    const st = RFP_STATUSES[r.status] || RFP_STATUSES.identified;
+    const st = RFP_STATUSES[rfpStatusKey(r.status)];
     const deadline = r.deadline ? new Date(r.deadline) : null;
     const today = new Date(); today.setHours(0,0,0,0);
     const overdue = deadline && r.status !== 'won' && r.status !== 'lost' && deadline < today;
