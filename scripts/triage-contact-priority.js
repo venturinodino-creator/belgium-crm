@@ -1,7 +1,7 @@
 /**
  * triage-contact-priority.js — one-off backfill of crm_contacts.priority.
  *
- * Every Belgian contact currently sits on the 'medium' default, so the CRM
+ * Belgian contacts sat on the 'medium' default, so the CRM
  * (and the board-facing summary PDF) can't distinguish a university's
  * library director from a name scraped off a publication. This assigns a
  * priority from the contact's job title, using the role families this CRM
@@ -18,7 +18,7 @@
  *   medium — coordinators, project/programme/communication/HR managers:
  *            real people worth keeping, but they don't hold the budget.
  *   low    — the generic 'Researcher' title. These are leftovers from the
- *            retired OpenAlex researcher scan (452 of Belgium's 708
+ *            retired OpenAlex researcher scan (454 of Denmark's 630
  *            contacts as of 2026-09-12). Marking them low keeps the record
  *            and its provenance while getting them out of the way of the
  *            leadership contacts this CRM is now built around. Nothing is
@@ -93,9 +93,17 @@ const LEADERSHIP_RE = new RegExp([
   // excluded above, which is why this needs the following preposition).
   'responsable', 'chef d[eu]\\b', 'médecin chef', 'medecin chef',
   'secretary general', 'secrétaire général', 'permanent secretary', 'vast secretaris',
+  // governance bodies. Membership of a university executive board is the
+  // most senior tier there is, and 'Member of the Executive Board' /
+  // 'Chair, College van Bestuur' match none of the role words above.
+  'executive board', 'board of management', 'college van bestuur',
+  '\\bchair(man|woman|person)?\\b',
   // academic leadership
   'dean\\b', 'decaan', 'rector', 'provost', 'vice-chancellor', 'pro-vice',
-  'university librarian', 'bibliotheksdirektør', 'hoofdbibliothecaris',
+  // any librarian, not just the university-wide one — at a research
+  // institute ('NIOZ Librarian') that is the person holding the
+  // subscription budget.
+  'librarian', 'bibliothecaris', 'bibliotheksdirektør',
   // the research-support / money side that signs off on subscriptions
   'grants? (manager|director|officer|lead)', 'research support',
   'research funding', 'funding (manager|director|officer|lead)',
