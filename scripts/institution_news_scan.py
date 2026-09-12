@@ -323,11 +323,16 @@ def main():
 
     if new_items:
         stored = new_items + stored
-        save_json(NEWS_FILE, stored[:MAX_STORED])
         print(f"[institution_news] Added {len(new_items)} announcement(s). "
               f"Total: {min(len(stored), MAX_STORED)}")
     else:
         print("[institution_news] Nothing new.")
+
+    # Written unconditionally, even when empty. A first run that finds nothing
+    # still has to leave the file on disk: the workflow's `git add` names it
+    # explicitly and fails the job outright if it is missing, and the CRM front
+    # end can then read it without special-casing its absence.
+    save_json(NEWS_FILE, stored[:MAX_STORED])
 
     save_json(STATE_FILE, {
         "lastRun": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
