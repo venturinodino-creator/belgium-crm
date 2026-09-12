@@ -608,7 +608,14 @@ Respond with ONLY one JSON object, exactly: {${OVERVIEW_SCHEMA_PROMPT}}`;
 
 async function main() {
   const articles = readJSON(DATA_FILE, []);
-  const existingUrls = new Set(articles.map(a => a.url));
+  // The archive counts as "already seen" too. Checking only the live feed
+  // means every archived story is rediscovered on each run, re-sent to the
+  // paid relevance filter, and then dropped again as an already-archived
+  // duplicate. Found in the Netherlands CRM on 2026-09-12, where one run put
+  // 13 articles through that round trip: 13 approved by the filter, none
+  // reaching the feed, the archive unchanged at 103.
+  const archivedUrlsAtStart = readJSON(ARCHIVE_FILE, []).map(a => a.url).filter(Boolean);
+  const existingUrls = new Set([...articles.map(a => a.url), ...archivedUrlsAtStart]);
   const candidateCounts = {};
   const freshCandidates = [];
 
@@ -680,7 +687,7 @@ async function main() {
     candidateCounts[category.key] = categoryCandidates;
   }
 
-  console.log(`[news-scan] ${freshCandidates.length} keyword-matched candidate(s) found — running Elsevier-relevance filter...`);
+  console.log(`[news-scan] ${freshCandidates.length} keyword-matched candidate(s) found (skipping ${articles.length} live + ${archivedUrlsAtStart.length} archived already known) — running Elsevier-relevance filter...`);
   const relevant = await filterRelevance(freshCandidates);
   for (const article of relevant) articles.unshift(article);
   const totalAdded = relevant.length;
