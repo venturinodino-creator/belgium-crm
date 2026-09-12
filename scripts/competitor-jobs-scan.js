@@ -458,6 +458,32 @@ const UNTRACKED_COMPANIES = [
   { company: 'Google', reason: 'Proprietary/internal API, not public', url: 'https://careers.google.com/' },
 ];
 
+// Hand the new roles to the workflow as a file outside the workspace, so the
+// email step can read them without them ever being echoed or committed.
+function writeRolesDigest(fresh) {
+  const out = process.env.ROLES_DIGEST_PATH;
+  if (!out || !fresh.length) return;
+  const esc = s => String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const row = r => `<tr>
+      <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb">
+        <a href="${esc(r.url)}" style="color:#0f172a;font-weight:600;text-decoration:none">${esc(r.title)}</a>
+        <div style="color:#64748b;font-size:13px;margin-top:3px">${esc(r.company)} &middot; ${esc(r.place)}${r.reachable ? '' : ' &middot; <span style="color:#b91c1c">not open from your countries</span>'}${r.domain_match ? ' &middot; <span style="color:#4338ca">your domain</span>' : ''}</div>
+        <div style="color:#94a3b8;font-size:12px;margin-top:2px">${esc(r.location)}</div>
+      </td>
+    </tr>`;
+  const html = `<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:640px">
+    <p style="font-size:15px;color:#0f172a">${fresh.length} new role${fresh.length === 1 ? '' : 's'} matching your profile:</p>
+    <table style="width:100%;border-collapse:collapse;border:1px solid #e5e7eb;border-radius:8px">${fresh.map(row).join('')}</table>
+    <p style="color:#94a3b8;font-size:12px;margin-top:14px">From the daily competitor hiring scan. The full shortlist lives on the Roles for You page in your CRM.</p>
+  </div>`;
+  try {
+    writeFileSync(out, html, 'utf8');
+  } catch (e) {
+    console.warn(`[competitor-jobs] roles-for-you: could not write the digest — ${e.message}`);
+  }
+}
+
 async function supaRequest(method, pathAndQuery, body) {
   const res = await fetch(`${SUPA_URL}/rest/v1/${pathAndQuery}`, {
     method,
@@ -474,6 +500,11 @@ async function supaRequest(method, pathAndQuery, body) {
 }
 
 async function pushPersonalRoles(roles, today) {
+  // Only the repo that sets PERSONAL_SHORTLIST maintains the list. It searches
+  // all three territories regardless of which repo it runs in, so one owner is
+  // full coverage — and the row id is company+url, which three concurrent
+  // scans would otherwise overwrite each other on.
+  if (process.env.PERSONAL_SHORTLIST !== '1') return;
   if (!SUPA_SERVICE_KEY) {
     console.warn('[competitor-jobs] roles-for-you: SUPABASE_SERVICE_ROLE_KEY not set — skipping the private shortlist.');
     return;
@@ -511,12 +542,11 @@ async function pushPersonalRoles(roles, today) {
       const list = stale.map(encodeURIComponent).join(',');
       await supaRequest('DELETE', `${PERSONAL_TABLE}?id=in.(${list})&owner_email=eq.${encodeURIComponent(PERSONAL_OWNER)}`);
     }
+    // Counts only. Actions logs are public on a public repo, so naming the
+    // roles here would undo the whole reason this list is not a file in it.
     const fresh = rows.filter(r => r.first_seen === today);
-    if (fresh.length) {
-      console.log(`[competitor-jobs] roles-for-you: ${fresh.length} NEW — ` +
-        fresh.map(r => `${r.company}: ${r.title} (${r.place}${r.reachable ? '' : ', not open from here'})`).join('; '));
-    }
-    console.log(`[competitor-jobs] roles-for-you: ${rows.length} role(s) on the private shortlist, ${stale.length} removed.`);
+    console.log(`[competitor-jobs] roles-for-you: ${rows.length} on the shortlist, ${fresh.length} new, ${stale.length} removed.`);
+    writeRolesDigest(fresh);
   } catch (e) {
     // Never fail the whole scan over the private extra.
     console.warn(`[competitor-jobs] roles-for-you: could not sync to Supabase — ${e.message}`);
