@@ -9278,6 +9278,33 @@ function getInstType(id) {
   return inst ? inst.type : 'research';
 }
 
+// crm_institutions is deliberately sparse — the master list lives in
+// SEED_INSTITUTIONS and the table only carries admin overrides, so most
+// institutions have no row (see the merge in load()). crm_contacts.inst_id
+// however has a foreign key to crm_institutions.id, so writing a contact for
+// an override-less institution fails with PostgreSQL 23503. That is not an
+// edge case — it was found in the Denmark CRM, where 34 of 79 institutions
+// had no row and all 100 pending contacts pointed at one of them, so Accept
+// and Accept All failed on every row while the table still rendered the
+// institution names correctly (those come from the seed list), making it look
+// like a dead button. Seed the institution's row on demand instead.
+//
+// Keyed by in-flight promise rather than a plain "done" set, so a bulk accept
+// running many rows in parallel issues one upsert per institution instead of
+// one per contact. A failed upsert is evicted so a later attempt can retry.
+const _instRowEnsured = new Map();
+function ensureInstitutionRow(instId) {
+  if (!instId) return Promise.resolve();
+  if (!_instRowEnsured.has(instId)) {
+    const inst = (state.institutions || []).find(i => i.id === instId);
+    // Not in the seed list either: let the contact insert fail on its own so
+    // the error names the real problem rather than this helper.
+    const p = inst ? supaUpsertInst(inst) : Promise.resolve();
+    _instRowEnsured.set(instId, p.catch(e => { _instRowEnsured.delete(instId); throw e; }));
+  }
+  return _instRowEnsured.get(instId);
+}
+
 // Shared by acceptPendingContact and acceptAllPendingContacts — takes an
 // already-fetched pending_contacts row (not an id) so bulk accept doesn't
 // need to re-fetch each row one at a time.
@@ -9296,6 +9323,7 @@ async function acceptOnePendingContact(c) {
   // row accepted) once the DB write actually succeeds, so a failed insert
   // (e.g. a foreign-key violation) can never look like a success locally
   // and then silently vanish on the next reload.
+  await ensureInstitutionRow(c.institution_id);
   await supaUpsertContact(newContact);
   state.contacts.push(newContact);
   save();
@@ -9346,18 +9374,27 @@ async function acceptAllPendingContacts(btn, selType) {
   if (!pending.length) { if (btn) btn.disabled = false; return; }
 
   const total = pending.length;
-  let done = 0, failed = 0;
+  let done = 0, failed = 0, firstError = '';
   if (btn) btn.textContent = `Accepting 0/${total}...`;
 
   await Promise.all(pending.map(async c => {
     try { await acceptOnePendingContact(c); }
-    catch(e) { console.error(e); failed++; }
+    catch(e) {
+      console.error(e);
+      failed++;
+      if (!firstError) firstError = String(e && e.message || e);
+    }
     done++;
     if (btn) btn.textContent = `Accepting ${done}/${total}...`;
   }));
 
   const added = total - failed;
-  toast(added + ' contact' + (added !== 1 ? 's' : '') + ' added to contacts' + (failed ? `, ${failed} failed` : ''), failed ? 'err' : 'ok');
+  // A bare "0 added, 100 failed" gave no clue what went wrong; quoting the
+  // first error makes a systemic cause (a constraint violation, an expired
+  // session) obvious instead of looking like a dead button.
+  let msg = added + ' contact' + (added !== 1 ? 's' : '') + ' added to contacts';
+  if (failed) msg += `, ${failed} failed` + (firstError ? ` — ${firstError.slice(0, 160)}` : '');
+  toast(msg, failed ? 'err' : 'ok');
   loadPendingCount();
   renderPendingContacts();
 }
