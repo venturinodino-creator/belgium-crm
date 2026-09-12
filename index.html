@@ -1061,6 +1061,34 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
 .dsh-code{display:block;font-size:12.5px;font-weight:800;color:var(--text2);letter-spacing:-.02em;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dsh-city{display:block;font-size:9.5px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dsh-marks{display:flex;gap:4px;margin-top:9px;min-height:6px;align-items:center}
+/* Key-role coverage: how many of the decision-maker seats (president/board,
+   rector, library director, research dean, research director, grants lead)
+   have a named contact. Shared by the dashboard tiles, institution cards and
+   the detail page. */
+.kr-wrap{display:block}
+.kr-bar{position:relative;display:block;height:4px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:8px}
+.kr-fill{display:block;height:100%;border-radius:3px;background:var(--krc,#64748b);width:0;transition:width .7s cubic-bezier(.22,1,.36,1)}
+.kr-lbl{display:flex;justify-content:space-between;font-size:9.5px;color:var(--muted);margin-top:4px;line-height:1.2}
+.kr-lbl b{color:var(--krc,#64748b);font-weight:700;font-variant-numeric:tabular-nums}
+.dsh-tile .kr-lbl{font-size:9px}
+.ic .kr-bar{height:5px;margin-top:10px}
+.ic .kr-lbl{font-size:10.5px}
+.kr-panel{margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.kr-phead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.kr-phead h4{font-size:12px;font-weight:700;color:var(--text2);letter-spacing:.2px}
+.kr-phead span{font-size:11px;color:var(--muted)}
+.kr-phead span b{color:var(--krc,#64748b);font-size:15px;font-weight:800;margin-right:2px}
+.kr-panel .kr-bar{height:8px;margin-top:0}
+.kr-slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px;margin-top:10px}
+.kr-slot{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,.02);font-size:11px;min-width:0}
+.kr-slot i{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18)}
+.kr-slot.on i{background:var(--success);border-color:var(--success);box-shadow:0 0 6px rgba(34,197,94,.5)}
+.kr-slot .kr-role{color:var(--muted);flex-shrink:0}
+.kr-slot .kr-who{color:var(--text2);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kr-slot.off .kr-who{color:#fca5a5;font-weight:500}
+.kr-slot.on{cursor:pointer}
+.kr-slot.on:hover{border-color:var(--border2);background:rgba(255,255,255,.05)}
+.dsh-trow.kr-trow b{font-weight:600;max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dsh-mark{width:6px;height:6px;border-radius:50%}
 .dsh-untracked{background:rgba(255,255,255,.012)}
 .dsh-untracked .dsh-code{color:var(--muted2)}
@@ -2235,6 +2263,47 @@ function avatarColor(name) {
 function initials(first, last) { return ((first||'')[0]||'') + ((last||'')[0]||''); }
 function getInst(id) { return state.institutions.find(i=>i.id===id) || {}; }
 function contactsForInst(id) { return state.contacts.filter(c=>c.instId===id); }
+
+// ── Key-role coverage ────────────────────────────────────────
+// The seats that matter for a subscription decision. Each slot has a title
+// regex; a slot counts as filled when any contact at the institution has a
+// title that matches. Titles here come in Dutch, French and English, so each
+// pattern carries all three. Universities carry the full academic set;
+// institutes, medical centers and NGOs skip the rector/dean seats that do not
+// exist there.
+const KEY_ROLES = [
+  { key:'exec',    label:'President / Exec Board', re:/\b(pr[eé]sident(e)?|chair(man|woman)?|executive (board|chairman|director)|director[- ]general|general director|directeur g[eé]n[eé]ral|directrice g[eé]n[eé]rale|algemeen directeur|gedelegeerd bestuurder|administrateur[- ]d[eé]l[eé]gu[eé]|secr[eé]taire g[eé]n[eé]ral(e)?|secretaris[- ]generaal|secretary general|ceo|managing director|voorzitter)\b|^\s*(interim |deputy |acting )?(director|directeur|directrice)\s*$/i },
+  { key:'rector',  label:'Rector', types:['university'], re:/\b(rector|recteur|rectrice)\b/i },
+  { key:'library', label:'Library Director', re:/\b(librar(y|ian|ies)|bibliothe)/i, and:/\b(director|directeur|directrice|head|hoofd|chef|chief|lead|manager|responsable|verantwoordelijke|librarian|biblioth[eé]caire|cio)\b/i },
+  { key:'dean',    label:'Dean / Vice-Dean Research', types:['university','medical'], re:/\b(dean|decaan|vicedecaan|doyen(ne)?|vice[- ]doyen(ne)?)\b/i },
+  { key:'resdir',  label:'Research Director', re:/\b(scientific|scientifique|wetenschappelijk|research|recherche|onderzoek)\b[^,;|]{0,25}\b(director|directeur|directrice|lead|head|hoofd|chef|responsable|manager|policy|beleid|support|strategy|strat[eé]gie|information|intelligence)\b|\b(director|directeur|directrice|directie|head|hoofd|vp|vice[- ]president|vice[- ]recteur|vice[- ]?rector|prorector|portfolio holder)\b[^,;|]{0,25}\b(research|recherche|onderzoek|science|wetenschap)\b|\bdirection scientifique\b|\bcio\b|\bchief scient|\bresearch (data|information)\b/i },
+  { key:'grants',  label:'Grants / Funding Lead', re:/\b(grant|grants|funding|fundrais\w*|financement|subsidie|subvention|valori[sz]ation|valorisatie|research support|bourses?)\b/i },
+];
+function keyRolesFor(inst) { const t = (inst && inst.type) || ''; return KEY_ROLES.filter(r => !r.types || r.types.includes(t)); }
+function keyRoleMatch(role, c) { const title = (c && c.title) || ''; if (!role.re.test(title)) return false; return role.and ? role.and.test(title) : true; }
+function keyRoleCoverage(inst) {
+  const contacts = contactsForInst(inst.id);
+  const slots = keyRolesFor(inst).map(r => {
+    const hits = contacts.filter(c => keyRoleMatch(r, c)).sort((a, b) => cxRoleRank(a) - cxRoleRank(b));
+    return { key:r.key, label:r.label, contact:hits[0] || null, count:hits.length };
+  });
+  const filled = slots.filter(x => x.contact).length;
+  const total = slots.length;
+  return { total, filled, pct: total ? Math.round(filled / total * 100) : 0, slots };
+}
+function keyRoleColor(pct) { return pct >= 80 ? 'var(--success)' : pct >= 50 ? '#fbbf24' : pct > 0 ? '#f97316' : '#ef4444'; }
+function keyRoleBarHtml(inst, opts) {
+  const cov = keyRoleCoverage(inst);
+  const col = keyRoleColor(cov.pct);
+  const title = cov.slots.map(x => `${x.contact ? '✓' : '✗'} ${x.label}${x.contact ? ': ' + x.contact.first + ' ' + x.contact.last : ''}`).join('\n');
+  const lbl = (opts && opts.short)
+    ? `<span class="kr-lbl"><span>key roles</span><b>${cov.filled}/${cov.total}</b></span>`
+    : `<span class="kr-lbl"><span>${cov.filled} of ${cov.total} key roles</span><b>${cov.pct}%</b></span>`;
+  return `<span class="kr-wrap" style="--krc:${col}" title="${esc(title)}"><span class="kr-bar"><span class="kr-fill" data-w="${cov.pct}"></span></span>${lbl}</span>`;
+}
+function keyRoleGrowBars() {
+  document.querySelectorAll('.kr-fill').forEach(el => { el.style.width = (el.dataset.w || 0) + '%'; });
+}
 function instOptions(selected='') {
   return state.institutions.slice().sort((a,b)=>a.name.localeCompare(b.name))
     .map(i=>`<option value="${esc(i.id)}" ${i.id===selected?'selected':''}>${esc(i.name)} (${esc(i.short||i.city)})</option>`).join('');
@@ -3367,6 +3436,7 @@ function dshBoardHtml() {
         <span class="dsh-code">${esc(i.short || i.name)}</span>
         <span class="dsh-city">${esc(i.city || '')}</span>
         <span class="dsh-marks">${marks}</span>
+        ${keyRoleBarHtml(i, { short:true })}
       </button>`;
   }).join('');
 
@@ -3409,7 +3479,12 @@ function dshInitTooltip() {
             (c.wos === 'yes' || c.wos === 'likely') ? '#a78bfa' : 'var(--muted)'),
         row('OpenAlex', esc(c.openalexTier || 'Free API'), '#fbbf24'),
         c.scopusRenewal ? row('Renewal', esc(c.scopusRenewal), '#f97316') : '',
-      ].join('') : '<div class="dsh-trow"><span>No subscription intel yet</span></div>');
+      ].join('') : '<div class="dsh-trow"><span>No subscription intel yet</span></div>') +
+      (() => {
+        const cov = keyRoleCoverage(i);
+        return `<div class="dsh-trow" style="margin-top:6px;border-top:1px solid var(--border);padding-top:6px"><span>Key roles</span><b style="color:${keyRoleColor(cov.pct)}">${cov.filled}/${cov.total} · ${cov.pct}%</b></div>` +
+          cov.slots.map(x => `<div class="dsh-trow kr-trow"><span>${x.contact ? '✓' : '✗'} ${esc(x.label)}</span><b style="color:${x.contact ? 'var(--text2)' : '#fca5a5'}">${x.contact ? esc(x.contact.first + ' ' + x.contact.last) : 'missing'}</b></div>`).join('');
+      })();
     const r = t.getBoundingClientRect();
     tip.style.left = Math.min(r.left, innerWidth - 265) + 'px';
     tip.style.top = (r.bottom + 9) + 'px';
@@ -3462,6 +3537,7 @@ function dshGrowBars() {
   document.querySelectorAll('.dsh-gfill,.bk-fill').forEach(el => {
     if (el.dataset.w) el.style.width = el.dataset.w + '%';
   });
+  keyRoleGrowBars();
 }
 
 // ── Command palette ─────────────────────────────────────────
@@ -4323,6 +4399,7 @@ function renderInstitutions() {
         ${i.short?`<div class="short">${esc(i.short)}</div>`:''}
         <div class="city"><span style="display:inline-flex;vertical-align:middle;margin-right:3px;opacity:.55"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>${esc(i.city)}${i.founded?' · Est. '+i.founded:''}</div>
         ${i.researchDirector?`<div style="font-size:11px;color:var(--muted);margin-top:6px;display:flex;align-items:center;gap:4px"><span style="opacity:.6"><span style="display:inline-flex;vertical-align:middle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span></span><span style="font-weight:600;color:var(--text2)">${esc(i.researchDirector)}</span></div>`:''}
+        ${keyRoleBarHtml(i)}
         <div class="ic-footer">
           <span><span style="opacity:.6;display:inline-flex;margin-right:3px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>${cc} contact${cc!==1?'s':''}</span>
           <div class="ic-actions">
@@ -4333,6 +4410,7 @@ function renderInstitutions() {
       </div>`;
     }).join('');
     document.getElementById('content').innerHTML = toolbar + `<div class="inst-grid">${cards}</div>`;
+    setTimeout(keyRoleGrowBars, 30);
   } else {
     const rows = insts.map(i=>{
       const cc = contactsForInst(i.id).length;
@@ -4784,6 +4862,20 @@ function renderDetail() {
       <div style="text-align:center;min-width:70px"><div style="font-size:22px;font-weight:700;color:var(--info)">${contacts.filter(c=>c.quality==='verified').length}</div><div style="font-size:11px;color:var(--muted)">Verified</div></div>
     </div>`;
 
+  // Which decision-maker seats have a named contact, and who is missing.
+  const _cov = keyRoleCoverage(inst);
+  const keyRolesHtml = `
+    <div class="kr-panel" style="--krc:${keyRoleColor(_cov.pct)}">
+      <div class="kr-phead">
+        <h4>Key-role coverage</h4>
+        <span><b>${_cov.pct}%</b> ${_cov.filled} of ${_cov.total} seats filled</span>
+      </div>
+      <div class="kr-bar"><div class="kr-fill" data-w="${_cov.pct}"></div></div>
+      <div class="kr-slots">${_cov.slots.map(x => x.contact
+        ? `<div class="kr-slot on" onclick="event.stopPropagation();openEditContact('${x.contact.id}')" title="${esc(x.contact.title||'')}"><i></i><span class="kr-role">${esc(x.label)}</span><span class="kr-who">${esc(x.contact.first + ' ' + x.contact.last)}${x.count > 1 ? ` +${x.count - 1}` : ''}</span></div>`
+        : `<div class="kr-slot off"><i></i><span class="kr-role">${esc(x.label)}</span><span class="kr-who">missing</span></div>`).join('')}</div>
+    </div>`;
+
   // Same ordering as the Contacts page: the people who sign for a
   // subscription — research and library directors, department and faculty
   // heads — sit at the top, then everyone else alphabetically.
@@ -4863,6 +4955,7 @@ function renderDetail() {
         </div>`:''}
       </div>
       ${statsHtml}
+      ${keyRolesHtml}
     </div>
     ${_rfHtml}
 
