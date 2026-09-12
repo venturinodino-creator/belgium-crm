@@ -6357,6 +6357,18 @@ const RFP_STATUSES = {
 // holds rows with status 'closed'.)
 const rfpStatusKey = s => RFP_STATUSES[s] ? s : 'identified';
 
+// The table opens already sorted by Status, so a plain toggle would read the
+// first click on Status as "reverse" and bury the Active Deals at the bottom.
+// Until a header has actually been clicked, the next click just asserts that
+// column ascending; after that it toggles the way every other table does.
+function rfpSortBy(field) {
+  const s = state.rfpSort;
+  if (!s.touched) { s.touched = true; s.field = field; s.dir = 'asc'; }
+  else if (s.field === field) { s.dir = s.dir === 'asc' ? 'desc' : 'asc'; }
+  else { s.field = field; s.dir = 'asc'; }
+  renderRFPOpps();
+}
+
 function refreshTenders() {
   const btn = document.getElementById('refresh-tenders-btn');
   if (btn) { btn.textContent = '↻ Refreshing...'; btn.disabled = true; }
@@ -6461,9 +6473,19 @@ function renderRFPOpps() {
       default:          return (r.title || '').toLowerCase();
     }
   };
+  // A row is greyed out when it was published in an earlier year than the one
+  // we are in. Greyed rows always sort below the live ones, whatever column is
+  // chosen, so a 2024 tender never sits above this year's work just because
+  // its title happens to start with an A.
+  const thisYear = new Date().getFullYear();
+  const rfpIsFaded = r => !!(r.publishedDate && new Date(r.publishedDate).getFullYear() < thisYear);
   const _rs = state.rfpSort;
   const _rsMult = _rs.dir === 'asc' ? 1 : -1;
   const sortedRfps = [...rfps].sort((a, b) => {
+    // Greyed-out rows sink to the bottom whatever the column, so the live work
+    // is always what you see first.
+    const fa = rfpIsFaded(a), fb = rfpIsFaded(b);
+    if (fa !== fb) return fa ? 1 : -1;
     const av = rfpSortVal(a, _rs.field), bv = rfpSortVal(b, _rs.field);
     if (av < bv) return -1 * _rsMult;
     if (av > bv) return 1 * _rsMult;
@@ -6483,10 +6505,7 @@ function renderRFPOpps() {
     const overdue = deadline && r.status !== 'won' && r.status !== 'lost' && deadline < today;
     const hasCompetitor = r.competitor && r.competitor !== '—';
     const isCris = isCrisTender(r);
-    // Published in an earlier year than the one we're in — old news, so it
-    // recedes. Tenders with no publication date are left at full strength
-    // rather than assumed old.
-    const stale = r.publishedDate && new Date(r.publishedDate).getFullYear() < today.getFullYear();
+    const stale = rfpIsFaded(r);
     const crisBadge = isCris
       ? `<span title="Current Research Information System — direct Elsevier Pure opportunity" style="display:inline-block;background:rgba(0,245,196,.14);color:#00f5c4;border:1px solid rgba(0,245,196,.4);border-radius:4px;padding:1px 6px;font-size:9.5px;font-weight:800;letter-spacing:.06em;margin-right:6px;vertical-align:2px">CRIS</span>`
       : '';
@@ -6535,7 +6554,7 @@ function renderRFPOpps() {
     if (!field) return `<th style="${base};color:#475569">${txt}</th>`;
     const on = state.rfpSort.field === field;
     const hover = on ? '' : ` onmouseover="this.style.color='#94a3b8'" onmouseout="this.style.color='#475569'"`;
-    return `<th onclick="toggleSort(state.rfpSort,'${field}',renderRFPOpps)" title="Sort by ${esc(txt)}"${hover}
+    return `<th onclick="rfpSortBy('${field}')" title="Sort by ${esc(txt)}"${hover}
       style="${base};color:${on ? '#00f5c4' : '#475569'};cursor:pointer;user-select:none${on ? ';background:rgba(0,245,196,.07)' : ''}">${txt}${sortArrow(field, state.rfpSort)}</th>`;
   };
 
