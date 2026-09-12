@@ -6483,13 +6483,17 @@ function renderRFPOpps() {
     const overdue = deadline && r.status !== 'won' && r.status !== 'lost' && deadline < today;
     const hasCompetitor = r.competitor && r.competitor !== '—';
     const isCris = isCrisTender(r);
+    // Published in an earlier year than the one we're in — old news, so it
+    // recedes. Tenders with no publication date are left at full strength
+    // rather than assumed old.
+    const stale = r.publishedDate && new Date(r.publishedDate).getFullYear() < today.getFullYear();
     const crisBadge = isCris
       ? `<span title="Current Research Information System — direct Elsevier Pure opportunity" style="display:inline-block;background:rgba(0,245,196,.14);color:#00f5c4;border:1px solid rgba(0,245,196,.4);border-radius:4px;padding:1px 6px;font-size:9.5px;font-weight:800;letter-spacing:.06em;margin-right:6px;vertical-align:2px">CRIS</span>`
       : '';
     const titleEl = r.url
       ? `<a href="${esc(safeHref(r.url))}" target="_blank" rel="noopener" style="color:#e2e8f0;font-weight:600;font-size:13.5px;text-decoration:none;line-height:1.3;display:flex;align-items:flex-start;gap:5px">${esc(r.title)}<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" style="opacity:.35;flex-shrink:0;margin-top:2px"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>`
       : `<span style="color:#e2e8f0;font-weight:600;font-size:13.5px">${esc(r.title)}</span>`;
-    return `<tr style="border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.025)'" onmouseout="this.style.background=''">
+    return `<tr style="border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s,opacity .15s${stale ? ';opacity:.42' : ''}" onmouseover="this.style.background='rgba(255,255,255,.025)';this.style.opacity='1'" onmouseout="this.style.background='';this.style.opacity='${stale ? '.42' : '1'}'">
       <td style="padding:16px 14px;vertical-align:top">
         <div style="display:flex;align-items:flex-start;gap:0">${crisBadge}<div style="min-width:0">${titleEl}</div></div>
         <div style="color:#475569;font-size:11.5px;margin-top:5px;font-weight:500">${esc(r.institution||'')}</div>
