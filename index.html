@@ -1831,6 +1831,15 @@ function dbToRfp(r) {
     status: r.status||'identified', value: r.value != null ? String(r.value) : '',
     product: r.product||'', competitor: r.competitor||'', url: r.url||'',
     notes: r.notes||'', source: r.source||'', createdAt: r.created_at||'',
+    // Added by the add_cris_and_award_columns_to_crm_tenders migration. is_cris
+    // and biddable stay undefined rather than false when the column is null, so
+    // "not yet evaluated" is distinguishable from "evaluated, not CRIS" —
+    // isCrisTender() only falls back to deriving in the first case.
+    isCRIS: r.is_cris === null || r.is_cris === undefined ? undefined : !!r.is_cris,
+    category: r.category||'', winner: r.winner||'',
+    contractEnd: r.contract_end||'', duration: r.duration||'',
+    noticeType: r.notice_type||'', noticeTypeLabel: r.notice_type_label||'',
+    biddable: r.biddable === null || r.biddable === undefined ? undefined : !!r.biddable,
   };
 }
 
@@ -1842,6 +1851,15 @@ async function supaUpsertRfp(r) {
     status: r.status||'identified', value: r.value ? parseFloat(r.value) : null,
     product: r.product||null, competitor: r.competitor||null, url: r.url||null,
     notes: r.notes||null, source: r.source||null,
+    // contract_end is a DATE column: an empty string is not a valid date and
+    // Postgres rejects the whole row, so coerce blanks to null rather than
+    // passing them through.
+    is_cris: typeof r.isCRIS === 'boolean' ? r.isCRIS : null,
+    category: r.category||null, winner: r.winner||null,
+    contract_end: r.contractEnd ? r.contractEnd : null,
+    duration: r.duration||null,
+    notice_type: r.noticeType||null, notice_type_label: r.noticeTypeLabel||null,
+    biddable: typeof r.biddable === 'boolean' ? r.biddable : null,
   };
   await supaFetch('crm_tenders?on_conflict=id', {
     method: 'POST',
@@ -6301,7 +6319,11 @@ async function saveInstAccount() {
 // then the marker the scraper writes into notes, then the title.
 function isCrisTender(r) {
   if (!r) return false;
-  if (r.isCRIS === true || r.category === 'CRIS') return true;
+  // crm_tenders.is_cris is authoritative once set — including when it is set to
+  // false. Deriving over the top of a deliberate false is how Denmark's KB
+  // licensing agreement kept coming back as a CRIS procurement.
+  if (typeof r.isCRIS === 'boolean') return r.isCRIS;
+  if (r.category === 'CRIS') return true;
   var hay = ((r.notes || '') + ' ' + (r.title || '')).toLowerCase();
   if (/current research information|research information system|\bcris\b|onderzoeksinformatiesysteem|forskningsinformationssystem|forskningsportal|onderzoeksportaal/.test(hay)) return true;
   // Same pair rule the scraper uses: "Pure" means nothing alone (TED is full of
