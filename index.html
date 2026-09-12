@@ -6475,12 +6475,22 @@ function renderRFPOpps() {
       default:          return (r.title || '').toLowerCase();
     }
   };
-  // A row is greyed out when it was published in an earlier year than the one
-  // we are in. Greyed rows always sort below the live ones, whatever column is
-  // chosen, so a 2024 tender never sits above this year's work just because
-  // its title happens to start with an A.
+  // Greyed rows always sort below the live ones, whatever column is chosen,
+  // so an old tender never sits above this year's work just because its
+  // title happens to start with an A.
   const thisYear = new Date().getFullYear();
-  const rfpIsFaded = r => !!(r.publishedDate && new Date(r.publishedDate).getFullYear() < thisYear);
+  // A row is greyed out when it is old news: published before this year, or
+  // (when there is no published date) its deadline fell before this year, or
+  // it is already won/lost and the deadline has passed.
+  const _todayMid = new Date(); _todayMid.setHours(0,0,0,0);
+  const rfpIsFaded = r => {
+    const pub = r.publishedDate ? new Date(r.publishedDate) : null;
+    const dl = r.deadline ? new Date(r.deadline) : null;
+    if (pub && !isNaN(pub) && pub.getFullYear() < thisYear) return true;
+    if (!pub && dl && !isNaN(dl) && dl.getFullYear() < thisYear) return true;
+    const closed = r.status === 'won' || r.status === 'lost';
+    return !!(closed && dl && !isNaN(dl) && dl < _todayMid);
+  };
   const _rs = state.rfpSort;
   const _rsMult = _rs.dir === 'asc' ? 1 : -1;
   const sortedRfps = [...rfps].sort((a, b) => {
