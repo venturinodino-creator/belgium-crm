@@ -50,16 +50,28 @@ jobs:
         uses: actions/github-script@v7
         env:
           NEW_COUNT: ${{ steps.scan.outputs.new_count }}
+          CRIS_COUNT: ${{ steps.scan.outputs.cris_count }}
           SUMMARY: ${{ steps.scan.outputs.summary }}
         with:
           script: |
             // Tender text comes from external sources (TED Europa, TenderNed) —
             // read via env, not interpolated into the script, so nothing in a
-            // scraped title/notes can affect what code actually runs here.
+            // scraped title or description can affect what code runs here.
+            //
+            // A CRIS procurement is the highest-value signal in this feed, so
+            // when there is one it leads the issue title and adds a 'cris'
+            // label — that is what should pull someone into the issue.
+            const total = Number(process.env.NEW_COUNT || 0);
+            const cris  = Number(process.env.CRIS_COUNT || 0);
+            const labels = cris > 0 ? ['rfp-alert', 'cris'] : ['rfp-alert'];
+            const title = cris > 0
+              ? `🚨 ${cris} new Belgium CRIS tender(s)` +
+                (total - cris > 0 ? ` + ${total - cris} other Elsevier-relevant` : '')
+              : `🔔 ${total} new Belgium tender(s) competing with Elsevier`;
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `🔔 ${process.env.NEW_COUNT} new Belgium tender(s) competing with Elsevier`,
+              title,
               body: process.env.SUMMARY,
-              labels: ['rfp-alert']
+              labels
             });
