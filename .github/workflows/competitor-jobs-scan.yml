@@ -21,6 +21,10 @@ jobs:
         with:
           node-version: '20'
       - name: Run competitor hiring scan
+        env:
+          # Only used for the private roles-for-you shortlist, which is
+          # written to Supabase behind RLS rather than into this public repo.
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: node scripts/competitor-jobs-scan.js
       - name: Commit new hiring findings
         run: |
