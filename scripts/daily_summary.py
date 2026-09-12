@@ -416,11 +416,22 @@ def build_trend_rows(history, stats, generated_dt):
 
 def compose_summary(stats, trend_rows=None, trend_baseline_date=None):
     parts = []
+    # '(0 high priority)' reads as "we triaged these and none matter", when
+    # it actually means nobody has triaged them at all — every contact still
+    # sits on the 'medium' default (true of all 708 Belgian and 630 Danish
+    # contacts as of 2026-09-12, against 115 genuinely-flagged in the
+    # Netherlands). Say which one it is rather than print a misleading zero.
+    if stats['contacts_high_priority']:
+        contacts_clause = (f"{stats['contacts_total']} verified contacts "
+                           f"({stats['contacts_high_priority']} high priority)")
+    else:
+        contacts_clause = (f"{stats['contacts_total']} verified contacts "
+                           f"(none triaged by priority yet)")
     parts.append(
         f"Research CRM tracks {stats['inst_total']} institutions across {REGION_ARTICLE}{REGION_LABEL} "
         f"({stats['inst_university']} universities, {stats['inst_medical']} medical centres, "
         f"{stats['inst_research']} research institutes, {stats['inst_ngo']} NGOs/foundations) "
-        f"and {stats['contacts_total']} verified contacts ({stats['contacts_high_priority']} high priority)."
+        f"and {contacts_clause}."
     )
     if stats['pending_total']:
         if stats['pending_is_live']:
@@ -667,7 +678,9 @@ def build_report(data, out_path, history=None):
         pending_tile_sub = 'awaiting review' if stats['pending_is_live'] else 'discovered to date'
         tiles = [
             ('Institutions', stats['inst_total'], f"{stats['inst_medical']} medical · {stats['inst_university']} univ.", TYPE_COLORS['university']),
-            ('Contacts', stats['contacts_total'], f"{stats['contacts_high_priority']} high priority", ACCENT),
+            ('Contacts', stats['contacts_total'],
+             f"{stats['contacts_high_priority']} high priority" if stats['contacts_high_priority']
+             else 'not yet prioritised', ACCENT),
             ('New Contacts', stats['pending_total'], pending_tile_sub, TYPE_COLORS['ngo']),
             ('News Live', stats['news_total'], 'scanned articles', NEWS_CATEGORY_COLORS['competitor_announcements']),
             ('Open Roles', stats['hiring_total'], 'at tracked competitors', '#f87171'),
