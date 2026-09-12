@@ -1,5 +1,21 @@
 [
   {
+    "id": "20260912T091230Z",
+    "date": "2026-09-12",
+    "generatedAt": "2026-09-12T09:12:30.059846+00:00",
+    "file": "reports/summary-2026-09-12-091229.pdf",
+    "summary": "Research CRM tracks 49 institutions across Belgium (10 universities, 12 medical centres, 22 research institutes, 5 NGOs/foundations) and 708 verified contacts (139 high priority). Scopus remains active at 9 of 49 tracked institutions; Clarivate's Web of Science is cancelled or expiring at 0. The daily intelligence scan currently has 5 live news item(s) and 4 open competitor role(s) tracked. Since 05 Sep: contacts +252, news live \u22123, open roles +3.",
+    "stats": {
+      "institutions": 49,
+      "contacts": 708,
+      "contactsIsLive": true,
+      "pending": 0,
+      "pendingIsLive": true,
+      "news": 5,
+      "hiring": 4
+    }
+  },
+  {
     "id": "20260912T085647Z",
     "date": "2026-09-12",
     "generatedAt": "2026-09-12T08:56:47.905422+00:00",
