@@ -368,6 +368,33 @@ async function fetchExistingPending() {
   }
 }
 
+// The review queue was the only thing candidates were checked against, so
+// anyone already in the CRM — added by hand, or accepted back when the queue
+// row was later pruned — looked brand new on every run. That is how the
+// Netherlands ended up with 11 duplicate contacts: a curated 'verified'
+// record alongside an agent 'seed' copy of the same person, the copy carrying
+// a worse title and department ("Directeur" for "Director TU Delft Library").
+//
+// No region filter: crm_contacts is per-deployment (each CRM has its own
+// database — the three differ in both contact counts and institution lists),
+// unlike the region-tagged pending_contacts.
+async function fetchExistingContacts() {
+  if (!SUPA_SERVICE_KEY) return [];
+  try {
+    const res = await supaFetch(`${SUPA_URL}/rest/v1/crm_contacts?select=first,last,email`, {
+      headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}` },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (e) {
+    // Non-fatal: fall back to the old behaviour rather than skipping the run.
+    // The worst case is the duplicate this function exists to prevent, which
+    // the reviewer can still reject in the queue.
+    console.warn('Could not fetch existing crm_contacts:', e.message);
+    return [];
+  }
+}
+
 async function insertPendingContacts(rows) {
   if (!rows.length) return 0;
   const res = await supaFetch(`${SUPA_URL}/rest/v1/pending_contacts`, {
@@ -421,9 +448,20 @@ async function main() {
   }
 
   const existingRemote = await fetchExistingPending();
+  const existingContacts = await fetchExistingContacts();
   const localPending = readJSON(PENDING_FILE, []);
-  const seenEmail = new Set([...existingRemote, ...localPending].map(c => (c.email || '').toLowerCase().trim()).filter(Boolean));
-  const seenName = new Set([...existingRemote, ...localPending].map(c => `${c.first || ''} ${c.last || ''}`.toLowerCase().trim()).filter(Boolean));
+  const queued = [...existingRemote, ...localPending];
+  // Existing CRM contacts join the EMAIL check only, deliberately not the name
+  // check. An email is a reliable identity; a name is not, and this table is
+  // large (900+ contacts in the Netherlands), so matching names against it
+  // would start silently dropping genuinely new people who happen to share a
+  // name with someone already in the CRM. The queue keeps its name check,
+  // where the population is small and mostly from the same run.
+  const seenEmail = new Set([...queued, ...existingContacts]
+    .map(c => (c.email || '').toLowerCase().trim()).filter(Boolean));
+  const seenName = new Set(queued
+    .map(c => `${c.first || ''} ${c.last || ''}`.toLowerCase().trim()).filter(Boolean));
+  console.log(`Skipping ${seenEmail.size} known email(s): ${existingRemote.length} queued, ${existingContacts.length} already in the CRM, ${localPending.length} local.`);
 
   const candidates = [];
   const report = [];
