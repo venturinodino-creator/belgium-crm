@@ -1,5 +1,92 @@
 [
   {
+    "id": "news-4zcwni",
+    "title": "OpenAI Launches GPT-6 Astra, a Leap in Office Productivity and Cybersecurity - Brief IA",
+    "description": "OpenAI Launches GPT-6 Astra, a Leap in Office Productivity and Cybersecurity&nbsp;&nbsp;Brief IA",
+    "institution": "OpenAI",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxNRWhzTUdUN3hDUll5WEJWSWJ4REt3c2lsRk5VdVVaQ0dBREFMTDc2R2k1dkcwbUpUQ0hUVDNQQ1p1QWlYWWdqSW12QUZZNWl5ZXBHWm1peWp3QXA5Tmt4TG82a1JlYmdGSlRMaXdXd1U1cjNTUUlVWWRqd2NmUWRDclJ6VVB5R09tY2U0dVRYbEVJc0d4aEItTmtQUjZtQQ?oc=5",
+    "sourceName": "Brief IA",
+    "publishedDate": "2026-09-05",
+    "foundDate": "2026-09-06",
+    "autoDiscovered": true,
+    "bottomLine": "OpenAI launches GPT-6 Astra, claiming major leap in office productivity and cybersecurity capabilities.",
+    "keyFindings": [
+      "GPT-6 Astra positioned as a generational advance in AI capability and integration.",
+      "Focus on office productivity tools and embedded cybersecurity features.",
+      "Product aims to compete directly in enterprise software and knowledge-work automation.",
+      "Represents OpenAI's push into integrated workplace AI ecosystems."
+    ],
+    "whyItMatters": "Belgian universities and research centres use office productivity tools for research administration and knowledge management; GPT-6 Astra's productivity claims directly threaten Elsevier's positioning as the research-intelligence backbone, so LeapSpace's research-specific AI edge must be emphasized.",
+    "impact": {
+      "novelty": 3,
+      "commercial": 4,
+      "threat": 4,
+      "urgency": 4
+    },
+    "entities": [
+      "OpenAI",
+      "GPT-6 Astra"
+    ],
+    "actionItems": [
+      "Create side-by-side comparison: LeapSpace research-AI vs. GPT-6 Astra's general office productivity positioning.",
+      "Develop case study showing how Elsevier's disciplinary expertise (via Scopus) outperforms generic LLM responses for academic research.",
+      "Brief sales team on LeapSpace's domain-specific advantages (funding discovery, claim-checking, deep research reports vs. general productivity)."
+    ],
+    "sourceType": "secondary"
+  },
+  {
+    "id": "news-s2702x",
+    "title": "OpenAI Agents: Incidents and Calls for Independent Investigations - Brief IA",
+    "description": "OpenAI Agents: Incidents and Calls for Independent Investigations&nbsp;&nbsp;Brief IA",
+    "institution": "OpenAI",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPVWpXcHM1VVN3Z3RwSGlrLWNDUDhReUE3MGo0OWpWdC1aMU05QUc5OF9JTTY4ajEyeThQWlRFOWpBdnYyMHhyUDZNUjF1ckRnVUt1N09nMDJzN1I1RzEybTVXd3hEdWdpVE5CVURpcG1uNEhUeUlfeG5nT2dNZHZxclVkSGhDQ0U0UkNsUFU2RGJrOW5GeUpqMk5lXzFnQjQ?oc=5",
+    "sourceName": "Brief IA",
+    "publishedDate": "2026-09-05",
+    "foundDate": "2026-09-07",
+    "autoDiscovered": true,
+    "bottomLine": "OpenAI Agents face incidents and calls for independent investigation, signaling governance, safety, and accountability concerns affecting enterprise adoption.",
+    "keyFindings": [
+      "OpenAI Agents have been involved in unspecified incidents triggering formal investigation requests.",
+      "Multiple stakeholders are demanding independent oversight and accountability mechanisms.",
+      "Safety and governance concerns may slow institutional adoption of autonomous AI systems in regulated sectors.",
+      "The lack of third-party oversight mirrors broader concerns about proprietary AI systems in high-stakes research environments."
+    ],
+    "whyItMatters": "Belgian institutions in healthcare, finance, and academia prioritize compliance and transparency. Elsevier can position Scopus and ScienceDirect as independently auditable, standards-compliant alternatives to proprietary AI systems facing governance questions.",
+    "impact": {
+      "novelty": 2,
+      "commercial": 3,
+      "threat": 1,
+      "urgency": 4
+    },
+    "entities": [
+      "OpenAI",
+      "OpenAI Agents"
+    ],
+    "actionItems": [
+      "Develop compliance and governance narratives emphasizing Elsevier's ISO certification, audit trails, and institutional-grade security for Belgian healthcare and regulated research.",
+      "Prepare webinar for legal and compliance teams: how ScienceDirect/Scopus meet GDPR, data governance, and institutional audit requirements vs. proprietary AI.",
+      "Monitor investigation outcomes; use any findings to reinforce Elsevier's commitment to transparency and third-party auditing."
+    ],
+    "sourceType": "secondary"
+  },
+  {
+    "id": "news-10qxhm",
+    "title": "OpenAI lance GPT-6 : son modèle le plus puissant, corseté pour limiter les risques - La Libre.be",
+    "description": "OpenAI lance GPT-6 : son modèle le plus puissant, corseté pour limiter les risques&nbsp;&nbsp;La Libre.be",
+    "institution": "OpenAI",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMi_wFBVV95cUxNbWZ6NWFoRkwxc2tRVTB0X1lLaDhjekdmRkZpSW9IRlZPSHJsNWZGOWJKNUpCalIwZERiNnJxUER4c2hpZTJmLXZRYlE2cVBCR3JOd0RQZGFsQkx5MXVDU2kzX3NIM0lDSnhTM1I4ZEFUNV9qQ0lqQ3BMUzRob1BDT0FMVThQUWk5eFVOYkdwVzE0bVBvMmxXeGl3ZXdZV3EtQnVFbGRYNzU1dGVHT2l5ZDdQWGN4RmJaeUhxTHYwOVg0RS1vTVl3M2pIbUNvZjNKWHNDNm5lMGU5aVdtb3FDX1ZudHNiZXBFZ1Y0eHNMMzdlcnJfbGcwT0NRS2NITk0?oc=5",
+    "sourceName": "La Libre.be",
+    "publishedDate": "2026-09-03",
+    "foundDate": "2026-09-12",
+    "autoDiscovered": true
+  },
+  {
     "id": "news-xruff",
     "title": "MentionOS AI Launches an Autonomous AEO Agent That Analyzes What ChatGPT, Gemini, and Other LLMs Say About Brands, Then Helps Get Them Mentioned - TMX Newsfile",
     "description": "MentionOS AI Launches an Autonomous AEO Agent That Analyzes What ChatGPT, Gemini, and Other LLMs Say About Brands, Then Helps Get Them Mentioned&nbsp;&nbsp;TMX Newsfile",

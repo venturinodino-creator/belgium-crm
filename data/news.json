@@ -1,5 +1,18 @@
 [
   {
+    "id": "news-jqxhlv",
+    "title": "OpenAI Launches ChatGPT Finance with Integrated Data and Quotes - Brief IA",
+    "description": "OpenAI Launches ChatGPT Finance with Integrated Data and Quotes&nbsp;&nbsp;Brief IA",
+    "institution": "OpenAI",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxNTE56T1V0LU5DS0ZHQjJaZEZaZXFBU3BGN3FqV2p6ZGhHSXFKV3RBTlVVdUtQQmtXdmx0T2I3Y0FvVGoyRHlVcXdyV0Y2b1o0NTVqZXNuUS1GdUdkRFdtb21nQjF5UXNUY2tUalRLaGlPMjJlZklWSGgxeHZ4QTR3NWY5MWFINDMyR01FcUJ0MDBRRmRxaURqRGtKRkJVRzA?oc=5",
+    "sourceName": "Brief IA",
+    "publishedDate": "2026-09-10",
+    "foundDate": "2026-09-12",
+    "autoDiscovered": true
+  },
+  {
     "id": "news-wpw9p3",
     "title": "OpenAI lance ChatGPT pour les services financiers avec des données intégrées - unite.ai",
     "description": "OpenAI lance ChatGPT pour les services financiers avec des données intégrées&nbsp;&nbsp;unite.ai",
@@ -109,80 +122,6 @@
       "Prepare talking point: true breakthrough validation requires literature review, peer review, and community vetting—LeapSpace accelerates, not replaces, this process.",
       "Ask: what problem was solved, and has it been independently verified? Emphasize Scopus' role in tracking citations and replication.",
       "Pitch LeapSpace's paper-comparison and deep-research-report features as essential due-diligence tools for validating AI-generated research claims."
-    ],
-    "sourceType": "secondary"
-  },
-  {
-    "id": "news-s2702x",
-    "title": "OpenAI Agents: Incidents and Calls for Independent Investigations - Brief IA",
-    "description": "OpenAI Agents: Incidents and Calls for Independent Investigations&nbsp;&nbsp;Brief IA",
-    "institution": "OpenAI",
-    "category": "competitor_announcements",
-    "categoryLabel": "Competitor Announcements",
-    "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPVWpXcHM1VVN3Z3RwSGlrLWNDUDhReUE3MGo0OWpWdC1aMU05QUc5OF9JTTY4ajEyeThQWlRFOWpBdnYyMHhyUDZNUjF1ckRnVUt1N09nMDJzN1I1RzEybTVXd3hEdWdpVE5CVURpcG1uNEhUeUlfeG5nT2dNZHZxclVkSGhDQ0U0UkNsUFU2RGJrOW5GeUpqMk5lXzFnQjQ?oc=5",
-    "sourceName": "Brief IA",
-    "publishedDate": "2026-09-05",
-    "foundDate": "2026-09-07",
-    "autoDiscovered": true,
-    "bottomLine": "OpenAI Agents face incidents and calls for independent investigation, signaling governance, safety, and accountability concerns affecting enterprise adoption.",
-    "keyFindings": [
-      "OpenAI Agents have been involved in unspecified incidents triggering formal investigation requests.",
-      "Multiple stakeholders are demanding independent oversight and accountability mechanisms.",
-      "Safety and governance concerns may slow institutional adoption of autonomous AI systems in regulated sectors.",
-      "The lack of third-party oversight mirrors broader concerns about proprietary AI systems in high-stakes research environments."
-    ],
-    "whyItMatters": "Belgian institutions in healthcare, finance, and academia prioritize compliance and transparency. Elsevier can position Scopus and ScienceDirect as independently auditable, standards-compliant alternatives to proprietary AI systems facing governance questions.",
-    "impact": {
-      "novelty": 2,
-      "commercial": 3,
-      "threat": 1,
-      "urgency": 4
-    },
-    "entities": [
-      "OpenAI",
-      "OpenAI Agents"
-    ],
-    "actionItems": [
-      "Develop compliance and governance narratives emphasizing Elsevier's ISO certification, audit trails, and institutional-grade security for Belgian healthcare and regulated research.",
-      "Prepare webinar for legal and compliance teams: how ScienceDirect/Scopus meet GDPR, data governance, and institutional audit requirements vs. proprietary AI.",
-      "Monitor investigation outcomes; use any findings to reinforce Elsevier's commitment to transparency and third-party auditing."
-    ],
-    "sourceType": "secondary"
-  },
-  {
-    "id": "news-4zcwni",
-    "title": "OpenAI Launches GPT-6 Astra, a Leap in Office Productivity and Cybersecurity - Brief IA",
-    "description": "OpenAI Launches GPT-6 Astra, a Leap in Office Productivity and Cybersecurity&nbsp;&nbsp;Brief IA",
-    "institution": "OpenAI",
-    "category": "competitor_announcements",
-    "categoryLabel": "Competitor Announcements",
-    "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxNRWhzTUdUN3hDUll5WEJWSWJ4REt3c2lsRk5VdVVaQ0dBREFMTDc2R2k1dkcwbUpUQ0hUVDNQQ1p1QWlYWWdqSW12QUZZNWl5ZXBHWm1peWp3QXA5Tmt4TG82a1JlYmdGSlRMaXdXd1U1cjNTUUlVWWRqd2NmUWRDclJ6VVB5R09tY2U0dVRYbEVJc0d4aEItTmtQUjZtQQ?oc=5",
-    "sourceName": "Brief IA",
-    "publishedDate": "2026-09-05",
-    "foundDate": "2026-09-06",
-    "autoDiscovered": true,
-    "bottomLine": "OpenAI launches GPT-6 Astra, claiming major leap in office productivity and cybersecurity capabilities.",
-    "keyFindings": [
-      "GPT-6 Astra positioned as a generational advance in AI capability and integration.",
-      "Focus on office productivity tools and embedded cybersecurity features.",
-      "Product aims to compete directly in enterprise software and knowledge-work automation.",
-      "Represents OpenAI's push into integrated workplace AI ecosystems."
-    ],
-    "whyItMatters": "Belgian universities and research centres use office productivity tools for research administration and knowledge management; GPT-6 Astra's productivity claims directly threaten Elsevier's positioning as the research-intelligence backbone, so LeapSpace's research-specific AI edge must be emphasized.",
-    "impact": {
-      "novelty": 3,
-      "commercial": 4,
-      "threat": 4,
-      "urgency": 4
-    },
-    "entities": [
-      "OpenAI",
-      "GPT-6 Astra"
-    ],
-    "actionItems": [
-      "Create side-by-side comparison: LeapSpace research-AI vs. GPT-6 Astra's general office productivity positioning.",
-      "Develop case study showing how Elsevier's disciplinary expertise (via Scopus) outperforms generic LLM responses for academic research.",
-      "Brief sales team on LeapSpace's domain-specific advantages (funding discovery, claim-checking, deep research reports vs. general productivity)."
     ],
     "sourceType": "secondary"
   }
