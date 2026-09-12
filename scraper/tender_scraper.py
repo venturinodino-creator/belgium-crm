@@ -414,6 +414,22 @@ NOTICE_TYPE_LABELS = {
 BIDDABLE_TYPES = {"cn-standard", "cn-social", "cn-desg", "pin-only",
                   "pin-buyer", "pin-rtl", "pin-cfc-standard", "pmc"}
 
+def _award_status(ntype: str, winner: str) -> str:
+    """Pipeline status for a notice.
+
+    A biddable notice is an opportunity ("identified"). An award notice is
+    already decided, so read the outcome off the winner the notice names:
+    Elsevier means we won it, another name means we lost it, and no name at
+    all leaves it "closed" — concluded, outcome unknown. Filing every award
+    as "closed" hid real wins behind the Monitoring badge.
+    """
+    if ntype in BIDDABLE_TYPES:
+        return "identified"
+    if not winner:
+        return "closed"
+    return "won" if "elsevier" in winner.lower() else "lost"
+
+
 def _ted_cutoff() -> str:
     return (date.today() - timedelta(days=LOOKBACK_DAYS)).strftime("%Y%m%d")
 
@@ -528,7 +544,7 @@ def ted_to_tender(notice: dict, product: str, competitor: str, is_cris: bool) ->
         "institution": buyer,
         "publishedDate": published,
         "deadline": deadline,
-        "status": "identified" if ntype in BIDDABLE_TYPES else "closed",
+        "status": _award_status(ntype, winner),
         "value": value,
         "product": product,
         "competitor": competitor or "—",

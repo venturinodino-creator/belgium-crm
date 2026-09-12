@@ -6349,6 +6349,7 @@ const RFP_STATUSES = {
   submitted:  { label: 'Submitted',    color: '#6366f1', bg: 'rgba(99,102,241,.15)'  },
   won:        { label: 'Won',          color: '#10b981', bg: 'rgba(16,185,129,.15)'  },
   lost:       { label: 'Lost',         color: '#ef4444', bg: 'rgba(239,68,68,.15)'   },
+  closed:     { label: 'Closed',       color: '#94a3b8', bg: 'rgba(148,163,184,.15)' },
 };
 
 // A tender whose status isn't one of the five above is shown as Monitoring,
@@ -6435,12 +6436,12 @@ function renderRFPOpps() {
   }
 
   // Summary stats
-  const counts = {won:0, lost:0, inprogress:0, identified:0, submitted:0};
+  const counts = {won:0, lost:0, inprogress:0, identified:0, submitted:0, closed:0};
   rfps.forEach(r => { counts[rfpStatusKey(r.status)]++; });
   // CRIS leads the row: it is the one count that says what kind of tender is in
   // play rather than where it sits in the pipeline.
   const crisCount = rfps.filter(isCrisTender).length;
-  const crisOpen  = rfps.filter(r => isCrisTender(r) && !['won','lost'].includes(r.status)).length;
+  const crisOpen  = rfps.filter(r => isCrisTender(r) && !['won','lost','closed'].includes(rfpStatusKey(r.status))).length;
   const stats = [
     {label:'CRIS Tenders',val:crisCount,       color:'#00f5c4', bg:'rgba(0,245,196,.12)',  icon:'★',
      sub: crisOpen + ' still open'},
@@ -6448,6 +6449,7 @@ function renderRFPOpps() {
     {label:'Active Deal',val:counts.inprogress, color:'#f59e0b', bg:'rgba(245,158,11,.1)', icon:'◉'},
     {label:'Monitoring',val:counts.identified,  color:'#6366f1', bg:'rgba(99,102,241,.1)', icon:'◎'},
     {label:'Lost',      val:counts.lost,        color:'#ef4444', bg:'rgba(239,68,68,.1)',  icon:'✕'},
+    {label:'Closed',    val:counts.closed,      color:'#94a3b8', bg:'rgba(148,163,184,.1)', icon:'⊘'},
   ];
   const statsHtml = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:24px 24px 0">
     ${stats.map(s=>`<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:16px 20px;display:flex;align-items:center;gap:14px">
@@ -6460,7 +6462,7 @@ function renderRFPOpps() {
   // default is the pipeline order this page has always opened with: Active
   // Deal first, then Monitoring/Submitted (still open), then Won, then Lost —
   // which is why Status sorts by that rank rather than alphabetically.
-  const RFP_SORT_ORDER = { inprogress: 0, identified: 1, submitted: 2, won: 3, lost: 4 };
+  const RFP_SORT_ORDER = { inprogress: 0, identified: 1, submitted: 2, won: 3, lost: 4, closed: 5 };
   // Tenders with no date sort to the end either way: an absent publication
   // date is oldest, an absent deadline is furthest away.
   const rfpSortVal = (r, field) => {
