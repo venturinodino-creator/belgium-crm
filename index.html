@@ -6292,6 +6292,27 @@ async function saveInstAccount() {
 
 //  PIPELINE PAGE 
 // ── RFP OPPS ──────────────────────────────────────────────────────────────────
+// A CRIS (Current Research Information System) procurement is the highest-value
+// signal in this feed: it is a direct Elsevier Pure opportunity, or a direct
+// threat where Pure is already installed. The scraper flags these with
+// isCRIS/category, but the Supabase round-trip keeps only the twelve columns
+// crm_tenders defines, so a row that has been to the database and back has
+// lost both. Derive it instead of trusting one source: explicit field first,
+// then the marker the scraper writes into notes, then the title.
+function isCrisTender(r) {
+  if (!r) return false;
+  if (r.isCRIS === true || r.category === 'CRIS') return true;
+  var hay = ((r.notes || '') + ' ' + (r.title || '')).toLowerCase();
+  if (/current research information|research information system|\bcris\b|onderzoeksinformatiesysteem|forskningsinformationssystem|forskningsportal|onderzoeksportaal/.test(hay)) return true;
+  // Same pair rule the scraper uses: "Pure" means nothing alone (TED is full of
+  // "pure sodium chloride") but is decisive beside Elsevier or a research
+  // context. This is the backstop for a row like VUB's "UL-Elsevier - Pure -
+  // licenties en hosting", whose title never says CRIS — without it that row
+  // depends on the marker text in notes, and notes are editable in this UI.
+  return /\bpure\b/.test(hay) &&
+         /elsevier|research information|onderzoeksinformatie|forskningsinformation|research portal|publicatie|repository/.test(hay);
+}
+
 function getRFPs() { return state.rfps || []; }
 function saveRFPs(list) { state.rfps = list; localStorage.setItem('be_crm_rfp', JSON.stringify(list)); }
 
@@ -6322,8 +6343,17 @@ function refreshTenders() {
         if (existingMap[t.id]) {
           // Merge new fields into existing entry
           var changed = false;
-          ['url','publishedDate','product','competitor','notes','source'].forEach(function(k){
-            if (t[k] && !existingMap[t.id][k]) { existingMap[t.id][k] = t[k]; changed = true; }
+          // Every field the scraper produces, not just the original six —
+          // winner, contract end and the CRIS flag were being dropped on any
+          // tender that already existed locally.
+          ['url','publishedDate','deadline','value','product','competitor','notes',
+           'source','winner','contractEnd','duration','noticeType','noticeTypeLabel',
+           'biddable','isCRIS','category'].forEach(function(k){
+            var incoming = t[k], current = existingMap[t.id][k];
+            var missing = current === undefined || current === null || current === '';
+            if (incoming !== undefined && incoming !== null && incoming !== '' && missing) {
+              existingMap[t.id][k] = incoming; changed = true;
+            }
           });
           if (changed) { updated++; touched.push(existingMap[t.id]); }
         } else {
@@ -6362,23 +6392,33 @@ function renderRFPOpps() {
   // Summary stats
   const counts = {won:0, lost:0, inprogress:0, identified:0, submitted:0};
   rfps.forEach(r => { if (counts[r.status] !== undefined) counts[r.status]++; else counts.identified++; });
+  // CRIS leads the row: it is the one count that says what kind of tender is in
+  // play rather than where it sits in the pipeline.
+  const crisCount = rfps.filter(isCrisTender).length;
+  const crisOpen  = rfps.filter(r => isCrisTender(r) && !['won','lost'].includes(r.status)).length;
   const stats = [
+    {label:'CRIS Tenders',val:crisCount,       color:'#00f5c4', bg:'rgba(0,245,196,.12)',  icon:'★',
+     sub: crisOpen + ' still open'},
     {label:'Won',       val:counts.won,        color:'#10b981', bg:'rgba(16,185,129,.1)',  icon:'✓'},
     {label:'Active Deal',val:counts.inprogress, color:'#f59e0b', bg:'rgba(245,158,11,.1)', icon:'◉'},
     {label:'Monitoring',val:counts.identified,  color:'#6366f1', bg:'rgba(99,102,241,.1)', icon:'◎'},
     {label:'Lost',      val:counts.lost,        color:'#ef4444', bg:'rgba(239,68,68,.1)',  icon:'✕'},
   ];
-  const statsHtml = `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:24px 24px 0">
+  const statsHtml = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:24px 24px 0">
     ${stats.map(s=>`<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:16px 20px;display:flex;align-items:center;gap:14px">
       <div style="width:36px;height:36px;border-radius:8px;background:${s.bg};display:flex;align-items:center;justify-content:center;color:${s.color};font-size:16px;font-weight:700;flex-shrink:0">${s.icon}</div>
-      <div><div style="font-size:22px;font-weight:700;color:#f1f5f9;line-height:1">${s.val}</div><div style="font-size:11px;color:#64748b;font-weight:500;margin-top:3px;text-transform:uppercase;letter-spacing:.04em">${s.label}</div></div>
+      <div style="min-width:0"><div style="font-size:22px;font-weight:700;color:#f1f5f9;line-height:1">${s.val}</div><div style="font-size:11px;color:#64748b;font-weight:500;margin-top:3px;text-transform:uppercase;letter-spacing:.04em">${s.label}</div>${s.sub?`<div style="font-size:10.5px;color:${s.color};font-weight:600;margin-top:2px">${s.sub}</div>`:''}</div>
     </div>`).join('')}
   </div>`;
 
   // Table rows — Active Deal first, then Monitoring/Submitted (still open), then Won, then Lost
   const RFP_SORT_ORDER = { inprogress: 0, identified: 1, submitted: 2, won: 3, lost: 4 };
-  const sortedRfps = [...rfps].sort((a, b) =>
-    (RFP_SORT_ORDER[a.status] ?? 5) - (RFP_SORT_ORDER[b.status] ?? 5));
+  // Within a pipeline stage, CRIS tenders sort above the rest.
+  const sortedRfps = [...rfps].sort((a, b) => {
+    const byStatus = (RFP_SORT_ORDER[a.status] ?? 5) - (RFP_SORT_ORDER[b.status] ?? 5);
+    if (byStatus !== 0) return byStatus;
+    return (isCrisTender(b) ? 1 : 0) - (isCrisTender(a) ? 1 : 0);
+  });
 
   const fmtDate = d => d ? new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
   const rows = sortedRfps.map((r,i) => {
@@ -6387,13 +6427,19 @@ function renderRFPOpps() {
     const today = new Date(); today.setHours(0,0,0,0);
     const overdue = deadline && r.status !== 'won' && r.status !== 'lost' && deadline < today;
     const hasCompetitor = r.competitor && r.competitor !== '—';
+    const isCris = isCrisTender(r);
+    const crisBadge = isCris
+      ? `<span title="Current Research Information System — direct Elsevier Pure opportunity" style="display:inline-block;background:rgba(0,245,196,.14);color:#00f5c4;border:1px solid rgba(0,245,196,.4);border-radius:4px;padding:1px 6px;font-size:9.5px;font-weight:800;letter-spacing:.06em;margin-right:6px;vertical-align:2px">CRIS</span>`
+      : '';
     const titleEl = r.url
       ? `<a href="${esc(safeHref(r.url))}" target="_blank" rel="noopener" style="color:#e2e8f0;font-weight:600;font-size:13.5px;text-decoration:none;line-height:1.3;display:flex;align-items:flex-start;gap:5px">${esc(r.title)}<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" style="opacity:.35;flex-shrink:0;margin-top:2px"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>`
       : `<span style="color:#e2e8f0;font-weight:600;font-size:13.5px">${esc(r.title)}</span>`;
     return `<tr style="border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.025)'" onmouseout="this.style.background=''">
       <td style="padding:16px 14px;vertical-align:top">
-        ${titleEl}
+        <div style="display:flex;align-items:flex-start;gap:0">${crisBadge}<div style="min-width:0">${titleEl}</div></div>
         <div style="color:#475569;font-size:11.5px;margin-top:5px;font-weight:500">${esc(r.institution||'')}</div>
+        ${r.winner ? `<div style="color:#64748b;font-size:11px;margin-top:3px">Won by <span style="color:#94a3b8;font-weight:600">${esc(r.winner)}</span></div>` : ''}
+        ${r.contractEnd ? `<div style="color:#64748b;font-size:11px;margin-top:2px">Contract ends <span style="color:#fbbf24;font-weight:600">${esc(r.contractEnd)}</span> — re-tender window</div>` : ''}
       </td>
       <td style="padding:16px 14px;vertical-align:top">
         <div style="color:#00f5c4;font-size:12px;font-weight:600;margin-bottom:${hasCompetitor?'5px':'0'}">${esc(r.product||'—')}</div>
