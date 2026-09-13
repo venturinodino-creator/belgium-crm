@@ -1,10 +1,19 @@
 {
-  "lastRun": "2026-09-12T11:44:28.078Z",
+  "lastRun": "2026-09-13T12:51:09.741Z",
   "lastAddedCount": 0,
   "sources": 38,
   "issues": [
     {
       "instId": "vib",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "solvay",
+      "url": "https://solvayinstitutes.be/home/mission/management/",
+      "error": "HTTP 429"
+    },
+    {
+      "instId": "solvay",
       "note": "no people extracted"
     },
     {
