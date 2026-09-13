@@ -4670,16 +4670,8 @@ function wsSortVal(i, field) {
   return instSortVal(i, field);
 }
 
-function renderWhiteSpace() {
-  document.getElementById('page-title').textContent = 'White Space';
-  document.getElementById('page-sub').textContent = 'Universities, medical centres, research institutes and NGOs with no active Pure subscription — outreach targets';
-  document.getElementById('topbar-actions').innerHTML = `
-    <div class="view-toggle">
-      <button class="vt-btn ${state.wsView==='grid'?'active':''}" onclick="state.wsView='grid';renderWhiteSpace()"> Grid</button>
-      <button class="vt-btn ${state.wsView==='table'?'active':''}" onclick="state.wsView='table';renderWhiteSpace()"> Table</button>
-    </div>`;
-
-  let insts = state.institutions.filter(i => {
+function whiteSpaceTargets() {
+  return state.institutions.filter(i => {
     if (!WS_ELIGIBLE_TYPES.includes(i.type)) return false;
     if (WS_EXCLUDE_IDS.has(i.id)) return false;
     const pureStatus = getProductStatus(i.id, 'pure');
@@ -4687,6 +4679,19 @@ function renderWhiteSpace() {
     if (state.wsSearch && !`${i.name} ${i.short} ${i.city}`.toLowerCase().includes(state.wsSearch.toLowerCase())) return false;
     return true;
   });
+}
+
+function renderWhiteSpace() {
+  document.getElementById('page-title').textContent = 'White Space';
+  document.getElementById('page-sub').textContent = 'Universities, medical centres, research institutes and NGOs with no active Pure subscription — outreach targets';
+  document.getElementById('topbar-actions').innerHTML = `
+    <div class="view-toggle">
+      <button class="vt-btn ${state.wsView==='grid'?'active':''}" onclick="state.wsView='grid';renderWhiteSpace()"> Grid</button>
+      <button class="vt-btn ${state.wsView==='table'?'active':''}" onclick="state.wsView='table';renderWhiteSpace()"> Table</button>
+    </div>
+    <button class="btn btn-outline" onclick="exportWhiteSpaceCSV()" title="Download the current target list, one row per contact">Export CSV</button>`;
+
+  let insts = whiteSpaceTargets();
   insts = sortInstList(insts, state.wsSort, wsSortVal);
 
   const toolbar = `
@@ -4751,6 +4756,40 @@ function renderWhiteSpace() {
         </table>
       </div>`;
   }
+}
+
+// One row per contact, in the order and under the search filter the page is
+// currently showing. Institutions with no contacts still get a row, with the
+// contact columns empty: on an outreach list the ones nobody has a name for
+// are the point, not noise to be filtered out.
+function exportWhiteSpaceCSV() {
+  const insts = sortInstList(whiteSpaceTargets(), state.wsSort, wsSortVal);
+  if (!insts.length) { toast('Nothing to export in the current filter.'); return; }
+
+  const header = ['Institution','Short','Type','Pure status','City','Founded','Website',
+    'Research director','Key roles','Contacts',
+    'Contact','Role','Department','Email','Phone','LinkedIn','Research areas','Status','Priority','Last contact'];
+
+  const out = [header];
+  insts.forEach(i => {
+    const cov = keyRoleCoverage(i);
+    const cs = contactsForInst(i.id);
+    const instCols = [i.name, i.short, TYPE_LABEL[i.type] || i.type,
+      WS_PURE_STATUS[getProductStatus(i.id, 'pure')].label, i.city, i.founded, i.website,
+      i.researchDirector, cov.filled + '/' + cov.total, String(cs.length)];
+    if (!cs.length) { out.push(instCols.concat(['', '', '', '', '', '', '', '', '', ''])); return; }
+    cs.forEach(c => out.push(instCols.concat([
+      [c.first, c.last].filter(Boolean).join(' '), c.title, c.dept, c.email, c.phone,
+      c.linkedin, c.research, c.status, c.priority, c.lastContact])));
+  });
+
+  const csv = out.map(r => r.map(v => '"' + csvSafe(v).replace(/"/g, '""') + '"').join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  a.download = 'be_white_space.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Exported ' + (out.length - 1) + ' row' + (out.length === 2 ? '' : 's'));
 }
 
 // Recomputed on every render() — cheap (tens of institutions) and the count
