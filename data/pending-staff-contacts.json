@@ -2891,5 +2891,104 @@
     "email": "hanne.poelmans@uhasselt.be",
     "constructed": false,
     "source": "https://www.uhasselt.be/en/research/directorate-research-library-and-internationalisation/team-contact"
+  },
+  {
+    "first": "Frank",
+    "last": "Monteny",
+    "title": "Director General, Belgian Federal Science Policy Office, Chair",
+    "dept": "Library & Research Support",
+    "instId": "rmca",
+    "instName": "Royal Museum for Central Africa",
+    "email": "frank.monteny@africamuseum.be",
+    "constructed": true,
+    "source": "https://www.africamuseum.be/en/about_us/mission_organisation"
+  },
+  {
+    "first": "Jacques",
+    "last": "de Gerlache",
+    "title": "Communications Manager, SOLVAY S.A.",
+    "dept": "Library & Research Support",
+    "instId": "rmca",
+    "instName": "Royal Museum for Central Africa",
+    "email": "jacques.degerlache@africamuseum.be",
+    "constructed": true,
+    "source": "https://www.africamuseum.be/en/about_us/mission_organisation"
+  },
+  {
+    "first": "Ingrid",
+    "last": "Vanden Berghe",
+    "title": "Director General, National Geographic Institute of Belgium",
+    "dept": "Library & Research Support",
+    "instId": "rmca",
+    "instName": "Royal Museum for Central Africa",
+    "email": "ingrid.vandenberghe@africamuseum.be",
+    "constructed": true,
+    "source": "https://www.africamuseum.be/en/about_us/mission_organisation"
+  },
+  {
+    "first": "Brigitte",
+    "last": "Lauwaert",
+    "title": "Head of Scientific Section, MUMM and RBINS",
+    "dept": "Library & Research Support",
+    "instId": "rmca",
+    "instName": "Royal Museum for Central Africa",
+    "email": "brigitte.lauwaert@africamuseum.be",
+    "constructed": true,
+    "source": "https://www.africamuseum.be/en/about_us/mission_organisation"
+  },
+  {
+    "first": "Didier",
+    "last": "Van den Spiegel",
+    "title": "Head of Department, Collection Management",
+    "dept": "Library & Research Support",
+    "instId": "rmca",
+    "instName": "Royal Museum for Central Africa",
+    "email": "didier.vandenspiegel@africamuseum.be",
+    "constructed": true,
+    "source": "https://www.africamuseum.be/en/about_us/mission_organisation"
+  },
+  {
+    "first": "François",
+    "last": "Kervyn de Meerendré",
+    "title": "Head of Department a.i., Earth Sciences",
+    "dept": "Library & Research Support",
+    "instId": "rmca",
+    "instName": "Royal Museum for Central Africa",
+    "email": "francois.kervyndemeerendre@africamuseum.be",
+    "constructed": true,
+    "source": "https://www.africamuseum.be/en/about_us/mission_organisation"
+  },
+  {
+    "first": "Marc",
+    "last": "De Meyer",
+    "title": "Head of Department a.i., Biology",
+    "dept": "Library & Research Support",
+    "instId": "rmca",
+    "instName": "Royal Museum for Central Africa",
+    "email": "marc.demeyer@africamuseum.be",
+    "constructed": true,
+    "source": "https://www.africamuseum.be/en/about_us/mission_organisation"
+  },
+  {
+    "first": "Jacky",
+    "last": "Maniacky",
+    "title": "Head of Department a.i., Cultural Anthropology and History",
+    "dept": "Library & Research Support",
+    "instId": "rmca",
+    "instName": "Royal Museum for Central Africa",
+    "email": "jacky.maniacky@africamuseum.be",
+    "constructed": true,
+    "source": "https://www.africamuseum.be/en/about_us/mission_organisation"
+  },
+  {
+    "first": "Patricia",
+    "last": "van Schuylenbergh",
+    "title": "Head of Service, History and Politics",
+    "dept": "Library & Research Support",
+    "instId": "rmca",
+    "instName": "Royal Museum for Central Africa",
+    "email": "patricia.vanschuylenbergh@africamuseum.be",
+    "constructed": true,
+    "source": "https://www.africamuseum.be/en/about_us/mission_organisation"
   }
 ]
