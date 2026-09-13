@@ -334,6 +334,22 @@
       "urls": [
         "https://cancer.be/qui-sommes-nous/"
       ]
+    },
+    {
+      "instId": "sckcen",
+      "instName": "SCK CEN (Belgian Nuclear Research Centre)",
+      "emailDomain": "sckcen.be",
+      "urls": [
+        "https://www.sckcen.be/en/about-sck-cen/structure-and-management"
+      ]
+    },
+    {
+      "instId": "rmca",
+      "instName": "Royal Museum for Central Africa",
+      "emailDomain": "africamuseum.be",
+      "urls": [
+        "https://www.africamuseum.be/en/about_us/mission_organisation"
+      ]
     }
   ]
 }
