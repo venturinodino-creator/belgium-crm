@@ -76,44 +76,6 @@ const DATA_FILE = 'data/competitor-jobs.json';
 const STATE_FILE = 'data/competitor-jobs-scan-state.json';
 const ARCHIVE_FILE = 'data/archive/competitor-jobs.json';
 
-// ── Private "roles for you" feed ──────────────────────────────────────────
-// A shortlist for the person who runs this CRM, not competitor intelligence:
-// roles at the tracked competitors that they could actually take — anywhere in
-// the three territories they cover, or genuinely remote-eligible. Written to
-// its own file and surfaced on a dashboard card only their account can see.
-// Never written to disk in this repo: it goes to Supabase, behind RLS.
-const PERSONAL_OWNER = 'venturino.dino@gmail.com';
-const PERSONAL_TABLE = 'personal_roles';
-const SUPA_URL = 'https://cfhljbexesdrabmadpcc.supabase.co';
-const SUPA_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const REGION = 'belgium';
-// All three covered territories, because the shortlist is the person's, not
-// this repo's region.
-const PERSONAL_PLACES = [
-  ['Netherlands', /netherlands|nederland|amsterdam|utrecht|rotterdam|the hague|den haag|eindhoven|groningen|delft|leiden|maastricht|\bnld\b/i],
-  ['Belgium',     /belgium|belgi[e\u00eb]|belgique|brussels|brussel|bruxelles|antwerp|antwerpen|ghent|\bgent\b|leuven|louvain|li[e\u00e8]ge|\bbel\b/i],
-  ['Denmark',     /denmark|danmark|copenhagen|k[\u00f8o]benhavn|aarhus|odense|aalborg|\bdnk\b/i],
-];
-// Senior individual contributor or first-line manager carrying a quota.
-// classifyRole() has already discarded everything non-commercial; this narrows
-// what is left to the seniority band worth a move.
-const PERSONAL_TITLE_RE = /\b(strategic|senior|key|enterprise|global|named|major|regional)?\s*account\s+(manager|director|executive|lead)\b|\baccount management\b|\bclient (director|partner|manager)\b|\bcustomer success manager\b|\bbusiness development (manager|director|lead)\b|\b(sales|commercial) (manager|director|lead|executive)\b|\b(channel|partner|partnership|alliance)s?\s*(manager|director|lead)\b|\bpartnerships lead\b|\brenewals? (manager|specialist)\b/i;
-const PERSONAL_EXCLUDE_RE = /\b(intern|internship|graduate|apprentice|working student|sdr|bdr|sales development representative|engineer|developer|scientist|recruit\w*|editor|editorial)\b/i;
-// Their own patch — research intelligence, scholarly publishing, libraries.
-const PERSONAL_DOMAIN_RE = /research|academic|scholarly|librar|higher education|university|institutional|life science|pharma/i;
-
-function personalFit(title, location) {
-  if (!PERSONAL_TITLE_RE.test(title) || PERSONAL_EXCLUDE_RE.test(title)) return null;
-  const loc = location || '';
-  for (const [place, re] of PERSONAL_PLACES) if (re.test(loc)) return { place, remote: false };
-  if (!/\bremote\b/i.test(loc) || NON_EUROPE_REMOTE_RE.test(loc)) return null;
-  // "Remote, FRA | Remote, DEU" is a closed list of the countries the role can
-  // actually be worked from. If it names countries and none of them is one of
-  // ours, it is still worth knowing about but it cannot be taken from here.
-  const named = loc.split('|').map(s => s.trim()).filter(l => /^remote,/i.test(l));
-  const reachable = !named.length || named.some(l => PERSONAL_PLACES.some(([, re]) => re.test(l)));
-  return { place: 'Remote', remote: true, reachable };
-}
 // A closed role lingers in the live list for a full month before moving to
 // the archive — see the file header for why. Kept in sync with
 // news-scan.js's ARCHIVE_AGE_DAYS concept, just a longer window: a closed
@@ -458,108 +420,12 @@ const UNTRACKED_COMPANIES = [
   { company: 'Google', reason: 'Proprietary/internal API, not public', url: 'https://careers.google.com/' },
 ];
 
-// Hand the new roles to the workflow as a file outside the workspace, so the
-// email step can read them without them ever being echoed or committed.
-function writeRolesDigest(fresh) {
-  const out = process.env.ROLES_DIGEST_PATH;
-  if (!out || !fresh.length) return;
-  const esc = s => String(s == null ? '' : s)
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  const row = r => `<tr>
-      <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb">
-        <a href="${esc(r.url)}" style="color:#0f172a;font-weight:600;text-decoration:none">${esc(r.title)}</a>
-        <div style="color:#64748b;font-size:13px;margin-top:3px">${esc(r.company)} &middot; ${esc(r.place)}${r.reachable ? '' : ' &middot; <span style="color:#b91c1c">not open from your countries</span>'}${r.domain_match ? ' &middot; <span style="color:#4338ca">your domain</span>' : ''}</div>
-        <div style="color:#94a3b8;font-size:12px;margin-top:2px">${esc(r.location)}</div>
-      </td>
-    </tr>`;
-  const html = `<div style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:640px">
-    <p style="font-size:15px;color:#0f172a">${fresh.length} new role${fresh.length === 1 ? '' : 's'} matching your profile:</p>
-    <table style="width:100%;border-collapse:collapse;border:1px solid #e5e7eb;border-radius:8px">${fresh.map(row).join('')}</table>
-    <p style="color:#94a3b8;font-size:12px;margin-top:14px">From the daily competitor hiring scan. The full shortlist lives on the Roles for You page in your CRM.</p>
-  </div>`;
-  try {
-    writeFileSync(out, html, 'utf8');
-  } catch (e) {
-    console.warn(`[competitor-jobs] roles-for-you: could not write the digest — ${e.message}`);
-  }
-}
-
-async function supaRequest(method, pathAndQuery, body) {
-  const res = await fetch(`${SUPA_URL}/rest/v1/${pathAndQuery}`, {
-    method,
-    headers: {
-      apikey: SUPA_SERVICE_KEY,
-      Authorization: `Bearer ${SUPA_SERVICE_KEY}`,
-      'Content-Type': 'application/json',
-      Prefer: method === 'POST' ? 'resolution=merge-duplicates,return=representation' : 'return=minimal',
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  });
-  if (!res.ok) throw new Error(`Supabase ${method} ${pathAndQuery}: ${res.status} ${await res.text()}`);
-  return method === 'POST' ? res.json() : null;
-}
-
-async function pushPersonalRoles(roles, today) {
-  // Only the repo that sets PERSONAL_SHORTLIST maintains the list. It searches
-  // all three territories regardless of which repo it runs in, so one owner is
-  // full coverage — and the row id is company+url, which three concurrent
-  // scans would otherwise overwrite each other on.
-  if (process.env.PERSONAL_SHORTLIST !== '1') return;
-  if (!SUPA_SERVICE_KEY) {
-    console.warn('[competitor-jobs] roles-for-you: SUPABASE_SERVICE_ROLE_KEY not set — skipping the private shortlist.');
-    return;
-  }
-  try {
-    const existing = await (await fetch(
-      `${SUPA_URL}/rest/v1/${PERSONAL_TABLE}?select=id,first_seen&owner_email=eq.${encodeURIComponent(PERSONAL_OWNER)}&region=eq.${REGION}`,
-      { headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}` } })).json();
-    const firstSeenById = new Map((existing || []).map(r => [r.id, r.first_seen]));
-
-    const rows = roles.map(r => ({
-      id: r.id,
-      owner_email: PERSONAL_OWNER,
-      company: r.company,
-      title: r.title,
-      location: r.location,
-      place: r.place,
-      reachable: r.reachable,
-      domain_match: r.domainMatch,
-      role_category: r.roleCategory,
-      url: r.url,
-      posted_date: r.postedDate,
-      source: r.source,
-      region: REGION,
-      first_seen: firstSeenById.get(r.id) || today,
-      last_seen: today,
-      updated_at: new Date().toISOString(),
-    }));
-    if (rows.length) await supaRequest('POST', PERSONAL_TABLE, rows);
-
-    // Anything we no longer see is off the market — drop it.
-    const keep = new Set(rows.map(r => r.id));
-    const stale = [...firstSeenById.keys()].filter(id => !keep.has(id));
-    if (stale.length) {
-      const list = stale.map(encodeURIComponent).join(',');
-      await supaRequest('DELETE', `${PERSONAL_TABLE}?id=in.(${list})&owner_email=eq.${encodeURIComponent(PERSONAL_OWNER)}`);
-    }
-    // Counts only. Actions logs are public on a public repo, so naming the
-    // roles here would undo the whole reason this list is not a file in it.
-    const fresh = rows.filter(r => r.first_seen === today);
-    console.log(`[competitor-jobs] roles-for-you: ${rows.length} on the shortlist, ${fresh.length} new, ${stale.length} removed.`);
-    writeRolesDigest(fresh);
-  } catch (e) {
-    // Never fail the whole scan over the private extra.
-    console.warn(`[competitor-jobs] roles-for-you: could not sync to Supabase — ${e.message}`);
-  }
-}
-
 async function main() {
   const existing = readJSON(DATA_FILE, []);
   const existingByKey = new Map(existing.map(j => [j.company + '|' + j.url, j]));
   const today = new Date().toISOString().slice(0, 10);
 
   const seenThisRun = new Map(); // key -> freshly-built job record
-  const personalSeen = new Map(); // key -> role for the private shortlist
   const perCompanyCounts = {};
   const errors = {};
 
@@ -580,7 +446,6 @@ async function main() {
         // sources already carry a usable location string from their list
         // fetch, so this only adds a request for Workday-sourced candidates.
         let displayLocation = j.location;
-        let personalLocation = j.location;
         let matchLocation = j.location;
         let descriptionHtml = j.descriptionHtml || '';
         if (j.workdayDetail) {
@@ -589,9 +454,6 @@ async function main() {
             descriptionHtml = detail.description || descriptionHtml;
             displayLocation = detail.country ? `${detail.location || j.location} — ${detail.country}` : (detail.location || j.location);
             matchLocation = [displayLocation, ...detail.additionalLocations].filter(Boolean).join(' | ');
-            // Captured before the Netherlands-only override below can blank
-            // matchLocation out — the personal feed wants the full picture.
-            personalLocation = matchLocation;
 
             // additionalLocations is sometimes a CLOSED enumerated list of
             // specific remote-eligible countries ("Remote, FRA" / "Remote,
@@ -614,20 +476,6 @@ async function main() {
             console.warn(`[competitor-jobs] Could not fetch job detail for "${j.title}" (${j.company}): ${e.message} — falling back to the list location text for this role.`);
           }
         }
-        const fit = personalFit(j.title, personalLocation);
-        if (fit) personalSeen.set(j.company + '|' + j.url, {
-          id: makeId(j.company, j.url),
-          company: j.company,
-          title: j.title.slice(0, 200),
-          location: String(personalLocation || j.location || '').slice(0, 220),
-          place: fit.place,
-          reachable: fit.remote ? fit.reachable !== false : true,
-          domainMatch: PERSONAL_DOMAIN_RE.test(j.title),
-          roleCategory,
-          url: j.url.slice(0, 500),
-          postedDate: j.postedDate,
-          source: j.source,
-        });
         if (!isTrackedLocation(matchLocation)) continue;
         perCompanyCounts[src.company].beOrRemote++;
         const key = j.company + '|' + j.url;
@@ -702,14 +550,6 @@ async function main() {
 
   live.sort((a, b) => (b.postedDate || b.foundDate || '').localeCompare(a.postedDate || a.foundDate || ''));
   saveJSON(DATA_FILE, live);
-
-  // Private shortlist -> Supabase. first_seen is preserved by the upsert (the
-  // column keeps its existing value because we only send it for rows we have
-  // not seen before), so the dashboard can still say what is new. Roles that
-  // drop off the boards are deleted: this is a live shortlist, not a record of
-  // everything ever advertised. A missing service-role key is not an error —
-  // the scan still does its main job, it just skips the private part.
-  await pushPersonalRoles([...personalSeen.values()], today);
 
   saveJSON(STATE_FILE, {
     lastRun: new Date().toISOString(),
