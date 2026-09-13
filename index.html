@@ -1042,6 +1042,78 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
 .dsh-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .dsh-chip i{width:7px;height:7px;border-radius:2px;display:block}
 
+/* ── Analytics ─────────────────────────────────────────────
+   One filter row scopes every chart below it. Marks are thin, gridlines are
+   solid hairlines, and no chart uses colour to say something the bar length
+   already says. */
+.an-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.an-bar .flt{min-width:150px}
+.an-seg{display:inline-flex;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;overflow:hidden}
+.an-seg button{padding:6px 11px;font-size:11.5px;font-weight:600;background:transparent;border:none;color:var(--muted2);cursor:pointer;font-family:inherit;transition:background .15s,color .15s}
+.an-seg button:hover{color:var(--text)}
+.an-seg button.on{background:rgba(0,245,196,.13);color:var(--accent)}
+.an-scope{font-size:11px;color:var(--muted);margin-left:auto}
+
+.an-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:10px;margin-bottom:12px}
+.an-kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--card-radius);padding:14px 16px}
+.an-kpi .k-l{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+.an-kpi .k-v{font-size:23px;font-weight:700;color:var(--text2);letter-spacing:-.5px;margin-top:6px;line-height:1.1}
+.an-kpi .k-s{font-size:11px;color:var(--muted);margin-top:4px}
+
+.an-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:12px}
+.an-grid .an-wide{grid-column:1/-1}
+.an-card{background:var(--card);border:1px solid var(--border);border-radius:var(--card-radius);padding:16px 18px}
+.an-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.an-title{font-size:12.5px;font-weight:700;color:var(--text2)}
+.an-sub{font-size:11px;color:var(--muted);margin:3px 0 14px}
+.an-link{font-size:11px;font-weight:600;color:var(--accent);background:none;border:none;cursor:pointer;font-family:inherit;padding:0;white-space:nowrap}
+.an-link:hover{text-decoration:underline}
+.an-empty{font-size:12px;color:var(--muted);padding:18px 0;text-align:center}
+
+/* label · track · value rows — the value is always written out, so nothing on
+   this screen is readable by colour alone */
+.an-row{display:grid;grid-template-columns:1fr auto;gap:5px 10px;align-items:center;padding:8px 0}
+.an-row + .an-row{border-top:1px solid var(--border)}
+.an-rl{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text);min-width:0}
+.an-rl i{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.an-rl > span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.an-rv{font-size:12px;font-weight:700;color:var(--text2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.an-rv em{font-style:normal;font-weight:600;color:var(--muted);margin-left:5px}
+.an-track{grid-column:1/-1;height:8px;border-radius:0 4px 4px 0;background:rgba(255,255,255,.05)}
+.an-fill{display:block;height:100%;width:0;border-radius:0 4px 4px 0;transition:width .9s cubic-bezier(.22,1,.36,1)}
+.an-step{grid-column:1/-1;font-size:10.5px;color:var(--muted)}
+
+/* activity columns — 18px head-room for the labels, a 28px gutter for the ticks */
+.an-plot{position:relative;display:flex;align-items:flex-end;gap:3px;height:150px;padding:18px 0 0 28px;border-bottom:1px solid var(--border2)}
+.an-gridline{position:absolute;left:28px;right:0;height:1px;background:var(--border);pointer-events:none}
+.an-gridline b{position:absolute;left:-28px;top:-6px;width:24px;text-align:right;font-size:9.5px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
+.an-col{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;position:relative;background:none;border:none;padding:0;cursor:default;font-family:inherit}
+.an-col:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.an-colbar{width:100%;max-width:24px;border-radius:4px 4px 0 0;transition:height .9s cubic-bezier(.22,1,.36,1),filter .15s}
+.an-col:hover .an-colbar,.an-col:focus-visible .an-colbar{filter:brightness(1.25)}
+.an-colv{position:absolute;top:-15px;font-size:10px;font-weight:700;color:var(--text2);font-variant-numeric:tabular-nums;opacity:0;transition:opacity .12s}
+.an-colv.keep,.an-col:hover .an-colv,.an-col:focus-visible .an-colv{opacity:1}
+.an-xaxis{display:flex;gap:3px;margin-top:7px;padding-left:28px}
+.an-xaxis span{flex:1;min-width:0;text-align:center;font-size:9.5px;color:var(--muted);overflow:hidden;white-space:nowrap}
+
+.an-scrollx{overflow-x:auto}
+.an-tbl{width:100%;border-collapse:collapse;font-size:11.5px;min-width:340px}
+.an-tbl th{text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--border2)}
+.an-tbl td{padding:7px 8px;border-bottom:1px solid var(--border);color:var(--text)}
+.an-tbl th.num,.an-tbl td.num{text-align:right}
+/* segmented status bar — one span per status, counts spelled out in the legend */
+.an-stack{grid-column:1/-1;display:flex;height:8px;border-radius:0 4px 4px 0;background:rgba(255,255,255,.05);overflow:hidden}
+.an-stk-fill{display:block;height:100%}
+.an-legend{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px 12px;font-size:10.5px;color:var(--muted)}
+.an-legend i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.an-a{cursor:pointer}
+.an-a:hover{color:var(--accent);text-decoration:underline}
+.an-tbl td.num{font-variant-numeric:tabular-nums;color:var(--text2);font-weight:600}
+.an-tbl tbody tr:hover{background:rgba(255,255,255,.03)}
+.an-tbl tbody tr.clickable{cursor:pointer}
+.an-data{margin-top:12px;border-top:1px solid var(--border);padding-top:10px}
+
+
 .dsh-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
 .dsh-tile{
   position:relative;text-align:left;cursor:pointer;font-family:inherit;
@@ -1295,6 +1367,9 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
     <div class="nav-section">Workspace</div>
     <div class="nav-item active" data-view="dashboard" onclick="nav('dashboard')">
       <div class="nav-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg></div> Dashboard
+    </div>
+    <div class="nav-item" data-view="analytics" onclick="nav('analytics')">
+      <div class="nav-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="21" x2="21" y2="21"/><rect x="5" y="12" width="3.6" height="7" rx="1"/><rect x="10.2" y="7" width="3.6" height="12" rx="1"/><rect x="15.4" y="3" width="3.6" height="16" rx="1"/></svg></div> Analytics
     </div>
     <div class="nav-item" data-view="institutions" onclick="nav('institutions')">
       <div class="nav-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div> Institutions
@@ -1642,6 +1717,8 @@ let state = {
   currentEmail: null, // signed-in address, for owner-only surfaces
   rolesForYou: null,  // private job shortlist, loaded on demand
   view: 'dashboard',
+  anRange: localStorage.getItem('crm_an_range') || '12m', // Analytics: 30d | 90d | 12m | all
+  anType: '',                                            // Analytics: institution-type filter
   pipelineStage: 'all',
   instView: 'grid', // grid | table
   contactPage: 1,
@@ -3215,6 +3292,7 @@ function renderBackToMain() {
 function render() {
   const views = {
     dashboard: renderDashboard,
+    analytics: renderAnalytics,
     institutions: renderInstitutions,
     whitespace: renderWhiteSpace,
     contacts: renderContacts,
@@ -3651,7 +3729,7 @@ function dshGrowBars() {
 
 // ── Command palette ─────────────────────────────────────────
 const DSH_PAGES = [
-  ['Dashboard','dashboard'],['Institutions','institutions'],['Contacts','contacts'],
+  ['Dashboard','dashboard'],['Analytics','analytics'],['Institutions','institutions'],['Contacts','contacts'],
   ['New Contacts','pending'],['Competitor Matrix','subscriptions'],['LeapSpace Insights','ai-insights'],
   ['RFP Opps','rfp'],['Map','map'],['News','news'],['Daily Digest','digest'],['Summary','summary'],
 ];
@@ -6736,6 +6814,602 @@ function renderPipeline() {
     </div>
     <div class="pipeline-board">${cols}</div>`;
 }
+
+const AN_RANGES = { '30d': 30, '90d': 90, '12m': 365, all: null };
+const AN_RANGE_LABEL = { '30d': 'last 30 days', '90d': 'last 90 days', '12m': 'last 12 months', all: 'all time' };
+const AN_RANGE_BTN = { '30d': '30 days', '90d': '90 days', '12m': '12 months', all: 'All time' };
+const AN_HUE = '#2dd4bf';
+const AN_STAGES = [
+  { key: 'prospect',    label: 'Prospect',    color: '#0f766e' },
+  { key: 'engaged',     label: 'Engaged',     color: '#0d9488' },
+  { key: 'proposal',    label: 'Proposal',    color: '#14b8a6' },
+  { key: 'negotiation', label: 'Negotiation', color: '#2dd4bf' },
+  { key: 'closed-won',  label: 'Closed Won',  color: '#5eead4' },
+];
+// Probability by stage — the usual weighting, used only for the weighted figure.
+const AN_WEIGHTS = { prospect: .1, engaged: .25, proposal: .5, negotiation: .75 };
+const AN_HEALTH = [
+  { key: 'active',  label: 'Active',          sub: 'touched in the last 30 days', color: '#10b981', max: 30 },
+  { key: 'warm',    label: 'Warm',            sub: '30–90 days ago',              color: '#f59e0b', max: 90 },
+  { key: 'cooling', label: 'Cooling',         sub: '90–180 days ago',             color: '#f97316', max: 180 },
+  { key: 'cold',    label: 'Cold',            sub: 'over 180 days ago',           color: '#ef4444', max: Infinity },
+  { key: 'never',   label: 'Never contacted', sub: 'no interaction on record',    color: '#64748b', max: null },
+];
+const AN_INT_TYPES = [
+  { key: 'email',    label: 'Email' },
+  { key: 'call',     label: 'Call' },
+  { key: 'meeting',  label: 'Meeting' },
+  { key: 'demo',     label: 'Demo' },
+  { key: 'proposal', label: 'Proposal sent' },
+  { key: 'other',    label: 'Other' },
+];
+
+// ── small helpers ───────────────────────────────────────────
+// Dates are handled as local YYYY-MM-DD throughout; toISOString() would shift a
+// day for anyone east of UTC, which is everyone using this CRM.
+function anISO(d) {
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function anParse(date) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(date || ''));
+  return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null;
+}
+function anDaysSince(date) {
+  const d = anParse(date);
+  return d ? Math.floor((Date.now() - d.getTime()) / 86400000) : null;
+}
+function anCutoff() {
+  const days = AN_RANGES[state.anRange];
+  if (!days) return null;
+  const d = new Date(); d.setDate(d.getDate() - days);
+  return anISO(d);
+}
+// No cutoff ("all time") lets undated records through; a cutoff does not.
+function anInRange(date) {
+  const c = anCutoff();
+  if (!c) return true;
+  const d = String(date || '').slice(0, 10);
+  return !!d && d >= c;
+}
+function anMoney(v) {
+  const n = Math.round(Number(v) || 0);
+  if (!n) return '—';
+  if (Math.abs(n) >= 1e6) return '€' + (n / 1e6).toFixed(n % 1e6 ? 1 : 0) + 'M';
+  if (Math.abs(n) >= 1e4) return '€' + Math.round(n / 1e3) + 'k';
+  return '€' + n.toLocaleString();
+}
+function anSum(list, f) { return list.reduce((a, x) => a + (parseFloat(f(x)) || 0), 0); }
+function anPct(n, d) { return d ? Math.round(n / d * 100) : 0; }
+
+// Tenders carry a free-text institution name rather than an id, so the type
+// filter resolves them by matching that text against the institutions in scope.
+function anTenderInst(rfp, insts) {
+  const name = (rfp.institution || '').toLowerCase();
+  if (!name) return null;
+  return insts.find(i =>
+    (i.short && name.includes(i.short.toLowerCase())) ||
+    (i.name && name.includes(i.name.toLowerCase()))) || null;
+}
+
+// The one slice every chart on this screen reads.
+function anScope() {
+  const insts = state.institutions.filter(i => !state.anType || i.type === state.anType);
+  const ids = new Set(insts.map(i => i.id));
+  const allRfps = (typeof getRFPs === 'function' ? getRFPs() : state.rfps) || [];
+  const allActs = state.interactions.filter(n => ids.has(n.instId));
+  return {
+    insts, ids, allActs,
+    contacts: state.contacts.filter(c => ids.has(c.instId)),
+    opps: state.opportunities.filter(o => ids.has(o.instId)),
+    acts: allActs.filter(n => anInRange(n.date)),
+    rfps: allRfps.filter(r =>
+      anInRange(r.publishedDate || r.createdAt) &&
+      (!state.anType || anTenderInst(r, insts))),
+  };
+}
+
+// Time buckets for the activity chart — weeks for the short ranges, months for
+// the long ones, so a bucket always holds enough to be worth plotting.
+function anBuckets() {
+  const out = [];
+  const weekly = state.anRange === '30d' || state.anRange === '90d';
+  if (weekly) {
+    const n = state.anRange === '30d' ? 5 : 13;
+    const start = new Date(); start.setHours(0, 0, 0, 0);
+    start.setDate(start.getDate() - ((start.getDay() + 6) % 7)); // back to Monday
+    for (let i = n - 1; i >= 0; i--) {
+      const from = new Date(start); from.setDate(from.getDate() - i * 7);
+      const to = new Date(from); to.setDate(to.getDate() + 6);
+      out.push({ from: anISO(from), to: anISO(to), label: from.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) });
+    }
+  } else {
+    let n = 12;
+    if (state.anRange === 'all') {
+      const dates = state.interactions.map(x => x.date).filter(Boolean).sort();
+      const first = anParse(dates[0]);
+      if (first) {
+        const now = new Date();
+        const months = (now.getFullYear() - first.getFullYear()) * 12 + (now.getMonth() - first.getMonth()) + 1;
+        n = Math.min(24, Math.max(6, months));
+      }
+    }
+    const now = new Date();
+    for (let i = n - 1; i >= 0; i--) {
+      const from = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const to = new Date(now.getFullYear(), now.getMonth() - i + 1, 0);
+      out.push({
+        from: anISO(from), to: anISO(to),
+        label: from.toLocaleDateString('en-GB', { month: 'short' }) + (n > 12 ? ' ’' + String(from.getFullYear()).slice(2) : ''),
+      });
+    }
+  }
+  return out;
+}
+
+// ── shared pieces ───────────────────────────────────────────
+function anCard(title, sub, body, opts) {
+  const o = opts || {};
+  return `<div class="an-card${o.wide ? ' an-wide' : ''}">
+    <div class="an-head"><span class="an-title">${title}</span>${o.action || ''}</div>
+    <div class="an-sub">${sub}</div>
+    ${body}
+  </div>`;
+}
+// label · track · value. The value is written out as text, so the bar is an aid
+// to comparison rather than the only way to read the number.
+function anRow(label, value, pct, color, opts) {
+  const o = opts || {};
+  return `<div class="an-row">
+    <div class="an-rl">${o.swatch === false ? '' : `<i style="background:${color}"></i>`}<span>${label}</span></div>
+    <div class="an-rv">${value}</div>
+    <span class="an-track"><span class="an-fill" data-w="${Math.max(0, Math.min(100, Math.round(pct)))}" style="background:${color}"></span></span>
+    ${o.note ? `<div class="an-step">${o.note}</div>` : ''}
+  </div>`;
+}
+function anEmpty(msg) { return `<div class="an-empty">${msg}</div>`; }
+
+// A table twin for the charts whose values sit on the marks rather than in a
+// row of text, so every figure stays reachable without hovering.
+let _anTables = {};
+function anToggleTable(id) {
+  _anTables[id] = !_anTables[id];
+  const el = document.getElementById(id);
+  const btn = document.getElementById(id + '-btn');
+  if (el) el.hidden = !_anTables[id];
+  if (btn) btn.textContent = _anTables[id] ? 'Hide data' : 'Show data';
+}
+function anTableBtn(id) {
+  return `<button class="an-link" id="${id}-btn" onclick="anToggleTable('${id}')">${_anTables[id] ? 'Hide data' : 'Show data'}</button>`;
+}
+// Bars are emitted at zero and grown on the next frame so the transition runs.
+function anGrowBars() {
+  document.querySelectorAll('#content .an-fill').forEach(el => { if (el.dataset.w) el.style.width = el.dataset.w + '%'; });
+  document.querySelectorAll('#content .an-colbar').forEach(el => { if (el.dataset.h) el.style.height = el.dataset.h + '%'; });
+}
+
+function anSetRange(r) {
+  state.anRange = r;
+  try { localStorage.setItem('crm_an_range', r); } catch (e) {}
+  renderAnalytics();
+}
+function anSetType(t) { state.anType = t; renderAnalytics(); }
+
+// ── network intelligence ────────────────────────────────────
+// This CRM records who sits where and what each account runs; it is not a deal
+// pipeline. So the headline figures come from the competitor matrix, the
+// contact base, the decision-maker seats and OpenAlex output. Deals and logged
+// interactions still get their cards, but only once there are some to show.
+const AN_PRODUCTS = [
+  { key: 'scopus', label: 'Scopus',         elsevier: true },
+  { key: 'scival', label: 'SciVal',         elsevier: true },
+  { key: 'pure',   label: 'Pure',           elsevier: true },
+  { key: 'wos',    label: 'Web of Science', elsevier: false },
+];
+const AN_STATUS = [
+  { key: 'yes',      label: 'Active',   color: '#2dd4bf' },
+  { key: 'likely',   label: 'Likely',   color: '#5eead4' },
+  { key: 'expiring', label: 'Expiring', color: '#f59e0b' },
+  { key: 'no',       label: 'None',     color: '#475569' },
+  { key: 'unknown',  label: 'Unknown',  color: '#1e293b' },
+];
+const AN_TYPE_PLURAL = { university: 'universities', medical: 'medical centres', research: 'research institutes', ngo: 'NGOs and foundations' };
+const AN_GLYPH = { yes: ['✓', '#2dd4bf'], likely: ['~', '#5eead4'], expiring: ['!', '#f59e0b'], no: ['—', '#475569'], unknown: ['?', '#64748b'] };
+function anStatus(id, key) {
+  const st = getProductStatus(id, key);
+  return AN_STATUS.some(x => x.key === st) ? st : 'unknown';
+}
+function anHas(id, key) { const st = anStatus(id, key); return st === 'yes' || st === 'likely' || st === 'expiring'; }
+// OpenAlex works — the research-focus scan first, the white-space dossier as fallback.
+function anWorks(id) {
+  const rf = (state.researchFocus || {})[id];
+  if (rf && typeof rf.worksCount === 'number') return rf.worksCount;
+  const w = (state.whitespace || {})[id];
+  return w && typeof w.works === 'number' ? w.works : null;
+}
+function anNum(n) {
+  if (n === null || n === undefined) return '—';
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+  if (n >= 1e4) return Math.round(n / 1e3) + 'k';
+  return n.toLocaleString();
+}
+function anLabel(main, sub) {
+  return sub ? `${main} <span style="color:var(--muted);font-weight:500">· ${sub}</span>` : main;
+}
+function anInstLink(i) {
+  return `<span class="an-a" onclick="nav('detail',{instId:'${i.id}'})">${esc(i.short || i.name)}</span>`;
+}
+// This region has no researched white-space dossier yet, so the accessor
+// returns an empty record and the bucket labels live here.
+function anWsInfo(id) { return (state.whitespace || {})[id] || {}; }
+const AN_WS_BUCKET = {
+  greenfield: { label: 'Greenfield',   color: '#4ade80' },
+  rival:      { label: 'Displacement', color: '#fb923c' },
+  unknown:    { label: 'Unverified',   color: '#fbbf24' },
+};
+// Pure white space, pinned to Pure exactly like the nav badge is.
+function anWsBucket(id) {
+  if (getProductStatus(id, 'pure') === 'unknown') return 'unknown';
+  const inc = anWsInfo(id).incumbent || '';
+  const rival = getProductStatus(id, 'converis') === 'yes' || getProductStatus(id, 'symplectic') === 'yes' || (!!inc && !/^none/i.test(inc));
+  return rival ? 'rival' : 'greenfield';
+}
+function anWhiteSpaceList(s) {
+  return s.insts.filter(i => WS_ELIGIBLE_TYPES.includes(i.type) && !WS_EXCLUDE_IDS.has(i.id) && getProductStatus(i.id, 'pure') in WS_PURE_STATUS);
+}
+// A segmented bar with one span per status. The counts sit in the legend, so
+// the colours are an aid to comparison rather than the only way to read it.
+function anStack(counts, total) {
+  const present = AN_STATUS.filter(st => counts[st.key]);
+  const segs = present.map(st =>
+    `<span class="an-stk-fill" style="width:${(counts[st.key] / (total || 1) * 100).toFixed(1)}%;background:${st.color}" title="${st.label}: ${counts[st.key]}"></span>`).join('');
+  const legend = present.map(st => `<span><i style="background:${st.color}"></i>${st.label} ${counts[st.key]}</span>`).join('');
+  return `<span class="an-stack">${segs}</span><span class="an-legend">${legend}</span>`;
+}
+function anRfpOpen(r) { return !['won', 'lost', 'closed'].includes(rfpStatusKey(r.status)); }
+
+// ── the cards ───────────────────────────────────────────────
+function anKpis(s) {
+  const n = s.insts.length;
+  const byType = {};
+  s.insts.forEach(i => { byType[i.type] = (byType[i.type] || 0) + 1; });
+  const typeSub = Object.entries(byType).sort((a, b) => b[1] - a[1])
+    .map(([t, c]) => `${c} ${AN_TYPE_PLURAL[t] || (TYPE_LABEL[t] || t).toLowerCase()}`).join(' · ');
+  const withEmail = s.contacts.filter(c => c.email).length;
+  const covs = s.insts.map(i => keyRoleCoverage(i));
+  const avgCov = covs.length ? Math.round(covs.reduce((a, c) => a + c.pct, 0) / covs.length) : 0;
+  const strong = covs.filter(c => c.pct >= 80).length;
+  const elsevier = s.insts.filter(i => AN_PRODUCTS.some(p => p.elsevier && anHas(i.id, p.key))).length;
+  const ws = anWhiteSpaceList(s);
+  const green = ws.filter(i => anWsBucket(i.id) === 'greenfield').length;
+  const openRfps = s.rfps.filter(anRfpOpen).length;
+  const tiles = [
+    { l: 'Accounts',            v: String(n),              s: typeSub || 'in scope' },
+    { l: 'Contacts',            v: String(s.contacts.length), s: `${anPct(withEmail, s.contacts.length)}% with an email on file` },
+    { l: 'Decision-maker seats', v: avgCov + '%',          s: `${strong} of ${n} accounts at 80% or more` },
+    { l: 'Elsevier footprint',  v: String(elsevier),       s: `of ${n} run Scopus, SciVal or Pure` },
+    { l: 'Pure white space',    v: String(ws.length),      s: `${green} greenfield · no Pure tenancy` },
+    { l: 'Tenders',             v: String(s.rfps.length),  s: `${openRfps} open · ${AN_RANGE_LABEL[state.anRange]}` },
+  ];
+  // Only once there is something behind them.
+  if (s.opps.length) {
+    const open = s.opps.filter(o => !['closed-won', 'closed-lost'].includes(o.stage));
+    tiles.push({ l: 'Open pipeline', v: anMoney(anSum(open, o => o.value)), s: `${open.length} open deal${open.length === 1 ? '' : 's'}` });
+  }
+  if (s.allActs.length) {
+    const touched = new Set(s.acts.map(a => a.instId));
+    tiles.push({ l: 'Interactions', v: String(s.acts.length), s: `${touched.size} of ${n} accounts touched · ${AN_RANGE_LABEL[state.anRange]}` });
+  }
+  return `<div class="an-kpis">${tiles.map(t => `<div class="an-kpi">
+    <div class="k-l">${esc(t.l)}</div><div class="k-v">${t.v}</div><div class="k-s">${esc(t.s)}</div>
+  </div>`).join('')}</div>`;
+}
+
+function anFootprint(s) {
+  const n = s.insts.length;
+  const rows = AN_PRODUCTS.map(p => {
+    const counts = {};
+    s.insts.forEach(i => { const k = anStatus(i.id, p.key); counts[k] = (counts[k] || 0) + 1; });
+    const active = (counts.yes || 0) + (counts.likely || 0) + (counts.expiring || 0);
+    return `<div class="an-row">
+      <div class="an-rl"><span>${anLabel(p.label, p.elsevier ? '' : 'competitor')}</span></div>
+      <div class="an-rv">${active}<em>of ${n} · ${anPct(active, n)}%</em></div>
+      ${anStack(counts, n)}
+    </div>`;
+  }).join('');
+  const oa = s.insts.filter(i => { const c = (window.COMP_DATA || {})[i.id]; return !!(c && (c.openalexTier || c.openalex === 'free')); }).length;
+  return anCard('Product footprint', 'What each account runs today, from the competitor matrix',
+    rows + `<div class="an-step" style="padding-top:10px">${oa} of ${n} accounts on OpenAlex (free tier or supporting member)</div>`,
+    { action: `<button class="an-link" onclick="nav('subscriptions')">Open matrix</button>` });
+}
+
+function anSeats(s) {
+  const covs = s.insts.map(i => keyRoleCoverage(i));
+  const total = covs.length || 1;
+  const bands = [
+    { label: 'Complete',       sub: 'every seat filled',   color: '#10b981', test: c => c.pct === 100 },
+    { label: 'Strong',         sub: '80–99%',          color: '#2dd4bf', test: c => c.pct >= 80 && c.pct < 100 },
+    { label: 'Partial',        sub: '50–79%',          color: '#fbbf24', test: c => c.pct >= 50 && c.pct < 80 },
+    { label: 'Thin',           sub: '1–49%',           color: '#f97316', test: c => c.pct > 0 && c.pct < 50 },
+    { label: 'No seat filled', sub: 'no decision-maker on file', color: '#ef4444', test: c => c.pct === 0 },
+  ];
+  const rows = bands.map(b => {
+    const k = covs.filter(b.test).length;
+    return anRow(anLabel(b.label, b.sub), `${k}<em>${anPct(k, total)}%</em>`, k / total * 100, b.color);
+  }).join('');
+  // Which seats sit empty most often — those are the roles to go and find.
+  const seat = {};
+  covs.forEach(c => c.slots.forEach(sl => {
+    const e = seat[sl.key] = seat[sl.key] || { label: sl.label, filled: 0, total: 0 };
+    e.total++; if (sl.contact) e.filled++;
+  }));
+  const seatRows = Object.values(seat).sort((a, b) => a.filled / a.total - b.filled / b.total)
+    .map(e => anRow(esc(e.label), `${e.filled}<em>of ${e.total}</em>`, e.filled / e.total * 100, AN_HUE, { swatch: false })).join('');
+  return anCard('Decision-maker seats',
+    'President, rector, library, research dean, research director and grants seats with a named contact',
+    rows + '<div class="an-step" style="padding:12px 0 2px">Seats filled, across the accounts where the seat exists</div>' + seatRows,
+    { action: `<button class="an-link" onclick="nav('institutions')">Open institutions</button>` });
+}
+
+function anContacts(s) {
+  const c = s.contacts, n = c.length || 1;
+  const prio = { high: 0, medium: 0, low: 0 };
+  c.forEach(x => { const k = cxPriority(x); prio[k] = (prio[k] || 0) + 1; });
+  const rows = [
+    ['High priority',   'senior and signing roles', prio.high,   '#f87171'],
+    ['Medium priority', '',                         prio.medium, '#fbbf24'],
+    ['Low priority',    '',                         prio.low,    '#64748b'],
+  ].map(([l, sub, v, col]) => anRow(anLabel(l, sub), `${v}<em>${anPct(v, n)}%</em>`, v / n * 100, col)).join('');
+  const reach = [
+    ['Email on file',    c.filter(x => x.email).length],
+    ['Phone on file',    c.filter(x => x.phone).length],
+    ['LinkedIn on file', c.filter(x => x.linkedin).length],
+    ['Verified',         c.filter(x => x.quality === 'verified').length],
+  ].map(([l, v]) => anRow(l, `${v}<em>of ${c.length}</em>`, anPct(v, n), AN_HUE, { swatch: false })).join('');
+  return anCard('Contact base', `${c.length} contacts across ${s.insts.length} accounts`,
+    rows + '<div class="an-step" style="padding:12px 0 2px">Ways to reach them</div>' + reach,
+    { action: `<button class="an-link" onclick="nav('contacts')">Open contacts</button>` });
+}
+
+function anResearch(s) {
+  const rows = s.insts.map(i => ({ inst: i, works: anWorks(i.id) })).filter(r => r.works !== null).sort((a, b) => b.works - a.works);
+  const open = `<button class="an-link" onclick="nav('openalex')">Open OpenAlex</button>`;
+  if (!rows.length) return anCard('Research output', 'Works indexed in OpenAlex', anEmpty('No OpenAlex output on file for the accounts in scope.'), { action: open });
+  const total = rows.reduce((a, r) => a + r.works, 0);
+  const top = rows.slice(0, 8);
+  const body = top.map(r => anRow(anInstLink(r.inst), `${anNum(r.works)}<em>${anPct(r.works, total)}%</em>`, r.works / top[0].works * 100, AN_HUE, { swatch: false })).join('');
+  // Fields, weighted by each account's output so a big university's spread
+  // counts for more than a small institute's.
+  const fields = {};
+  s.insts.forEach(i => {
+    const rf = (state.researchFocus || {})[i.id];
+    if (!rf || !Array.isArray(rf.fields)) return;
+    rf.fields.forEach(f => { fields[f.name] = (fields[f.name] || 0) + (rf.worksCount || 0) * (f.pct || 0) / 100; });
+  });
+  const fl = Object.entries(fields).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const fRows = fl.length
+    ? '<div class="an-step" style="padding:12px 0 2px">Largest fields, weighted by output</div>' +
+      fl.map(([name, w]) => anRow(esc(name), anNum(Math.round(w)), w / fl[0][1] * 100, '#a78bfa', { swatch: false })).join('')
+    : '';
+  return anCard('Research output', `${anNum(total)} works across ${rows.length} accounts with OpenAlex data`, body + fRows, { action: open });
+}
+
+function anWhiteSpace(s) {
+  const list = anWhiteSpaceList(s);
+  const open = `<button class="an-link" onclick="nav('whitespace')">Open White Space</button>`;
+  if (!list.length) return anCard('Pure white space', 'Universities and medical centres with no Pure tenancy', anEmpty('Every eligible account in scope runs Pure.'), { action: open });
+  const b = { greenfield: 0, rival: 0, unknown: 0 };
+  list.forEach(i => { b[anWsBucket(i.id)]++; });
+  const subs = { greenfield: 'no rival CRIS either', rival: 'a rival CRIS is installed', unknown: 'not yet verified' };
+  const rows = Object.entries(AN_WS_BUCKET).map(([k, m]) =>
+    anRow(anLabel(m.label, subs[k]), `${b[k]}<em>${anPct(b[k], list.length)}%</em>`, b[k] / list.length * 100, m.color)).join('');
+  const top = list.map(i => ({ inst: i, works: anWorks(i.id) })).filter(r => r.works !== null).sort((a, b) => b.works - a.works).slice(0, 5);
+  const topRows = top.length
+    ? '<div class="an-step" style="padding:12px 0 2px">Biggest unmanaged output</div>' +
+      top.map(r => anRow(anInstLink(r.inst), `${anNum(r.works)}<em>works</em>`, r.works / top[0].works * 100, '#fb923c', { swatch: false })).join('')
+    : '';
+  return anCard('Pure white space', `${list.length} universities and medical centres with no Pure tenancy`, rows + topRows, { action: open });
+}
+
+function anGaps(s) {
+  const has = (i, k) => anHas(i.id, k);
+  const gaps = [
+    { l: 'Scopus without SciVal',      sub: 'SciVal upsell',     n: s.insts.filter(i => has(i, 'scopus') && !has(i, 'scival')).length },
+    { l: 'Pure without Scopus',        sub: 'Scopus cross-sell', n: s.insts.filter(i => has(i, 'pure') && !has(i, 'scopus')).length },
+    { l: 'Scopus without Pure',        sub: 'Pure cross-sell',   n: s.insts.filter(i => has(i, 'scopus') && !has(i, 'pure')).length },
+    { l: 'Web of Science, no Scopus',  sub: 'displacement',      n: s.insts.filter(i => has(i, 'wos') && !has(i, 'scopus')).length },
+    { l: 'No Elsevier product at all', sub: 'greenfield',        n: s.insts.filter(i => !AN_PRODUCTS.some(p => p.elsevier && has(i, p.key))).length },
+  ];
+  const max = Math.max.apply(null, gaps.map(g => g.n).concat([1]));
+  const body = gaps.map(g => anRow(anLabel(esc(g.l), g.sub), `${g.n}<em>of ${s.insts.length}</em>`, g.n / max * 100, AN_HUE, { swatch: false })).join('');
+  // Renewal dates are the one time-bound fact the matrix holds.
+  const ren = [];
+  s.insts.forEach(i => {
+    const c = (window.COMP_DATA || {})[i.id]; if (!c) return;
+    AN_PRODUCTS.forEach(p => { const d = c[p.key + 'Renewal']; if (d) ren.push({ inst: i, p: p.label, d: String(d) }); });
+  });
+  ren.sort((a, b) => a.d.localeCompare(b.d));
+  const renRows = ren.length
+    ? '<div class="an-step" style="padding:12px 0 2px">Known renewal dates</div>' +
+      ren.slice(0, 6).map(r => `<div class="an-row"><div class="an-rl"><span>${anInstLink(r.inst)} · ${r.p}</span></div><div class="an-rv">${esc(r.d)}</div></div>`).join('')
+    : '<div class="an-step" style="padding-top:12px">No renewal dates recorded in the matrix yet.</div>';
+  return anCard('Expansion openings', 'Accounts where one Elsevier product is in and another is not', body + renRows,
+    { action: `<button class="an-link" onclick="nav('subscriptions')">Open matrix</button>` });
+}
+
+function anFunnel(s) {
+  const stages = AN_STAGES.map(st => {
+    const list = s.opps.filter(o => o.stage === st.key);
+    return { key: st.key, label: st.label, color: st.color, n: list.length, val: anSum(list, o => o.value) };
+  });
+  const lost = s.opps.filter(o => o.stage === 'closed-lost');
+  // A deal sits in exactly one stage, so "reached" a stage means it is there or
+  // past it. Lost deals have left the funnel and get their own line.
+  const reach = stages.map((_, i) => stages.slice(i).reduce((a, x) => a + x.n, 0));
+  const top = reach[0] || 1;
+  const body = reach[0]
+    ? stages.map((st, i) => anRow(
+        st.label,
+        `${reach[i]} reached`,
+        reach[i] / top * 100,
+        st.color,
+        { note: `${st.n} here now · ${anMoney(st.val)}` + (i ? ` · ${anPct(reach[i], reach[i - 1])}% advanced from ${stages[i - 1].label}` : '') }
+      )).join('') + `<div class="an-step" style="padding-top:10px">${lost.length} closed lost · ${anMoney(anSum(lost, o => o.value))}</div>`
+    : anEmpty('No deals recorded yet — add one from a institution’s detail page.');
+  return anCard('Deal funnel', 'How far deals get, and what drops out between stages', body);
+}
+
+function anTrend(s) {
+  const weekly = state.anRange === '30d' || state.anRange === '90d';
+  const buckets = anBuckets();
+  const counts = buckets.map(b => s.allActs.filter(a => a.date >= b.from && a.date <= b.to).length);
+  const peak = Math.max(...counts, 0);
+  if (!peak) {
+    return anCard('Activity over time', `Interactions logged per ${weekly ? 'week' : 'month'}`,
+      anEmpty('No interactions logged in this period.'), { wide: true });
+  }
+  const lastIdx = counts.length - 1;
+  const peakIdx = counts.indexOf(peak);
+  // Only the peak and the latest bucket are direct-labelled; the rest are on
+  // hover/focus and in the table twin.
+  const cols = counts.map((n, i) => `<button class="an-col" title="${esc(buckets[i].label)}: ${n} interaction${n === 1 ? '' : 's'}">
+      <span class="an-colv${i === peakIdx || i === lastIdx ? ' keep' : ''}">${n}</span>
+      <span class="an-colbar" data-h="${Math.round(n / peak * 100)}" style="height:0;background:${AN_HUE}"></span>
+    </button>`).join('');
+  const half = Math.round(peak / 2);
+  const plot = `<div class="an-plot">
+      <span class="an-gridline" style="top:18px"><b>${peak}</b></span>
+      ${half && half !== peak ? `<span class="an-gridline" style="top:84px"><b>${half}</b></span>` : ''}
+      ${cols}
+    </div>
+    <div class="an-xaxis">${buckets.map(b => `<span>${esc(b.label)}</span>`).join('')}</div>
+    <div class="an-data" id="an-trend-data"${_anTables['an-trend-data'] ? '' : ' hidden'}>
+      <table class="an-tbl"><thead><tr><th>Period</th><th class="num">Interactions</th></tr></thead>
+      <tbody>${buckets.map((b, i) => `<tr><td>${esc(b.label)}</td><td class="num">${counts[i]}</td></tr>`).join('')}</tbody></table>
+    </div>`;
+  return anCard('Activity over time',
+    // Buckets are whole weeks/months, so their total can sit just under the
+    // headline count — say which span this number covers rather than leaving
+    // two different totals on one screen.
+    `Interactions logged per ${weekly ? 'week' : 'month'} · ${counts.reduce((a, b) => a + b, 0)} across ${esc(buckets[0].label)}–${esc(buckets[lastIdx].label)}`,
+    plot, { wide: true, action: anTableBtn('an-trend-data') });
+}
+
+function anMix(s) {
+  const total = s.acts.length;
+  const rows = AN_INT_TYPES
+    .map(t => ({ key: t.key, label: t.label, n: s.acts.filter(a => (a.type || 'other') === t.key).length }))
+    .filter(t => t.n)
+    .sort((a, b) => b.n - a.n);
+  const body = rows.length
+    ? rows.map(t => anRow(t.label, `${t.n}<em>${anPct(t.n, total)}%</em>`, t.n / rows[0].n * 100, AN_HUE, { swatch: false })).join('')
+    : anEmpty('No interactions logged in this period.');
+  return anCard('How you are reaching out', `Interaction mix · ${AN_RANGE_LABEL[state.anRange]}`, body);
+}
+
+function anHealth(s) {
+  // Health is "as of today" on purpose — scoping it to the selected range would
+  // file every account last touched before that window under "never contacted".
+  const last = {};
+  s.allActs.forEach(a => { if (a.date && (!last[a.instId] || a.date > last[a.instId])) last[a.instId] = a.date; });
+  const counts = {};
+  s.insts.forEach(i => {
+    const d = anDaysSince(last[i.id]);
+    const bucket = d === null ? 'never' : (AN_HEALTH.find(h => h.max !== null && d < h.max) || AN_HEALTH[3]).key;
+    counts[bucket] = (counts[bucket] || 0) + 1;
+  });
+  const total = s.insts.length || 1;
+  const body = AN_HEALTH.map(h => anRow(
+    `${h.label} <span style="color:var(--muted);font-weight:500">· ${h.sub}</span>`,
+    `${counts[h.key] || 0}<em>${anPct(counts[h.key] || 0, total)}%</em>`,
+    (counts[h.key] || 0) / total * 100, h.color
+  )).join('');
+  return anCard('Account health', `When each of the ${s.insts.length} accounts in scope was last touched · as of today`, body);
+}
+
+function anAccounts(s) {
+  const glyph = (id, k) => {
+    const st = anStatus(id, k), g = AN_GLYPH[st];
+    return `<span title="${AN_STATUS.find(x => x.key === st).label}" style="color:${g[1]};font-weight:700">${g[0]}</span>`;
+  };
+  const rows = s.insts.map(i => ({
+    inst: i, works: anWorks(i.id), cov: keyRoleCoverage(i),
+    contacts: s.contacts.filter(c => c.instId === i.id).length,
+  })).sort((a, b) => (b.works || 0) - (a.works || 0) || b.contacts - a.contacts).slice(0, 10);
+  const body = rows.length
+    ? `<div class="an-scrollx"><table class="an-tbl">
+        <thead><tr><th>Account</th><th>Type</th><th class="num">Works</th><th class="num">Scopus</th><th class="num">SciVal</th><th class="num">Pure</th><th class="num">WoS</th><th class="num">Key roles</th><th class="num">Contacts</th></tr></thead>
+        <tbody>${rows.map(r => `<tr class="clickable" onclick="nav('detail',{instId:'${r.inst.id}'})">
+          <td>${esc(r.inst.short || r.inst.name)}</td>
+          <td style="color:var(--muted)">${esc(TYPE_LABEL[r.inst.type] || r.inst.type || '')}</td>
+          <td class="num">${anNum(r.works)}</td>
+          <td class="num">${glyph(r.inst.id, 'scopus')}</td>
+          <td class="num">${glyph(r.inst.id, 'scival')}</td>
+          <td class="num">${glyph(r.inst.id, 'pure')}</td>
+          <td class="num">${glyph(r.inst.id, 'wos')}</td>
+          <td class="num" style="color:${keyRoleColor(r.cov.pct)};font-weight:700">${r.cov.filled}/${r.cov.total}</td>
+          <td class="num">${r.contacts}</td>
+        </tr>`).join('')}</tbody></table></div>
+      <div class="an-step" style="padding-top:8px">✓ active · ~ likely · ! expiring · — none · ? unknown</div>`
+    : anEmpty('No accounts in scope.');
+  return anCard('Largest accounts', 'The ten biggest research producers in scope, and where you stand with each', body, { wide: true });
+}
+
+function anTenders(s) {
+  const openRfp = `<button class="an-link" onclick="nav('rfp')">Open RFP Opps</button>`;
+  if (!s.rfps.length) {
+    return anCard('Tenders', `Published · ${AN_RANGE_LABEL[state.anRange]}`,
+      anEmpty('No tenders in this period.'), { action: openRfp });
+  }
+  const byStatus = {};
+  s.rfps.forEach(r => { const k = r.status || 'identified'; (byStatus[k] = byStatus[k] || []).push(r); });
+  const max = Math.max.apply(null, Object.values(byStatus).map(v => v.length));
+  const rows = Object.entries(byStatus).sort((a, b) => b[1].length - a[1].length).map(([k, list]) => {
+    const meta = RFP_STATUSES[k] || { label: k.charAt(0).toUpperCase() + k.slice(1), color: '#64748b' };
+    return anRow(esc(meta.label), `${list.length}<em>${anMoney(anSum(list, r => r.value))}</em>`, list.length / max * 100, meta.color);
+  }).join('');
+  const comps = {};
+  s.rfps.forEach(r => { if (r.competitor) comps[r.competitor] = (comps[r.competitor] || 0) + 1; });
+  const compList = Object.entries(comps).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const compRows = compList.length
+    ? '<div class="an-step" style="padding:12px 0 2px">Incumbent named in the notice</div>' +
+      compList.map(([name, n]) => anRow(esc(name), String(n), n / compList[0][1] * 100, AN_HUE, { swatch: false })).join('')
+    : '';
+  return anCard('Tenders',
+    `${s.rfps.length} published · ${AN_RANGE_LABEL[state.anRange]} · ${anMoney(anSum(s.rfps, r => r.value))} total value`,
+    rows + compRows, { action: openRfp });
+}
+
+function renderAnalytics() {
+  document.getElementById('page-title').textContent = 'Analytics';
+  document.getElementById('page-sub').textContent = 'Footprint, coverage and research output across the Belgium network';
+  document.getElementById('topbar-actions').innerHTML = '';
+
+  const s = anScope();
+  const ranges = Object.keys(AN_RANGES).map(r =>
+    `<button class="${state.anRange === r ? 'on' : ''}" onclick="anSetRange('${r}')">${AN_RANGE_BTN[r]}</button>`).join('');
+  const types = [''].concat(Object.keys(TYPE_LABEL)).map(t =>
+    `<option value="${t}"${state.anType === t ? ' selected' : ''}>${t ? TYPE_LABEL[t] : 'All institution types'}</option>`).join('');
+
+  const cards = [
+    anFootprint(s), anSeats(s), anContacts(s),
+    anResearch(s), anWhiteSpace(s), anGaps(s),
+    anAccounts(s), anTenders(s),
+  ];
+  // Deals and logged activity only earn a card once there is some of it.
+  if (s.opps.length) cards.push(anFunnel(s));
+  if (s.allActs.length) cards.push(anTrend(s), anHealth(s), anMix(s));
+
+  document.getElementById('content').innerHTML = `
+    <div class="an-bar">
+      <div class="an-seg">${ranges}</div>
+      <select class="flt" onchange="anSetType(this.value)">${types}</select>
+      <span class="an-scope">${s.insts.length} accounts · ${s.contacts.length} contacts in scope · the period applies to tenders and activity</span>
+    </div>
+    ${anKpis(s)}
+    <div class="an-grid">${cards.join('')}</div>`;
+  requestAnimationFrame(() => requestAnimationFrame(anGrowBars));
+}
+
 
 //  AUTH GATE
 // Sign-in itself happens on landing.html (shared Supabase session via localStorage,
