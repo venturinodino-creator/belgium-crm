@@ -7,6 +7,13 @@
   "city": "Edegem"
  },
  {
+  "id": "azdelta",
+  "name": "AZ Delta",
+  "short": "AZ Delta",
+  "type": "medical",
+  "city": "Roeselare"
+ },
+ {
   "id": "bruegel",
   "name": "Bruegel",
   "short": "Bruegel",
@@ -14,11 +21,32 @@
   "city": "Brussels"
  },
  {
+  "id": "craw",
+  "name": "Centre wallon de Recherches agronomiques",
+  "short": "CRA-W",
+  "type": "research",
+  "city": "Gembloux"
+ },
+ {
+  "id": "chucharleroi",
+  "name": "CHU de Charleroi (réseau HUmani)",
+  "short": "CHU Charleroi",
+  "type": "medical",
+  "city": "Charleroi"
+ },
+ {
   "id": "chuliege",
   "name": "CHU de Liège",
   "short": "CHU Liège",
   "type": "medical",
   "city": "Liège"
+ },
+ {
+  "id": "saintpierre",
+  "name": "CHU Saint-Pierre",
+  "short": "Saint-Pierre",
+  "type": "medical",
+  "city": "Brussels"
  },
  {
   "id": "chunamur",
@@ -54,6 +82,13 @@
   "short": "Flanders Make",
   "type": "research",
   "city": "Lommel"
+ },
+ {
+  "id": "ilvo",
+  "name": "Flanders Research Institute for Agriculture, Fisheries and Food",
+  "short": "ILVO",
+  "type": "research",
+  "city": "Merelbeke"
  },
  {
   "id": "fondationcontrelecancer",
@@ -105,6 +140,13 @@
   "city": "Brussels"
  },
  {
+  "id": "itg",
+  "name": "Institute of Tropical Medicine Antwerp",
+  "short": "ITM",
+  "type": "research",
+  "city": "Antwerp"
+ },
+ {
   "id": "solvay",
   "name": "International Solvay Institutes for Physics and Chemistry",
   "short": "Solvay Institutes",
@@ -147,6 +189,13 @@
   "city": "Brussels"
  },
  {
+  "id": "inbo",
+  "name": "Research Institute for Nature and Forest",
+  "short": "INBO",
+  "type": "research",
+  "city": "Brussels"
+ },
+ {
   "id": "royalacademiesbelgium",
   "name": "Royal Academies for Science and the Arts of Belgium",
   "short": "RASAB",
@@ -175,6 +224,20 @@
   "city": "Brussels"
  },
  {
+  "id": "rma",
+  "name": "Royal Military Academy",
+  "short": "RMA",
+  "type": "research",
+  "city": "Brussels"
+ },
+ {
+  "id": "rmca",
+  "name": "Royal Museum for Central Africa",
+  "short": "AfricaMuseum",
+  "type": "research",
+  "city": "Tervuren"
+ },
+ {
   "id": "rob",
   "name": "Royal Observatory of Belgium",
   "short": "ROB",
@@ -187,6 +250,13 @@
   "short": "Sciensano",
   "type": "research",
   "city": "Brussels"
+ },
+ {
+  "id": "sckcen",
+  "name": "SCK CEN (Belgian Nuclear Research Centre)",
+  "short": "SCK CEN",
+  "type": "research",
+  "city": "Mol"
  },
  {
   "id": "uclouvain",
@@ -257,6 +327,13 @@
   "short": "VITO",
   "type": "research",
   "city": "Mol"
+ },
+ {
+  "id": "vki",
+  "name": "Von Karman Institute for Fluid Dynamics",
+  "short": "VKI",
+  "type": "research",
+  "city": "Sint-Genesius-Rode"
  },
  {
   "id": "vub",
