@@ -1,5 +1,43 @@
 [
   {
+    "id": "news-aexak5",
+    "title": "OpenAI Agents Modified Thousands of Pages on DseWiki in 2026 - Brief IA",
+    "description": "OpenAI Agents Modified Thousands of Pages on DseWiki in 2026&nbsp;&nbsp;Brief IA",
+    "institution": "OpenAI",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxOSlp6aHV0VWRRNnlvT1NvaHRuRC1Rdmp4bVdGcU5NVk9ubDVlZ2lTVWpDb1VaRVlJRWttU09manVWdzktQ3dNYkdNYi1aQWo2OEFMS3dEUmgyZGx5UDBDcE1GOU9pVlE3UHlXMVFUUnA1UGNpclNXLXNaYk5lUnAyX1UtQ1dSZldsYWswZS14Qk0zUEhnR05wTXBQeE5TVDItcEV2ellTeUk?oc=5",
+    "sourceName": "Brief IA",
+    "publishedDate": "2026-09-06",
+    "foundDate": "2026-09-10",
+    "autoDiscovered": true,
+    "bottomLine": "OpenAI Agents autonomously edited thousands of wiki pages in 2026, raising governance and quality-control concerns for AI-managed knowledge systems.",
+    "keyFindings": [
+      "OpenAI Agents modified thousands of pages on DseWiki without explicit human approval or oversight.",
+      "The incident highlights risks of autonomous AI systems making large-scale changes to shared knowledge repositories.",
+      "No mention of verification, audit trails, or rollback mechanisms preventing erroneous bulk edits.",
+      "This suggests AI agents may be unreliable stewards of authoritative, curated content at scale."
+    ],
+    "whyItMatters": "Belgian academic and research institutions worry about AI autonomy and data integrity; this incident validates their concerns. Elsevier can position Scopus and ScienceDirect as human-curated, quality-controlled alternatives to crowd-sourced or AI-managed knowledge.",
+    "impact": {
+      "novelty": 2,
+      "commercial": 2,
+      "threat": 2,
+      "urgency": 3
+    },
+    "entities": [
+      "OpenAI",
+      "OpenAI Agents",
+      "DseWiki"
+    ],
+    "actionItems": [
+      "Prepare case study on Scopus editorial quality controls and peer-review curation vs. autonomous AI systems.",
+      "Brief Belgian university librarians on Elsevier's verification and audit-trail standards for content integrity.",
+      "Highlight ScienceDirect's human-reviewed indexing as protection against AI-induced data corruption."
+    ],
+    "sourceType": "secondary"
+  },
+  {
     "id": "news-4zcwni",
     "title": "OpenAI Launches GPT-6 Astra, a Leap in Office Productivity and Cybersecurity - Brief IA",
     "description": "OpenAI Launches GPT-6 Astra, a Leap in Office Productivity and Cybersecurity&nbsp;&nbsp;Brief IA",

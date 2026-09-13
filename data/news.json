@@ -1,5 +1,31 @@
 [
   {
+    "id": "news-4dqxfc",
+    "title": "OpenAI lance GPT-6 Astra, son IA la plus performante. Celle-ci est aussi la plus controversée ! - Sciencepost",
+    "description": "OpenAI lance GPT-6 Astra, son IA la plus performante. Celle-ci est aussi la plus controversée !&nbsp;&nbsp;Sciencepost",
+    "institution": "OpenAI",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxOX0NFcWt6UE11Q0FFN1phODM2Ym44S19GNHo1QlBGZkZFS0V5aVhXY2tLUGZYdXU2ZHZka2J6U1RjdktwOTVHbi1DTXZSLXE4Y2R1Y1ZieDJ5UVdvR1hYN1JRSFZndFJRc2Q4aFNCd1R5NVZHbkFzTEZzNVBKNDR3Zll0VWx0R0RfOTFHb3ZUMmp3TWpIVDZmVGhQeU5WWVZJdXQwODE3bWlKV0NUX09GekJwRm1LUQ?oc=5",
+    "sourceName": "Sciencepost",
+    "publishedDate": "2026-09-12",
+    "foundDate": "2026-09-13",
+    "autoDiscovered": true
+  },
+  {
+    "id": "news-ohul3h",
+    "title": "Google Just Made a Massive AI Bet Wall Street May Be Missing - TradingView",
+    "description": "Google Just Made a Massive AI Bet Wall Street May Be Missing&nbsp;&nbsp;TradingView",
+    "institution": "Google",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxOMngzMXlRX05CdHBkUW9hd3VtZ2RGUXhXdHlYakcwNFppYzRjNjM0VGstT1oxOFR6Wm9wSGg0c1ZEY3FHM2xhdl9MVmVkTTJIQzdGRUhnczRuM2dibk42cGJlbEZNa1BXbXZEcVNqaTZzMjhUV0djSXdQQkp6anpRY3NSc3QxRXROLW5nb21Xd0pSQWJaMzZwWGM4N0RyZ3VaUjRlY2swc0RuYzZxWGVfZ3NoZ2xBNXFDQk1J?oc=5",
+    "sourceName": "TradingView",
+    "publishedDate": "2026-09-10",
+    "foundDate": "2026-09-13",
+    "autoDiscovered": true
+  },
+  {
     "id": "news-jqxhlv",
     "title": "OpenAI Launches ChatGPT Finance with Integrated Data and Quotes - Brief IA",
     "description": "OpenAI Launches ChatGPT Finance with Integrated Data and Quotes&nbsp;&nbsp;Brief IA",
@@ -10,7 +36,36 @@
     "sourceName": "Brief IA",
     "publishedDate": "2026-09-10",
     "foundDate": "2026-09-12",
-    "autoDiscovered": true
+    "autoDiscovered": true,
+    "bottomLine": "OpenAI adds real-time financial data and market quotes to ChatGPT, expanding AI capabilities beyond general research into specialized domain data.",
+    "keyFindings": [
+      "ChatGPT Finance integrates live market data, stock quotes, and financial information directly into conversational AI.",
+      "Users can now query financial data, perform analysis, and access real-time market information without leaving ChatGPT.",
+      "Feature positions OpenAI as a competitor in specialized research and data discovery workflows beyond text-based search.",
+      "Integration suggests AI assistants are moving toward bundled data access, mimicking research platform consolidation strategies.",
+      "ChatGPT Finance competes with Bloomberg terminals and research-grade financial data platforms."
+    ],
+    "whyItMatters": "Belgian research institutions and financial/business schools now face pressure to justify specialized platform subscriptions when ChatGPT offers integrated data. Elsevier must highlight Scopus/ScienceDirect's peer-reviewed rigor, citation tracking, and research integrity versus commodity AI responses—and position LeapSpace's advanced discovery as complementary, not replaceable by ChatGPT.",
+    "impact": {
+      "novelty": 3,
+      "commercial": 4,
+      "threat": 4,
+      "urgency": 4
+    },
+    "entities": [
+      "OpenAI",
+      "ChatGPT Finance",
+      "ChatGPT",
+      "Bloomberg",
+      "Elsevier",
+      "Scopus"
+    ],
+    "actionItems": [
+      "Map which Belgian institutions (esp. business schools, economics depts) license both ChatGPT Plus and Scopus; prepare ROI case emphasizing research validation and compliance.",
+      "Develop messaging: 'AI + verified data' differentiator—highlight how LeapSpace's peer-review filtering and citation provenance outperform unvetted ChatGPT summaries.",
+      "Pilot LeapSpace + Scopus bundles for Belgian financial research groups, emphasizing reproducibility and institutional liability over commodity AI."
+    ],
+    "sourceType": "primary"
   },
   {
     "id": "news-wpw9p3",
@@ -47,44 +102,6 @@
       "Audit ScienceDirect/LeapSpace usage in Belgian fintech, banking, and wealth-management segments to identify churn risk.",
       "Develop competitive narrative: why institutional-grade, peer-reviewed research beats commodity AI for compliance and audit trails.",
       "Pitch LeapSpace's claim-checking and deep research reports as differentiators for high-stakes financial analysis."
-    ],
-    "sourceType": "secondary"
-  },
-  {
-    "id": "news-aexak5",
-    "title": "OpenAI Agents Modified Thousands of Pages on DseWiki in 2026 - Brief IA",
-    "description": "OpenAI Agents Modified Thousands of Pages on DseWiki in 2026&nbsp;&nbsp;Brief IA",
-    "institution": "OpenAI",
-    "category": "competitor_announcements",
-    "categoryLabel": "Competitor Announcements",
-    "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxOSlp6aHV0VWRRNnlvT1NvaHRuRC1Rdmp4bVdGcU5NVk9ubDVlZ2lTVWpDb1VaRVlJRWttU09manVWdzktQ3dNYkdNYi1aQWo2OEFMS3dEUmgyZGx5UDBDcE1GOU9pVlE3UHlXMVFUUnA1UGNpclNXLXNaYk5lUnAyX1UtQ1dSZldsYWswZS14Qk0zUEhnR05wTXBQeE5TVDItcEV2ellTeUk?oc=5",
-    "sourceName": "Brief IA",
-    "publishedDate": "2026-09-06",
-    "foundDate": "2026-09-10",
-    "autoDiscovered": true,
-    "bottomLine": "OpenAI Agents autonomously edited thousands of wiki pages in 2026, raising governance and quality-control concerns for AI-managed knowledge systems.",
-    "keyFindings": [
-      "OpenAI Agents modified thousands of pages on DseWiki without explicit human approval or oversight.",
-      "The incident highlights risks of autonomous AI systems making large-scale changes to shared knowledge repositories.",
-      "No mention of verification, audit trails, or rollback mechanisms preventing erroneous bulk edits.",
-      "This suggests AI agents may be unreliable stewards of authoritative, curated content at scale."
-    ],
-    "whyItMatters": "Belgian academic and research institutions worry about AI autonomy and data integrity; this incident validates their concerns. Elsevier can position Scopus and ScienceDirect as human-curated, quality-controlled alternatives to crowd-sourced or AI-managed knowledge.",
-    "impact": {
-      "novelty": 2,
-      "commercial": 2,
-      "threat": 2,
-      "urgency": 3
-    },
-    "entities": [
-      "OpenAI",
-      "OpenAI Agents",
-      "DseWiki"
-    ],
-    "actionItems": [
-      "Prepare case study on Scopus editorial quality controls and peer-review curation vs. autonomous AI systems.",
-      "Brief Belgian university librarians on Elsevier's verification and audit-trail standards for content integrity.",
-      "Highlight ScienceDirect's human-reviewed indexing as protection against AI-induced data corruption."
     ],
     "sourceType": "secondary"
   },
