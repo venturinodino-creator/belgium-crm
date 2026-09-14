@@ -1,5 +1,18 @@
 [
   {
+    "id": "news-j5wyzt",
+    "title": "Sur fond de polémique, OpenAI annonce avoir résolu l’équation de Navier-Stokes, vieille de deux siècles - Le Temps",
+    "description": "Sur fond de polémique, OpenAI annonce avoir résolu l’équation de Navier-Stokes, vieille de deux siècles&nbsp;&nbsp;Le Temps",
+    "institution": "OpenAI",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMi7AFBVV95cUxOT0pVdHNJQVg4di1iWVBhYnRhQXVRQk1jQUNUUkR2eWo2dXVleFFYVGZEd0JJTHNwMTQtYkZXb1J3U1FGQ0E3RncxYVRCYk1GSUt0S3o0eWRMTmxCdVNFMTZFUmdCaS0tUjB2bXVZZC1vS1dBQlNuX1RNS2xGdFRwdmlLTGQ0OUt6M1RVZE9KNjRnRWZ0WWEzWEdqRWs0SmFQSTAwTjlQc3h3UEZGTHVFbDhnZHFhczl1QzBJSUpQWUVyT2JQZVkzaFZ5S0IwbmRIUHM1SGJEWmxkZC0xR3Vyd3FhMlo5Uk1zUzNxaA?oc=5",
+    "sourceName": "Le Temps",
+    "publishedDate": "2026-09-09",
+    "foundDate": "2026-09-14",
+    "autoDiscovered": true
+  },
+  {
     "id": "news-4dqxfc",
     "title": "OpenAI lance GPT-6 Astra, son IA la plus performante. Celle-ci est aussi la plus controversée ! - Sciencepost",
     "description": "OpenAI lance GPT-6 Astra, son IA la plus performante. Celle-ci est aussi la plus controversée !&nbsp;&nbsp;Sciencepost",
@@ -10,7 +23,32 @@
     "sourceName": "Sciencepost",
     "publishedDate": "2026-09-12",
     "foundDate": "2026-09-13",
-    "autoDiscovered": true
+    "autoDiscovered": true,
+    "bottomLine": "OpenAI's GPT-6 Astra raises both performance and controversy, signaling intensifying AI capability race with unclear research governance implications.",
+    "keyFindings": [
+      "OpenAI has launched GPT-6 Astra, positioned as its most advanced AI model to date.",
+      "The model has generated significant controversy alongside its technical performance claims.",
+      "Launch timing and controversy suggest escalating competition in frontier AI capabilities.",
+      "Implications for research infrastructure governance and ethical AI deployment remain contested."
+    ],
+    "whyItMatters": "Belgian research institutions must understand how next-generation AI models like Astra will integrate into discovery workflows. LeapSpace's competitive positioning depends on demonstrating superior research-specific features over generic AI tools amid rapid capability shifts.",
+    "impact": {
+      "novelty": 4,
+      "commercial": 4,
+      "threat": 4,
+      "urgency": 4
+    },
+    "entities": [
+      "OpenAI",
+      "GPT-6 Astra",
+      "Sciencepost"
+    ],
+    "actionItems": [
+      "Investigate Astra's specific research capabilities (literature synthesis, citation handling, domain accuracy) versus LeapSpace's existing strengths.",
+      "Prepare positioning talking points for Belgian institutions: research-grade accuracy, compliance, and institutional control over AI outputs.",
+      "Monitor OpenAI's research-tool partnerships and pricing to anticipate direct competition in academic market."
+    ],
+    "sourceType": "secondary"
   },
   {
     "id": "news-ohul3h",
@@ -23,7 +61,33 @@
     "sourceName": "TradingView",
     "publishedDate": "2026-09-10",
     "foundDate": "2026-09-13",
-    "autoDiscovered": true
+    "autoDiscovered": true,
+    "bottomLine": "Google's major new AI investment signals deeper commitment to AI-powered research tools, escalating competition for Elsevier's research platform market share.",
+    "keyFindings": [
+      "Google has announced a significant AI investment bet that Wall Street may be undervaluing.",
+      "The move suggests Google is prioritizing AI as a core strategic pillar across product lines.",
+      "Investment scale implies potential for disruption in multiple information-access markets including academic research.",
+      "Google Scholar and emerging AI tools remain positioned to compete directly with ScienceDirect/Scopus/LeapSpace."
+    ],
+    "whyItMatters": "Belgian universities and research institutes rely on trusted, integrated discovery platforms. Google's expanding AI capabilities threaten ScienceDirect/Scopus market position unless Elsevier clearly demonstrates superior research governance, institutional data control, and seamless integration with local research workflows.",
+    "impact": {
+      "novelty": 3,
+      "commercial": 5,
+      "threat": 5,
+      "urgency": 5
+    },
+    "entities": [
+      "Google",
+      "Wall Street",
+      "Google Scholar",
+      "TradingView"
+    ],
+    "actionItems": [
+      "Accelerate LeapSpace feature releases and ROI case studies from Belgian early adopters to demonstrate institutional differentiation.",
+      "Conduct competitive analysis: map Google's likely AI research tool roadmap against Elsevier's ScienceDirect/Scopus/LeapSpace feature roadmap.",
+      "Engage Belgian research leadership on data sovereignty, compliance, and research integrity concerns with free or ad-supported AI research tools."
+    ],
+    "sourceType": "secondary"
   },
   {
     "id": "news-jqxhlv",
