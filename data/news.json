@@ -10,7 +10,36 @@
     "sourceName": "Le Temps",
     "publishedDate": "2026-09-09",
     "foundDate": "2026-09-14",
-    "autoDiscovered": true
+    "autoDiscovered": true,
+    "bottomLine": "OpenAI claims AI breakthrough on Navier-Stokes equations amid controversy; raises stakes for AI-driven research discovery and validation.",
+    "keyFindings": [
+      "OpenAI announces progress on solving the 200-year-old Navier-Stokes problem, a major unsolved challenge in fluid dynamics and mathematics.",
+      "Announcement occurs amid controversy, suggesting skepticism or debate about the validity or scope of the claimed solution.",
+      "AI-driven mathematical problem-solving now targets fundamental equations central to physics, engineering, and computational research.",
+      "Breakthrough, if validated, could transform how researchers approach classical problems and accelerate discovery cycles.",
+      "Raises questions about AI's role in peer review, validation, and the future of traditional mathematical proof methodologies."
+    ],
+    "whyItMatters": "Belgian research institutions (universities, engineering faculties) need visibility into AI-powered discovery tools and validation frameworks. Elsevier's LeapSpace claim-checking and deep research reports can help researchers critically evaluate AI breakthroughs, while Scopus/ScienceDirect ensure access to peer-reviewed counterarguments and rigorous literature context.",
+    "impact": {
+      "novelty": 4,
+      "commercial": 4,
+      "threat": 3,
+      "urgency": 4
+    },
+    "entities": [
+      "OpenAI",
+      "Navier-Stokes equations",
+      "Le Temps",
+      "Elsevier LeapSpace",
+      "AI-driven research",
+      "Computational mathematics"
+    ],
+    "actionItems": [
+      "Monitor OpenAI's peer-reviewed publications and responses from Fields Medal mathematicians to assess claim legitimacy and adoption risk.",
+      "Position LeapSpace claim-checking as essential tool for Belgian institutions evaluating AI-generated research breakthroughs and validating competing claims.",
+      "Develop case study showing how Scopus/ScienceDirect + LeapSpace help researchers contextualize disruptive AI announcements within published literature."
+    ],
+    "sourceType": "secondary"
   },
   {
     "id": "news-4dqxfc",

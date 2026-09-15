@@ -1,33 +1,16 @@
 {
-  "generatedAt": "2026-09-14T13:53:38.824Z",
-  "articleCount": 1,
-  "headline": "AI breakthroughs fuel research tool arms race; Belgian institutions face critical tech decisions",
-  "bottomLine": "OpenAI's claimed resolution of Navier-Stokes signals AI's rising capability in research validation, intensifying competition for Belgian academic subscriptions as institutions must choose between integrated AI platforms and traditional…",
-  "keyFindings": [
-    "AI systems are now attempting to solve century-old mathematical problems, raising questions about research verification and the role of traditional peer review in validating AI-generated…",
-    "Competitive pressure is mounting from free/freemium AI research assistants and search engines, forcing premium platforms to justify subscription value through depth, verification, and integrated AI…",
-    "Belgian research institutions face urgent choice: invest in comprehensive, verified platforms with AI layers (ScienceDirect/Scopus/LeapSpace) or adopt point-solution free tools that lack…"
-  ],
-  "whyItMatters": "OpenAI's high-profile claim creates both opportunity and threat: it demonstrates market hunger for AI-assisted research, validating Elsevier's LeapSpace investment, but also signals that competitors are racing to commoditize discovery and verification. Belgian institutions will demand proof that paid platforms outperform free alternatives in research quality, speed, and trustworthiness.",
+  "generatedAt": "2026-09-15T12:38:57.904Z",
+  "articleCount": 0,
+  "headline": "",
+  "bottomLine": "No live stories to summarize yet.",
+  "keyFindings": [],
+  "whyItMatters": "",
   "impact": {
-    "novelty": 4,
-    "commercial": 4,
-    "threat": 4,
-    "urgency": 4
+    "novelty": 3,
+    "commercial": 3,
+    "threat": 3,
+    "urgency": 3
   },
-  "entities": [
-    "OpenAI",
-    "Elsevier",
-    "ScienceDirect",
-    "Scopus",
-    "LeapSpace",
-    "Google Scholar",
-    "Semantic Scholar",
-    "Clarivate"
-  ],
-  "actionItems": [
-    "Prepare one-pager on how Scopus and LeapSpace verify and contextualize AI-generated claims vs. unverified free tools; test messaging with 2–3 target Belgian research directors this week.",
-    "Audit current LeapSpace capabilities for claim-checking and paper validation; identify gaps vs. OpenAI's announced features and prioritize product roadmap for Belgian sales cycle.",
-    "Schedule discovery calls with top 5 Belgian research institutions to understand AI adoption plans, budget cycles, and trust concerns; map decision-makers before competitors establish free-tool usage."
-  ]
+  "entities": [],
+  "actionItems": []
 }
