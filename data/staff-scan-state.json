@@ -1,5 +1,5 @@
 {
-  "lastRun": "2026-09-15T12:50:58.323Z",
+  "lastRun": "2026-09-16T12:46:10.977Z",
   "lastAddedCount": 0,
   "sources": 40,
   "issues": [
@@ -69,6 +69,15 @@
     },
     {
       "instId": "uzleuven",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "uza",
+      "url": "https://www.uza.be/nl/organisatie-en-structuur",
+      "error": "HTTP 429"
+    },
+    {
+      "instId": "uza",
       "note": "no people extracted"
     }
   ]
