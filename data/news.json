@@ -1,45 +1,42 @@
 [
   {
-    "id": "news-j5wyzt",
-    "title": "Sur fond de polémique, OpenAI annonce avoir résolu l’équation de Navier-Stokes, vieille de deux siècles - Le Temps",
-    "description": "Sur fond de polémique, OpenAI annonce avoir résolu l’équation de Navier-Stokes, vieille de deux siècles&nbsp;&nbsp;Le Temps",
+    "id": "news-50gr6p",
+    "title": "Anthropic lance Claude pour les conseillers financiers avec des connecteurs partenaires - Unite.AI",
+    "description": "Anthropic lance Claude pour les conseillers financiers avec des connecteurs partenaires&nbsp;&nbsp;Unite.AI",
+    "institution": "Anthropic",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxNaktKQVJBRGVDYkNDR0xIUFBFYU1xb0x0QWNRTVpWcXFzZE9QV2k4Q0U4aUJfOHV2bzViTHM5VXltdmc1dUVXeURzUEtPSVFMd2VXVGt0MHNNWXl4bDR3d3pFMUhvelkxeWYwdURhWWhmMzM2UEhjMU40QlFsdzNUSzZTdzlRWDY5YXZLQV9iRGtnall3Z0dObXFVRjRIdw?oc=5",
+    "sourceName": "Unite.AI",
+    "publishedDate": "2026-09-14",
+    "foundDate": "2026-09-16",
+    "autoDiscovered": true
+  },
+  {
+    "id": "news-m5zlqt",
+    "title": "OpenAI Foundation lance le programme Public Data for Health - Unite.AI",
+    "description": "OpenAI Foundation lance le programme Public Data for Health&nbsp;&nbsp;Unite.AI",
     "institution": "OpenAI",
     "category": "competitor_announcements",
     "categoryLabel": "Competitor Announcements",
-    "url": "https://news.google.com/rss/articles/CBMi7AFBVV95cUxOT0pVdHNJQVg4di1iWVBhYnRhQXVRQk1jQUNUUkR2eWo2dXVleFFYVGZEd0JJTHNwMTQtYkZXb1J3U1FGQ0E3RncxYVRCYk1GSUt0S3o0eWRMTmxCdVNFMTZFUmdCaS0tUjB2bXVZZC1vS1dBQlNuX1RNS2xGdFRwdmlLTGQ0OUt6M1RVZE9KNjRnRWZ0WWEzWEdqRWs0SmFQSTAwTjlQc3h3UEZGTHVFbDhnZHFhczl1QzBJSUpQWUVyT2JQZVkzaFZ5S0IwbmRIUHM1SGJEWmxkZC0xR3Vyd3FhMlo5Uk1zUzNxaA?oc=5",
-    "sourceName": "Le Temps",
-    "publishedDate": "2026-09-09",
-    "foundDate": "2026-09-14",
-    "autoDiscovered": true,
-    "bottomLine": "OpenAI claims AI breakthrough on Navier-Stokes equations amid controversy; raises stakes for AI-driven research discovery and validation.",
-    "keyFindings": [
-      "OpenAI announces progress on solving the 200-year-old Navier-Stokes problem, a major unsolved challenge in fluid dynamics and mathematics.",
-      "Announcement occurs amid controversy, suggesting skepticism or debate about the validity or scope of the claimed solution.",
-      "AI-driven mathematical problem-solving now targets fundamental equations central to physics, engineering, and computational research.",
-      "Breakthrough, if validated, could transform how researchers approach classical problems and accelerate discovery cycles.",
-      "Raises questions about AI's role in peer review, validation, and the future of traditional mathematical proof methodologies."
-    ],
-    "whyItMatters": "Belgian research institutions (universities, engineering faculties) need visibility into AI-powered discovery tools and validation frameworks. Elsevier's LeapSpace claim-checking and deep research reports can help researchers critically evaluate AI breakthroughs, while Scopus/ScienceDirect ensure access to peer-reviewed counterarguments and rigorous literature context.",
-    "impact": {
-      "novelty": 4,
-      "commercial": 4,
-      "threat": 3,
-      "urgency": 4
-    },
-    "entities": [
-      "OpenAI",
-      "Navier-Stokes equations",
-      "Le Temps",
-      "Elsevier LeapSpace",
-      "AI-driven research",
-      "Computational mathematics"
-    ],
-    "actionItems": [
-      "Monitor OpenAI's peer-reviewed publications and responses from Fields Medal mathematicians to assess claim legitimacy and adoption risk.",
-      "Position LeapSpace claim-checking as essential tool for Belgian institutions evaluating AI-generated research breakthroughs and validating competing claims.",
-      "Develop case study showing how Scopus/ScienceDirect + LeapSpace help researchers contextualize disruptive AI announcements within published literature."
-    ],
-    "sourceType": "secondary"
+    "url": "https://news.google.com/rss/articles/CBMiigFBVV95cUxOMkpKNnA4dmU3NEswVTNGN1MxT0hzbVRFTEh5dDlfZGtSdU1VaEtuakdUUjRZcG92c2k5MGxpelNHbHlNNU1LQmZDMGNWeVNPaE5NdFVWUGpZVnhfcUlLZlFoMGNral9YMVQ0QkxNT1RUVXRiQnVubkdEdGhES0t3YzRXbHBZd05QTHc?oc=5",
+    "sourceName": "Unite.AI",
+    "publishedDate": "2026-09-15",
+    "foundDate": "2026-09-16",
+    "autoDiscovered": true
+  },
+  {
+    "id": "news-q0nijq",
+    "title": "Google lance les modèles vocaux Gemini 3.8 Live et Extended Thinking - Unite.AI",
+    "description": "Google lance les modèles vocaux Gemini 3.8 Live et Extended Thinking&nbsp;&nbsp;Unite.AI",
+    "institution": "Google",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMilgFBVV95cUxQSHVoMTJPRTgzLXpNcmhLaFh5SS1BX1JQZzRRMWpkc3FLbnRBUUdTbkY2aXYweHo2cExKdUoybGhDdXBJODdVRTVqVE1FdkdPYjdidGpzQ2hoMlloUmZVWHNDMnh0U3pHcDN3TGp1cEV2N0hjMzRFUXdYQ0NpVWp1cW15U0wyRjJwOXBOV1JJdV9JeEx5QWc?oc=5",
+    "sourceName": "Unite.AI",
+    "publishedDate": "2026-09-15",
+    "foundDate": "2026-09-16",
+    "autoDiscovered": true
   },
   {
     "id": "news-4dqxfc",
@@ -195,43 +192,6 @@
       "Audit ScienceDirect/LeapSpace usage in Belgian fintech, banking, and wealth-management segments to identify churn risk.",
       "Develop competitive narrative: why institutional-grade, peer-reviewed research beats commodity AI for compliance and audit trails.",
       "Pitch LeapSpace's claim-checking and deep research reports as differentiators for high-stakes financial analysis."
-    ],
-    "sourceType": "secondary"
-  },
-  {
-    "id": "news-a98nsa",
-    "title": "En moins de quatre jours | OpenAI dit avoir résolu un problème de maths datant de plus d’un siècle - La Presse",
-    "description": "En moins de quatre jours | OpenAI dit avoir résolu un problème de maths datant de plus d’un siècle&nbsp;&nbsp;La Presse",
-    "institution": "OpenAI",
-    "category": "competitor_announcements",
-    "categoryLabel": "Competitor Announcements",
-    "url": "https://news.google.com/rss/articles/CBMi6wFBVV95cUxNdzBENmt2aEI4UHRUbkt5NnBjbkJ6MndjOVNTdUdaRzB2ZWpfTjVXbkFoam9yZlF0QVRPLXRiQ21IWXE0Wl9JNjdCOWU2YjJNUUFXamF3MmM2NWxWVVhtQmhFdFEwSFNTQlJQeHpMcnpPYXZpVl9KNXlaN215UDhLVFg3NHNfbTAxWDdYZmRUellWd194Z21XRFlteXBpcG52dTZLeGVsMVhJQ2sxQm1mVi1xNkhDYmstRlY2SnN0ZVFQRTVGdHRoMVhKam5Sczg0Q2NsamNQZ0FuNlE5NHV1aDNBcDAySW5XTXVv?oc=5",
-    "sourceName": "La Presse",
-    "publishedDate": "2026-09-09",
-    "foundDate": "2026-09-10",
-    "autoDiscovered": true,
-    "bottomLine": "OpenAI claims to have solved a century-old mathematical problem in under four days, demonstrating AI's growing capacity to tackle deep research challenges.",
-    "keyFindings": [
-      "OpenAI reports solving a mathematical problem unsolved for over 100 years in less than four days.",
-      "The achievement suggests AI models can now tackle complex, frontier research problems previously requiring years of human effort.",
-      "No details provided on verification, peer review, or publication status of the claimed solution.",
-      "This narrative emphasizes AI's research potential and may encourage institutions to view AI as a primary research tool rather than a supporting resource."
-    ],
-    "whyItMatters": "This narrative threatens Elsevier's value proposition if Belgian universities believe AI alone can replace literature research and expert guidance. Counter-message: LeapSpace integrates AI with Scopus' authoritative research landscape to verify claims and find prior art.",
-    "impact": {
-      "novelty": 3,
-      "commercial": 3,
-      "threat": 3,
-      "urgency": 4
-    },
-    "entities": [
-      "OpenAI",
-      "Mathematical Research Problem (unnamed)"
-    ],
-    "actionItems": [
-      "Prepare talking point: true breakthrough validation requires literature review, peer review, and community vetting—LeapSpace accelerates, not replaces, this process.",
-      "Ask: what problem was solved, and has it been independently verified? Emphasize Scopus' role in tracking citations and replication.",
-      "Pitch LeapSpace's paper-comparison and deep-research-report features as essential due-diligence tools for validating AI-generated research claims."
     ],
     "sourceType": "secondary"
   }

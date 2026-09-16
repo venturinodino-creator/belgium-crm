@@ -1,16 +1,35 @@
 {
-  "generatedAt": "2026-09-15T12:38:57.904Z",
-  "articleCount": 0,
-  "headline": "",
-  "bottomLine": "No live stories to summarize yet.",
-  "keyFindings": [],
-  "whyItMatters": "",
+  "generatedAt": "2026-09-16T12:35:46.958Z",
+  "articleCount": 3,
+  "headline": "AI Giants Race to Embed Domain-Specific Intelligence; Research Discovery at Risk",
+  "bottomLine": "Major AI players (Anthropic, OpenAI, Google) are rapidly verticalized their models into financial advisory, healthcare, and conversational research workflows—directly competing with traditional research platforms for institutional…",
+  "keyFindings": [
+    "Anthropic, OpenAI, and Google are each launching domain-specific AI applications (finance, healthcare, voice research) with deep partner integrations, signaling a shift from general-purpose models…",
+    "OpenAI's Public Data for Health program and Google's Extended Thinking voice models emphasize data accessibility and multi-modal interaction—capabilities that challenge Scopus/ScienceDirect's…",
+    "Competitor investments in partner connectors and ecosystem integration (Anthropic's financial advisor network, OpenAI's health data initiative) suggest a strategy to lock institutions into AI-native…",
+    "The convergence of conversational AI, domain knowledge, and open data initiatives creates a new competitive landscape where research institutions may increasingly view general-purpose LLMs plus…"
+  ],
+  "whyItMatters": "Belgian research institutions and medical centres are likely receiving pitched offers from AI vendors for embedded research intelligence, data integration, and writing workflows. Elsevier must urgently reposition LeapSpace and Scopus as AI-first research infrastructure—not legacy databases—to defend subscription value and prevent customer adoption of competitor stacks.",
   "impact": {
-    "novelty": 3,
-    "commercial": 3,
-    "threat": 3,
-    "urgency": 3
+    "novelty": 4,
+    "commercial": 5,
+    "threat": 5,
+    "urgency": 5
   },
-  "entities": [],
-  "actionItems": []
+  "entities": [
+    "Anthropic",
+    "OpenAI",
+    "Google",
+    "Claude",
+    "Gemini",
+    "Public Data for Health",
+    "Extended Thinking",
+    "Scopus/ScienceDirect"
+  ],
+  "actionItems": [
+    "Conduct rapid win/loss interviews with 3–5 recent Belgian university and medical-centre prospects to quantify stated adoption of competitor AI tools and their perceived gaps vs.",
+    "Develop concise positioning narrative (1-pager) contrasting LeapSpace's curated, verified research integration against commodity LLM + public-data strategies; ready for use in upcoming institution…",
+    "Audit LeapSpace roadmap for voice interface, healthcare/life-sciences verticalization, and partner-ecosystem depth vs.",
+    "Schedule war-room briefing with Elsevier product and marketing leadership to align messaging: position Elsevier as the research-native AI layer, not a traditional publisher facing disruption."
+  ]
 }
