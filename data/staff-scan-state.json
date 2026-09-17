@@ -1,33 +1,14 @@
 {
-  "lastRun": "2026-09-17T12:44:47.656Z",
+  "lastRun": "2026-09-17T19:19:21.958Z",
   "lastAddedCount": 0,
   "sources": 40,
+  "blockedSources": [
+    "https://www.bruegel.org/about/board-and-scientific-council",
+    "https://www.bruegel.org/our-researchers"
+  ],
   "issues": [
     {
       "instId": "vib",
-      "note": "no people extracted"
-    },
-    {
-      "instId": "rbins",
-      "url": "https://www.naturalsciences.be/nl/over-ons/bestuursorganen/directieraad",
-      "error": "fetch failed"
-    },
-    {
-      "instId": "rbins",
-      "note": "no people extracted"
-    },
-    {
-      "instId": "solvay",
-      "url": "https://solvayinstitutes.be/home/mission/board-of-directors/",
-      "error": "HTTP 429"
-    },
-    {
-      "instId": "solvay",
-      "url": "https://solvayinstitutes.be/home/mission/management/",
-      "error": "HTTP 429"
-    },
-    {
-      "instId": "solvay",
       "note": "no people extracted"
     },
     {
@@ -58,25 +39,6 @@
       "note": "no people extracted"
     },
     {
-      "instId": "uclouvain",
-      "url": "https://uclouvain.be/fr/bibliotheques/service-central-des-bibliotheques",
-      "error": "fetch failed"
-    },
-    {
-      "instId": "uclouvain",
-      "url": "https://uclouvain.be/en/research/funding",
-      "error": "fetch failed"
-    },
-    {
-      "instId": "uclouvain",
-      "url": "https://uclouvain.be/en/research-institutes/icteam/data-science-and-artificial-intelligence",
-      "error": "fetch failed"
-    },
-    {
-      "instId": "uclouvain",
-      "note": "no people extracted"
-    },
-    {
       "instId": "umons",
       "url": "https://web.umons.ac.be/fr/universite/lumons-en-bref/structure-de-luniversite/administration/direction-archives-bibliotheques-dab/",
       "error": "fetch failed"
@@ -97,29 +59,6 @@
     },
     {
       "instId": "uzleuven",
-      "note": "no people extracted"
-    },
-    {
-      "instId": "uzbrussel",
-      "url": "https://www.uzbrussel.be/directiecomite",
-      "error": "HTTP 403"
-    },
-    {
-      "instId": "uzbrussel",
-      "url": "https://www.uzbrussel.be/bestuurscollege",
-      "error": "HTTP 403"
-    },
-    {
-      "instId": "uzbrussel",
-      "note": "no people extracted"
-    },
-    {
-      "instId": "erasme",
-      "url": "https://www.erasme.be/en/organisation-and-governing-bodies",
-      "error": "fetch failed"
-    },
-    {
-      "instId": "erasme",
       "note": "no people extracted"
     }
   ]
