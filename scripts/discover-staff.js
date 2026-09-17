@@ -39,7 +39,17 @@ const LIMIT = (() => {
   return i !== -1 && args[i + 1] ? parseInt(args[i + 1], 10) : 60;
 })();
 
-const UA = 'NL-CRM-Bot/1.0 (mailto:venturino.dino@gmail.com)';
+// A real browser identity. Several university sites answer a bot UA with
+// HTTP 403 (TU Delft, Tilburg, CPB, UMCG, Clingendael all did on 2026-09-17),
+// which silently removed them from coverage every day.
+const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36';
+const FETCH_HEADERS = {
+  'User-Agent': UA,
+  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+  'Accept-Language': 'en-GB,en;q=0.9,nl;q=0.8,da;q=0.7,fr;q=0.7',
+};
+const BLOCKED_STATUSES = new Set([403, 429, 503]);
+const RETRY_WAITS_MS = [3000, 8000];
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 // ── Role taxonomy ──────────────────────────────────────────────────────────
@@ -416,13 +426,22 @@ async function insertPendingContacts(rows) {
 
 // ── Fetch ──────────────────────────────────────────────────────────────────
 async function getHTML(url) {
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 20000);
-  try {
-    const r = await fetch(url, { headers: { 'User-Agent': UA }, redirect: 'follow', signal: ctrl.signal });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return await r.text();
-  } finally { clearTimeout(timer); }
+  // A 403/429/503 is retried with a pause: bot-protection often lets the
+  // second polite attempt through, and a source that still refuses is then
+  // reported as blocked rather than quietly counted as "no people".
+  for (let attempt = 0; ; attempt++) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 20000);
+    try {
+      const r = await fetch(url, { headers: FETCH_HEADERS, redirect: 'follow', signal: ctrl.signal });
+      if (r.ok) return await r.text();
+      if (BLOCKED_STATUSES.has(r.status) && attempt < RETRY_WAITS_MS.length) {
+        await sleep(RETRY_WAITS_MS[attempt]);
+        continue;
+      }
+      throw new Error(`HTTP ${r.status}`);
+    } finally { clearTimeout(timer); }
+  }
 }
 
 function readJSON(path, fallback) {
@@ -535,10 +554,20 @@ async function main() {
   try { added = await insertPendingContacts(rows); }
   catch (e) { console.error('Supabase insert error:', e.message); failed = true; }
 
+  // Sources that refused us outright. They are not "no people found" — they
+  // are coverage we lost, and the run summary should say so.
+  const blocked = report.filter(r => /^HTTP (403|429|503)\b/.test(r.error || ''));
+  if (blocked.length) {
+    const names = [...new Set(blocked.map(b => b.instId))].join(', ');
+    console.warn(`\n${blocked.length} source page(s) blocked this run (${names}).`);
+    if (process.env.GITHUB_ACTIONS) console.log(`::warning::${blocked.length} staff page(s) answered 403/429/503 and were skipped: ${names}. Coverage is reduced until they stop blocking the runner.`);
+  }
+
   saveJSON(STATE_FILE, {
     lastRun: new Date().toISOString(),
     lastAddedCount: added,
     sources: cfg.sources.length,
+    blockedSources: blocked.map(b => b.url),
     issues: report,
   });
   if (!failed) saveJSON(PENDING_FILE, [...localPending, ...candidates]);

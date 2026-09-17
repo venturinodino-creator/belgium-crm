@@ -227,6 +227,9 @@ def save_state(new_count: int, scanned: int, cris_count: int) -> None:
         "lastNewCount": new_count,
         "lastScannedCount": scanned,
         "lastCrisCount": cris_count,
+        # Requests TED throttled (each retried); non-zero means the day's
+        # count may be short even though the run went green.
+        "lastRateLimited": RATE_LIMITED,
     }
     STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
     STATE_FILE.write_text(json.dumps(state, indent=2), encoding="utf-8")
@@ -335,26 +338,52 @@ def is_relevant(title: str, description: str = "", cpvs=None) -> tuple:
 
     return False, "", "", False
 
+# How many requests TED throttled this run. A 429 used to be logged and then
+# treated exactly like "no notices", so a rate-limited day read as a quiet day
+# — on 2026-09-17 every country's scan reported "no new tenders" while TED was
+# answering 429 Too Many Requests. Retried now, counted, and surfaced.
+RATE_LIMITED = 0
+RETRY_STATUSES = (429, 500, 502, 503, 504)
+RETRY_WAITS = (5, 15, 30)
+
 def fetch_json(url: str, data: bytes = None, headers: dict = None):
-    """HTTP GET/POST returning parsed JSON, or None on error."""
+    """HTTP GET/POST returning parsed JSON, or None on error.
+
+    Retries on 429 and 5xx with a growing pause (honouring Retry-After when
+    the server sends one); every other failure returns None at once.
+    """
+    global RATE_LIMITED
     req = urllib.request.Request(url, data=data, headers=headers or {})
     req.add_header("Accept", "application/json")
     if data:
         req.add_header("Content-Type", "application/json")
-    try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            return json.loads(resp.read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
-        body = ""
+    for attempt in range(len(RETRY_WAITS) + 1):
         try:
-            body = e.read().decode("utf-8", errors="replace")[:300]
-        except Exception:
-            pass
-        print(f"  HTTP {e.code} for {url} :: {body}", file=sys.stderr)
-        return None
-    except Exception as e:
-        print(f"  Error fetching {url}: {e}", file=sys.stderr)
-        return None
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                return json.loads(resp.read().decode("utf-8"))
+        except urllib.error.HTTPError as e:
+            body = ""
+            try:
+                body = e.read().decode("utf-8", errors="replace")[:300]
+            except Exception:
+                pass
+            if e.code in RETRY_STATUSES and attempt < len(RETRY_WAITS):
+                if e.code == 429:
+                    RATE_LIMITED += 1
+                wait = RETRY_WAITS[attempt]
+                try:
+                    wait = max(wait, int(e.headers.get("Retry-After", "0")))
+                except (TypeError, ValueError):
+                    pass
+                print(f"  HTTP {e.code} for {url} — retrying in {wait}s (attempt {attempt + 1}/{len(RETRY_WAITS)})")
+                time.sleep(wait)
+                continue
+            print(f"  HTTP {e.code} for {url} :: {body}", file=sys.stderr)
+            return None
+        except Exception as e:
+            print(f"  Error fetching {url}: {e}", file=sys.stderr)
+            return None
+    return None
 
 # ── TED Europa scraper ───────────────────────────────────────────────────────
 # API v3 expert-query syntax. Field names verified against the live API on
@@ -487,7 +516,7 @@ def search_ted(query: str) -> list:
         out.extend(batch)
         if len(batch) < TED_PAGE_LIMIT:
             break
-        time.sleep(0.5)
+        time.sleep(1.0)
     return out
 
 def ted_to_tender(notice: dict, product: str, competitor: str, is_cris: bool) -> dict:
@@ -613,7 +642,7 @@ def scrape_ted(existing: list) -> tuple:
             titles.add(key)   # so repeat notices for one procurement collapse
             flag = "[CRIS] " if is_cris else ""
             print(f"       + {flag}{t['title'][:78]}")
-        time.sleep(0.6)
+        time.sleep(2.0)
 
     return new, scanned
 
@@ -724,6 +753,11 @@ def main():
         print(f"[tender_scraper] No new relevant tenders found "
               f"({scanned} domestic notices scanned).")
 
+    if RATE_LIMITED:
+        print(f"[tender_scraper] TED rate-limited {RATE_LIMITED} request(s) this run (retried).")
+        if os.environ.get("GITHUB_ACTIONS"):
+            print(f"::warning::TED answered 429 Too Many Requests {RATE_LIMITED} time(s); "
+                  f"each was retried, but if it kept failing this run's notice count is short.")
     save_state(len(new_tenders), scanned, cris_count)
     write_notification(new_tenders)
     return len(new_tenders)
