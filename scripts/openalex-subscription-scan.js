@@ -174,6 +174,17 @@ async function main() {
 
   const text = extractText(response);
   const found = parseJSONL(text);
+  // How much searching actually happened. Without this, "0 candidates" from
+  // a model that answered from memory looks identical to a real search that
+  // found nothing new.
+  const usage = response.usage || {};
+  const searches = (usage.server_tool_use && usage.server_tool_use.web_search_requests) || 0;
+  const toolCalls = (response.content || []).filter(b => b.type === 'server_tool_use').length;
+  console.log(`[openalex-subscription-scan] Web searches run: ${searches} (${toolCalls} tool call(s)) · stop_reason=${response.stop_reason} · output tokens=${usage.output_tokens != null ? usage.output_tokens : '?'}`);
+  if (!searches && !toolCalls) {
+    console.warn(`[openalex-subscription-scan] The model answered without running a single web search — this run's result is not live evidence.`);
+    if (process.env.GITHUB_ACTIONS) console.log('::warning::openalex-subscription-scan: the model ran no web searches this run, so "0 candidates" is not a real result. Check the web_search tool and model availability.');
+  }
   console.log(`[openalex-subscription-scan] Model returned ${found.length} candidate(s).`);
 
   let added = 0, updated = 0;
@@ -217,6 +228,7 @@ async function main() {
     lastAddedCount: added,
     lastUpdatedCount: updated,
     lastCandidateCount: found.length,
+    lastWebSearches: searches,
   });
   console.log(`[openalex-subscription-scan] Done — ${added} new, ${updated} updated.`);
 }
