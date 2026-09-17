@@ -1,10 +1,19 @@
 {
-  "lastRun": "2026-09-16T12:46:10.977Z",
+  "lastRun": "2026-09-17T12:44:47.656Z",
   "lastAddedCount": 0,
   "sources": 40,
   "issues": [
     {
       "instId": "vib",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "rbins",
+      "url": "https://www.naturalsciences.be/nl/over-ons/bestuursorganen/directieraad",
+      "error": "fetch failed"
+    },
+    {
+      "instId": "rbins",
       "note": "no people extracted"
     },
     {
@@ -49,6 +58,25 @@
       "note": "no people extracted"
     },
     {
+      "instId": "uclouvain",
+      "url": "https://uclouvain.be/fr/bibliotheques/service-central-des-bibliotheques",
+      "error": "fetch failed"
+    },
+    {
+      "instId": "uclouvain",
+      "url": "https://uclouvain.be/en/research/funding",
+      "error": "fetch failed"
+    },
+    {
+      "instId": "uclouvain",
+      "url": "https://uclouvain.be/en/research-institutes/icteam/data-science-and-artificial-intelligence",
+      "error": "fetch failed"
+    },
+    {
+      "instId": "uclouvain",
+      "note": "no people extracted"
+    },
+    {
       "instId": "umons",
       "url": "https://web.umons.ac.be/fr/universite/lumons-en-bref/structure-de-luniversite/administration/direction-archives-bibliotheques-dab/",
       "error": "fetch failed"
@@ -72,12 +100,26 @@
       "note": "no people extracted"
     },
     {
-      "instId": "uza",
-      "url": "https://www.uza.be/nl/organisatie-en-structuur",
-      "error": "HTTP 429"
+      "instId": "uzbrussel",
+      "url": "https://www.uzbrussel.be/directiecomite",
+      "error": "HTTP 403"
     },
     {
-      "instId": "uza",
+      "instId": "uzbrussel",
+      "url": "https://www.uzbrussel.be/bestuurscollege",
+      "error": "HTTP 403"
+    },
+    {
+      "instId": "uzbrussel",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "erasme",
+      "url": "https://www.erasme.be/en/organisation-and-governing-bodies",
+      "error": "fetch failed"
+    },
+    {
+      "instId": "erasme",
       "note": "no people extracted"
     }
   ]
