@@ -1,9 +1,17 @@
 {
-  "lastRun": "2026-09-17T12:08:28.763076Z",
-  "lastNewCount": 0,
-  "sourcesReached": 4,
-  "sourcesTotal": 4,
-  "itemsExamined": 61,
-  "failedSources": [],
-  "seenUrls": []
+  "lastRun": "2026-09-17T19:16:22.757063Z",
+  "lastNewCount": 1,
+  "sourcesReached": 12,
+  "sourcesTotal": 13,
+  "itemsExamined": 522,
+  "failedSources": [
+    {
+      "institution": "UMons",
+      "url": "https://web.umons.ac.be/fr/feed/",
+      "error": "<urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>"
+    }
+  ],
+  "seenUrls": [
+    "https://www.uantwerpen.be/en/library/about-us/news/"
+  ]
 }
