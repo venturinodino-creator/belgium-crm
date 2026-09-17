@@ -1,15 +1,16 @@
 {
-  "generatedAt": "2026-09-16T12:35:37.328Z",
-  "articleCount": 7,
-  "headline": "AI Giants Race into Specialized Domains; Research Platform Competition Intensifies",
-  "bottomLine": "OpenAI, Google, and Anthropic are rapidly deploying domain-specific AI assistants (finance, health, research) with integrated data capabilities, directly threatening Elsevier's traditional lock on institutional research and professional…",
+  "generatedAt": "2026-09-17T12:35:46.963Z",
+  "articleCount": 4,
+  "headline": "AI Giants Race to Own Research Infrastructure Layer; Governance Gaps Widen",
+  "bottomLine": "Competitors are systematically embedding AI into institutional workflows (healthcare, finance, research) while advancing reasoning and voice capabilities, creating infrastructure lock-in risk and raising governance concerns that position…",
   "keyFindings": [
-    "OpenAI and Google are aggressively moving beyond general-purpose chatbots into vertical markets (finance, healthcare, research) with real-time data integration, directly competing for the same…",
-    "Multiple AI players are launching specialized research and data tools simultaneously—ChatGPT Finance, GPT-6 Astra, Public Data for Health, Gemini Extended Thinking—signaling coordinated efforts to…",
-    "AI assistants now feature integrated financial data, health datasets, and partner connectors, reducing friction for users to switch from traditional platforms like ScienceDirect/Scopus to AI-native…",
-    "Governance and controversy around advanced AI models (GPT-6 Astra) remain unresolved, but are not slowing commercialization—creating uncertainty about regulatory risk and long-term competitive…"
+    "OpenAI and Google are establishing themselves as foundational infrastructure for institutions: OpenAI via public health data programs, Google via advanced voice/reasoning models.",
+    "Anthropic extends Claude into regulated professional services (finance advisory), signaling AI vendors are moving beyond consumer/research use into mission-critical institutional decision-making…",
+    "Advanced reasoning (GPT-6 Astra extended thinking, Gemini 3.8 real-time voice) directly competes with LeapSpace's research assistant and reading/comparison features, raising bar for depth and…",
+    "Governance and controversy around GPT-6 Astra highlight regulatory and trust risks that institutions now weigh alongside capability—creating both risk and opportunity for vendors who can offer…",
+    "Consolidation around AI-native research workspaces is accelerating: competitors are bundling data access, reasoning, and domain connectors, making standalone citation/abstract databases less…"
   ],
-  "whyItMatters": "Belgian universities, medical centers, and research institutes now face a credible alternative ecosystem where AI-native tools bundle research discovery, data integration, and domain expertise in single workflows. This directly threatens ScienceDirect/Scopus seat adoption and renewal rates.",
+  "whyItMatters": "Belgian universities and research institutes are now evaluating AI-first platforms, not legacy databases. Competitors are locking in institutional relationships through infrastructure plays (health data, voice interfaces, reasoning depth) rather than content alone.",
   "impact": {
     "novelty": 4,
     "commercial": 5,
@@ -18,18 +19,16 @@
   },
   "entities": [
     "OpenAI",
-    "Google",
-    "Anthropic",
-    "ChatGPT",
-    "Gemini",
-    "Claude",
+    "Google (Gemini)",
+    "Anthropic (Claude)",
+    "Elsevier (LeapSpace, ScienceDirect, Scopus)",
     "GPT-6 Astra",
-    "LeapSpace"
+    "Claude (financial advisory)",
+    "Gemini 3.8 Live"
   ],
   "actionItems": [
-    "Map current Belgian institution subscriptions by discipline (finance, healthcare, general research) and validate which workflows are most vulnerable to AI assistant replacement; prioritize retention…",
-    "Audit LeapSpace feature parity against observed competitor capabilities (real-time data integration, domain connectors, writing assistance) and identify gaps that will be used as objections in…",
-    "Conduct win/loss analysis on recent lost deals or non-renewals to determine if 'AI assistant' was mentioned as alternative; benchmark against Google Scholar, Consensus, and scite adoption rates in…",
-    "Develop Belgian institution pilot program for LeapSpace bundled with ScienceDirect/Scopus emphasizing governance, institutional control, and research integrity—positions Elsevier against…"
+    "Audit LeapSpace's reasoning depth and voice capabilities against Gemini 3.8 and GPT-6 Astra; identify feature/performance gaps and prioritize roadmap fixes before next Belgian institution RFP cycle.",
+    "Develop governance and audit-trail messaging (ethics, transparency, data handling) that addresses institutional risk concerns around GPT-6 controversy; position Elsevier as 'trustworthy AI research…",
+    "Map which Belgian universities and research institutes are already using OpenAI/Google health or finance integrations; prioritize outreach to largest/most-strategic accounts to prevent lock-in and…"
   ]
 }

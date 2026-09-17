@@ -10,7 +10,33 @@
     "sourceName": "Unite.AI",
     "publishedDate": "2026-09-14",
     "foundDate": "2026-09-16",
-    "autoDiscovered": true
+    "autoDiscovered": true,
+    "bottomLine": "Anthropic embeds Claude AI into financial advisory platforms via partner connectors, extending AI reach into regulated professional services.",
+    "keyFindings": [
+      "Anthropic has launched Claude integration capabilities specifically designed for financial advisors with built-in partner connectors.",
+      "The connectors enable seamless embedding of Claude into existing financial advisory workflows and systems.",
+      "This move targets professional services sector, traditionally underserved by general-purpose AI assistants.",
+      "Integration includes compliance-aware features suitable for regulated financial advisory environments."
+    ],
+    "whyItMatters": "Belgian financial institutions and advisory firms may adopt Claude instead of building in-house AI research workflows; Elsevier should position LeapSpace's research-grade literature integration and compliance features as superior for evidence-based advisory decision-making.",
+    "impact": {
+      "novelty": 2,
+      "commercial": 3,
+      "threat": 2,
+      "urgency": 2
+    },
+    "entities": [
+      "Anthropic",
+      "Claude",
+      "Financial advisors",
+      "Partner connectors"
+    ],
+    "actionItems": [
+      "Map Belgian financial advisory firms to understand current research tool adoption and AI readiness.",
+      "Develop LeapSpace use case for financial research and due diligence workflows versus general Claude.",
+      "Identify whether Anthropic connectors include scientific literature or only market/financial data sources."
+    ],
+    "sourceType": "secondary"
   },
   {
     "id": "news-m5zlqt",
@@ -23,7 +49,33 @@
     "sourceName": "Unite.AI",
     "publishedDate": "2026-09-15",
     "foundDate": "2026-09-16",
-    "autoDiscovered": true
+    "autoDiscovered": true,
+    "bottomLine": "OpenAI Foundation launches public health data program, positioning OpenAI as infrastructure layer for healthcare and research institutions.",
+    "keyFindings": [
+      "OpenAI Foundation introduced a Public Data for Health program to make health data more accessible and usable.",
+      "Program aims to support researchers and healthcare institutions in leveraging public datasets for research.",
+      "Represents OpenAI's strategic move into healthcare and life sciences research infrastructure.",
+      "Offers potential free or subsidized data access to align with public health goals and build institutional adoption."
+    ],
+    "whyItMatters": "Belgian medical centres and research institutes may view OpenAI's health data program as a one-stop infrastructure solution; Elsevier must emphasize that Scopus/ScienceDirect provide curated, peer-reviewed evidence and Scopus indexing of health studies—critical for research validation that raw data programs cannot guarantee.",
+    "impact": {
+      "novelty": 3,
+      "commercial": 4,
+      "threat": 3,
+      "urgency": 3
+    },
+    "entities": [
+      "OpenAI Foundation",
+      "Public Data for Health program",
+      "Healthcare institutions",
+      "Research institutions"
+    ],
+    "actionItems": [
+      "Clarify scope of OpenAI's health data program: does it index or link to peer-reviewed literature?",
+      "Develop messaging around Scopus + ScienceDirect as the gold standard for evidence synthesis in health research.",
+      "Conduct outreach to Belgian university medical centres to discuss competitive positioning versus OpenAI's offering."
+    ],
+    "sourceType": "secondary"
   },
   {
     "id": "news-q0nijq",
@@ -36,7 +88,33 @@
     "sourceName": "Unite.AI",
     "publishedDate": "2026-09-15",
     "foundDate": "2026-09-16",
-    "autoDiscovered": true
+    "autoDiscovered": true,
+    "bottomLine": "Google advances Gemini voice models with real-time interaction and extended reasoning, raising bar for AI-driven research assistants.",
+    "keyFindings": [
+      "Google launched Gemini 3.8 Live with native voice capabilities for real-time conversational AI interactions.",
+      "Extended Thinking feature enhances Gemini's reasoning depth, enabling more complex problem-solving tasks.",
+      "Real-time voice interface lowers friction for researchers to query and synthesize information verbally.",
+      "These capabilities directly compete with conversational research assistants and literature discovery interfaces."
+    ],
+    "whyItMatters": "Belgian academic institutions may prefer Google's integrated voice + reasoning model for research workflows; Elsevier must position LeapSpace's domain-specific literature grounding, peer-review validation, and ScienceDirect indexing as advantages over generic AI reasoning without research-grade source control.",
+    "impact": {
+      "novelty": 4,
+      "commercial": 4,
+      "threat": 4,
+      "urgency": 4
+    },
+    "entities": [
+      "Google",
+      "Gemini 3.8 Live",
+      "Extended Thinking",
+      "Voice interface"
+    ],
+    "actionItems": [
+      "Test Gemini 3.8 Live with sample research queries to benchmark against LeapSpace capabilities and user experience.",
+      "Develop messaging emphasizing LeapSpace's literature-grounded, peer-review-validated approach versus generic reasoning models.",
+      "Plan pilot with Belgian universities to demonstrate LeapSpace as a research-specific alternative to consumer AI assistants."
+    ],
+    "sourceType": "secondary"
   },
   {
     "id": "news-4dqxfc",
@@ -73,125 +151,6 @@
       "Investigate Astra's specific research capabilities (literature synthesis, citation handling, domain accuracy) versus LeapSpace's existing strengths.",
       "Prepare positioning talking points for Belgian institutions: research-grade accuracy, compliance, and institutional control over AI outputs.",
       "Monitor OpenAI's research-tool partnerships and pricing to anticipate direct competition in academic market."
-    ],
-    "sourceType": "secondary"
-  },
-  {
-    "id": "news-ohul3h",
-    "title": "Google Just Made a Massive AI Bet Wall Street May Be Missing - TradingView",
-    "description": "Google Just Made a Massive AI Bet Wall Street May Be Missing&nbsp;&nbsp;TradingView",
-    "institution": "Google",
-    "category": "competitor_announcements",
-    "categoryLabel": "Competitor Announcements",
-    "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxOMngzMXlRX05CdHBkUW9hd3VtZ2RGUXhXdHlYakcwNFppYzRjNjM0VGstT1oxOFR6Wm9wSGg0c1ZEY3FHM2xhdl9MVmVkTTJIQzdGRUhnczRuM2dibk42cGJlbEZNa1BXbXZEcVNqaTZzMjhUV0djSXdQQkp6anpRY3NSc3QxRXROLW5nb21Xd0pSQWJaMzZwWGM4N0RyZ3VaUjRlY2swc0RuYzZxWGVfZ3NoZ2xBNXFDQk1J?oc=5",
-    "sourceName": "TradingView",
-    "publishedDate": "2026-09-10",
-    "foundDate": "2026-09-13",
-    "autoDiscovered": true,
-    "bottomLine": "Google's major new AI investment signals deeper commitment to AI-powered research tools, escalating competition for Elsevier's research platform market share.",
-    "keyFindings": [
-      "Google has announced a significant AI investment bet that Wall Street may be undervaluing.",
-      "The move suggests Google is prioritizing AI as a core strategic pillar across product lines.",
-      "Investment scale implies potential for disruption in multiple information-access markets including academic research.",
-      "Google Scholar and emerging AI tools remain positioned to compete directly with ScienceDirect/Scopus/LeapSpace."
-    ],
-    "whyItMatters": "Belgian universities and research institutes rely on trusted, integrated discovery platforms. Google's expanding AI capabilities threaten ScienceDirect/Scopus market position unless Elsevier clearly demonstrates superior research governance, institutional data control, and seamless integration with local research workflows.",
-    "impact": {
-      "novelty": 3,
-      "commercial": 5,
-      "threat": 5,
-      "urgency": 5
-    },
-    "entities": [
-      "Google",
-      "Wall Street",
-      "Google Scholar",
-      "TradingView"
-    ],
-    "actionItems": [
-      "Accelerate LeapSpace feature releases and ROI case studies from Belgian early adopters to demonstrate institutional differentiation.",
-      "Conduct competitive analysis: map Google's likely AI research tool roadmap against Elsevier's ScienceDirect/Scopus/LeapSpace feature roadmap.",
-      "Engage Belgian research leadership on data sovereignty, compliance, and research integrity concerns with free or ad-supported AI research tools."
-    ],
-    "sourceType": "secondary"
-  },
-  {
-    "id": "news-jqxhlv",
-    "title": "OpenAI Launches ChatGPT Finance with Integrated Data and Quotes - Brief IA",
-    "description": "OpenAI Launches ChatGPT Finance with Integrated Data and Quotes&nbsp;&nbsp;Brief IA",
-    "institution": "OpenAI",
-    "category": "competitor_announcements",
-    "categoryLabel": "Competitor Announcements",
-    "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxNTE56T1V0LU5DS0ZHQjJaZEZaZXFBU3BGN3FqV2p6ZGhHSXFKV3RBTlVVdUtQQmtXdmx0T2I3Y0FvVGoyRHlVcXdyV0Y2b1o0NTVqZXNuUS1GdUdkRFdtb21nQjF5UXNUY2tUalRLaGlPMjJlZklWSGgxeHZ4QTR3NWY5MWFINDMyR01FcUJ0MDBRRmRxaURqRGtKRkJVRzA?oc=5",
-    "sourceName": "Brief IA",
-    "publishedDate": "2026-09-10",
-    "foundDate": "2026-09-12",
-    "autoDiscovered": true,
-    "bottomLine": "OpenAI adds real-time financial data and market quotes to ChatGPT, expanding AI capabilities beyond general research into specialized domain data.",
-    "keyFindings": [
-      "ChatGPT Finance integrates live market data, stock quotes, and financial information directly into conversational AI.",
-      "Users can now query financial data, perform analysis, and access real-time market information without leaving ChatGPT.",
-      "Feature positions OpenAI as a competitor in specialized research and data discovery workflows beyond text-based search.",
-      "Integration suggests AI assistants are moving toward bundled data access, mimicking research platform consolidation strategies.",
-      "ChatGPT Finance competes with Bloomberg terminals and research-grade financial data platforms."
-    ],
-    "whyItMatters": "Belgian research institutions and financial/business schools now face pressure to justify specialized platform subscriptions when ChatGPT offers integrated data. Elsevier must highlight Scopus/ScienceDirect's peer-reviewed rigor, citation tracking, and research integrity versus commodity AI responses—and position LeapSpace's advanced discovery as complementary, not replaceable by ChatGPT.",
-    "impact": {
-      "novelty": 3,
-      "commercial": 4,
-      "threat": 4,
-      "urgency": 4
-    },
-    "entities": [
-      "OpenAI",
-      "ChatGPT Finance",
-      "ChatGPT",
-      "Bloomberg",
-      "Elsevier",
-      "Scopus"
-    ],
-    "actionItems": [
-      "Map which Belgian institutions (esp. business schools, economics depts) license both ChatGPT Plus and Scopus; prepare ROI case emphasizing research validation and compliance.",
-      "Develop messaging: 'AI + verified data' differentiator—highlight how LeapSpace's peer-review filtering and citation provenance outperform unvetted ChatGPT summaries.",
-      "Pilot LeapSpace + Scopus bundles for Belgian financial research groups, emphasizing reproducibility and institutional liability over commodity AI."
-    ],
-    "sourceType": "primary"
-  },
-  {
-    "id": "news-wpw9p3",
-    "title": "OpenAI lance ChatGPT pour les services financiers avec des données intégrées - unite.ai",
-    "description": "OpenAI lance ChatGPT pour les services financiers avec des données intégrées&nbsp;&nbsp;unite.ai",
-    "institution": "OpenAI",
-    "category": "competitor_announcements",
-    "categoryLabel": "Competitor Announcements",
-    "url": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNS1FQQURLWDl2b0tiS25NWVRieDctZlZmN21CM2VfX1JvQ3NoWFp3XzlGU1M2V1d1TVpuemxnSHhOVUhLYlVmNnhjakJBWUc5VjdDb2hCYXFuV3FFZk9xcnZOSGdKWldUZ0VkOHRIdUFhdjdhclhWR19vNkk5TVJxLVJLMXRZNHQyRHducndsNjFabFVt?oc=5",
-    "sourceName": "unite.ai",
-    "publishedDate": "2026-09-10",
-    "foundDate": "2026-09-11",
-    "autoDiscovered": true,
-    "bottomLine": "OpenAI extends ChatGPT into financial services with integrated data, signaling AI's encroachment into high-value professional research and decision-making domains.",
-    "keyFindings": [
-      "OpenAI launched ChatGPT tailored for financial services with built-in data integration capabilities.",
-      "The move targets professional workflows where research databases and real-time information are mission-critical.",
-      "Financial institutions can now access AI-assisted analysis without leaving the ChatGPT platform.",
-      "This represents a direct threat to specialized research and analytics platforms used in banking and investment sectors."
-    ],
-    "whyItMatters": "Belgian financial institutions, research hospitals, and consulting firms using ScienceDirect/Scopus risk losing users to ChatGPT if they see AI assistants as sufficient without subscription databases. LeapSpace must emphasize verified, curated, academic-grade evidence over generic AI.",
-    "impact": {
-      "novelty": 3,
-      "commercial": 4,
-      "threat": 4,
-      "urgency": 4
-    },
-    "entities": [
-      "OpenAI",
-      "ChatGPT",
-      "Financial Services Vertical"
-    ],
-    "actionItems": [
-      "Audit ScienceDirect/LeapSpace usage in Belgian fintech, banking, and wealth-management segments to identify churn risk.",
-      "Develop competitive narrative: why institutional-grade, peer-reviewed research beats commodity AI for compliance and audit trails.",
-      "Pitch LeapSpace's claim-checking and deep research reports as differentiators for high-stakes financial analysis."
     ],
     "sourceType": "secondary"
   }
