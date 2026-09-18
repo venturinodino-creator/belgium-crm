@@ -2660,12 +2660,13 @@ async function showNewsSummaryModal() {
     if (comp) overviewParts.push(`Most recent competitor signal: ${esc(comp.institution || 'a competitor')} — "${esc(comp.title || '')}".`);
   }
 
+  const hiringNearby = jobs.filter(j => j.region !== 'global');
   const hiringCatOrder = Object.keys(HIRING_CATEGORIES);
   const hiringCounts = {};
-  jobs.forEach(j => { if (j.roleCategory) hiringCounts[j.roleCategory] = (hiringCounts[j.roleCategory] || 0) + 1; });
-  const hiringTotal = jobs.length;
-  const hiringCompanyCount = new Set(jobs.map(j => j.company).filter(Boolean)).size;
-  const hiringSorted = jobs.slice().sort((a, b) => (b.postedDate || b.foundDate || '').localeCompare(a.postedDate || a.foundDate || ''));
+  hiringNearby.forEach(j => { if (j.roleCategory) hiringCounts[j.roleCategory] = (hiringCounts[j.roleCategory] || 0) + 1; });
+  const hiringTotal = hiringNearby.length;
+  const hiringCompanyCount = new Set(hiringNearby.map(j => j.company).filter(Boolean)).size;
+  const hiringSorted = hiringNearby.slice().sort((a, b) => (b.postedDate || b.foundDate || '').localeCompare(a.postedDate || a.foundDate || ''));
   if (hiringTotal > 0) {
     overviewParts.push(`${hiringTotal} competitor role${hiringTotal === 1 ? ' is' : 's are'} currently open across ${hiringCompanyCount} tracked compan${hiringCompanyCount === 1 ? 'y' : 'ies'}.`);
   }
@@ -6038,6 +6039,12 @@ const HIRING_CATEGORIES = {
 let _hiringAllJobs        = [];
 let _hiringActiveCompany  = 'all';
 let _hiringActiveCategory = 'all';
+// Region is cumulative: Belgium & remote < Europe < Global. Europe by default —
+// wide enough to show the competitors' European go-to-market hiring, narrow
+// enough to leave the US volume out unless asked for.
+const HIRING_REGION_RANK = { domestic: 0, remote: 0, europe: 1, global: 2 };
+const HIRING_REGION_CHIPS = [['domestic', 'Belgium & remote'], ['europe', 'Europe'], ['global', 'Global']];
+let _hiringActiveRegion = (() => { try { return localStorage.getItem('crm_hiring_region') || 'europe'; } catch (e) { return 'europe'; } })();
 
 function buildHiringSubfilterHTML() {
   const catBtns = ['all', ...Object.keys(HIRING_CATEGORIES)].map(cat => {
@@ -6049,7 +6056,9 @@ function buildHiringSubfilterHTML() {
     const label = co === 'all' ? 'All Companies' : co;
     return `<button id="${safeId}" class="news-filter-btn hiring-company-btn${co === _hiringActiveCompany ? ' active' : ''}" onclick="setHiringCompany('${co}')">${esc(label)}</button>`;
   }).join('');
-  return `<div class="news-filter-bar">${catBtns}</div><div class="news-filter-bar" style="margin-top:-6px">${companyBtns}</div>`;
+  const regionBtns = HIRING_REGION_CHIPS.map(([r, label]) =>
+    `<button id="hr-${r}" class="news-filter-btn hiring-region-btn${r === _hiringActiveRegion ? ' active' : ''}" onclick="setHiringRegion('${r}')">${esc(label)}</button>`).join('');
+  return `<div class="news-filter-bar">${regionBtns}</div><div class="news-filter-bar" style="margin-top:-6px">${catBtns}</div><div class="news-filter-bar" style="margin-top:-6px">${companyBtns}</div>`;
 }
 
 async function loadCompetitorJobs() {
@@ -6072,6 +6081,14 @@ function setHiringCompany(co) {
   renderHiringFeed();
 }
 
+function setHiringRegion(r) {
+  _hiringActiveRegion = r;
+  try { localStorage.setItem('crm_hiring_region', r); } catch (e) {}
+  document.querySelectorAll('.hiring-region-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('hr-' + r)?.classList.add('active');
+  renderHiringFeed();
+}
+
 function setHiringCategory(cat) {
   _hiringActiveCategory = cat;
   document.querySelectorAll('.hiring-cat-btn').forEach(b => b.classList.remove('active'));
@@ -6084,14 +6101,15 @@ function renderHiringFeed() {
   if (!feed) return;
 
   const byCompany = _hiringActiveCompany === 'all' ? _hiringAllJobs : _hiringAllJobs.filter(j => j.company === _hiringActiveCompany);
-  const filtered = _hiringActiveCategory === 'all' ? byCompany : byCompany.filter(j => j.roleCategory === _hiringActiveCategory);
+  const byRegion = byCompany.filter(j => (HIRING_REGION_RANK[j.region || 'domestic'] ?? 2) <= HIRING_REGION_RANK[_hiringActiveRegion]);
+  const filtered = _hiringActiveCategory === 'all' ? byRegion : byRegion.filter(j => j.roleCategory === _hiringActiveCategory);
   const sorted = filtered.slice().sort((a, b) => (b.postedDate || '').localeCompare(a.postedDate || ''));
 
   if (!sorted.length) {
     feed.innerHTML = `<div class="news-empty">
       <div style="font-size:32px;margin-bottom:10px">­</div>
       No open customer-facing roles tracked right now.<br>
-      <small>Scoped to roles based in Belgium, or remote roles a Belgium-based hire is actually eligible for (a remote posting restricted to specific other countries doesn't count), at each tracked competitor, in Strategic Account Mgmt, Sales Development (SDR), Renewals, Channel & Partnerships, or the full customer lifecycle (Customer Success, Pre-Sales, Implementation/Onboarding, Support, Customer Service, Training, Usage & Reporting, Product Marketing). A role stays listed for a month after a company stops posting it (marked "Closed") before moving to the archive. The daily scan runs at 07:00 UTC — check back after that, or run it manually from the button above.</small>
+      <small>Nothing matches the current region, role and company filters. Every tracked competitor's open roles in Strategic Account Mgmt, Sales Development (SDR), Renewals, Channel & Partnerships and the customer lifecycle (Customer Success, Pre-Sales, Implementation/Onboarding, Support, Customer Service, Training, Usage & Reporting, Product Marketing) are kept and tagged by region — widen the region chip above to Europe or Global. A role stays listed for a month after a company stops posting it (marked "Closed"). The daily scan runs at 07:00 UTC.</small>
     </div>`;
     return;
   }
@@ -6104,6 +6122,7 @@ function renderHiringFeed() {
       <div class="news-card-top">
         <span class="news-source-badge" style="background:#f8717122;color:#f87171">${esc(j.company || '')}</span>
         <span class="news-topic-tag" style="background:${cat.color}22;color:${cat.color}">${esc(cat.label)}</span>
+        ${j.region === 'europe' ? '<span class="news-topic-tag" style="background:#38bdf822;color:#38bdf8">Europe</span>' : j.region === 'global' ? '<span class="news-topic-tag" style="background:#94a3b822;color:#94a3b8">Rest of world</span>' : j.region === 'remote' ? '<span class="news-topic-tag" style="background:#34d39922;color:#34d399">Remote</span>' : ''}
         ${isClosed ? `<span class="news-topic-tag" style="background:#64748b22;color:#64748b" title="No longer posted by the company as of ${esc(j.closedDate || '')} — kept visible for reference, moves to the archive after a month closed">Closed</span>` : ''}
         <span class="news-date">${esc(j.postedDate || j.foundDate || '')}</span>
       </div>
@@ -6126,7 +6145,7 @@ async function renderHiringScanStatus() {
     if (!state || !state.lastRun) { el.innerHTML = '<p style="font-size:12px;color:var(--muted)">No scan recorded yet.</p>'; return; }
     const closedVisible = (state.totalListed || 0) - (state.totalOpenRoles || 0);
     el.innerHTML = `<p style="font-size:12px;color:var(--text)">Last scan: <strong>${_relativeTime(state.lastRun)}</strong></p>
-      <p style="font-size:12px;color:var(--muted);margin-top:3px">${state.totalOpenRoles || 0} open role${state.totalOpenRoles === 1 ? '' : 's'} tracked${closedVisible > 0 ? `, ${closedVisible} recently closed (still shown)` : ''}</p>
+      <p style="font-size:12px;color:var(--muted);margin-top:3px">${state.totalOpenRoles || 0} open role${state.totalOpenRoles === 1 ? '' : 's'} tracked${state.openByRegion ? ` — ${(state.openByRegion.domestic || 0) + (state.openByRegion.remote || 0)} Belgium/remote, ${state.openByRegion.europe || 0} Europe, ${state.openByRegion.global || 0} rest of world` : ''}${closedVisible > 0 ? `, ${closedVisible} recently closed (still shown)` : ''}</p>
       ${state.archivedCount ? `<p style="font-size:11px;color:var(--muted);margin-top:3px">${state.archivedCount} moved to archive this run (closed a month+ ago)</p>` : ''}
       ${state.error ? `<p style="font-size:11px;color:#f87171;margin-top:6px">${esc(state.error)}</p>` : ''}`;
 
@@ -9165,7 +9184,7 @@ async function loadDigestHiring() {
   try {
     const res = await fetch('data/competitor-jobs.json?t=' + Date.now());
     const data = res.ok ? await res.json() : [];
-    const jobs = (Array.isArray(data) ? data : []).filter(j => j.status !== 'closed');
+    const jobs = (Array.isArray(data) ? data : []).filter(j => j.status !== 'closed' && j.region !== 'global');
 
     if (countEl) countEl.textContent = `${jobs.length} open role${jobs.length === 1 ? '' : 's'}`;
     if (!jobs.length) {
