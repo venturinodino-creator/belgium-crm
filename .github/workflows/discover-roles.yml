@@ -23,6 +23,10 @@ on:
         description: 'Search and log only, insert nothing (true/false)'
         default: 'false'
         required: false
+      inst:
+        description: 'Only these institution ids, comma-separated (skips the rotation)'
+        default: ''
+        required: false
 
 permissions:
   contents: write
@@ -46,6 +50,7 @@ jobs:
         run: |
           EXTRA=""
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then EXTRA="--dry-run"; fi
+          if [ -n "${{ github.event.inputs.inst }}" ]; then EXTRA="$EXTRA --inst ${{ github.event.inputs.inst }}"; fi
           node scripts/discover-roles.js --batch "${{ github.event.inputs.batch || '6' }}" $EXTRA
       - name: Commit state
         run: |
