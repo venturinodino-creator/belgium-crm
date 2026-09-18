@@ -1,0 +1,70 @@
+name: Daily Role-Targeted Contact Discovery
+
+# The second contact source next to discover-staff.yml. That scan reads a
+# fixed list of staff-directory pages and had, by 2026-09-18, filed everyone
+# on them. This one asks Claude with web search, per institution, who
+# currently holds the eleven roles the CRM sells through (vice-rector for
+# research, e-resources, research support and grants, CIO/CISO/DPO,
+# procurement, deans, research integrity, AI/digital strategy, research
+# support librarians) and queues the people it can cite. It works through the
+# region's institutions in a rotating batch, so the daily run covers the whole
+# territory every couple of weeks at a bounded API cost.
+
+on:
+  schedule:
+    - cron: '15 8 * * *'
+  workflow_dispatch:
+    inputs:
+      batch:
+        description: 'Institutions to search this run'
+        default: '6'
+        required: false
+      dry_run:
+        description: 'Search and log only, insert nothing (true/false)'
+        default: 'false'
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: discover-roles-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  discover-roles:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run role-targeted discovery
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          EXTRA=""
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then EXTRA="--dry-run"; fi
+          node scripts/discover-roles.js --batch "${{ github.event.inputs.batch || '6' }}" $EXTRA
+      - name: Commit state
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add data/roles-scan-state.json
+          [ -f data/pending-role-contacts.json ] && git add data/pending-role-contacts.json
+          if git diff --staged --quiet; then
+            echo "Nothing to commit"
+            exit 0
+          fi
+          git commit -m "roles: auto-discover $(date +%Y-%m-%d)"
+          for attempt in 1 2 3; do
+            if git pull --rebase origin ${{ github.ref_name }} && git push; then
+              echo "Pushed successfully"
+              exit 0
+            fi
+            echo "Push attempt $attempt failed (likely a concurrent run of this workflow) — retrying"
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 5))
+          done
+          echo "::warning::Could not push role-discovery state after 3 attempts. Any contacts inserted into Supabase are already in the review queue; only the cursor and audit trail were not saved, so the next run may revisit this batch."
