@@ -116,14 +116,16 @@ function isTrackedLocation(location) {
   return /\bremote\b/i.test(loc) && !NON_EUROPE_REMOTE_RE.test(loc);
 }
 
-// Where a tracked-category role sits. Until 2026-09-18 anything outside
-// "Belgium or remote-eligible" was dropped, which left the feed at two
-// roles while the eight competitors had 229 open in these categories. Every
-// role is kept now and tagged, and the feed filters by region instead:
+// Where a tracked-category role sits. Only `domestic` and `remote` roles are
+// listed — the feed is for what could be filled from Belgium. The other two
+// buckets are counted (per-company log line, `openByRegion` in the state
+// file) but not written, so a thin feed reads as "nothing nearby" rather than
+// "the scan is broken": on 2026-09-18 the eight competitors had 229 open
+// tracked-category roles, 2 of them here or remote, 35 elsewhere in Europe.
 //   domestic — in Belgium
 //   remote   — remote and not restricted to a non-European country
-//   europe   — based elsewhere in Europe
-//   global   — everywhere else
+//   europe   — based elsewhere in Europe (counted, not listed)
+//   global   — everywhere else (counted, not listed)
 const EUROPE_RE = /\b(?:europe|european|emea|dach|nordics?|benelux|germany|deutschland|france|spain|espa[ñn]a|italy|italia|portugal|ireland|united kingdom|great britain|britain|england|scotland|wales|austria|switzerland|sweden|norway|finland|iceland|poland|czech|slovakia|hungary|romania|bulgaria|greece|croatia|slovenia|serbia|estonia|latvia|lithuania|luxembourg|malta|cyprus|belgium|netherlands|denmark|gbr|deu|fra|esp|ita|prt|irl|aut|che|swe|nor|fin|pol|cze|svk|hun|rou|bgr|grc|hrv|svn|est|lva|ltu|lux|bel|nld|dnk)\b|london|oxford|cambridge|manchester|edinburgh|dublin|berlin|munich|m[üu]nchen|hamburg|frankfurt|cologne|k[öo]ln|heidelberg|paris|lyon|madrid|barcelona|milan|milano|rome|roma|lisbon|lisboa|vienna|wien|zurich|z[üu]rich|geneva|stockholm|oslo|helsinki|warsaw|warszawa|prague|praha|budapest|athens|amsterdam|utrecht|rotterdam|brussels|copenhagen/i;
 function regionOf(location) {
   const loc = location || '';
@@ -495,7 +497,8 @@ async function main() {
         }
         const region = regionOf(matchLocation);
         perCompanyCounts[src.company][region]++;
-        if (region === 'domestic' || region === 'remote') perCompanyCounts[src.company].beOrRemote++;
+        if (region !== 'domestic' && region !== 'remote') continue; // counted above, never listed
+        perCompanyCounts[src.company].beOrRemote++;
         const key = j.company + '|' + j.url;
         const prior = existingByKey.get(key);
 
@@ -518,7 +521,7 @@ async function main() {
           applicationDeadline: extractDeadline(descriptionHtml),
         });
       }
-      { const c = perCompanyCounts[src.company]; console.log(`[competitor-jobs] ${src.company}: ${jobs.length} open role(s) — tracked categories: ${c.beOrRemote} Belgium/remote, ${c.europe} elsewhere in Europe, ${c.global} rest of world`); }
+      { const c = perCompanyCounts[src.company]; console.log(`[competitor-jobs] ${src.company}: ${jobs.length} open role(s) — tracked categories: ${c.beOrRemote} Belgium/remote listed; ${c.europe} elsewhere in Europe and ${c.global} in the rest of world seen, not listed`); }
     } catch (e) {
       errors[src.company] = e.message;
       console.warn(`[competitor-jobs] ${src.company} failed: ${e.message}`);
@@ -541,6 +544,10 @@ async function main() {
     const fresh = seenThisRun.get(key);
     const prior = existingByKey.get(key);
     if (prior && !prior.region) prior.region = regionOf(prior.location); // rows from before regions existed
+    // Rows outside the country/remote scope only ever existed from the
+    // 2026-09-18 run that listed every region — drop them rather than carry
+    // them as "closed".
+    if (prior && !fresh && prior.region !== 'domestic' && prior.region !== 'remote') continue;
 
     if (fresh) {
       if (!prior) newCount++;
@@ -574,7 +581,14 @@ async function main() {
   saveJSON(STATE_FILE, {
     lastRun: new Date().toISOString(),
     totalOpenRoles: live.filter(j => j.status !== 'closed').length,
-    openByRegion: ['domestic', 'remote', 'europe', 'global'].reduce((m, r) => { m[r] = live.filter(j => j.status !== 'closed' && j.region === r).length; return m; }, {}),
+    // domestic/remote are open listed roles; europe/global are roles seen this
+    // run in the tracked categories but not listed (see regionOf).
+    openByRegion: {
+      domestic: live.filter(j => j.status !== 'closed' && j.region === 'domestic').length,
+      remote: live.filter(j => j.status !== 'closed' && j.region === 'remote').length,
+      europe: Object.values(perCompanyCounts).reduce((n, c) => n + (c.europe || 0), 0),
+      global: Object.values(perCompanyCounts).reduce((n, c) => n + (c.global || 0), 0),
+    },
     totalListed: live.length,
     newCount,
     reopenedCount,
