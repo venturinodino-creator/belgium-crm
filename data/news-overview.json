@@ -1,16 +1,15 @@
 {
-  "generatedAt": "2026-09-17T12:35:46.963Z",
-  "articleCount": 4,
-  "headline": "AI Giants Race to Own Research Infrastructure Layer; Governance Gaps Widen",
-  "bottomLine": "Competitors are systematically embedding AI into institutional workflows (healthcare, finance, research) while advancing reasoning and voice capabilities, creating infrastructure lock-in risk and raising governance concerns that position…",
+  "generatedAt": "2026-09-18T12:13:40.818Z",
+  "articleCount": 11,
+  "headline": "AI giants race to embed domain expertise—life sciences, health, finance—while governance risks mount",
+  "bottomLine": "Anthropic, OpenAI, and Google are rapidly embedding specialized AI capabilities into regulated domains (pharma, healthcare, finance), creating urgency for research institutions to integrate trusted verification and governance layers into…",
   "keyFindings": [
-    "OpenAI and Google are establishing themselves as foundational infrastructure for institutions: OpenAI via public health data programs, Google via advanced voice/reasoning models.",
-    "Anthropic extends Claude into regulated professional services (finance advisory), signaling AI vendors are moving beyond consumer/research use into mission-critical institutional decision-making…",
-    "Advanced reasoning (GPT-6 Astra extended thinking, Gemini 3.8 real-time voice) directly competes with LeapSpace's research assistant and reading/comparison features, raising bar for depth and…",
-    "Governance and controversy around GPT-6 Astra highlight regulatory and trust risks that institutions now weigh alongside capability—creating both risk and opportunity for vendors who can offer…",
-    "Consolidation around AI-native research workspaces is accelerating: competitors are bundling data access, reasoning, and domain connectors, making standalone citation/abstract databases less…"
+    "Anthropic, OpenAI, and Google are embedding AI into high-stakes domains: drug discovery (Novo–Anthropic), health research (OpenAI public data program), financial advisory (Claude), and voice-driven…",
+    "New verification and safety frameworks (Anthropic's Life Sciences Verification Program, OpenAI's misalignment reporting) signal that AI governance and domain compliance are becoming table-stakes for…",
+    "AI-driven research is shifting from general search/citation tools toward domain-specific reasoning engines; institutions risk vendor lock-in if they adopt point solutions without a unified discovery…",
+    "Performance and capability escalation (GPT-6 Astra, Gemini extended thinking, Anthropic's specialized APIs) is raising researcher expectations; standalone platforms like ScienceDirect/Scopus risk…"
   ],
-  "whyItMatters": "Belgian universities and research institutes are now evaluating AI-first platforms, not legacy databases. Competitors are locking in institutional relationships through infrastructure plays (health data, voice interfaces, reasoning depth) rather than content alone.",
+  "whyItMatters": "Belgian universities and research institutes are now caught between competing AI ecosystems, each claiming domain expertise and safety. Without a unified, trusted research workspace that integrates AI reasoning, literature discovery, verification, and governance, institutions will fragment spending across multiple vendors and lose control over research reproducibility and compliance.",
   "impact": {
     "novelty": 4,
     "commercial": 5,
@@ -18,17 +17,19 @@
     "urgency": 5
   },
   "entities": [
+    "Anthropic",
     "OpenAI",
-    "Google (Gemini)",
-    "Anthropic (Claude)",
-    "Elsevier (LeapSpace, ScienceDirect, Scopus)",
+    "Google",
+    "Novo Nordisk",
+    "Claude",
     "GPT-6 Astra",
-    "Claude (financial advisory)",
-    "Gemini 3.8 Live"
+    "Gemini",
+    "Life Sciences Verification Program"
   ],
   "actionItems": [
-    "Audit LeapSpace's reasoning depth and voice capabilities against Gemini 3.8 and GPT-6 Astra; identify feature/performance gaps and prioritize roadmap fixes before next Belgian institution RFP cycle.",
-    "Develop governance and audit-trail messaging (ethics, transparency, data handling) that addresses institutional risk concerns around GPT-6 controversy; position Elsevier as 'trustworthy AI research…",
-    "Map which Belgian universities and research institutes are already using OpenAI/Google health or finance integrations; prioritize outreach to largest/most-strategic accounts to prevent lock-in and…"
+    "Conduct immediate discovery calls with key Belgian pharma research centres and university libraries: map which AI tools they're piloting, and identify gaps where LeapSpace + Scopus verification could…",
+    "Develop a one-pager positioning LeapSpace as the 'AI verification layer' for institutions adopting third-party AI research assistants—emphasize claim-checking, source tracing, and governance audit…",
+    "Benchmark Elsevier's current AI reasoning capabilities (reading assistant, deep research reports, paper comparison) against Claude, Gemini, and emerging domain-specific APIs; identify 2–3 quick wins…",
+    "Prepare 'AI governance playbook' for prospect conversations: show Belgian institutions how to adopt AI safely and compliantly through LeapSpace's integrated verification, not by stitching together…"
   ]
 }
