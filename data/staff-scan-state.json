@@ -1,10 +1,11 @@
 {
-  "lastRun": "2026-09-17T19:19:21.958Z",
+  "lastRun": "2026-09-18T12:23:31.650Z",
   "lastAddedCount": 0,
   "sources": 40,
   "blockedSources": [
     "https://www.bruegel.org/about/board-and-scientific-council",
-    "https://www.bruegel.org/our-researchers"
+    "https://www.bruegel.org/our-researchers",
+    "https://www.uza.be/nl/organisatie-en-structuur"
   ],
   "issues": [
     {
@@ -35,6 +36,44 @@
       "note": "no people extracted"
     },
     {
+      "instId": "ugent",
+      "url": "https://www.ugent.be/en/research/funding/eu-int/euteam-extern.htm",
+      "error": "fetch failed"
+    },
+    {
+      "instId": "ugent",
+      "url": "https://www.ugent.be/we/en/faculty/faculty-offices/library/team.htm",
+      "error": "fetch failed"
+    },
+    {
+      "instId": "ugent",
+      "url": "https://ai.ugent.be/people/",
+      "error": "fetch failed"
+    },
+    {
+      "instId": "ugent",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "uantwerpen",
+      "url": "https://www.uantwerpen.be/en/research/policy/riva/grantsoffice/",
+      "error": "fetch failed"
+    },
+    {
+      "instId": "uantwerpen",
+      "url": "https://www.uantwerpen.be/en/research-groups/antwerp-center-responsible-ai/meet-the-team/",
+      "error": "fetch failed"
+    },
+    {
+      "instId": "uantwerpen",
+      "url": "https://www.uantwerpen.be/en/research-groups/idlab/contact/",
+      "error": "fetch failed"
+    },
+    {
+      "instId": "uantwerpen",
+      "note": "no people extracted"
+    },
+    {
       "instId": "vub",
       "note": "no people extracted"
     },
@@ -59,6 +98,15 @@
     },
     {
       "instId": "uzleuven",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "uza",
+      "url": "https://www.uza.be/nl/organisatie-en-structuur",
+      "error": "HTTP 429"
+    },
+    {
+      "instId": "uza",
       "note": "no people extracted"
     }
   ]
