@@ -382,14 +382,27 @@ async function supaFetch(url, options = {}) {
   finally { clearTimeout(timer); }
 }
 
+// PostgREST answers at most 1,000 rows per request. Both dedup lists are past
+// or heading past that (2,626 CRM contacts across the regions on 2026-09-18,
+// and the Danish queue at 927), so page explicitly — an unpaged read used to
+// truncate silently and let known people back into the queue.
+async function supaAllRows(pathAndQuery) {
+  const out = [];
+  for (let from = 0; ; from += 1000) {
+    const res = await supaFetch(`${SUPA_URL}/rest/v1/${pathAndQuery}`, {
+      headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}`, Range: `${from}-${from + 999}`, 'Range-Unit': 'items' },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const rows = await res.json();
+    out.push(...rows);
+    if (rows.length < 1000) return out;
+  }
+}
+
 async function fetchExistingPending() {
   if (!SUPA_SERVICE_KEY) return [];
   try {
-    const res = await supaFetch(`${SUPA_URL}/rest/v1/pending_contacts?select=first,last,email&region=eq.${REGION}`, {
-      headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}` },
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.json();
+    return await supaAllRows(`pending_contacts?select=first,last,email&region=eq.${REGION}`);
   } catch (e) {
     console.warn('Could not fetch existing pending_contacts:', e.message);
     return [];
@@ -409,11 +422,9 @@ async function fetchExistingPending() {
 async function fetchExistingContacts() {
   if (!SUPA_SERVICE_KEY) return [];
   try {
-    const res = await supaFetch(`${SUPA_URL}/rest/v1/crm_contacts?select=first,last,email`, {
-      headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}` },
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.json();
+    // The three CRMs share one database with a region column (the comment
+    // above predates that), so filter to this region — and page.
+    return await supaAllRows(`crm_contacts?select=first,last,email&region=eq.${REGION}`);
   } catch (e) {
     // Non-fatal: fall back to the old behaviour rather than skipping the run.
     // The worst case is the duplicate this function exists to prevent, which
