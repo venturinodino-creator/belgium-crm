@@ -1,0 +1,5 @@
+{
+  "_comment": "White Space dossier for the Belgium region, in the same shape as the Denmark CRM file: institutions[instId] = {works, incumbent, evidence, why, contacts[]} plus optional per-product blocks. Empty for now — the page falls back to the competitor matrix for status and to CRM contacts for people. Fill it in as institutions are researched.",
+  "generated": "2026-09-19",
+  "institutions": {}
+}

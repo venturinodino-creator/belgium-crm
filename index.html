@@ -1042,6 +1042,29 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
 .dsh-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .dsh-chip i{width:7px;height:7px;border-radius:2px;display:block}
 
+/* White Space (product prospect list) */
+.ws-caveat{flex-basis:100%;font-size:11px;color:var(--muted,#8a93a3);line-height:1.45;margin-top:2px}
+.ws-card .ws-eviz{font-size:10.5px;line-height:1.4;color:var(--muted,#8a93a3);margin-top:6px;border-left:2px solid var(--border2,rgba(255,255,255,.12));padding-left:7px}
+.ws-chips{display:flex;gap:6px;flex-wrap:wrap}
+.ws-chip{background:var(--card2,rgba(255,255,255,.04));border:1px solid var(--border,rgba(255,255,255,.1));color:var(--text2,#aeb6c4);
+  border-radius:99px;padding:4px 10px;font-size:11px;cursor:pointer;transition:.15s}
+.ws-chip:hover{color:var(--text,#fff);border-color:rgba(255,255,255,.25)}
+.ws-chip.active{background:rgba(96,165,250,.16);border-color:rgba(96,165,250,.5);color:#93c5fd}
+.ws-chip b{font-weight:700;margin-left:2px}
+.ws-card .ws-why{font-size:11px;line-height:1.45;color:var(--text2,#aeb6c4);margin-top:8px;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.ws-card .ws-rival{font-size:11px;color:#fb923c;margin-top:6px;font-weight:600}
+.ws-people{margin-top:10px;border-top:1px solid var(--border,rgba(255,255,255,.08));padding-top:8px;display:flex;flex-direction:column;gap:5px}
+.ws-people.ws-none{font-size:11px;color:var(--muted,#6b7280);font-style:italic}
+.ws-person{display:flex;flex-direction:column;gap:1px;line-height:1.3}
+.ws-person .wp-n{font-size:11.5px;font-weight:600;color:var(--text,#e6eaf2)}
+.ws-person .wp-t{font-size:10.5px;color:var(--muted,#8a93a3)}
+.ws-person .wp-e{font-size:10.5px;color:#60a5fa;text-decoration:none;word-break:break-all}
+.ws-person .wp-e:hover{text-decoration:underline}
+.wp-warn{font-size:9px;color:#fbbf24;border:1px solid rgba(251,191,36,.4);border-radius:4px;padding:0 4px;margin-left:4px;white-space:nowrap}
+
+.ws-more{font-size:10.5px;color:var(--muted,#8a93a3)}
+
 /* ── Analytics ─────────────────────────────────────────────
    One filter row scopes every chart below it. Marks are thin, gridlines are
    solid hairlines, and no chart uses colour to say something the bar length
@@ -1723,7 +1746,10 @@ let state = {
   instType: '',
   instSort: { field: 'type', dir: 'asc' }, // Institutions table column sort
   rfpSort: { field: 'status', dir: 'asc' }, // RFP Opps table column sort
-  wsView: 'grid', // grid | table — White Space (universities without Pure)
+  wsView: 'grid', // grid | table | contacts — White Space (no tenancy for the selected product)
+  wsProduct: 'pure', // pure | scopus | scival — which Elsevier product the view is about
+  whitespace: {}, // instId -> {works, incumbent, evidence, why, contacts[]} from data/whitespace-contacts.json
+  wsFilter: 'all', // all | greenfield | rival | unknown
   wsSearch: '',
   wsSort: { field: 'type', dir: 'asc' }, // White Space table column sort
   contactSearch: '',
@@ -1991,9 +2017,28 @@ async function loadResearchFocus() {
     if (cached) state.researchFocus = JSON.parse(cached);
   } catch (e) {}
 }
+// The White Space dossier is researched offline (see data/whitespace-contacts.json
+// for the method) and shipped as a static file, exactly like research-focus.json —
+// none of it is per-user state, so it does not belong in Supabase.
+async function loadWhiteSpace() {
+  try {
+    const res = await fetch('data/whitespace-contacts.json?t=' + Date.now());
+    if (res.ok) {
+      const json = await res.json();
+      state.whitespace = (json && json.institutions) || {};
+      localStorage.setItem('be_crm_whitespace', JSON.stringify(state.whitespace));
+      return;
+    }
+  } catch (e) { /* fall through to cache below */ }
+  try {
+    const cached = localStorage.getItem('be_crm_whitespace');
+    if (cached) state.whitespace = JSON.parse(cached);
+  } catch (e) {}
+}
 async function load() {
   showLoadingScreen();
   const researchFocusPromise = loadResearchFocus();
+  const whiteSpacePromise = loadWhiteSpace();
   try {
     const [instRows, contRows, oppRows, intRows, rfpRows] = await Promise.all([
       supaFetch('crm_institutions?select=*&order=name'),
@@ -2058,6 +2103,7 @@ async function load() {
     toast('Working offline — changes will sync when connection restores', 'warn');
   }
   await researchFocusPromise;
+  await whiteSpacePromise;
   hideLoadingScreen();
 }
 function save() {
@@ -4567,11 +4613,19 @@ function getProductStatus(instId, key) {
   if (cp && cp[key]) return cp[key];
   return 'unknown';
 }
-const WS_PURE_STATUS = {
+// The three statuses that put an institution on this list. The "no" label names
+// the selected product, so a card never reads "No Pure" while the Scopus view is
+// open; "unknown" says unverified rather than absent, which is the honest word
+// for SciVal, where no register exists to confirm either way.
+const WS_STATUS = {
   no:       { label: 'No Pure',    color: '#f87171' },
   cancelled:{ label: 'Cancelled',  color: '#f87171' },
-  unknown:  { label: 'Unknown',    color: '#fbbf24' },
+  unknown:  { label: 'Unverified', color: '#fbbf24' },
 };
+function wsStatusLabel(code) {
+  if (code !== 'no') return (WS_STATUS[code] || {}).label || code;
+  return 'No ' + ((WS_PRODUCTS[state.wsProduct] || WS_PRODUCTS.pure).label);
+}
 
 // Pure is sold into any research-active organisation, not just universities —
 // a medical centre, an independent research institute, or a research-producing
@@ -4588,130 +4642,273 @@ const WS_EXCLUDE_IDS = new Set(['royalacademiesbelgium', 'fwo', 'fnrs', 'kbf', '
 
 const WS_PURE_SORT_ORDER = {no:0, cancelled:1, unknown:2};
 function wsSortVal(i, field) {
-  if (field === 'pure') return WS_PURE_SORT_ORDER[getProductStatus(i.id, 'pure')] ?? 9;
+  if (field === 'pure') return WS_PURE_SORT_ORDER[getProductStatus(i.id, state.wsProduct)] ?? 9;
+  // Biggest unserved research output first is the useful default, so sort
+  // descending on a negated value rather than making the caller special-case it.
+  if (field === 'works') return -((((state.whitespace || {})[i.id] || {}).works) || 0);
   return instSortVal(i, field);
 }
 
-function whiteSpaceTargets() {
-  return state.institutions.filter(i => {
-    if (!WS_ELIGIBLE_TYPES.includes(i.type)) return false;
-    if (WS_EXCLUDE_IDS.has(i.id)) return false;
-    const pureStatus = getProductStatus(i.id, 'pure');
-    if (!(pureStatus in WS_PURE_STATUS)) return false; // yes/likely/expiring already have or probably have Pure
-    if (state.wsSearch && !`${i.name} ${i.short} ${i.city}`.toLowerCase().includes(state.wsSearch.toLowerCase())) return false;
-    return true;
-  });
+function wsInfo(id) { return (state.whitespace || {})[id] || {}; }
+// The researched `incumbent` is the competing CRIS an institution runs, which
+// only displaces Pure — Esploro is not an alternative to Scopus or SciVal, so
+// it must not colour those two views. No incumbent data is held for the
+// database products, so under them everything is greenfield or unverified.
+function wsHasRival(id) {
+  // Two different kinds of incumbent. For Pure it is the researched CRIS in
+  // wsInfo().incumbent — Esploro displaces Pure, but it is no alternative to a
+  // citation database. For Scopus and SciVal the rival is Web of Science, so an
+  // institution known to run WoS or Dimensions is a displacement rather than a greenfield
+  // target. This only fires where the competitor matrix records the rival, so
+  // a "greenfield" is only as good as the matrix research behind it.
+  if (state.wsProduct === 'pure') {
+    if (getProductStatus(id, 'converis') === 'yes' || getProductStatus(id, 'symplectic') === 'yes') return true;
+    const inc = wsInfo(id).incumbent || '';
+    return !!inc && !/^none/i.test(inc);
+  }
+  return getProductStatus(id, 'wos') === 'yes' || getProductStatus(id, 'dimensions') === 'yes';
+}
+// Three buckets a rep actually works differently:
+//   greenfield — verified no Pure and no rival CRIS at all
+//   rival      — verified no Pure but a competitor product is already installed
+//   unknown    — not yet researched; no evidence either way
+function wsBucket(id) {
+  const st = getProductStatus(id, state.wsProduct);
+  if (st === 'unknown') return 'unknown';
+  return wsHasRival(id) ? 'rival' : 'greenfield';
+}
+const WS_BUCKET_LABEL = {
+  greenfield: { label: 'Greenfield',   color: '#4ade80', hint: 'No Pure and no competing CRIS' },
+  rival:      { label: 'Displacement', color: '#fb923c', hint: 'A competing product is already installed (a rival CRIS for Pure; Web of Science or Dimensions for Scopus and SciVal)' },
+  unknown:    { label: 'Unverified',   color: '#fbbf24', hint: 'No evidence either way yet' },
+};
+function wsWorks(id) { const w = wsInfo(id).works; return typeof w === 'number' ? w : null; }
+function fmtWorks(n) {
+  if (n === null) return '';
+  return n >= 1000 ? (n / 1000).toFixed(n >= 10000 ? 0 : 1).replace(/\.0$/, '') + 'k' : String(n);
+}
+// Contacts on a White Space card come from the researched dossier when one
+// exists (data/whitespace-contacts.json, same shape as the sibling CRMs) and otherwise
+// from the CRM's own contacts for the institution, so a card is never empty
+// for an account that already has people in it.
+function wsDossierContacts(id) { return wsInfo(id).contacts || []; }
+function wsContacts(id) {
+  const d = wsDossierContacts(id);
+  if (d.length) return d;
+  return contactsForInst(id).map(c => ({
+    name: [c.first, c.last].filter(Boolean).join(' '), title: c.title || c.dept || '',
+    email: c.email || '', phone: c.phone || '', source: c.linkedin || '', fromCrm: true,
+  }));
+}
+// What the Displacement badge is about: the researched CRIS for Pure (or the
+// rival CRIS the matrix records), Web of Science or Dimensions for the two
+// database products.
+function wsRivalName(id) {
+  if (state.wsProduct === 'pure') {
+    const inc = wsInfo(id).incumbent || '';
+    if (inc && !/^none/i.test(inc)) return inc;
+    if (getProductStatus(id, 'converis') === 'yes') return 'Converis';
+    if (getProductStatus(id, 'symplectic') === 'yes') return 'Symplectic Elements';
+    return '';
+  }
+  const r = [];
+  if (getProductStatus(id, 'wos') === 'yes') r.push('Web of Science');
+  if (getProductStatus(id, 'dimensions') === 'yes') r.push('Dimensions');
+  return r.join(', ');
 }
 
+// The three Elsevier products this view can be pointed at. 'caveat' is shown
+// under the toolbar because the strength of a "no" differs between them, and
+// because this region has no researched dossier yet: every status here comes
+// from the competitor matrix (COMP_DATA and its overrides).
+const WS_PRODUCTS = {
+  pure:   { label: 'Pure',   title: 'White Space — Pure',
+            sub: 'Research-producing organisations in Belgium with no Elsevier Pure tenancy — and who to call',
+            caveat: 'Pure status comes from the competitor matrix: a "no" was checked against the public Pure portals and a hosted-tenant lookup; "Unverified" has not been researched yet.' },
+  scopus: { label: 'Scopus', title: 'White Space — Scopus',
+            sub: 'Institutions with no evidence of a Scopus subscription',
+            caveat: 'Scopus status comes from the competitor matrix, built from public library and licence pages. A consortium or direct purchase that is not published would not show, so "Unverified" means no evidence either way, not absence.' },
+  scival: { label: 'SciVal', title: 'White Space — SciVal',
+            sub: 'Institutions with no evidence of SciVal — the strongest are those already paying for Scopus',
+            caveat: 'SciVal has no public register, so "Unverified" means no evidence either way. The best prospects are institutions that hold Scopus but show no SciVal — worth checking against Elsevier records.' },
+};
+function wsSetProduct(p) { state.wsProduct = p; state.wsFilter = 'all'; renderWhiteSpace(); }
 function renderWhiteSpace() {
-  document.getElementById('page-title').textContent = 'White Space';
-  document.getElementById('page-sub').textContent = 'Universities, medical centres, research institutes and NGOs with no active Pure subscription — outreach targets';
-  document.getElementById('topbar-actions').innerHTML = `
-    <div class="view-toggle">
-      <button class="vt-btn ${state.wsView==='grid'?'active':''}" onclick="state.wsView='grid';renderWhiteSpace()"> Grid</button>
-      <button class="vt-btn ${state.wsView==='table'?'active':''}" onclick="state.wsView='table';renderWhiteSpace()"> Table</button>
-    </div>
-    <button class="btn btn-outline" onclick="exportWhiteSpaceCSV()" title="Download the current target list, one row per contact">Export CSV</button>`;
+  const prod = WS_PRODUCTS[state.wsProduct] || WS_PRODUCTS.pure;
+  document.getElementById('page-title').textContent = prod.title;
+  document.getElementById('page-sub').textContent = prod.sub;
+  document.getElementById('topbar-actions').innerHTML =
+    '<div class="view-toggle" style="margin-right:8px">' +
+    Object.entries(WS_PRODUCTS).map(([k, p]) =>
+      '<button class="vt-btn ' + (state.wsProduct === k ? 'active' : '') + '" onclick="wsSetProduct(\'' + k + '\')">' + p.label + '</button>').join('') +
+    '</div>' +
+    '<div class="view-toggle">' +
+    ['grid', 'table', 'contacts'].map(v =>
+      '<button class="vt-btn ' + (state.wsView === v ? 'active' : '') + '" onclick="state.wsView=\'' + v + '\';renderWhiteSpace()">' +
+      (v === 'grid' ? 'Grid' : v === 'table' ? 'Table' : 'Contacts') + '</button>').join('') +
+    '</div>' +
+    '<button class="btn btn-outline" onclick="exportWhiteSpaceContacts()" title="Download the current target list, one row per contact">Export CSV</button>';
 
-  let insts = whiteSpaceTargets();
+  let insts = state.institutions.filter(i => {
+    if (!WS_ELIGIBLE_TYPES.includes(i.type)) return false;
+    if (WS_EXCLUDE_IDS.has(i.id)) return false;
+    const pureStatus = getProductStatus(i.id, state.wsProduct);
+    if (!(pureStatus in WS_STATUS)) return false; // yes/likely/expiring already have or probably have Pure
+    if (state.wsFilter !== 'all' && wsBucket(i.id) !== state.wsFilter) return false;
+    if (state.wsSearch) {
+      const hay = (i.name + ' ' + (i.short || '') + ' ' + i.city + ' ' + (wsInfo(i.id).why || '') + ' ' +
+        wsContacts(i.id).map(c => c.name + ' ' + c.title).join(' ')).toLowerCase();
+      if (!hay.includes(state.wsSearch.toLowerCase())) return false;
+    }
+    return true;
+  });
   insts = sortInstList(insts, state.wsSort, wsSortVal);
 
-  const toolbar = `
-    <div class="toolbar">
-      <div class="search-wrap"><span class="search-icon"></span>
-        <input id="ws-search-input" placeholder="Search institutions..." value="${esc(state.wsSearch)}"
-          oninput="state.wsSearch=this.value;renderWhiteSpace()">
-      </div>
-      <span style="font-size:12px;color:var(--muted)">${insts.length} target${insts.length!==1?'s':''}</span>
-    </div>`;
+  const all = state.institutions.filter(i =>
+    WS_ELIGIBLE_TYPES.includes(i.type) && !WS_EXCLUDE_IDS.has(i.id) && getProductStatus(i.id, state.wsProduct) in WS_STATUS);
+  const counts = { all: all.length, greenfield: 0, rival: 0, unknown: 0 };
+  all.forEach(i => counts[wsBucket(i.id)]++);
+  const chip = (key, label) =>
+    '<button class="ws-chip' + (state.wsFilter === key ? ' active' : '') + '" onclick="state.wsFilter=\'' + key + '\';renderWhiteSpace()">' +
+    esc(label) + ' <b>' + counts[key] + '</b></button>';
+
+  const toolbar =
+    '<div class="toolbar">' +
+      '<div class="search-wrap"><span class="search-icon"></span>' +
+        '<input id="ws-search-input" placeholder="Search institutions, contacts, rationale..." value="' + esc(state.wsSearch) + '" ' +
+          'oninput="state.wsSearch=this.value;renderWhiteSpace()">' +
+      '</div>' +
+      '<div class="ws-chips">' + chip('all', 'All') + chip('greenfield', 'Greenfield') +
+        chip('rival', 'Displacement') + chip('unknown', 'Unverified') + '</div>' +
+      '<span style="font-size:12px;color:var(--muted);margin-left:auto">' + insts.length +
+        ' target' + (insts.length !== 1 ? 's' : '') + '</span>' +
+    '</div>' +
+    '<div class="ws-caveat">' + esc(prod.caveat) + '</div>';
 
   if (!insts.length) {
-    document.getElementById('content').innerHTML = toolbar + `<div class="empty"><div class="ei"></div><h3>No white space right now</h3><p>Every tracked institution either has Pure or is likely/expiring. Try adjusting your search.</p></div>`;
+    document.getElementById('content').innerHTML = toolbar +
+      '<div class="empty"><div class="ei"></div><h3>Nothing in this slice</h3>' +
+      '<p>No institution matches the current filter and search. Clear them to see the full ' + esc(prod.label) + ' white space.</p></div>';
     return;
   }
 
   if (state.wsView === 'grid') {
-    const cards = insts.map(i => {
-      const cc = contactsForInst(i.id).length;
-      const st = WS_PURE_STATUS[getProductStatus(i.id, 'pure')];
-      return `<div class="ic" onclick="nav('detail',{instId:'${i.id}'})">
-        <div class="ic-head">
-          <div class="ic-icon ${i.type}">${TYPE_ICON[i.type]||''}</div>
-          <span class="badge b-${i.type}" style="font-size:10px">${TYPE_LABEL[i.type]||i.type}</span>
-          <span class="badge" style="font-size:10px;background:${st.color}22;color:${st.color};border:1px solid ${st.color}55">${esc(st.label)}</span>
-        </div>
-        <h3>${esc(i.name)}</h3>
-        ${i.short?`<div class="short">${esc(i.short)}</div>`:''}
-        <div class="city"><span style="display:inline-flex;vertical-align:middle;margin-right:3px;opacity:.55"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>${esc(i.city)}${i.founded?' · Est. '+i.founded:''}</div>
-        ${i.researchDirector?`<div style="font-size:11px;color:var(--muted);margin-top:6px;display:flex;align-items:center;gap:4px"><span style="font-weight:600;color:var(--text2)">${esc(i.researchDirector)}</span></div>`:''}
-        <div class="ic-footer">
-          <span><span style="opacity:.6;display:inline-flex;margin-right:3px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>${cc} contact${cc!==1?'s':''}</span>
-        </div>
-      </div>`;
-    }).join('');
-    document.getElementById('content').innerHTML = toolbar + `<div class="inst-grid">${cards}</div>`;
+    document.getElementById('content').innerHTML = toolbar +
+      '<div class="inst-grid">' + insts.map(i => {
+        const info = wsInfo(i.id), bk = WS_BUCKET_LABEL[wsBucket(i.id)];
+        const st = WS_STATUS[getProductStatus(i.id, state.wsProduct)];
+        const works = wsWorks(i.id), cx = wsContacts(i.id), crm = contactsForInst(i.id).length;
+        return '<div class="ic ws-card" onclick="nav(\'detail\',{instId:\'' + i.id + '\'})">' +
+          '<div class="ic-head">' +
+            '<div class="ic-icon ' + i.type + '">' + (TYPE_ICON[i.type] || '') + '</div>' +
+            '<span class="badge b-' + i.type + '" style="font-size:10px">' + (TYPE_LABEL[i.type] || i.type) + '</span>' +
+            '<span class="badge" style="font-size:10px;background:' + st.color + '22;color:' + st.color + ';border:1px solid ' + st.color + '55">' + esc(wsStatusLabel(getProductStatus(i.id, state.wsProduct))) + '</span>' +
+            '<span class="badge" title="' + esc(bk.hint) + '" style="font-size:10px;background:' + bk.color + '22;color:' + bk.color + ';border:1px solid ' + bk.color + '55">' + bk.label + '</span>' +
+          '</div>' +
+          '<h3>' + esc(i.name) + '</h3>' +
+          (i.short ? '<div class="short">' + esc(i.short) + '</div>' : '') +
+          '<div class="city">' + esc(i.city) + (works !== null && works > 0 ? ' · ' + fmtWorks(works) + ' indexed works' : '') + '</div>' +
+          (info.why ? '<div class="ws-why">' + esc(info.why) + '</div>' : '') +
+          ((info[state.wsProduct] || {}).evidence ? '<div class="ws-eviz">' + esc(info[state.wsProduct].evidence) + '</div>' : '') +
+          (wsHasRival(i.id) ? '<div class="ws-rival">Incumbent: ' + esc(wsRivalName(i.id)) + '</div>' : '') +
+          (cx.length ? '<div class="ws-people">' + cx.slice(0, 3).map(c =>
+              '<div class="ws-person"><span class="wp-n">' + esc(c.name) + '</span>' +
+              '<span class="wp-t">' + esc(c.title) + '</span>' +
+              (c.email ? '<a class="wp-e" onclick="event.stopPropagation()" href="mailto:' + esc(c.email) + '">' + esc(c.email) + '</a>' +
+                (c.emailStatus === 'constructed' ? '<span class="wp-warn" title="Constructed from the institution address pattern — verify before sending">unverified</span>' : '') : '') +
+              '</div>').join('') +
+            (cx.length > 3 ? '<div class="ws-more">+' + (cx.length - 3) + ' more</div>' : '') + '</div>'
+            : '<div class="ws-people ws-none">No contact yet — the nightly discovery scans fill these in</div>') +
+          '<div class="ic-footer"><span>' + (wsDossierContacts(i.id).length ? cx.length + ' researched · ' + crm + ' in CRM' : crm + ' in CRM') + '</span></div>' +
+        '</div>';
+      }).join('') + '</div>';
+
+  } else if (state.wsView === 'table') {
+    document.getElementById('content').innerHTML = toolbar +
+      '<div class="table-wrap"><table><thead><tr>' +
+        '<th class="sortable-th' + sortThStyle('name', state.wsSort) + '" onclick="toggleSort(state.wsSort,\'name\',renderWhiteSpace)">Institution' + sortArrow('name', state.wsSort) + '</th>' +
+        '<th class="sortable-th' + sortThStyle('type', state.wsSort) + '" onclick="toggleSort(state.wsSort,\'type\',renderWhiteSpace)">Type' + sortArrow('type', state.wsSort) + '</th>' +
+        '<th class="sortable-th' + sortThStyle('pure', state.wsSort) + '" onclick="toggleSort(state.wsSort,\'pure\',renderWhiteSpace)">' + esc(prod.label) + ' status' + sortArrow('pure', state.wsSort) + '</th>' +
+        '<th class="sortable-th' + sortThStyle('works', state.wsSort) + '" onclick="toggleSort(state.wsSort,\'works\',renderWhiteSpace)">Output' + sortArrow('works', state.wsSort) + '</th>' +
+        '<th>Incumbent</th>' +
+        '<th class="sortable-th' + sortThStyle('city', state.wsSort) + '" onclick="toggleSort(state.wsSort,\'city\',renderWhiteSpace)">City' + sortArrow('city', state.wsSort) + '</th>' +
+        '<th>Contacts</th><th>Actions</th>' +
+      '</tr></thead><tbody>' + insts.map(i => {
+        const info = wsInfo(i.id), st = WS_STATUS[getProductStatus(i.id, state.wsProduct)];
+        const works = wsWorks(i.id), cx = wsContacts(i.id);
+        return '<tr onclick="nav(\'detail\',{instId:\'' + i.id + '\'})">' +
+          '<td><div class="name-cell"><span style="font-size:18px">' + (TYPE_ICON[i.type] || '') + '</span><div>' +
+            '<div style="font-weight:600">' + esc(i.name) + '</div>' +
+            '<div style="font-size:11px;color:var(--muted)">' + esc(i.short || '') + '</div></div></div></td>' +
+          '<td><span class="badge b-' + i.type + '">' + (TYPE_LABEL[i.type] || i.type) + '</span></td>' +
+          '<td><span class="badge" style="background:' + st.color + '22;color:' + st.color + ';border:1px solid ' + st.color + '55">' + esc(wsStatusLabel(getProductStatus(i.id, state.wsProduct))) + '</span></td>' +
+          '<td style="white-space:nowrap">' + (works !== null && works > 0 ? fmtWorks(works) : '—') + '</td>' +
+          '<td style="font-size:11px;color:' + (wsHasRival(i.id) ? '#fb923c' : 'var(--muted)') + '">' + esc(wsHasRival(i.id) ? wsRivalName(i.id) : 'none') + '</td>' +
+          '<td>' + esc(i.city) + '</td>' +
+          '<td>' + cx.length + '</td>' +
+          '<td onclick="event.stopPropagation()" style="white-space:nowrap">' +
+            (i.website ? '<a class="ext-link" href="' + esc(safeHref(i.website)) + '" target="_blank">Website</a>' : '') + '</td>' +
+        '</tr>';
+      }).join('') + '</tbody></table></div>';
+
   } else {
-    const rows = insts.map(i => {
-      const cc = contactsForInst(i.id).length;
-      const st = WS_PURE_STATUS[getProductStatus(i.id, 'pure')];
-      return `<tr onclick="nav('detail',{instId:'${i.id}'})">
-        <td><div class="name-cell"><span style="font-size:18px">${TYPE_ICON[i.type]||''}</span><div><div style="font-weight:600">${esc(i.name)}</div><div style="font-size:11px;color:var(--muted)">${esc(i.short||'')}</div></div></div></td>
-        <td><span class="badge b-${i.type}">${TYPE_LABEL[i.type]||i.type}</span></td>
-        <td><span class="badge" style="background:${st.color}22;color:${st.color};border:1px solid ${st.color}55">${esc(st.label)}</span></td>
-        <td>${esc(i.city)}</td>
-        <td>${cc} contact${cc!==1?'s':''}</td>
-        <td onclick="event.stopPropagation()" style="white-space:nowrap">${i.website?`<a class="ext-link" href="${esc(safeHref(i.website))}" target="_blank"> Website</a>`:''}</td>
-      </tr>`;
-    }).join('');
-    document.getElementById('content').innerHTML = toolbar + `
-      <div class="table-wrap">
-        <table>
-          <thead><tr>
-            <th class="sortable-th${sortThStyle('name',state.wsSort)}" onclick="toggleSort(state.wsSort,'name',renderWhiteSpace)">Institution${sortArrow('name',state.wsSort)}</th>
-            <th class="sortable-th${sortThStyle('type',state.wsSort)}" onclick="toggleSort(state.wsSort,'type',renderWhiteSpace)">Type${sortArrow('type',state.wsSort)}</th>
-            <th class="sortable-th${sortThStyle('pure',state.wsSort)}" onclick="toggleSort(state.wsSort,'pure',renderWhiteSpace)">Pure status${sortArrow('pure',state.wsSort)}</th>
-            <th class="sortable-th${sortThStyle('city',state.wsSort)}" onclick="toggleSort(state.wsSort,'city',renderWhiteSpace)">City${sortArrow('city',state.wsSort)}</th>
-            <th class="sortable-th${sortThStyle('contacts',state.wsSort)}" onclick="toggleSort(state.wsSort,'contacts',renderWhiteSpace)">Contacts${sortArrow('contacts',state.wsSort)}</th>
-            <th>Actions</th>
-          </tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>`;
+    // Contacts view — the flat prospecting list, every researched decision-maker
+    // across the whole white space in one table.
+    const rows = [];
+    insts.forEach(i => wsContacts(i.id).forEach(c => rows.push({ i, c })));
+    if (!rows.length) {
+      document.getElementById('content').innerHTML = toolbar +
+        '<div class="empty"><div class="ei"></div><h3>No contacts researched for this slice</h3>' +
+        '<p>Widen the filter, or let the nightly discovery scans fill these in.</p></div>';
+      return;
+    }
+    document.getElementById('content').innerHTML = toolbar +
+      '<div class="table-wrap"><table><thead><tr>' +
+        '<th>Name</th><th>Role</th><th>Institution</th><th>Email</th><th>Phone</th><th>Source</th>' +
+      '</tr></thead><tbody>' + rows.map(({ i, c }) =>
+        '<tr>' +
+          '<td style="font-weight:600">' + esc(c.name) + '</td>' +
+          '<td style="font-size:12px">' + esc(c.title) + '</td>' +
+          '<td style="font-size:12px"><a class="ext-link" onclick="event.stopPropagation();nav(\'detail\',{instId:\'' + i.id + '\'})">' + esc(i.short || i.name) + '</a></td>' +
+          '<td style="font-size:12px">' + (c.email
+            ? '<a class="ext-link" href="mailto:' + esc(c.email) + '">' + esc(c.email) + '</a>' +
+              (c.emailStatus === 'constructed' ? ' <span class="wp-warn" title="Constructed from the institution address pattern — verify before sending">unverified</span>' : '')
+            : '<span style="color:var(--muted)">—</span>') + '</td>' +
+          '<td style="font-size:12px;white-space:nowrap">' + esc(c.phone || '—') + '</td>' +
+          '<td style="font-size:11px">' + (c.fromCrm ? '<a class="ext-link" onclick="event.stopPropagation();nav(\'detail\',{instId:\'' + i.id + '\'})">CRM</a>' : c.source ? '<a class="ext-link" href="' + esc(safeHref(c.source)) + '" target="_blank">page</a>' : '—') + '</td>' +
+        '</tr>').join('') + '</tbody></table></div>';
   }
 }
 
-// One row per contact, in the order and under the search filter the page is
-// currently showing. Institutions with no contacts still get a row, with the
-// contact columns empty: on an outreach list the ones nobody has a name for
-// are the point, not noise to be filtered out.
-function exportWhiteSpaceCSV() {
-  const insts = sortInstList(whiteSpaceTargets(), state.wsSort, wsSortVal);
-  if (!insts.length) { toast('Nothing to export in the current filter.'); return; }
-
-  const header = ['Institution','Short','Type','Pure status','City','Founded','Website',
-    'Research director','Key roles','Contacts',
-    'Contact','Role','Department','Email','Phone','LinkedIn','Research areas','Status','Priority','Last contact'];
-
-  const out = [header];
+// Exports exactly the rows the Contacts view is showing, so whatever the rep has
+// filtered down to is what lands in the CSV.
+function exportWhiteSpaceContacts() {
+  const insts = state.institutions.filter(i =>
+    WS_ELIGIBLE_TYPES.includes(i.type) && !WS_EXCLUDE_IDS.has(i.id) &&
+    getProductStatus(i.id, state.wsProduct) in WS_STATUS &&
+    (state.wsFilter === 'all' || wsBucket(i.id) === state.wsFilter));
+  const prod = WS_PRODUCTS[state.wsProduct] || WS_PRODUCTS.pure;
+  const out = [['Name', 'Role', 'Institution', 'Type', 'City', 'Email', 'Email status', 'Phone', prod.label + ' status', 'Incumbent', 'Indexed works', 'Source']];
+  // An institution nobody has a name for still gets a row: on an outreach
+  // list those are the point, not noise.
   insts.forEach(i => {
-    const cov = keyRoleCoverage(i);
-    const cs = contactsForInst(i.id);
-    const instCols = [i.name, i.short, TYPE_LABEL[i.type] || i.type,
-      WS_PURE_STATUS[getProductStatus(i.id, 'pure')].label, i.city, i.founded, i.website,
-      i.researchDirector, cov.filled + '/' + cov.total, String(cs.length)];
-    if (!cs.length) { out.push(instCols.concat(['', '', '', '', '', '', '', '', '', ''])); return; }
-    cs.forEach(c => out.push(instCols.concat([
-      [c.first, c.last].filter(Boolean).join(' '), c.title, c.dept, c.email, c.phone,
-      c.linkedin, c.research, c.status, c.priority, c.lastContact])));
+    const tail = [wsStatusLabel(getProductStatus(i.id, state.wsProduct)), wsHasRival(i.id) ? wsRivalName(i.id) : 'none', wsWorks(i.id) === null ? '' : wsWorks(i.id)];
+    const cx = wsContacts(i.id);
+    if (!cx.length) { out.push(['', '', i.name, TYPE_LABEL[i.type] || i.type, i.city, '', '', '', ...tail, '']); return; }
+    cx.forEach(c => out.push([
+      c.name, c.title, i.name, TYPE_LABEL[i.type] || i.type, i.city,
+      c.email || '', c.emailStatus || (c.fromCrm ? 'crm' : ''), c.phone || '',
+      ...tail, c.source || (c.fromCrm ? 'CRM' : ''),
+    ]));
   });
-
+  if (out.length === 1) { toast('Nothing to export in the current filter.', 'warn'); return; }
   const csv = out.map(r => r.map(v => '"' + csvSafe(v).replace(/"/g, '""') + '"').join(',')).join('\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-  a.download = 'be_white_space.csv';
+  a.download = state.wsProduct + '_white_space_contacts.csv';
   a.click();
   URL.revokeObjectURL(a.href);
-  toast('Exported ' + (out.length - 1) + ' row' + (out.length === 2 ? '' : 's'));
+  toast('Exported ' + (out.length - 1) + ' row' + (out.length === 2 ? '' : 's') + '.', 'ok');
 }
 
 // Recomputed on every render() — cheap (tens of institutions) and the count
@@ -4721,8 +4918,13 @@ function exportWhiteSpaceCSV() {
 function updateWhiteSpaceBadge() {
   const badge = document.getElementById('nav-whitespace-badge');
   if (!badge) return;
-  const count = state.institutions.filter(i => WS_ELIGIBLE_TYPES.includes(i.type) && !WS_EXCLUDE_IDS.has(i.id) && getProductStatus(i.id, 'pure') in WS_PURE_STATUS).length;
+  // Deliberately pinned to Pure rather than the view's selected product: the
+  // badge sits in the nav and is read from every screen, so it has to mean one
+  // stable thing. It also only recomputes on a full render(), so following the
+  // in-view product toggle would leave it showing a stale count.
+  const count = state.institutions.filter(i => WS_ELIGIBLE_TYPES.includes(i.type) && !WS_EXCLUDE_IDS.has(i.id) && getProductStatus(i.id, 'pure') in WS_STATUS).length;
   badge.textContent = count;
+  badge.title = count + ' institutions with no Pure tenancy';
   badge.style.display = count > 0 ? 'inline-block' : 'none';
 }
 
@@ -7008,21 +7210,15 @@ function anInstLink(i) {
 }
 // This region has no researched white-space dossier yet, so the accessor
 // returns an empty record and the bucket labels live here.
-function anWsInfo(id) { return (state.whitespace || {})[id] || {}; }
-const AN_WS_BUCKET = {
-  greenfield: { label: 'Greenfield',   color: '#4ade80' },
-  rival:      { label: 'Displacement', color: '#fb923c' },
-  unknown:    { label: 'Unverified',   color: '#fbbf24' },
-};
 // Pure white space, pinned to Pure exactly like the nav badge is.
 function anWsBucket(id) {
   if (getProductStatus(id, 'pure') === 'unknown') return 'unknown';
-  const inc = anWsInfo(id).incumbent || '';
+  const inc = wsInfo(id).incumbent || '';
   const rival = getProductStatus(id, 'converis') === 'yes' || getProductStatus(id, 'symplectic') === 'yes' || (!!inc && !/^none/i.test(inc));
   return rival ? 'rival' : 'greenfield';
 }
 function anWhiteSpaceList(s) {
-  return s.insts.filter(i => WS_ELIGIBLE_TYPES.includes(i.type) && !WS_EXCLUDE_IDS.has(i.id) && getProductStatus(i.id, 'pure') in WS_PURE_STATUS);
+  return s.insts.filter(i => WS_ELIGIBLE_TYPES.includes(i.type) && !WS_EXCLUDE_IDS.has(i.id) && getProductStatus(i.id, 'pure') in WS_STATUS);
 }
 // A segmented bar with one span per status. The counts sit in the legend, so
 // the colours are an aid to comparison rather than the only way to read it.
@@ -7168,7 +7364,7 @@ function anWhiteSpace(s) {
   const b = { greenfield: 0, rival: 0, unknown: 0 };
   list.forEach(i => { b[anWsBucket(i.id)]++; });
   const subs = { greenfield: 'no rival CRIS either', rival: 'a rival CRIS is installed', unknown: 'not yet verified' };
-  const rows = Object.entries(AN_WS_BUCKET).map(([k, m]) =>
+  const rows = Object.entries(WS_BUCKET_LABEL).map(([k, m]) =>
     anRow(anLabel(m.label, subs[k]), `${b[k]}<em>${anPct(b[k], list.length)}%</em>`, b[k] / list.length * 100, m.color)).join('');
   const top = list.map(i => ({ inst: i, works: anWorks(i.id) })).filter(r => r.works !== null).sort((a, b) => b.works - a.works).slice(0, 5);
   const topRows = top.length
