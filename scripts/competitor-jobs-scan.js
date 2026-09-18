@@ -661,7 +661,7 @@ async function main() {
     untracked,
     source: 'Company career-page ATS APIs (Greenhouse/Ashby/SmartRecruiters/Pinpoint/Workday), plus a Claude web search for companies without one — see file header',
   });
-  console.log(`[competitor-jobs] Done — ${live.length} tracked-category role(s) listed (${newCount} new, ${reopenedCount} reopened, ${closedCount} newly closed, ${newlyArchived.length} archived) across ${SOURCES.length - Object.keys(errors).length}/${SOURCES.length} tracked companies.`);
+  console.log(`[competitor-jobs] Done — ${live.length} tracked-category role(s) listed (${newCount} new, ${reopenedCount} reopened, ${closedCount} newly closed, ${newlyArchived.length} archived) across ${allSources.length - Object.keys(errors).length}/${allSources.length} tracked companies.`);
 }
 
 main().catch(e => {
