@@ -1,25 +1,25 @@
 {
-  "lastRun": "2026-09-18T18:44:47.525Z",
-  "totalOpenRoles": 2,
+  "lastRun": "2026-09-18T19:14:23.042Z",
+  "totalOpenRoles": 28,
   "openByRegion": {
-    "domestic": 0,
-    "remote": 2,
+    "domestic": 1,
+    "remote": 27,
     "europe": 35,
-    "global": 191
+    "global": 166
   },
-  "totalListed": 2,
-  "newCount": 0,
+  "totalListed": 28,
+  "newCount": 26,
   "reopenedCount": 0,
   "closedCount": 0,
   "archivedCount": 0,
   "perCompanyCounts": {
     "Digital Science": {
       "total": 2,
-      "beOrRemote": 0,
+      "beOrRemote": 1,
       "domestic": 0,
-      "remote": 0,
+      "remote": 1,
       "europe": 0,
-      "global": 1
+      "global": 0
     },
     "Allen Institute for AI": {
       "total": 17,
@@ -31,11 +31,11 @@
     },
     "Clarivate": {
       "total": 182,
-      "beOrRemote": 0,
+      "beOrRemote": 9,
       "domestic": 0,
-      "remote": 0,
+      "remote": 9,
       "europe": 7,
-      "global": 20
+      "global": 11
     },
     "Springer Nature": {
       "total": 76,
@@ -47,19 +47,19 @@
     },
     "Wiley": {
       "total": 78,
-      "beOrRemote": 0,
+      "beOrRemote": 7,
       "domestic": 0,
-      "remote": 0,
+      "remote": 7,
       "europe": 0,
-      "global": 12
+      "global": 5
     },
     "OpenAI": {
       "total": 814,
-      "beOrRemote": 1,
+      "beOrRemote": 8,
       "domestic": 0,
-      "remote": 1,
+      "remote": 8,
       "europe": 8,
-      "global": 74
+      "global": 67
     },
     "Anthropic": {
       "total": 605,
@@ -71,50 +71,70 @@
     },
     "Elicit": {
       "total": 10,
-      "beOrRemote": 1,
+      "beOrRemote": 2,
       "domestic": 0,
-      "remote": 1,
+      "remote": 2,
       "europe": 0,
-      "global": 1
+      "global": 0
+    },
+    "scite": {
+      "total": 0,
+      "beOrRemote": 0,
+      "domestic": 0,
+      "remote": 0,
+      "europe": 0,
+      "global": 0
+    },
+    "SciSpace": {
+      "total": 0,
+      "beOrRemote": 0,
+      "domestic": 0,
+      "remote": 0,
+      "europe": 0,
+      "global": 0
+    },
+    "Paperguide": {
+      "total": 0,
+      "beOrRemote": 0,
+      "domestic": 0,
+      "remote": 0,
+      "europe": 0,
+      "global": 0
+    },
+    "IGI Global Scientific Publishing": {
+      "total": 0,
+      "beOrRemote": 0,
+      "domestic": 0,
+      "remote": 0,
+      "europe": 0,
+      "global": 0
+    },
+    "IEEE": {
+      "total": 0,
+      "beOrRemote": 0,
+      "domestic": 0,
+      "remote": 0,
+      "europe": 0,
+      "global": 0
+    },
+    "Google": {
+      "total": 1,
+      "beOrRemote": 1,
+      "domestic": 1,
+      "remote": 0,
+      "europe": 0,
+      "global": 0
     }
   },
-  "errors": {},
+  "errors": {
+    "Consensus": "fetch failed"
+  },
   "untracked": [
     {
-      "company": "scite",
-      "reason": "Not currently hiring (applications by email)",
-      "url": "https://scite.ai/jobs"
-    },
-    {
       "company": "Consensus",
-      "reason": "Roles posted only to LinkedIn, no ATS board found",
+      "reason": "Web search failed this run: fetch failed",
       "url": "https://consensus.app/home/careers/"
-    },
-    {
-      "company": "SciSpace",
-      "reason": "No formal careers-page ATS found (Ashby/Greenhouse/Lever all checked)",
-      "url": "https://typeset.io/careers"
-    },
-    {
-      "company": "Paperguide",
-      "reason": "No formal careers page/ATS (small team, hires ad hoc via LinkedIn)",
-      "url": "https://linkedin.com/company/paperguideai"
-    },
-    {
-      "company": "IGI Global Scientific Publishing",
-      "reason": "Static list, applications by email",
-      "url": "https://www.igi-global.com/about/staff/job-opportunities/"
-    },
-    {
-      "company": "IEEE",
-      "reason": "Oracle Taleo, session-based, no public JSON API",
-      "url": "https://ieee.taleo.net/careersection/2/jobsearch.ftl"
-    },
-    {
-      "company": "Google",
-      "reason": "Proprietary/internal API, not public",
-      "url": "https://careers.google.com/"
     }
   ],
-  "source": "Company career-page ATS APIs (Greenhouse/Ashby/SmartRecruiters/Pinpoint/Workday) — not LinkedIn, see file header"
+  "source": "Company career-page ATS APIs (Greenhouse/Ashby/SmartRecruiters/Pinpoint/Workday), plus a Claude web search for companies without one — see file header"
 }
