@@ -21,7 +21,7 @@
  * why nothing happened.
  *
  * Flags:  --batch N   institutions this run (default 6)
- *         --inst ID   only this institution id (ignores the cursor)
+ *         --inst IDS  only these institution ids, comma-separated (ignores the cursor)
  *         --dry-run   search and print, insert nothing
  */
 import { readFileSync, writeFileSync, mkdirSync } from 'fs';
@@ -40,7 +40,7 @@ const MAX_SEARCHES = 10;
 const args = process.argv.slice(2);
 const flag = (name, dflt) => { const i = args.indexOf(name); return i !== -1 && args[i + 1] ? args[i + 1] : dflt; };
 const BATCH = Math.max(1, parseInt(flag('--batch', '6'), 10) || 6);
-const ONLY_INST = flag('--inst', '');
+const ONLY_INST = flag('--inst', '').split(',').map(s => s.trim()).filter(Boolean);
 const DRY_RUN = args.includes('--dry-run');
 
 // The role families, in the words the institution itself is likely to use.
@@ -150,7 +150,9 @@ Return ONLY JSON Lines — one JSON object per person, no prose, no markdown —
 Rules: only people you found on a page you can cite; never invent an email — leave it empty if it is not published; at most 3 people per role family; up to ${MAX_SEARCHES} searches. If a role family has no identifiable holder, simply omit it.`;
 
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 240000);
+  // Six minutes: an Opus call making ten web searches ran past four on the
+  // first full Danish run and two institutions were skipped as aborted.
+  const timer = setTimeout(() => ctrl.abort(), 360000);
   let res;
   try {
     res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -195,9 +197,9 @@ async function main() {
   const order = insts.map(i => i.id);
   let cursor = Number.isInteger(state.cursor) ? state.cursor % order.length : 0;
   let batch;
-  if (ONLY_INST) batch = insts.filter(i => i.id === ONLY_INST);
+  if (ONLY_INST.length) batch = insts.filter(i => ONLY_INST.includes(i.id));
   else { batch = []; for (let n = 0; n < Math.min(BATCH, order.length); n++) batch.push(insts[(cursor + n) % order.length]); }
-  if (!batch.length) { console.log(`[discover-roles] Institution ${ONLY_INST} not found.`); return; }
+  if (!batch.length) { console.log(`[discover-roles] Institution(s) ${ONLY_INST.join(', ')} not found for this region.`); return; }
 
   // Dedup against everything already queued or in the CRM for this region.
   const pending = await supaAll(`pending_contacts?select=first,last,email,institution_id&region=eq.${REGION}`);
@@ -246,7 +248,7 @@ async function main() {
     perInst.push({ instId: inst.id, named: result.people.length, kept, searches: result.searches });
     await sleep(2000);
   }
-  if (!ONLY_INST) cursor = (cursor + batch.length) % order.length;
+  if (!ONLY_INST.length) cursor = (cursor + batch.length) % order.length;
 
   console.log(`\nFound ${candidates.length} new candidate(s):`);
   for (const c of candidates) console.log(`  ${(c.first + ' ' + c.last).padEnd(28)} ${c.department.padEnd(40)} ${c.title.slice(0, 40).padEnd(42)} ${c.email}${c.constructed ? '  (email constructed)' : ''}`);
