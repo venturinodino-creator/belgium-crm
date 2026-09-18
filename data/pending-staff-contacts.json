@@ -2990,5 +2990,137 @@
     "email": "patricia.vanschuylenbergh@africamuseum.be",
     "constructed": true,
     "source": "https://www.africamuseum.be/en/about_us/mission_organisation"
+  },
+  {
+    "first": "Jan",
+    "last": "Vanvelk",
+    "title": "research support - financial databases",
+    "dept": "Library & Research Support",
+    "instId": "kuleuven",
+    "instName": "KU Leuven",
+    "email": "jan.vanvelk@kuleuven.be",
+    "constructed": true,
+    "source": "https://bib.kuleuven.be/english/ebib/about-us/who-is-who-economics"
+  },
+  {
+    "first": "Liesbet",
+    "last": "Notebaert",
+    "title": "information specialist education",
+    "dept": "Library & Research Support",
+    "instId": "kuleuven",
+    "instName": "KU Leuven",
+    "email": "liesbet.notebaert@kuleuven.be",
+    "constructed": true,
+    "source": "https://bib.kuleuven.be/english/ebib/about-us/who-is-who-economics"
+  },
+  {
+    "first": "Julien",
+    "last": "DUMOULIN",
+    "title": "Grants Advisor",
+    "dept": "Library & Research Support",
+    "instId": "uliege",
+    "instName": "Université de Liège",
+    "email": "julien.dumoulin@uliege.be",
+    "constructed": true,
+    "source": "https://www.recherche.uliege.be/cms/c_9329551/fr/rise-recherche-innovation-support-et-entreprises"
+  },
+  {
+    "first": "Cécile",
+    "last": "DAWANS",
+    "title": "Juriste",
+    "dept": "Library & Research Support",
+    "instId": "uliege",
+    "instName": "Université de Liège",
+    "email": "cecile.dawans@uliege.be",
+    "constructed": true,
+    "source": "https://www.recherche.uliege.be/cms/c_9329551/fr/rise-recherche-innovation-support-et-entreprises"
+  },
+  {
+    "first": "Yvon",
+    "last": "Englert",
+    "title": "pro-recteur de l'Université",
+    "dept": "Library & Research Support",
+    "instId": "ulb",
+    "instName": "Université libre de Bruxelles",
+    "email": "yvon.englert@ulb.be",
+    "constructed": true,
+    "source": "https://www.ulb.be/fr/gouvernance/autorites"
+  },
+  {
+    "first": "Arnaud",
+    "last": "Destrebecqz",
+    "title": "vice-recteur aux affaires étudiantes et sociales",
+    "dept": "Library & Research Support",
+    "instId": "ulb",
+    "instName": "Université libre de Bruxelles",
+    "email": "arnaud.destrebecqz@ulb.be",
+    "constructed": true,
+    "source": "https://www.ulb.be/fr/gouvernance/autorites"
+  },
+  {
+    "first": "Michel",
+    "last": "Verstraeten",
+    "title": "vice-recteur à la prospective et aux ressources financières et immobilières",
+    "dept": "Library & Research Support",
+    "instId": "ulb",
+    "instName": "Université libre de Bruxelles",
+    "email": "michel.verstraeten@ulb.be",
+    "constructed": true,
+    "source": "https://www.ulb.be/fr/gouvernance/autorites"
+  },
+  {
+    "first": "Pierre",
+    "last": "Coheur",
+    "title": "vice-recteur au développement durable",
+    "dept": "Library & Research Support",
+    "instId": "ulb",
+    "instName": "Université libre de Bruxelles",
+    "email": "pierre.coheur@ulb.be",
+    "constructed": true,
+    "source": "https://www.ulb.be/fr/gouvernance/autorites"
+  },
+  {
+    "first": "Herwig",
+    "last": "Reynaert",
+    "title": "vicerector van de Universiteit Gent",
+    "dept": "Library & Research Support",
+    "instId": "uzgent",
+    "instName": "Ghent University Hospital",
+    "email": "herwig.reynaert@uzgent.be",
+    "constructed": true,
+    "source": "https://www.uzgent.be/nl/over-uz-gent/organisatie/bestuur/bestuurscomite-van-het-uz-gent"
+  },
+  {
+    "first": "Bestuurscollege",
+    "last": "Jan Danckaert",
+    "title": "rector Vrije Universiteit Brussel (VUB)",
+    "dept": "Library & Research Support",
+    "instId": "uzbrussel",
+    "instName": "UZ Brussel",
+    "email": "bestuurscollege.jandanckaert@uzbrussel.be",
+    "constructed": true,
+    "source": "https://www.uzbrussel.be/bestuurscollege"
+  },
+  {
+    "first": "Pieter",
+    "last": "Ballon",
+    "title": "vicerector Onderzoek VUB",
+    "dept": "Library & Research Support",
+    "instId": "uzbrussel",
+    "instName": "UZ Brussel",
+    "email": "pieter.ballon@uzbrussel.be",
+    "constructed": true,
+    "source": "https://www.uzbrussel.be/bestuurscollege"
+  },
+  {
+    "first": "Auriane",
+    "last": "Van Hecke",
+    "title": "legal advisor",
+    "dept": "Library & Research Support",
+    "instId": "kbf",
+    "instName": "King Baudouin Foundation",
+    "email": "auriane.vanhecke@kbs-frb.be",
+    "constructed": true,
+    "source": "https://www.kbs-frb.be/en/About-us/Who-we-are/Staff"
   }
 ]
