@@ -1,113 +1,17 @@
 {
-  "lastRun": "2026-09-18T17:58:17.204Z",
-  "lastAddedCount": 96,
+  "lastRun": "2026-09-18T18:00:41.282Z",
+  "lastAddedCount": 13,
   "lastBatch": [
-    "ugent",
-    "uhasselt",
-    "kuleuven",
-    "uclouvain",
-    "uliege",
-    "umons",
-    "ulb",
-    "uantwerpen",
-    "unamur",
-    "vub",
-    "uza",
-    "azdelta",
-    "chucharleroi",
-    "chuliege",
-    "saintpierre"
+    "kuleuven"
   ],
-  "lastWebSearches": 140,
+  "lastWebSearches": 10,
   "cursor": 15,
   "institutions": 49,
   "perInstitution": [
     {
-      "instId": "ugent",
-      "named": 5,
-      "kept": 3,
-      "searches": 10
-    },
-    {
-      "instId": "uhasselt",
-      "named": 9,
-      "kept": 6,
-      "searches": 10
-    },
-    {
       "instId": "kuleuven",
-      "error": "This operation was aborted"
-    },
-    {
-      "instId": "uclouvain",
-      "named": 7,
-      "kept": 6,
-      "searches": 10
-    },
-    {
-      "instId": "uliege",
-      "named": 14,
+      "named": 17,
       "kept": 13,
-      "searches": 10
-    },
-    {
-      "instId": "umons",
-      "named": 13,
-      "kept": 11,
-      "searches": 10
-    },
-    {
-      "instId": "ulb",
-      "named": 4,
-      "kept": 4,
-      "searches": 10
-    },
-    {
-      "instId": "uantwerpen",
-      "named": 10,
-      "kept": 8,
-      "searches": 10
-    },
-    {
-      "instId": "unamur",
-      "named": 6,
-      "kept": 5,
-      "searches": 10
-    },
-    {
-      "instId": "vub",
-      "named": 7,
-      "kept": 7,
-      "searches": 10
-    },
-    {
-      "instId": "uza",
-      "named": 16,
-      "kept": 13,
-      "searches": 10
-    },
-    {
-      "instId": "azdelta",
-      "named": 6,
-      "kept": 5,
-      "searches": 10
-    },
-    {
-      "instId": "chucharleroi",
-      "named": 9,
-      "kept": 9,
-      "searches": 10
-    },
-    {
-      "instId": "chuliege",
-      "named": 5,
-      "kept": 5,
-      "searches": 10
-    },
-    {
-      "instId": "saintpierre",
-      "named": 1,
-      "kept": 1,
       "searches": 10
     }
   ]
