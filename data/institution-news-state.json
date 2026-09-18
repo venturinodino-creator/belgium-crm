@@ -1,14 +1,19 @@
 {
-  "lastRun": "2026-09-17T19:16:22.757063Z",
-  "lastNewCount": 1,
-  "sourcesReached": 12,
+  "lastRun": "2026-09-18T11:53:03.566554Z",
+  "lastNewCount": 0,
+  "sourcesReached": 11,
   "sourcesTotal": 13,
-  "itemsExamined": 522,
+  "itemsExamined": 511,
   "failedSources": [
     {
       "institution": "UMons",
       "url": "https://web.umons.ac.be/fr/feed/",
       "error": "<urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>"
+    },
+    {
+      "institution": "Ghent University",
+      "url": "https://www.ugent.be/en/news-events",
+      "error": "<urlopen error timed out>"
     }
   ],
   "seenUrls": [
