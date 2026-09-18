@@ -221,9 +221,9 @@ async function main() {
   }));
 
   const news = readJSON('data/news.json', []);
-  // The summary report counts roles in reach — this country, remote-eligible
-  // and Europe — not the whole world the feed now also carries.
-  const hiring = readJSON('data/competitor-jobs.json', []).filter(j => j.region !== 'global');
+  // Only roles in this country or remote-eligible from it are listed; the
+  // filter guards against rows from the one run that listed every region.
+  const hiring = readJSON('data/competitor-jobs.json', []).filter(j => !j.region || j.region === 'domestic' || j.region === 'remote');
   const tenders = readJSON('data/tenders.json', []);
   const competitors = readJSON('data/leapspace-competitors.json', []);
   const openalexSubs = readJSON('data/openalex-subscriptions.json', []);
