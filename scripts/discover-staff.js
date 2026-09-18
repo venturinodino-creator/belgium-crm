@@ -78,6 +78,24 @@ const DECISION_MAKER_RE = new RegExp([
   '\\b(?:director|directeur|direct(?:ie|rice)|head|hoofd|chief|manager|coordinator|co[oö]rdinator',
   '|teamlead|team\\s?leader|teamleider|lead|dean|decaan|kabinetschef',
   '|responsable',
+  // The eleven role families the CRM sells through, added 2026-09-18 (they
+  // are also what discover-roles.js searches for): vice-rector for research,
+  // e-resources/collections, research support and grants, CIO, CISO, DPO and
+  // legal, procurement, deans and group leads, research integrity and
+  // doctoral schools, AI/digital strategy, research support librarians and
+  // advisors — in English, Dutch, Danish and French.
+  '|(?:vice|pro)[\\s-]?rector|vice[\\s-]?recteur|prorektor|vicerector|rector|rektor|recteur',
+  '|cio|ciso|cto|cdo|dpo|data\\s+protection\\s+officer|information\\s+security\\s+officer|security\\s+officer|privacy\\s+officer',
+  '|functionaris\\s+gegevensbescherming|databeskyttelsesr[åa]dgiver|d[ée]l[ée]gu[ée]\\s+[àa]\\s+la\\s+protection\\s+des\\s+donn[ée]es',
+  '|procurement|purchasing|inkoop|inkoper|indk[øo]b|achats|acheteur|acheteuse',
+  '|legal\\s+counsel|general\\s+counsel|legal\\s+advis[eo]r|jurist|juriste|legal\\s+affairs|juridische\\s+zaken',
+  '|research\\s+integrity|integrity\\s+officer|wetenschappelijke\\s+integriteit|int[ée]grit[ée]\\s+scientifique|ombuds(?:man|person|woman)?',
+  '|doctoral\\s+school|graduate\\s+school|phd\\s+school|ph\\.?d\\.?-?skole|forskerskole|[ée]cole\\s+doctorale',
+  '|research\\s+(?:advis[eo]r|consultant|support|services?|funding|intelligence|data\\s+(?:management|steward|officer))',
+  '|grants?\\s+(?:officer|advis[eo]r|manager|office)|funding\\s+advis[eo]r|subsidieadviseur|forskningsst[øo]tte|appui\\s+[àa]\\s+la\\s+recherche',
+  '|(?:liaison|subject|research|faculty|academic)\\s+librarian|informatiespecialist|information\\s+specialist|forskningsbibliotekar|biblioth[ée]caire',
+  '|e-?resources|electronic\\s+resources|collections?\\s+(?:manager|librarian|development|officer)|collectiemanager|collectiebeheer|samlingsansvarlig',
+  '|digital\\s+strateg(?:y|ist|ie)|digitali[sz]ation|digitalisering|ai\\s+(?:lead|officer|strateg(?:y|ist|ie)|programme?|taskforce|task\\s+force)|artificial\\s+intelligence',
   '|head\\s+librarian|hoofdbibliothecaris|university\\s+librarian|chief\\s+librarian|bibliothecaris)\\b',
   '|(?:chef|leder|direkt[oø]r)\\b',
 ].join(''), 'i');

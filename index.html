@@ -3331,6 +3331,11 @@ const DSH_AGENTS = [
       statusEl: 'agent-discovery-lastrun', view: 'pending', workflow: 'discover-staff.yml',
     },
     {
+      id: 'agent-roles', name: 'Role-Targeted Contact Discovery', icon: '🎯',
+      status: 'active', cadence: 'Daily · 08:15 UTC · GitHub Actions', source: 'Claude web search per institution',
+      statusEl: 'agent-roles-lastrun', view: 'pending', workflow: 'discover-roles.yml',
+    },
+    {
       id: 'agent-tenders', name: 'Tender / RFP Scraper', icon: '📄',
       status: 'active', cadence: 'Daily · 06:30 UTC · GitHub Actions', source: 'TED Europa',
       statusEl: 'agent-tenders-lastrun', view: 'rfp', workflow: 'tenders.yml',
@@ -4062,6 +4067,7 @@ function _syncAgentFrom(elId, jsonPath, extra) {
 }
 function syncAgentStatus() {
   _syncAgentFrom('agent-discovery-lastrun', 'data/staff-scan-state.json', d => d.lastAddedCount != null ? ` · +${d.lastAddedCount}` : '');
+  _syncAgentFrom('agent-roles-lastrun', 'data/roles-scan-state.json', d => d.error ? ` · ${d.error}` : d.lastAddedCount != null ? ` · +${d.lastAddedCount}` : '');
   _syncAgentFrom('agent-tenders-lastrun', 'data/tenders-scan-state.json', d => d.lastNewCount ? ` · +${d.lastNewCount}` : '');
   _syncAgentFrom('agent-openalex-subs-lastrun', 'data/openalex-scan-state.json', d => d.error === 'missing_api_key' ? ' · needs ANTHROPIC_API_KEY' : d.lastAddedCount ? ` · +${d.lastAddedCount}` : '');
   _syncAgentFrom('agent-news-lastrun', 'data/news-scan-state.json', d => d.error === 'missing_api_key' ? ' · needs ANTHROPIC_API_KEY' : d.lastAddedCount ? ` · +${d.lastAddedCount}` : '');
