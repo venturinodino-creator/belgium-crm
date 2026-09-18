@@ -181,16 +181,25 @@ function toRecord(item, inst, today) {
 }
 
 // Keep the strongest finding per organisation: a subscription beats an
-// engagement signal; among equals the later one wins.
+// engagement signal, and among engagement signals the ones closest to a
+// purchasing decision rank first. A weaker finding still contributes its
+// source, so the record accumulates every page cited for it.
 const RANK = { subscriber: 2, active: 1 };
+const SIGNAL_RANK = ['subscription', 'database_cancellation', 'cris_integration', 'pilot_evaluation', 'bibliometrics_use', 'library_guide', 'barcelona_declaration', 'national_initiative', 'staff_advocacy', 'other'];
+const signalRank = s => { const i = SIGNAL_RANK.indexOf(s); return i === -1 ? SIGNAL_RANK.length : i; };
 function merge(entries, byId, record) {
   const prior = byId.get(record.id);
   if (!prior) { entries.push(record); byId.set(record.id, record); return 'added'; }
-  const upgrade = (RANK[record.status] || 0) > (RANK[prior.status] || 0);
-  const changed = record.status === prior.status && (record.tier !== prior.tier || record.annualFee !== prior.annualFee || (prior.autoDiscovered && record.signalType !== prior.signalType));
-  if (!upgrade && !changed) return 'unchanged';
   const sources = [...(prior.sources || [])];
-  for (const s of record.sources) if (!sources.some(x => x.url === s.url)) sources.push(s);
+  let newSource = false;
+  for (const s of record.sources) if (!sources.some(x => x.url === s.url)) { sources.push(s); newSource = true; }
+  const statusUp = (RANK[record.status] || 0) > (RANK[prior.status] || 0);
+  const signalUp = record.status === prior.status && prior.autoDiscovered && signalRank(record.signalType) < signalRank(prior.signalType);
+  const feeChanged = record.status === prior.status && (record.tier !== prior.tier || record.annualFee !== prior.annualFee);
+  if (!statusUp && !signalUp && !feeChanged) {
+    if (newSource) prior.sources = sources;
+    return 'unchanged';
+  }
   Object.assign(prior, record, { sources, foundDate: prior.foundDate || record.foundDate, lastConfirmed: record.foundDate });
   return 'updated';
 }
