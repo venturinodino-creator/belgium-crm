@@ -1,67 +1,68 @@
 /**
- * openalex-subscription-scan.js — Daily OpenAlex subscription intelligence scan
- * Calls the Claude API (web search tool) to research public evidence — institution
- * library pages, press releases, blog posts, OpenAlex's own Community Advisory
- * Board notes — that a Belgium research institution has subscribed to OpenAlex
- * (Member / Member+ / Partner tier), and critically, what it is paying and when the
- * subscription was announced/took effect. Genuinely new or updated findings are
- * appended to data/openalex-subscriptions.json, tagged autoDiscovered: true so the
- * UI can flag them as not yet manually reviewed.
+ * openalex-subscription-scan.js — Daily OpenAlex adoption scan, per institution
  *
- * Requires ANTHROPIC_API_KEY in the environment.
- * Run: node scripts/openalex-subscription-scan.js
+ * What it looks for. Evidence that a Belgium research institution has
+ * adopted OpenAlex (OurResearch's open scholarly index) or open research
+ * information more broadly — the signal a competing publisher's account
+ * manager needs before a Scopus or Web of Science renewal:
+ *   subscriber — a paid OpenAlex subscription (Premium / Member / Member+ /
+ *                Partner), with the fee and dates where published
+ *   active     — public engagement short of a confirmed contract: a library
+ *                guide on OpenAlex, OpenAlex feeding the CRIS / research
+ *                portal or bibliometric reports, a Scopus / Web of Science
+ *                cancellation or review citing open alternatives, signing
+ *                the Barcelona Declaration on Open Research Information, a
+ *                pilot or evaluation, membership of a national open-metadata
+ *                initiative, or library staff presenting on OpenAlex
+ * Each record carries a signalType so the reader knows which of these it is.
+ *
+ * Why per institution. Until 2026-09-18 this was one Claude call with twelve
+ * web searches asked to cover every tracked institution and to report only
+ * confirmed paid subscriptions with a price. Those are rare and rarely
+ * announced, and twelve searches spread over 45 institutions is a quarter of
+ * a search each; it returned zero candidates every day for a week. Now each
+ * run takes a rotating batch of institutions (default 6) and gives each one
+ * its own call with its own search budget, plus a country-level search once
+ * a week for consortium and funder deals that no single institution's site
+ * would carry. Every URL the model cites is fetched before the finding is
+ * kept, and a record's institution name is the CRM's own, so the OpenAlex
+ * page can merge it by name.
+ *
+ * Reads the institution list from data/institutions.json (exported daily from
+ * the CRM), so a new institution joins the rotation without a code change.
+ *
+ * Requires ANTHROPIC_API_KEY. Run: node scripts/openalex-subscription-scan.js
+ *   --batch N     institutions this run (default 6)
+ *   --inst IDS    only these institution ids, comma-separated (skips the cursor)
+ *   --dry-run     search and log, write nothing
  */
 
 import { readFileSync, writeFileSync, mkdirSync } from 'fs';
 
+const COUNTRY = 'Belgium';
+const DEMONYM = 'Belgian';
 const DATA_FILE = 'data/openalex-subscriptions.json';
 const STATE_FILE = 'data/openalex-scan-state.json';
+const INSTITUTIONS_FILE = 'data/institutions.json';
 const API_KEY = process.env.ANTHROPIC_API_KEY;
 const MODEL = 'claude-opus-5';
+const MAX_SEARCHES = 6;
+const NATIONAL_EVERY_DAYS = 7;
+const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36';
 
-// The Belgium institutions this CRM tracks — kept in sync with SEED_INSTITUTIONS
-// in index.html. Used to focus the search and to let the model flag status changes
-// for institutions we already have an opinion on, not just brand-new subscribers.
-const BE_INSTITUTIONS = [
-  'KU Leuven',
-  'Ghent University (UGent)',
-  'University of Antwerp (UAntwerpen)',
-  'Vrije Universiteit Brussel (VUB)',
-  'Hasselt University (UHasselt)',
-  'UCLouvain',
-  'Université de Liège (ULiège)',
-  'Université libre de Bruxelles (ULB)',
-  'University of Namur (UNamur)',
-  'Université de Mons (UMons)',
-  'UZ Leuven (University Hospitals Leuven) (UZ Leuven)',
-  'Ghent University Hospital (UZ Gent)',
-  'Antwerp University Hospital (UZA)',
-  'UZ Brussel',
-  'CHU de Liège (CHU Liège)',
-  'Cliniques universitaires Saint-Luc (Saint-Luc)',
-  'Hôpital Erasme (Erasme)',
-  'Institut Jules Bordet (Bordet)',
-  'CHU UCL Namur (Godinne) (CHU UCL Namur)',
-  'imec',
-  'VIB (Vlaams Instituut voor Biotechnologie) (VIB)',
-  'Flanders Make',
-  'Sciensano',
-  'Royal Belgian Institute of Natural Sciences (RBINS)',
-  'Royal Meteorological Institute of Belgium (RMI)',
-  'Royal Observatory of Belgium (ROB)',
-  'International Solvay Institutes for Physics and Chemistry (Solvay Institutes)',
-  'VITO (Flemish Institute for Technological Research) (VITO)',
-  'Royal Academies for Science and the Arts of Belgium (RASAB)',
-  'Royal Belgian Institute for Space Aeronomy (BIRA-IASB)',
-  'Egmont Institute (Royal Institute for International Relations) (Egmont Institute)',
-  'Bruegel',
-  'Itinera Institute (Itinera)',
-  'Research Foundation – Flanders (FWO)',
-  'F.R.S.-FNRS',
-  'King Baudouin Foundation (KBF)',
-  'Kom op tegen Kanker (KOTK)',
-  'Fondation contre le Cancer / Stichting tegen Kanker (FCC)',
-];
+// Country-level bodies whose deals cover many institutions at once — the
+// weekly national search names them so the model looks in the right places.
+const NATIONAL_HINTS = 'FWO and FNRS, VLIR and CRef, BELSPO (the Belgian Science Policy Office), the FRIS research portal (Flanders), KU Leuven LIBIS, BICfB (the Belgian consortium of university libraries), the Royal Library of Belgium (KBR), ELEKTRON, the Flanders Open Science Board';
+
+const args = process.argv.slice(2);
+const flag = (name, dflt) => { const i = args.indexOf(name); return i !== -1 && args[i + 1] ? args[i + 1] : dflt; };
+const BATCH = Math.max(1, parseInt(flag('--batch', '6'), 10) || 6);
+const ONLY_INST = flag('--inst', '').split(',').map(s => s.trim()).filter(Boolean);
+const DRY_RUN = args.includes('--dry-run');
+
+const TYPE_LABEL = { university: 'University', medical: 'Medical Centre', ngo: 'NGO / Funder', research: 'NGO / Research' };
+const TYPE_ORDER = { university: 0, medical: 1, research: 2, ngo: 3 };
+const SIGNAL_TYPES = ['subscription', 'library_guide', 'cris_integration', 'bibliometrics_use', 'database_cancellation', 'barcelona_declaration', 'pilot_evaluation', 'national_initiative', 'staff_advocacy', 'other'];
 
 function readJSON(path, fallback) {
   try { return JSON.parse(readFileSync(path, 'utf8')); } catch { return fallback; }
@@ -80,163 +81,228 @@ function extractText(response) {
 function parseJSONL(text) {
   const items = [];
   for (const line of text.split('\n')) {
-    const trimmed = line.trim();
-    if (!trimmed.startsWith('{')) continue;
-    try { items.push(JSON.parse(trimmed)); } catch { /* skip malformed lines */ }
+    const t = line.trim().replace(/^```(?:json)?|```$/g, '').trim();
+    if (!t.startsWith('{')) continue;
+    try { items.push(JSON.parse(t)); } catch { /* skip malformed line */ }
   }
   return items;
 }
+function isoDate(s) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(String(s || '')) ? s : null;
+}
+// 404/410 or a dead host means the cited page is not there; a 403/429 is a
+// bot wall, not evidence either way, so the finding stays.
+async function urlLooksLive(url) {
+  try {
+    const res = await fetch(url, { redirect: 'follow', headers: { 'user-agent': UA, accept: 'text/html,*/*' }, signal: AbortSignal.timeout(20000) });
+    return res.status !== 404 && res.status !== 410;
+  } catch { return false; }
+}
 
-async function callClaude(existing) {
-  const known = existing.map(e => `- ${e.inst}: ${e.status}${e.tier ? ' (' + e.tier + (e.annualFee ? ', ' + e.annualFee : '') + ')' : ''}`).join('\n') || '(none tracked yet)';
+const OUTPUT_SPEC = `Return ONLY JSON Lines — one object per finding, no prose, no markdown. Fields:
+{"inst": "organisation name", "status": "subscriber" or "active", "signalType": one of ${SIGNAL_TYPES.map(s => `"${s}"`).join(', ')}, "tier": "Premium" | "Member" | "Member+" | "Partner" | null, "annualFee": "as published, e.g. $5,000 USD / year, or null", "announceDate": "YYYY-MM-DD or null", "effectiveDate": "YYYY-MM-DD or null", "signal": "one sentence: what the evidence is", "notes": "two or three sentences: what was found, where, and what it means for a Scopus or Web of Science renewal", "sourceName": "page or document title", "sourceUrl": "the page you saw it on"}
 
-  const prompt = `You are researching OpenAlex (the open scholarly metadata index run by OurResearch) subscription status for Belgium research institutions, for a sales-intelligence CRM used by a competing publisher.
+Rules: only findings you saw on a page in this session, with that page's URL — never a URL from memory; "subscriber" only for a paid subscription stated by the institution or by OpenAlex/OurResearch; "active" for the other signal types; one object per distinct signal; nothing at all if there is no evidence. Up to ${MAX_SEARCHES} searches.`;
 
-OpenAlex has four tiers: Free/API ($1/day rate-limited), Member ($5,000/yr — admin dashboard, affiliation editor, unsub access), Member+ ($20,000/yr — increased API quotas, consulting hours), and Partner (custom pricing — product roadmap influence, dedicated support).
-
-Institutions this CRM tracks, with what we currently know:
-${known}
-
-Search the web (institution library pages and news sections, press releases, procurement/tender notices, OpenAlex's own blog and Community Advisory Board notes on GitHub, LinkedIn posts from library staff, relevant EU/BE open-science coverage) for CURRENT, VERIFIABLE evidence of:
-1. Any of the above institutions confirming an OpenAlex Member/Member+/Partner subscription that we don't already have correctly recorded above (a new subscriber, a status upgrade, or a previously-unconfirmed price now disclosed).
-2. Any Belgian university, medical centre, or research institute NOT in the list above that has confirmed an OpenAlex subscription.
-
-The price/fee and the announcement or effective date are the most important facts to capture — always include them if the source states them, and say "not disclosed" if the source confirms a subscription but not the amount. Do not guess a price.
-
-For each genuinely new or updated finding, respond with one JSON object per line (JSONL), each with exactly these fields:
-{"inst": "institution name", "type": "University"|"Medical Centre"|"NGO / Funder"|"NGO / Research", "status": "subscriber"|"active", "tier": "Member"|"Member+"|"Partner"|null, "annualFee": "e.g. $5,000 USD / year, or Custom — price not disclosed, or null if status is not subscriber", "announceDate": "YYYY-MM-DD or null", "effectiveDate": "YYYY-MM-DD or null", "notes": "2-4 factual sentences: what was confirmed, by whom, and any related signal like a Scopus/Web of Science cancellation", "signal": "one short sentence for a table cell, e.g. 'CONFIRMED PAYING. Member tier at $5,000/yr, effective March 2026.'", "sourceUrl": "...", "sourceName": "..."}
-
-Use status "active" only for an institution publicly and substantially engaging with OpenAlex (e.g. built a library guide on it, cancelled Scopus/WoS explicitly citing OpenAlex as the replacement) without a confirmed paid subscription. Only report what your search actually surfaces with a verifiable source URL — never invent a subscription, a price, or a source. If you find nothing genuinely new, output nothing at all.`;
-
+async function callClaude(prompt) {
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 180000);
+  const timer = setTimeout(() => ctrl.abort(), 360000);
   let res;
   try {
     res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: {
-        'x-api-key': API_KEY,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json',
-      },
+      headers: { 'x-api-key': API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
       body: JSON.stringify({
         model: MODEL,
         max_tokens: 4096,
-        tools: [{ type: 'web_search_20260209', name: 'web_search', max_uses: 12 }],
+        tools: [{ type: 'web_search_20260209', name: 'web_search', max_uses: MAX_SEARCHES }],
         messages: [{ role: 'user', content: prompt }],
       }),
       signal: ctrl.signal,
     });
-  } finally {
-    clearTimeout(timer);
-  }
+  } finally { clearTimeout(timer); }
+  if (!res.ok) throw new Error(`Anthropic API ${res.status}: ${(await res.text()).slice(0, 300)}`);
+  const response = await res.json();
+  const usage = response.usage || {};
+  const searches = (usage.server_tool_use && usage.server_tool_use.web_search_requests) || 0;
+  if (response.stop_reason === 'refusal') return { items: [], searches, refused: true };
+  return { items: parseJSONL(extractText(response)), searches, refused: false };
+}
 
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`Anthropic API ${res.status}: ${body.slice(0, 500)}`);
+function institutionPrompt(inst) {
+  const label = inst.short && inst.short !== inst.name ? `${inst.name} (${inst.short})` : inst.name;
+  return `You are researching, for a sales-intelligence CRM used by a scholarly publisher, whether one ${COUNTRY} research institution has adopted OpenAlex (OurResearch's open index of scholarly works) or open research information more broadly.
+
+Institution: ${label}, ${inst.city || COUNTRY}, ${COUNTRY} (${TYPE_LABEL[inst.type] || 'institution'}).
+
+Look for, in this order:
+1. A paid OpenAlex subscription — OpenAlex Premium, or the older Member / Member+ / Partner tiers — announced by the institution, its library, or by OpenAlex/OurResearch; capture the fee and the dates if published.
+2. Public engagement short of a contract: a library guide or LibGuide on OpenAlex; OpenAlex data feeding the institution's CRIS, research portal, or bibliometric and open-access monitoring reports; a Scopus or Web of Science cancellation, non-renewal, or review that cites OpenAlex or open alternatives; the institution signing the Barcelona Declaration on Open Research Information; a pilot or evaluation of OpenAlex or OpenAIRE as a replacement; membership of a national open-metadata initiative; library or research-support staff presenting or writing about OpenAlex.
+
+Search the institution's own library and research-support pages first (in English and in the local language), then OpenAlex's and OurResearch's blog and documentation, the Barcelona Declaration signatory list, and LinkedIn or conference material from the institution's library staff. Ignore other organisations with similar names and anything older than 2022.
+
+${OUTPUT_SPEC}
+Use exactly "${inst.name}" as inst.`;
+}
+
+function nationalPrompt(known) {
+  return `You are researching, for a sales-intelligence CRM used by a scholarly publisher, country-level adoption of OpenAlex (OurResearch's open index of scholarly works) and open research information in ${COUNTRY}: deals and commitments made by consortia, funders, ministries, research councils, national libraries, and CRIS or research-portal providers that cover many institutions at once.
+
+Bodies to check: ${NATIONAL_HINTS}.
+
+Look for: a national or consortium OpenAlex subscription or agreement; a funder or ministry recommending or mandating open research information; the Barcelona Declaration on Open Research Information signed by a ${DEMONYM} organisation; a national research portal or CRIS built on OpenAlex; a consortium-level Scopus or Web of Science review, non-renewal, or replacement; a national open-science plan naming OpenAlex.
+
+Already recorded (do not repeat unless the status or price has changed): ${known || '(nothing yet)'}.
+
+Search in English and in the local language, on the bodies' own sites, OpenAlex's and OurResearch's blog, the Barcelona Declaration signatory list, and open-science news. Ignore anything older than 2022.
+
+${OUTPUT_SPEC}
+Use the organisation's usual name as inst.`;
+}
+
+function toRecord(item, inst, today) {
+  const status = item.status === 'subscriber' ? 'subscriber' : 'active';
+  return {
+    id: slugify(inst ? inst.name : item.inst),
+    inst: inst ? inst.name : String(item.inst).slice(0, 150),
+    type: inst ? (TYPE_LABEL[inst.type] || 'University') : (['University', 'Medical Centre', 'NGO / Funder', 'NGO / Research'].includes(item.type) ? item.type : 'NGO / Research'),
+    status,
+    signalType: SIGNAL_TYPES.includes(item.signalType) ? item.signalType : (status === 'subscriber' ? 'subscription' : 'other'),
+    tier: item.tier ? String(item.tier).slice(0, 60) : null,
+    annualFee: item.annualFee ? String(item.annualFee).slice(0, 150) : null,
+    announceDate: isoDate(item.announceDate),
+    effectiveDate: isoDate(item.effectiveDate),
+    notes: String(item.notes || '').slice(0, 800),
+    signal: String(item.signal || item.notes || '').slice(0, 400),
+    sources: [{ label: String(item.sourceName || item.inst || '').slice(0, 150), url: String(item.sourceUrl).slice(0, 500) }],
+    autoDiscovered: true,
+    foundDate: today,
+  };
+}
+
+// Keep the strongest finding per organisation: a subscription beats an
+// engagement signal; among equals the later one wins.
+const RANK = { subscriber: 2, active: 1 };
+function merge(entries, byId, record) {
+  const prior = byId.get(record.id);
+  if (!prior) { entries.push(record); byId.set(record.id, record); return 'added'; }
+  const upgrade = (RANK[record.status] || 0) > (RANK[prior.status] || 0);
+  const changed = record.status === prior.status && (record.tier !== prior.tier || record.annualFee !== prior.annualFee || (prior.autoDiscovered && record.signalType !== prior.signalType));
+  if (!upgrade && !changed) return 'unchanged';
+  const sources = [...(prior.sources || [])];
+  for (const s of record.sources) if (!sources.some(x => x.url === s.url)) sources.push(s);
+  Object.assign(prior, record, { sources, foundDate: prior.foundDate || record.foundDate, lastConfirmed: record.foundDate });
+  return 'updated';
+}
+
+async function checkPrompt(label, prompt) {
+  const { items, searches, refused } = await callClaude(prompt);
+  if (refused) { console.log(`[openalex-subscription-scan] ${label}: the model declined the request.`); return { items: [], searches }; }
+  const kept = [];
+  for (const it of items) {
+    if (!it || !it.inst || !it.sourceUrl || !/^https?:\/\//i.test(String(it.sourceUrl))) continue;
+    if (!(await urlLooksLive(String(it.sourceUrl)))) { console.log(`[openalex-subscription-scan] ${label}: dropped a finding — ${it.sourceUrl} does not answer`); continue; }
+    kept.push(it);
   }
-  return res.json();
+  console.log(`[openalex-subscription-scan] ${label}: ${searches} search(es), ${items.length} finding(s), ${kept.length} with a page that answers`);
+  return { items: kept, searches };
 }
 
 async function main() {
+  console.log(`[openalex-subscription-scan] ${new Date().toISOString().slice(0, 16)} starting (${COUNTRY}) — batch ${BATCH}${DRY_RUN ? ', dry run' : ''}`);
+  const state = readJSON(STATE_FILE, {});
   if (!API_KEY) {
     console.log('[openalex-subscription-scan] ANTHROPIC_API_KEY not set — skipping scan until it is configured.');
-    saveJSON(STATE_FILE, { lastRun: new Date().toISOString(), lastAddedCount: 0, error: 'missing_api_key' });
+    saveJSON(STATE_FILE, { ...state, lastRun: new Date().toISOString(), lastAddedCount: 0, error: 'missing_api_key' });
     return;
   }
+
+  const insts = readJSON(INSTITUTIONS_FILE, []).filter(i => i && i.id && i.name)
+    .sort((a, b) => (TYPE_ORDER[a.type] ?? 9) - (TYPE_ORDER[b.type] ?? 9) || a.name.localeCompare(b.name));
+  if (!insts.length) { console.log(`[openalex-subscription-scan] No institutions in ${INSTITUTIONS_FILE}.`); return; }
+
+  const order = insts.map(i => i.id);
+  let cursor = Number.isInteger(state.cursor) ? state.cursor % order.length : 0;
+  let batch;
+  if (ONLY_INST.length) batch = insts.filter(i => ONLY_INST.includes(i.id));
+  else batch = Array.from({ length: Math.min(BATCH, order.length) }, (_, k) => insts[(cursor + k) % order.length]);
+  if (!batch.length) { console.log(`[openalex-subscription-scan] Institution(s) ${ONLY_INST.join(', ')} not found for this region.`); return; }
 
   const entries = readJSON(DATA_FILE, []);
   const byId = new Map(entries.map(e => [e.id, e]));
+  const today = new Date().toISOString().slice(0, 10);
+  const checked = { ...(state.checked || {}) };
+  let added = 0, updated = 0, candidates = 0, searchesTotal = 0;
+  const errors = {};
 
-  console.log(`[openalex-subscription-scan] Calling Claude with web search across ${BE_INSTITUTIONS.length} tracked institutions...`);
-  let response;
-  try {
-    response = await callClaude(entries);
-  } catch (e) {
-    // Same graceful-degradation the other AI-dependent scans already use
-    // (see news-scan.js's callHaiku): a transient Anthropic API failure —
-    // rate limit, outage, insufficient credit — should skip this run's
-    // findings, not hard-fail the whole job. Confirmed live: this script's
-    // old behavior (an uncaught throw) silently broke OpenAlex scanning for
-    // 3 straight days (2026-09-09 through 2026-09-11) on an empty API
-    // credit balance, while news-scan and competitor-scan kept succeeding
-    // right through the same outage because they already degrade this way.
-    console.warn(`[openalex-subscription-scan] Anthropic API call failed: ${e.message} — skipping this run, no findings added. Will retry on the next scheduled run.`);
-    saveJSON(STATE_FILE, { lastRun: new Date().toISOString(), lastAddedCount: 0, error: e.message });
-    return;
-  }
-
-  if (response.stop_reason === 'refusal') {
-    console.log('[openalex-subscription-scan] Request was declined by safety classifiers — no results this run.');
-    saveJSON(STATE_FILE, { lastRun: new Date().toISOString(), lastAddedCount: 0, refused: true });
-    return;
-  }
-
-  const text = extractText(response);
-  const found = parseJSONL(text);
-  // How much searching actually happened. Without this, "0 candidates" from
-  // a model that answered from memory looks identical to a real search that
-  // found nothing new.
-  const usage = response.usage || {};
-  const searches = (usage.server_tool_use && usage.server_tool_use.web_search_requests) || 0;
-  const toolCalls = (response.content || []).filter(b => b.type === 'server_tool_use').length;
-  console.log(`[openalex-subscription-scan] Web searches run: ${searches} (${toolCalls} tool call(s)) · stop_reason=${response.stop_reason} · output tokens=${usage.output_tokens != null ? usage.output_tokens : '?'}`);
-  if (!searches && !toolCalls) {
-    console.warn(`[openalex-subscription-scan] The model answered without running a single web search — this run's result is not live evidence.`);
-    if (process.env.GITHUB_ACTIONS) console.log('::warning::openalex-subscription-scan: the model ran no web searches this run, so "0 candidates" is not a real result. Check the web_search tool and model availability.');
-  }
-  console.log(`[openalex-subscription-scan] Model returned ${found.length} candidate(s).`);
-
-  let added = 0, updated = 0;
-  for (const item of found) {
-    if (!item.inst || !item.status || !item.sourceUrl) continue;
-    const id = slugify(item.inst);
-    const record = {
-      id,
-      inst: String(item.inst).slice(0, 150),
-      type: ['University', 'Medical Centre', 'NGO / Funder', 'NGO / Research'].includes(item.type) ? item.type : 'University',
-      status: ['subscriber', 'active'].includes(item.status) ? item.status : 'active',
-      tier: item.tier ? String(item.tier).slice(0, 60) : null,
-      annualFee: item.annualFee ? String(item.annualFee).slice(0, 150) : null,
-      announceDate: /^\d{4}-\d{2}-\d{2}$/.test(item.announceDate) ? item.announceDate : null,
-      effectiveDate: /^\d{4}-\d{2}-\d{2}$/.test(item.effectiveDate) ? item.effectiveDate : null,
-      notes: String(item.notes || '').slice(0, 800),
-      signal: String(item.signal || item.notes || '').slice(0, 400),
-      sources: [{ label: String(item.sourceName || item.inst).slice(0, 150), url: String(item.sourceUrl).slice(0, 500) }],
-      autoDiscovered: true,
-      foundDate: new Date().toISOString().slice(0, 10),
-    };
-
-    const prior = byId.get(id);
-    if (!prior) {
-      entries.push(record);
-      byId.set(id, record);
-      added++;
-      console.log(`  + ${record.inst}: ${record.status}${record.tier ? ' (' + record.tier + ')' : ''}`);
-    } else if (prior.status !== record.status || prior.annualFee !== record.annualFee || prior.tier !== record.tier) {
-      // Keep manually-reviewed source history, but let a status/price upgrade through.
-      Object.assign(prior, record, { sources: [...(prior.sources || []), ...record.sources] });
-      updated++;
-      console.log(`  ~ ${record.inst}: updated to ${record.status}${record.tier ? ' (' + record.tier + ')' : ''}`);
+  // Country-level search once a week (or when asked for a specific list, never).
+  const nationalDue = !ONLY_INST.length && (!state.nationalLastRun || (Date.now() - new Date(state.nationalLastRun).getTime()) / 86400000 >= NATIONAL_EVERY_DAYS);
+  let nationalLastRun = state.nationalLastRun || null;
+  if (nationalDue) {
+    try {
+      const known = entries.map(e => `${e.inst}: ${e.status}${e.tier ? ' (' + e.tier + ')' : ''}`).join('; ');
+      const { items, searches } = await checkPrompt(`${COUNTRY} (national)`, nationalPrompt(known));
+      searchesTotal += searches; candidates += items.length;
+      for (const it of items) {
+        const byName = insts.find(i => i.name.toLowerCase() === String(it.inst).toLowerCase());
+        const r = merge(entries, byId, toRecord(it, byName || null, today));
+        if (r === 'added') added++; else if (r === 'updated') updated++;
+        console.log(`  ${r === 'unchanged' ? '=' : r === 'added' ? '+' : '~'} ${it.inst}: ${it.status} / ${it.signalType || '?'} — ${String(it.signal || '').slice(0, 100)}`);
+      }
+      nationalLastRun = new Date().toISOString();
+    } catch (e) {
+      errors.national = e.message;
+      console.warn(`[openalex-subscription-scan] national search failed: ${e.message}`);
     }
   }
 
-  if (added > 0 || updated > 0) saveJSON(DATA_FILE, entries);
+  for (const inst of batch) {
+    try {
+      const { items, searches } = await checkPrompt(inst.name, institutionPrompt(inst));
+      searchesTotal += searches; candidates += items.length;
+      let best = 'none';
+      for (const it of items) {
+        const r = merge(entries, byId, toRecord(it, inst, today));
+        if (r === 'added') added++; else if (r === 'updated') updated++;
+        if (it.status === 'subscriber') best = 'subscriber'; else if (best === 'none') best = 'active';
+        console.log(`  ${r === 'unchanged' ? '=' : r === 'added' ? '+' : '~'} ${inst.name}: ${it.status} / ${it.signalType || '?'} — ${String(it.signal || '').slice(0, 100)}`);
+      }
+      checked[inst.id] = { lastChecked: today, result: best, searches };
+    } catch (e) {
+      errors[inst.id] = e.message;
+      console.warn(`[openalex-subscription-scan] ${inst.name} failed: ${e.message}`);
+    }
+  }
 
+  if (!ONLY_INST.length) cursor = (cursor + batch.length) % order.length;
+
+  if (DRY_RUN) {
+    console.log(`[openalex-subscription-scan] Dry run — would add ${added}, update ${updated} (${candidates} finding(s), ${searchesTotal} searches). Nothing written.`);
+    return;
+  }
+  if (added > 0 || updated > 0) saveJSON(DATA_FILE, entries);
   saveJSON(STATE_FILE, {
     lastRun: new Date().toISOString(),
     lastAddedCount: added,
     lastUpdatedCount: updated,
-    lastCandidateCount: found.length,
-    lastWebSearches: searches,
+    lastCandidateCount: candidates,
+    lastWebSearches: searchesTotal,
+    lastBatch: batch.map(i => i.id),
+    cursor,
+    institutionsTotal: order.length,
+    nationalLastRun,
+    checked,
+    errors,
   });
-  console.log(`[openalex-subscription-scan] Done — ${added} new, ${updated} updated.`);
+  const withSignal = Object.values(checked).filter(c => c.result !== 'none').length;
+  console.log(`[openalex-subscription-scan] Done — ${added} new, ${updated} updated from ${candidates} finding(s) across ${batch.length} institution(s)${nationalDue ? ' + national' : ''}; ${Object.keys(checked).length}/${order.length} institutions checked so far, ${withSignal} with a signal.`);
 }
 
 main().catch(e => {
   console.error('[openalex-subscription-scan] Failed:', e.message);
   try {
-    saveJSON(STATE_FILE, { lastRun: new Date().toISOString(), lastAddedCount: 0, error: e.message });
+    const state = readJSON(STATE_FILE, {});
+    saveJSON(STATE_FILE, { ...state, lastRun: new Date().toISOString(), lastAddedCount: 0, error: e.message });
   } catch { /* ignore */ }
   process.exit(1);
 });
