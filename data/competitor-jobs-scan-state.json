@@ -1,15 +1,15 @@
 {
-  "lastRun": "2026-09-18T18:27:20.392Z",
-  "totalOpenRoles": 228,
+  "lastRun": "2026-09-18T18:44:47.525Z",
+  "totalOpenRoles": 2,
   "openByRegion": {
     "domestic": 0,
     "remote": 2,
     "europe": 35,
     "global": 191
   },
-  "totalListed": 229,
-  "newCount": 225,
-  "reopenedCount": 1,
+  "totalListed": 2,
+  "newCount": 0,
+  "reopenedCount": 0,
   "closedCount": 0,
   "archivedCount": 0,
   "perCompanyCounts": {
@@ -30,7 +30,7 @@
       "global": 0
     },
     "Clarivate": {
-      "total": 181,
+      "total": 182,
       "beOrRemote": 0,
       "domestic": 0,
       "remote": 0,
@@ -54,7 +54,7 @@
       "global": 12
     },
     "OpenAI": {
-      "total": 815,
+      "total": 814,
       "beOrRemote": 1,
       "domestic": 0,
       "remote": 1,
@@ -62,7 +62,7 @@
       "global": 74
     },
     "Anthropic": {
-      "total": 608,
+      "total": 605,
       "beOrRemote": 0,
       "domestic": 0,
       "remote": 0,
