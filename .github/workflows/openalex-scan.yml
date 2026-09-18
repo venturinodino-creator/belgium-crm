@@ -1,9 +1,25 @@
 name: Daily OpenAlex Subscription Scan
 
+# Per-institution since 2026-09-18: a rotating batch of institutions each
+# gets its own Claude web search, plus a country-level search once a week.
+# The old single call over every institution found nothing for a week.
 on:
   schedule:
     - cron: '0 7 * * *'
   workflow_dispatch:
+    inputs:
+      batch:
+        description: 'Institutions to check this run'
+        default: '6'
+        required: false
+      dry_run:
+        description: 'Search and log only, write nothing (true/false)'
+        default: 'false'
+        required: false
+      inst:
+        description: 'Only these institution ids, comma-separated (skips the rotation)'
+        default: ''
+        required: false
 
 permissions:
   contents: write
@@ -23,7 +39,11 @@ jobs:
       - name: Run OpenAlex subscription scan
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: node scripts/openalex-subscription-scan.js
+        run: |
+          EXTRA="--batch ${{ github.event.inputs.batch || '6' }}"
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then EXTRA="$EXTRA --dry-run"; fi
+          if [ -n "${{ github.event.inputs.inst }}" ]; then EXTRA="$EXTRA --inst ${{ github.event.inputs.inst }}"; fi
+          node scripts/openalex-subscription-scan.js $EXTRA
       - name: Commit new OpenAlex subscription findings
         run: |
           git config user.email "actions@github.com"
