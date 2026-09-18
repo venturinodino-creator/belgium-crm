@@ -6010,7 +6010,7 @@ function renderHiringSidebarLegend() {
       <div id="news-scan-status"><p style="font-size:12px;color:var(--muted)">Loading…</p></div>
     </div>
     <div class="news-archive-card">
-      <h4 title="Companies not scanned for roles — no public careers-page API found (LinkedIn-only, static page, or session-based ATS)">Not Shown</h4>
+      <h4 title="Companies the scan could not cover this run — no public careers feed and the web search did not run or failed">Not Scanned This Run</h4>
       <div id="news-hiring-untracked"><p style="font-size:12px;color:var(--muted)">Loading…</p></div>
     </div>`;
 }
@@ -6039,7 +6039,7 @@ const HIRING_CATEGORIES = {
 let _hiringAllJobs        = [];
 let _hiringActiveCompany  = 'all';
 let _hiringActiveCategory = 'all';
-// Only roles in Belgium or remote-eligible from it are listed — the scan
+// Only roles in Belgium or remote (from anywhere) are listed — the scan
 // drops the rest (scripts/competitor-jobs-scan.js, regionOf). The filter below
 // guards against rows from the one run (2026-09-18) that listed every region.
 const hiringInScope = j => !j.region || j.region === 'domestic' || j.region === 'remote';
@@ -6097,7 +6097,7 @@ function renderHiringFeed() {
     feed.innerHTML = `<div class="news-empty">
       <div style="font-size:32px;margin-bottom:10px">­</div>
       No open customer-facing roles tracked right now.<br>
-      <small>Nothing matches the current role and company filters. Only roles based in Belgium, or remote-eligible from it, are listed — every tracked competitor's open roles in Strategic Account Mgmt, Sales Development (SDR), Renewals, Channel & Partnerships and the customer lifecycle (Customer Success, Pre-Sales, Implementation/Onboarding, Support, Customer Service, Training, Usage & Reporting, Product Marketing) elsewhere are counted in the scan status card but not shown. A role stays listed for a month after a company stops posting it (marked "Closed"). The daily scan runs at 07:00 UTC.</small>
+      <small>Nothing matches the current role and company filters. Only roles based in Belgium, or remote from anywhere, are listed — every tracked competitor's open roles in Strategic Account Mgmt, Sales Development (SDR), Renewals, Channel & Partnerships and the customer lifecycle (Customer Success, Pre-Sales, Implementation/Onboarding, Support, Customer Service, Training, Usage & Reporting, Product Marketing) elsewhere are counted in the scan status card but not shown. A role stays listed for a month after a company stops posting it (marked "Closed"). The daily scan runs at 07:00 UTC.</small>
     </div>`;
     return;
   }

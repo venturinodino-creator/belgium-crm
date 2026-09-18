@@ -15,9 +15,9 @@
  * Covers every company tracked elsewhere in this app as an Elsevier
  * competitor (e.g. in news-scan.js's Competitor Announcements) that also has
  * a usable public ATS API — see SOURCES below for the full list and what
- * each one competes with. A handful of tracked competitors have no usable
- * public API and can't be scanned at all (LinkedIn-only postings, static
- * pages, session-based ATS) — see UNTRACKED_COMPANIES.
+ * each one competes with. The tracked competitors with no public feed at
+ * all (LinkedIn-only postings, static pages, session-based ATS, Google's
+ * internal API) are covered by a Claude web search — see WEB_SEARCH_SOURCES.
  *
  * Deliberately NOT LinkedIn: LinkedIn requires login for job search and
  * actively blocks automated access, so there is no reliable or
@@ -34,12 +34,12 @@
  *   - Greenhouse, Ashby, SmartRecruiters, Pinpoint: simple GET, no auth.
  *   - Workday (CXS API): requires a POST with a JSON search body — see
  *     fetchWorkday() below.
- *   - No usable public API found: scite (not hiring), Consensus (LinkedIn
- *     only), SciSpace (no ATS found on Ashby/Greenhouse/Lever), Paperguide
- *     (no formal ATS), IGI Global (email-only), IEEE (Taleo, session-based),
- *     Google (proprietary/internal API). These are listed in
- *     UNTRACKED_COMPANIES so the UI can be upfront about the gap instead of
- *     silently omitting them.
+ *   - No public feed at all: scite, Consensus, SciSpace, Paperguide, IGI
+ *     Global, IEEE (session-based Taleo), Google (internal API) — re-checked
+ *     2026-09-18. Each of these gets one Claude web search per run instead
+ *     (see WEB_SEARCH_SOURCES / fetchWebSearch): the model is asked for the
+ *     open roles in the tracked categories based here or remote, and every
+ *     URL it returns is fetched before the role is listed.
  *
  * Like news-scan.js, this now accumulates rather than fully resyncing: a
  * role no longer returned by a company's ATS is marked closed (status:
@@ -63,9 +63,9 @@
  * company and jurisdiction, so both are frequently null. That's an honest
  * "not stated," not a bug.
  *
- * No ANTHROPIC_API_KEY needed — ATS results are already precise structured
- * data, no relevance judgement call required, just deterministic
- * location/title filtering.
+ * ANTHROPIC_API_KEY is needed only for the web-searched companies above; the
+ * ATS sources are deterministic location/title filtering and run without it
+ * (the web-searched companies are then reported as untracked).
  *
  * Run: node scripts/competitor-jobs-scan.js
  */
@@ -96,25 +96,11 @@ const REQUEST_TIMEOUT_MS = 20000;
 // English forms these ATSes actually use.
 const BE_CITY_COUNTRY_RE = /belgium|belgie|belgië|belgique|brussels|brussel|bruxelles|antwerp|antwerpen|ghent|\bgent\b|leuven|louvain|liege|liège|charleroi|bruges|brugge|namur|\bmons\b|hasselt|kortrijk|\bbe\b|\bbel\b/i;
 
-// A bare "remote" match is not enough on its own: ATS location fields almost
-// always pair "Remote" with a specific country ("Remote, United States of
-// America", "Australia, Remote") or a closed list of specific eligible
-// countries that may not include Belgium at all — a globally-remote US or
-// Australian role, or one remote-eligible only from France/Germany/Spain/UK,
-// has nothing to do with Belgium. Only exclude on an explicit non-European
-// qualifier; a bare "Remote" with no country named, or one paired with
-// Belgium/EMEA/Europe/another EU country, still passes — see
-// isTrackedLocation() and the closed-enumerated-list check in main() for the
-// second case. Same exclusion list as the Netherlands sibling app (country
-// names, ISO codes, and major non-Europe hub cities) — this class of false
-// positive doesn't depend on which EU country is being tracked.
-const NON_EUROPE_REMOTE_RE = /united states|\bu\.?s\.?a?\.?\b|canada|australia|new zealand|\bapac\b|\blatam\b|brazil|mexico|argentina|colombia|\bindia\b|china|japan|singapore|hong kong|south korea|philippines|indonesia|vietnam|thailand|malaysia|south africa|nigeria|kenya|\buae\b|united arab emirates|saudi arabia|\bisrael\b|\bidn\b|\busa\b|\baus\b|\bnzl\b|\bcan\b|\bbra\b|\bmex\b|\bind\b|\bchn\b|\bjpn\b|\bkor\b|\bsgp\b|\bphl\b|\bvnm\b|\btha\b|\bmys\b|\bzaf\b|\bnga\b|\bken\b|\bare\b|\bsau\b|san francisco|silicon valley|new york|\bnyc\b|los angeles|chicago|boston|seattle|austin|denver|atlanta|washington,? d\.?c\.?|toronto|vancouver|montreal|sydney|melbourne|tokyo|bangalore|bengaluru|mumbai|new delhi|shanghai|beijing|shenzhen|seoul|manila|jakarta/i;
-
-function isTrackedLocation(location) {
-  const loc = location || '';
-  if (BE_CITY_COUNTRY_RE.test(loc)) return true;
-  return /\bremote\b/i.test(loc) && !NON_EUROPE_REMOTE_RE.test(loc);
-}
+// Remote counts wherever the posting is remote from. The feed is competitive
+// signal (who is building a go-to-market team), not a job board, so
+// "US - Remote" matters as much as "Remote, EMEA". Until 2026-09-18 a remote
+// role pinned to a non-European country was dropped, which hid 23 of the 25.
+const REMOTE_RE = /\bremote\b|work[- ]from[- ]home|\banywhere\b|\bdistributed\b|\bhome[- ]based\b/i;
 
 // Where a tracked-category role sits. Only `domestic` and `remote` roles are
 // listed — the feed is for what could be filled from Belgium. The other two
@@ -123,14 +109,14 @@ function isTrackedLocation(location) {
 // "the scan is broken": on 2026-09-18 the eight competitors had 229 open
 // tracked-category roles, 2 of them here or remote, 35 elsewhere in Europe.
 //   domestic — in Belgium
-//   remote   — remote and not restricted to a non-European country
+//   remote   — remote, from anywhere
 //   europe   — based elsewhere in Europe (counted, not listed)
 //   global   — everywhere else (counted, not listed)
 const EUROPE_RE = /\b(?:europe|european|emea|dach|nordics?|benelux|germany|deutschland|france|spain|espa[ñn]a|italy|italia|portugal|ireland|united kingdom|great britain|britain|england|scotland|wales|austria|switzerland|sweden|norway|finland|iceland|poland|czech|slovakia|hungary|romania|bulgaria|greece|croatia|slovenia|serbia|estonia|latvia|lithuania|luxembourg|malta|cyprus|belgium|netherlands|denmark|gbr|deu|fra|esp|ita|prt|irl|aut|che|swe|nor|fin|pol|cze|svk|hun|rou|bgr|grc|hrv|svn|est|lva|ltu|lux|bel|nld|dnk)\b|london|oxford|cambridge|manchester|edinburgh|dublin|berlin|munich|m[üu]nchen|hamburg|frankfurt|cologne|k[öo]ln|heidelberg|paris|lyon|madrid|barcelona|milan|milano|rome|roma|lisbon|lisboa|vienna|wien|zurich|z[üu]rich|geneva|stockholm|oslo|helsinki|warsaw|warszawa|prague|praha|budapest|athens|amsterdam|utrecht|rotterdam|brussels|copenhagen/i;
 function regionOf(location) {
   const loc = location || '';
   if (BE_CITY_COUNTRY_RE.test(loc)) return 'domestic';
-  if (/\bremote\b/i.test(loc) && !NON_EUROPE_REMOTE_RE.test(loc)) return 'remote';
+  if (REMOTE_RE.test(loc)) return 'remote';
   if (EUROPE_RE.test(loc)) return 'europe';
   return 'global';
 }
@@ -415,7 +401,7 @@ async function fetchWorkdayJobDetail({ base, tenant, site, externalPath }) {
 //     AI-assisted research products
 // Endpoints below verified by hand (see git history for the research this
 // was built from; do not guess new endpoints without verifying the same
-// way) — see UNTRACKED_COMPANIES for the companies with no usable API found.
+// way) — see WEB_SEARCH_SOURCES for the companies with no public feed.
 const SOURCES = [
   { company: 'Digital Science', fetch: () => fetchPinpoint('Digital Science', 'digitalscience') },
   { company: 'Allen Institute for AI', fetch: () => fetchGreenhouse('Allen Institute for AI', 'thealleninstitute') },
@@ -427,17 +413,95 @@ const SOURCES = [
   { company: 'Elicit', fetch: () => fetchAshby('Elicit', 'elicit') },
 ];
 
-// Companies with no usable public API found — surfaced in scan state so the
-// UI can be upfront about the gap instead of silently omitting them.
-const UNTRACKED_COMPANIES = [
-  { company: 'scite', reason: 'Not currently hiring (applications by email)', url: 'https://scite.ai/jobs' },
-  { company: 'Consensus', reason: 'Roles posted only to LinkedIn, no ATS board found', url: 'https://consensus.app/home/careers/' },
-  { company: 'SciSpace', reason: 'No formal careers-page ATS found (Ashby/Greenhouse/Lever all checked)', url: 'https://typeset.io/careers' },
-  { company: 'Paperguide', reason: 'No formal careers page/ATS (small team, hires ad hoc via LinkedIn)', url: 'https://linkedin.com/company/paperguideai' },
-  { company: 'IGI Global Scientific Publishing', reason: 'Static list, applications by email', url: 'https://www.igi-global.com/about/staff/job-opportunities/' },
-  { company: 'IEEE', reason: 'Oracle Taleo, session-based, no public JSON API', url: 'https://ieee.taleo.net/careersection/2/jobsearch.ftl' },
-  { company: 'Google', reason: 'Proprietary/internal API, not public', url: 'https://careers.google.com/' },
+// Companies with no public ATS feed (LinkedIn-only postings, static pages,
+// session-based Taleo, Google's internal API — re-checked 2026-09-18). Each
+// gets one Claude web search per run: the model is asked for the open roles
+// in the tracked categories based in Belgium or remote, and every URL it
+// returns is fetched before the role is listed (404/410 drops it). Needs
+// ANTHROPIC_API_KEY; without it these companies are reported as untracked.
+const WEB_SEARCH_SOURCES = [
+  { company: 'scite', url: 'https://scite.ai/jobs' },
+  { company: 'Consensus', url: 'https://consensus.app/home/careers/' },
+  { company: 'SciSpace', url: 'https://typeset.io/careers' },
+  { company: 'Paperguide', url: 'https://paperguide.ai/' },
+  { company: 'IGI Global Scientific Publishing', url: 'https://www.igi-global.com/about/staff/job-opportunities/' },
+  { company: 'IEEE', url: 'https://ieee.taleo.net/careersection/2/jobsearch.ftl' },
+  { company: 'Google', url: 'https://www.google.com/about/careers/applications/jobs/results/' },
 ];
+const API_KEY = process.env.ANTHROPIC_API_KEY;
+const MODEL = 'claude-opus-5';
+const MAX_SEARCHES = 6;
+const WEB_SEARCH_GRACE_DAYS = 7; // a web search misses things; close its roles only after a week unseen
+const CATEGORY_LABELS = 'Strategic/Senior Account Management; Sales Development (SDR/BDR); Renewals; Customer Success; Channel & Partnerships; Pre-Sales / Solution Consulting; Implementation & Onboarding; Technical/Product Support; Customer Service & Licence administration; Training & Customer Education; Usage/Reporting Analytics; Product Marketing';
+const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36';
+
+function extractText(response) {
+  return (response.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n');
+}
+function parseJSONL(text) {
+  const items = [];
+  for (const line of text.split('\n')) {
+    const s = line.trim().replace(/^```(?:json)?|```$/g, '').trim();
+    if (!s.startsWith('{')) continue;
+    try { items.push(JSON.parse(s)); } catch { /* skip malformed line */ }
+  }
+  return items;
+}
+// 404/410 or a dead host means the posting is gone (or was never there); a
+// 403/429 is a bot wall, not evidence either way, so the role stays.
+async function urlLooksLive(url) {
+  try {
+    const res = await fetch(url, { redirect: 'follow', headers: { 'user-agent': UA, accept: 'text/html,*/*' }, signal: AbortSignal.timeout(20000) });
+    return res.status !== 404 && res.status !== 410;
+  } catch { return false; }
+}
+async function fetchWebSearch(company, careersUrl) {
+  const prompt = `Find the job openings ${company} currently has open in these customer-facing categories only: ${CATEGORY_LABELS}.
+Include a role only if it is based in Belgium (Brussels, Antwerp, Ghent, Leuven, Liège) or is a remote role — remote from anywhere counts, including "US - Remote".
+Start from the careers page ${careersUrl} and the company's LinkedIn jobs page; also search "${company} jobs Belgium", "${company} remote jobs" and the category names with "${company}". Ignore other companies with similar names, closed or expired postings, and roles outside the categories (engineering, product, editorial, finance, HR).
+
+Return ONLY JSON Lines — one object per role, no prose, no markdown — with exactly these fields:
+{"title": "exact posted title", "location": "as posted, e.g. 'Copenhagen, Denmark' or 'Remote - US'", "department": "team or function if shown, else empty", "url": "the posting's own URL exactly as you saw it", "postedDate": "YYYY-MM-DD if shown, else empty"}
+
+Rules: only roles you saw on a page in this session; never invent or guess a URL; at most 15 roles; up to ${MAX_SEARCHES} searches. If there are none, return nothing.`;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 360000);
+  let res;
+  try {
+    res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'x-api-key': API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 4096,
+        tools: [{ type: 'web_search_20260209', name: 'web_search', max_uses: MAX_SEARCHES }],
+        messages: [{ role: 'user', content: prompt }],
+      }),
+      signal: ctrl.signal,
+    });
+  } finally { clearTimeout(timer); }
+  if (!res.ok) throw new Error(`Anthropic API ${res.status}: ${(await res.text()).slice(0, 300)}`);
+  const response = await res.json();
+  const searches = (response.usage && response.usage.server_tool_use && response.usage.server_tool_use.web_search_requests) || 0;
+  if (response.stop_reason === 'refusal') throw new Error('model refused the search');
+  const items = parseJSONL(extractText(response));
+  const jobs = [];
+  for (const it of items) {
+    if (!it || !it.title || !it.url || !/^https?:\/\//i.test(String(it.url))) continue;
+    if (!(await urlLooksLive(String(it.url)))) { console.log(`[competitor-jobs] ${company}: dropped "${it.title}" — ${it.url} does not answer`); continue; }
+    jobs.push({
+      company,
+      title: String(it.title).trim(),
+      location: String(it.location || '').trim(),
+      department: String(it.department || '').trim(),
+      url: String(it.url).trim(),
+      postedDate: it.postedDate ? toISODate(it.postedDate) : null,
+      source: 'Web search',
+    });
+  }
+  console.log(`[competitor-jobs] ${company}: web search — ${searches} search(es), ${items.length} role(s) returned, ${jobs.length} with a URL that answers`);
+  return jobs;
+}
 
 async function main() {
   const existing = readJSON(DATA_FILE, []);
@@ -447,8 +511,17 @@ async function main() {
   const seenThisRun = new Map(); // key -> freshly-built job record
   const perCompanyCounts = {};
   const errors = {};
+  const untracked = []; // companies not covered this run, with the reason, for the status card
 
-  for (const src of SOURCES) {
+  const allSources = [
+    ...SOURCES,
+    ...WEB_SEARCH_SOURCES.map(w => ({ company: w.company, url: w.url, web: true, fetch: () => fetchWebSearch(w.company, w.url) })),
+  ];
+  for (const src of allSources) {
+    if (src.web && !API_KEY) {
+      untracked.push({ company: src.company, reason: 'No public careers feed — needs ANTHROPIC_API_KEY for the web search', url: src.url });
+      continue;
+    }
     try {
       const jobs = await src.fetch();
       perCompanyCounts[src.company] = { total: jobs.length, beOrRemote: 0, domestic: 0, remote: 0, europe: 0, global: 0 };
@@ -474,23 +547,8 @@ async function main() {
             displayLocation = detail.country ? `${detail.location || j.location} — ${detail.country}` : (detail.location || j.location);
             matchLocation = [displayLocation, ...detail.additionalLocations].filter(Boolean).join(' | ');
 
-            // additionalLocations is sometimes a CLOSED enumerated list of
-            // specific remote-eligible countries ("Remote, FRA" / "Remote,
-            // DEU" / "Remote, ESP" / "Remote, GBR") rather than an open-ended
-            // "remote, Europe" — confirmed live (2026-09-11) on a Wiley
-            // posting remote-eligible from exactly those four countries,
-            // none of which is Belgium, even though every one of them is
-            // European and so none trips NON_EUROPE_REMOTE_RE. When every
-            // remote entry names a specific country and none names Belgium,
-            // the role genuinely can't be filled from Belgium no matter how
-            // "European" the list looks overall — this overrides the
-            // generic bare-remote-not-excluded rule.
-            const remoteEntries = detail.additionalLocations.filter(l => /^remote,/i.test(l));
-            if (remoteEntries.length && remoteEntries.length === detail.additionalLocations.length
-                && !BE_CITY_COUNTRY_RE.test(displayLocation)
-                && !remoteEntries.some(l => BE_CITY_COUNTRY_RE.test(l))) {
-              matchLocation = '';
-            }
+            // additionalLocations may be a closed list of remote-eligible
+            // countries ("Remote, FRA" / "Remote, DEU") — remote all the same.
           } catch (e) {
             console.warn(`[competitor-jobs] Could not fetch job detail for "${j.title}" (${j.company}): ${e.message} — falling back to the list location text for this role.`);
           }
@@ -524,6 +582,7 @@ async function main() {
       { const c = perCompanyCounts[src.company]; console.log(`[competitor-jobs] ${src.company}: ${jobs.length} open role(s) — tracked categories: ${c.beOrRemote} Belgium/remote listed; ${c.europe} elsewhere in Europe and ${c.global} in the rest of world seen, not listed`); }
     } catch (e) {
       errors[src.company] = e.message;
+      if (src.web) untracked.push({ company: src.company, reason: `Web search failed this run: ${e.message.slice(0, 120)}`, url: src.url });
       console.warn(`[competitor-jobs] ${src.company} failed: ${e.message}`);
     }
   }
@@ -559,6 +618,9 @@ async function main() {
     // No longer returned by its company's ATS this run.
     const company = prior.company;
     if (errors[company]) { live.push(prior); continue; } // fetch failed — treat as unknown, not closed
+    // A web search is not exhaustive: a role it listed last week is not gone
+    // because today's search did not surface it. Close only after a week unseen.
+    if (prior.source === 'Web search' && prior.status !== 'closed' && !isOlderThanDays(prior.lastSeenDate, WEB_SEARCH_GRACE_DAYS)) { live.push(prior); continue; }
     if (prior.status === 'closed') {
       if (isOlderThanDays(prior.closedDate, ARCHIVE_AGE_DAYS)) { newlyArchived.push(prior); continue; }
       live.push(prior);
@@ -596,8 +658,8 @@ async function main() {
     archivedCount: newlyArchived.length,
     perCompanyCounts,
     errors,
-    untracked: UNTRACKED_COMPANIES,
-    source: 'Company career-page ATS APIs (Greenhouse/Ashby/SmartRecruiters/Pinpoint/Workday) — not LinkedIn, see file header',
+    untracked,
+    source: 'Company career-page ATS APIs (Greenhouse/Ashby/SmartRecruiters/Pinpoint/Workday), plus a Claude web search for companies without one — see file header',
   });
   console.log(`[competitor-jobs] Done — ${live.length} tracked-category role(s) listed (${newCount} new, ${reopenedCount} reopened, ${closedCount} newly closed, ${newlyArchived.length} archived) across ${SOURCES.length - Object.keys(errors).length}/${SOURCES.length} tracked companies.`);
 }
@@ -605,7 +667,7 @@ async function main() {
 main().catch(e => {
   console.error('[competitor-jobs] Failed:', e.message);
   try {
-    saveJSON(STATE_FILE, { lastRun: new Date().toISOString(), totalOpenRoles: 0, error: e.message, untracked: UNTRACKED_COMPANIES });
+    saveJSON(STATE_FILE, { lastRun: new Date().toISOString(), totalOpenRoles: 0, error: e.message, untracked: [] });
   } catch { /* ignore */ }
   process.exit(1);
 });
