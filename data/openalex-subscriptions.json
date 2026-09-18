@@ -1,1 +1,65 @@
-[]
+[
+  {
+    "id": "fris-research-portal",
+    "inst": "FRIS Research Portal (Flanders Research Information Space)",
+    "type": "NGO / Research",
+    "status": "active",
+    "signalType": "national_initiative",
+    "tier": null,
+    "annualFee": null,
+    "announceDate": null,
+    "effectiveDate": null,
+    "notes": "Seen on the live FRIS portal homepage in this session: FRIS is the Flemish Government's regional CRIS aggregating publicly funded research across Flemish universities and research institutes and releasing it as open data via public APIs. It is an open-research-information commitment that covers many institutions at once, but the page shows no OpenAlex sourcing, no OpenAlex subscription and no Barcelona Declaration signature. For a Scopus/Web of Science renewal it signals a regional preference for open, government-owned metadata as the reporting backbone, which weakens the case for proprietary databases as the system of record in Flanders, though no cancellation or replacement evidence was found.",
+    "signal": "The Flemish government's region-wide research portal publishes research information on ~88,000 researchers, 46,000 projects and 50,000 publications as freely available open data.",
+    "sources": [
+      {
+        "label": "FRIS Research Portal",
+        "url": "https://www.researchportal.be/en"
+      }
+    ],
+    "autoDiscovered": true,
+    "foundDate": "2026-09-18"
+  },
+  {
+    "id": "ku-leuven",
+    "inst": "KU Leuven",
+    "type": "University",
+    "status": "active",
+    "signalType": "staff_advocacy",
+    "tier": null,
+    "annualFee": null,
+    "announceDate": null,
+    "effectiveDate": null,
+    "notes": "Found in a Katina Magazine Q&A piece (2025) in which a senior KU Leuven Libraries figure engages publicly with the Barcelona Declaration and the shift to open research information infrastructures. No paid OpenAlex tier or contract was evidenced, but library leadership is publicly aligned with open metadata principles. For a Scopus or Web of Science renewal this signals an institution where open-alternative arguments will be raised in evaluation, so value-for-money and openness-of-metadata terms should be prepared.",
+    "signal": "Demmy Verbeke, associate professor of open scholarship at KU Leuven and head of KU Leuven Libraries Artes, features in a 2025 Katina Magazine Q&A on what the Barcelona Declaration on Open Research Information means for research libraries.",
+    "sources": [
+      {
+        "label": "What Does the Barcelona Declaration on Open Research Information Mean for Research Libraries? | Katina Magazine",
+        "url": "https://katinamagazine.org/content/article/open-knowledge/2025/qa-barceolna-declaration-on-open-research-information"
+      }
+    ],
+    "autoDiscovered": true,
+    "foundDate": "2026-09-18"
+  },
+  {
+    "id": "uclouvain",
+    "inst": "UCLouvain",
+    "type": "University",
+    "status": "active",
+    "signalType": "other",
+    "tier": null,
+    "annualFee": null,
+    "announceDate": "2024-04-16",
+    "effectiveDate": null,
+    "notes": "The Coimbra Group's own pages name Université catholique de Louvain among member universities and state the Group was among the initial signatories of the Barcelona Declaration, that several member universities are themselves signatories, and that the Brussels Office sits in the working group on sustaining infrastructures; UCLouvain's individual signature was not confirmed on the declaration's signatory list in this session. This is an indirect, association-level commitment to open research information rather than a UCLouvain institutional policy. For a Scopus or Web of Science renewal it suggests exposure to peer-group pressure on open metadata, but no evidence yet of OpenAlex procurement or of a proprietary-database review at UCLouvain.",
+    "signal": "UCLouvain is listed as a member university of the Coimbra Group, which signed the Barcelona Declaration on Open Research Information as an initial signatory and later joined its steering group.",
+    "sources": [
+      {
+        "label": "The Coimbra Group joins the steering group of the Barcelona Declaration on Open Research Information",
+        "url": "https://www.coimbra-group.eu/the-coimbra-group-joins-the-steering-group-of-the-barcelona-declaration-on-open-research-information/"
+      }
+    ],
+    "autoDiscovered": true,
+    "foundDate": "2026-09-18"
+  }
+]

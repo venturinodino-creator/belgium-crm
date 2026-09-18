@@ -1,7 +1,51 @@
 {
-  "lastRun": "2026-09-18T12:07:19.097Z",
-  "lastAddedCount": 0,
+  "lastRun": "2026-09-18T21:44:52.463Z",
+  "lastAddedCount": 3,
   "lastUpdatedCount": 0,
-  "lastCandidateCount": 0,
-  "lastWebSearches": 12
+  "lastCandidateCount": 3,
+  "lastWebSearches": 42,
+  "lastBatch": [
+    "ugent",
+    "uhasselt",
+    "kuleuven",
+    "uclouvain",
+    "uliege",
+    "umons"
+  ],
+  "cursor": 6,
+  "institutionsTotal": 49,
+  "nationalLastRun": "2026-09-18T21:31:33.782Z",
+  "checked": {
+    "ugent": {
+      "lastChecked": "2026-09-18",
+      "result": "none",
+      "searches": 6
+    },
+    "uhasselt": {
+      "lastChecked": "2026-09-18",
+      "result": "none",
+      "searches": 6
+    },
+    "kuleuven": {
+      "lastChecked": "2026-09-18",
+      "result": "active",
+      "searches": 6
+    },
+    "uclouvain": {
+      "lastChecked": "2026-09-18",
+      "result": "active",
+      "searches": 6
+    },
+    "uliege": {
+      "lastChecked": "2026-09-18",
+      "result": "none",
+      "searches": 6
+    },
+    "umons": {
+      "lastChecked": "2026-09-18",
+      "result": "none",
+      "searches": 6
+    }
+  },
+  "errors": {}
 }
