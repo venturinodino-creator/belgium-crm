@@ -1,5 +1,56 @@
 [
   {
+    "id": "news-4dqxfc",
+    "title": "OpenAI lance GPT-6 Astra, son IA la plus performante. Celle-ci est aussi la plus controversée ! - Sciencepost",
+    "description": "OpenAI lance GPT-6 Astra, son IA la plus performante. Celle-ci est aussi la plus controversée !&nbsp;&nbsp;Sciencepost",
+    "institution": "OpenAI",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxOX0NFcWt6UE11Q0FFN1phODM2Ym44S19GNHo1QlBGZkZFS0V5aVhXY2tLUGZYdXU2ZHZka2J6U1RjdktwOTVHbi1DTXZSLXE4Y2R1Y1ZieDJ5UVdvR1hYN1JRSFZndFJRc2Q4aFNCd1R5NVZHbkFzTEZzNVBKNDR3Zll0VWx0R0RfOTFHb3ZUMmp3TWpIVDZmVGhQeU5WWVZJdXQwODE3bWlKV0NUX09GekJwRm1LUQ?oc=5",
+    "sourceName": "Sciencepost",
+    "publishedDate": "2026-09-12",
+    "foundDate": "2026-09-13",
+    "autoDiscovered": true,
+    "bottomLine": "OpenAI's GPT-6 Astra raises both performance and controversy, signaling intensifying AI capability race with unclear research governance implications.",
+    "keyFindings": [
+      "OpenAI has launched GPT-6 Astra, positioned as its most advanced AI model to date.",
+      "The model has generated significant controversy alongside its technical performance claims.",
+      "Launch timing and controversy suggest escalating competition in frontier AI capabilities.",
+      "Implications for research infrastructure governance and ethical AI deployment remain contested."
+    ],
+    "whyItMatters": "Belgian research institutions must understand how next-generation AI models like Astra will integrate into discovery workflows. LeapSpace's competitive positioning depends on demonstrating superior research-specific features over generic AI tools amid rapid capability shifts.",
+    "impact": {
+      "novelty": 4,
+      "commercial": 4,
+      "threat": 4,
+      "urgency": 4
+    },
+    "entities": [
+      "OpenAI",
+      "GPT-6 Astra",
+      "Sciencepost"
+    ],
+    "actionItems": [
+      "Investigate Astra's specific research capabilities (literature synthesis, citation handling, domain accuracy) versus LeapSpace's existing strengths.",
+      "Prepare positioning talking points for Belgian institutions: research-grade accuracy, compliance, and institutional control over AI outputs.",
+      "Monitor OpenAI's research-tool partnerships and pricing to anticipate direct competition in academic market."
+    ],
+    "sourceType": "secondary"
+  },
+  {
+    "id": "news-2elpq4",
+    "title": "Annonce par OpenAI de la résolution de l’équation de Navier-Stokes : menace pour les maths humaines ou écran de fumée - Libération",
+    "description": "Annonce par OpenAI de la résolution de l’équation de Navier-Stokes : menace pour les maths humaines ou écran de fumée&nbsp;&nbsp;Libération",
+    "institution": "OpenAI",
+    "category": "competitor_announcements",
+    "categoryLabel": "Competitor Announcements",
+    "url": "https://news.google.com/rss/articles/CBMilAJBVV95cUxOOU5PYXNkNmpobkVDUjJRLXQwSEo4TG5CREdSempNcXc5MGxJa0lZTHUzWXNQUUwyaGRFcEJmaDI2YXpNOWoyLUhBRlVObm5ia1dUd3FkQUZYNTVscWNWRzRZU0lHUHMtOUowdDhRMnJVbGwtOVN1MG1RQVRQZHNmWTA0SWhwdjYzQXh1UlA4WUkxSFF0RkZhZkJXMkthcktZcHdaUGVOTncwUG1oYzRJS1FvRHFOLV9vSjA0OVhtSjRVb29lTDItY2JTU0FiS1BNU0EtRldJVE92NkVwVUJxUTZLdWRuaDBpNmJUMjJSRE9ualpwSml5QVk5Zi1lLUw0X0JBZGQ4MHpCQmRldmZocWtiZjQ?oc=5",
+    "sourceName": "Libération",
+    "publishedDate": "2026-09-12",
+    "foundDate": "2026-09-19",
+    "autoDiscovered": true
+  },
+  {
     "id": "news-wpw9p3",
     "title": "OpenAI lance ChatGPT pour les services financiers avec des données intégrées - unite.ai",
     "description": "OpenAI lance ChatGPT pour les services financiers avec des données intégrées&nbsp;&nbsp;unite.ai",

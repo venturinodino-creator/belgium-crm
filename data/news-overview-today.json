@@ -1,35 +1,16 @@
 {
-  "generatedAt": "2026-09-18T12:13:49.484Z",
-  "articleCount": 7,
-  "headline": "AI Giants Race to Dominate Life Sciences: Anthropic, OpenAI, Google All Push New Tools",
-  "bottomLine": "Major AI vendors (Anthropic, OpenAI, Google) are rapidly deploying specialized life sciences and safety frameworks, forcing research institutions to evaluate whether integrated AI research platforms will become essential infrastructure.",
-  "keyFindings": [
-    "Anthropic and Novo are partnering to accelerate drug discovery via AI, while Anthropic launches a beta Life Sciences Verification Program—signaling AI vendors are moving upstream into pharma/biotech…",
-    "OpenAI and Google are establishing governance frameworks (misalignment reporting, health/climate impact claims) to build institutional trust—a prerequisite for adoption in regulated research…",
-    "Google is integrating third-party AI agents via MCP Protocol into consumer platforms, suggesting interoperability will soon be table-stakes; research tools that can't plug into emerging AI ecosystems…",
-    "The convergence of life sciences AI tools, safety verification, and interoperable agent protocols is reshaping the research stack—positioning AI-first platforms as potential alternatives to…"
-  ],
-  "whyItMatters": "These moves signal AI vendors are moving beyond general-purpose chatbots into domain-specific research tools (drug discovery, literature synthesis, claims verification) that directly compete with or displace Scopus/ScienceDirect workflows.",
+  "generatedAt": "2026-09-19T11:56:08.501Z",
+  "articleCount": 0,
+  "headline": "",
+  "bottomLine": "No live stories to summarize yet.",
+  "keyFindings": [],
+  "whyItMatters": "",
   "impact": {
-    "novelty": 4,
-    "commercial": 5,
-    "threat": 4,
-    "urgency": 4
+    "novelty": 3,
+    "commercial": 3,
+    "threat": 3,
+    "urgency": 3
   },
-  "entities": [
-    "Anthropic",
-    "OpenAI",
-    "Google",
-    "Novo Nordisk",
-    "Elsevier",
-    "ScienceDirect",
-    "Scopus",
-    "LeapSpace"
-  ],
-  "actionItems": [
-    "Map which Belgian pharma, biotech, and university research labs are piloting Anthropic's Life Sciences Verification Program or OpenAI's new frameworks; identify decision-makers and timing for…",
-    "Audit LeapSpace's current AI safety/governance claims and verification capabilities against Anthropic and OpenAI's published standards; brief product team on gaps before institutions demand proof of…",
-    "Prepare talking points on how Scopus + LeapSpace + ScienceDirect together provide end-to-end research discovery vs.",
-    "Initiate early conversations with key institutions' CIOs and research leadership on interoperability roadmap: can LeapSpace/ScienceDirect plug into MCP Protocol or similar standards, or will…"
-  ]
+  "entities": [],
+  "actionItems": []
 }
