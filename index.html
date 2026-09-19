@@ -1064,6 +1064,8 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
 .wp-warn{font-size:9px;color:#fbbf24;border:1px solid rgba(251,191,36,.4);border-radius:4px;padding:0 4px;margin-left:4px;white-space:nowrap}
 
 .ws-more{font-size:10.5px;color:var(--muted,#8a93a3)}
+.ws-status-pick{font-size:10px;font-weight:600;border-radius:99px;padding:2px 8px;cursor:pointer;font-family:inherit;line-height:1.4}
+.ws-status-pick option{background:#0f172a;color:#e2e8f0}
 .ws-act{margin-left:auto;opacity:.65}
 .ws-card:hover .ws-act,tr:hover .ws-act{opacity:1}
 .ws-chip.active[onclick*="removed"]{background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.45);color:#fca5a5}
@@ -1877,7 +1879,8 @@ function dbToInst(r) {
     contractValue: r.contract_value||'', renewalDate: r.renewal_date||'',
     products: r.products||'', nextAction: r.next_action||'',
     nextActionDate: r.next_action_date||'', lat: r.lat, lng: r.lng,
-    wsPinned: !!r.ws_pinned
+    wsPinned: !!r.ws_pinned,
+    productStatus: (r.product_status && typeof r.product_status === 'object') ? r.product_status : {}
   };
 }
 
@@ -1904,7 +1907,8 @@ function instToDB(inst) {
     next_action: inst.nextAction||null,
     next_action_date: inst.nextActionDate||null,
     lat: inst.lat||null, lng: inst.lng||null,
-    ws_pinned: !!inst.wsPinned
+    ws_pinned: !!inst.wsPinned,
+    product_status: inst.productStatus || {}
   };
 }
 
@@ -2085,6 +2089,7 @@ async function load() {
     // row so the folder follows the user across devices. Push any local pins
     // up once (not awaited: the page must not wait on it).
     wsMigrateLegacyPins();
+    migrateLocalProductStatus();
     // Merge seed emails into contacts loaded from Supabase
     const seedEmailMap = Object.fromEntries(SEED_CONTACTS.map(c => [c.id, c.email]));
     state.contacts = contRows.map(dbToContact).map(c => ({
@@ -4664,6 +4669,10 @@ function renderInstitutions() {
 // crm_institutions row, which falls back to 'unknown') so this list agrees
 // with the Matrix rather than reading a separate, possibly stale copy.
 function getProductStatus(instId, key) {
+  // Hand-set on the record (shared across devices) beats everything else.
+  const inst = state.institutions.find(i => i.id === instId);
+  const saved = inst && inst.productStatus && inst.productStatus[key];
+  if (saved) return saved;
   const ov = (window.matrixOverrides || {})[instId]?.[key];
   if (ov) return ov;
   const cd = (window.COMP_DATA || {})[instId];
@@ -4671,6 +4680,39 @@ function getProductStatus(instId, key) {
   const cp = (state.compProducts || []).find(p => p.instId === instId);
   if (cp && cp[key]) return cp[key];
   return 'unknown';
+}
+// The one path for every hand-set product status: the White Space picker, the
+// Competitor Matrix edit mode and the profile's competitor card. Saved on the
+// institution record (crm_institutions.product_status) so it holds on every
+// device, and mirrored into the local override map so this browser agrees at
+// once even if the write is slow. An empty value clears the hand-set status.
+async function setProductStatus(instId, key, value) {
+  const inst = state.institutions.find(i => i.id === instId);
+  if (!inst) return false;
+  inst.productStatus = { ...(inst.productStatus || {}) };
+  if (value) inst.productStatus[key] = value; else delete inst.productStatus[key];
+  if (!window.matrixOverrides) window.matrixOverrides = {};
+  if (!window.matrixOverrides[instId]) window.matrixOverrides[instId] = {};
+  if (value) window.matrixOverrides[instId][key] = value; else delete window.matrixOverrides[instId][key];
+  if (!Object.keys(window.matrixOverrides[instId]).length) delete window.matrixOverrides[instId];
+  try { localStorage.setItem('be_crm_matrix_overrides', JSON.stringify(window.matrixOverrides)); } catch (e) {}
+  save();
+  try { await supaUpsertInst(inst); syncBadge(true); return true; }
+  catch (e) { console.error(e); syncBadge(true, 'err'); toast('Status not saved to the shared database — it only survives in this browser until it is retried.', 'err'); return false; }
+}
+// One-time: statuses this browser set before they lived on the record go onto
+// the records. A refused write (a viewer cannot write) is simply retried next load.
+async function migrateLocalProductStatus() {
+  const local = window.matrixOverrides || {};
+  for (const instId of Object.keys(local)) {
+    const inst = state.institutions.find(i => i.id === instId);
+    if (!inst) continue;
+    const missing = Object.entries(local[instId] || {}).filter(([k, v]) => v && !(inst.productStatus || {})[k]);
+    if (!missing.length) continue;
+    inst.productStatus = { ...(inst.productStatus || {}) };
+    missing.forEach(([k, v]) => { inst.productStatus[k] = v; });
+    try { await supaUpsertInst(inst); } catch (e) { console.warn('Product status not saved to Supabase:', e.message); return; }
+  }
 }
 // The three statuses that put an institution on this list. The "no" label names
 // the selected product, so a card never reads "No Pure" while the Scopus view is
@@ -4686,6 +4728,26 @@ const WS_STATUS = {
 // badge rather than crashing on a colour WS_STATUS has no entry for.
 const WS_PINNED_STATUS = { label: 'Pinned', color: '#60a5fa' };
 function wsStatusOf(id, product) { return WS_STATUS[getProductStatus(id, product)] || WS_PINNED_STATUS; }
+// The status badge on a White Space card or row is a picker for admins: set
+// what the institution has for the selected product and it is saved on the
+// record. No / Cancelled / Unverified keep it on the list with that label;
+// Has / Likely / Expiring take it off the list for that product.
+function wsStatusPicker(id, code) {
+  const st = WS_STATUS[code] || WS_PINNED_STATUS;
+  const badge = '<span class="badge" style="font-size:10px;background:' + st.color + '22;color:' + st.color + ';border:1px solid ' + st.color + '55">' + esc(wsStatusLabel(code)) + '</span>';
+  if (state.currentRole !== 'admin') return badge;
+  const prod = (WS_PRODUCTS[state.wsProduct] || WS_PRODUCTS.pure).label;
+  const opts = [['no', 'No ' + prod], ['cancelled', prod + ' cancelled'], ['unknown', 'Unverified'], ['yes', 'Has ' + prod], ['likely', 'Likely has ' + prod], ['expiring', prod + ' expiring']];
+  return '<select class="ws-status-pick" style="background:' + st.color + '22;color:' + st.color + ';border:1px solid ' + st.color + '55" title="Set what this institution has for ' + esc(prod) + ' — saved on the record, on every device" onclick="event.stopPropagation()" onchange="event.stopPropagation();wsSetStatus(\'' + id + '\', this.value)">' +
+    opts.map(([v, l]) => '<option value="' + v + '"' + (v === code ? ' selected' : '') + '>' + esc(l) + '</option>').join('') + '</select>';
+}
+async function wsSetStatus(id, value) {
+  const inst = state.institutions.find(i => i.id === id);
+  const prod = (WS_PRODUCTS[state.wsProduct] || WS_PRODUCTS.pure).label;
+  const ok = await setProductStatus(id, state.wsProduct, value);
+  renderWhiteSpace();
+  if (ok) toast((inst ? inst.name : 'Institution') + ' — ' + prod + ': ' + (WS_STATUS[value] ? wsStatusLabel(value) : value === 'yes' ? 'has it' : value === 'likely' ? 'likely has it' : 'expiring') + (WS_STATUS[value] ? '' : ', so it leaves the ' + prod + ' white space'), 'ok');
+}
 function wsStatusLabel(code) {
   if (code !== 'no') return (WS_STATUS[code] || WS_PINNED_STATUS).label;
   return 'No ' + ((WS_PRODUCTS[state.wsProduct] || WS_PRODUCTS.pure).label);
@@ -5027,7 +5089,7 @@ function renderWhiteSpace() {
           '<div class="ic-head">' +
             '<div class="ic-icon ' + i.type + '">' + (TYPE_ICON[i.type] || '') + '</div>' +
             '<span class="badge b-' + i.type + '" style="font-size:10px">' + (TYPE_LABEL[i.type] || i.type) + '</span>' +
-            '<span class="badge" style="font-size:10px;background:' + st.color + '22;color:' + st.color + ';border:1px solid ' + st.color + '55">' + esc(wsStatusLabel(getProductStatus(i.id, state.wsProduct))) + '</span>' +
+            wsStatusPicker(i.id, getProductStatus(i.id, state.wsProduct)) +
             // The bucket only adds information once the status is verified: an
             // unverified status is the unverified bucket, so one badge is enough.
             (getProductStatus(i.id, state.wsProduct) === 'unknown' ? '' : '<span class="badge" title="' + esc(bk.hint) + '" style="font-size:10px;background:' + bk.color + '22;color:' + bk.color + ';border:1px solid ' + bk.color + '55">' + bk.label + '</span>') +
@@ -5069,7 +5131,7 @@ function renderWhiteSpace() {
             '<div style="font-weight:600">' + esc(i.name) + '</div>' +
             '<div style="font-size:11px;color:var(--muted)">' + esc(i.short || '') + '</div></div></div></td>' +
           '<td><span class="badge b-' + i.type + '">' + (TYPE_LABEL[i.type] || i.type) + '</span></td>' +
-          '<td><span class="badge" style="background:' + st.color + '22;color:' + st.color + ';border:1px solid ' + st.color + '55">' + esc(wsStatusLabel(getProductStatus(i.id, state.wsProduct))) + '</span></td>' +
+          '<td>' + wsStatusPicker(i.id, getProductStatus(i.id, state.wsProduct)) + '</td>' +
           '<td style="white-space:nowrap">' + (works !== null && works > 0 ? fmtWorks(works) : '—') + '</td>' +
           '<td style="font-size:11px;color:' + (wsHasRival(i.id) ? '#fb923c' : 'var(--muted)') + '">' + esc(wsHasRival(i.id) ? wsRivalName(i.id) : 'none') + '</td>' +
           '<td>' + esc(i.city) + '</td>' +
@@ -7954,14 +8016,11 @@ function toggleMatrixEdit(){
 function cycleCell(instId, colKey, ev){
   if(ev) ev.stopPropagation();
   if(!_matrixEditMode) return;
-  if(!window.matrixOverrides[instId]) window.matrixOverrides[instId] = {};
-  const cur = window.matrixOverrides[instId][colKey];
+  const inst = state.institutions.find(i => i.id === instId);
+  const cur = ((inst && inst.productStatus) || {})[colKey] || ((window.matrixOverrides || {})[instId] || {})[colKey];
   const idx = _CYCLE.indexOf(cur);
-  if(idx >= _CYCLE.length-1){ delete window.matrixOverrides[instId][colKey]; }
-  else if(idx === -1){ window.matrixOverrides[instId][colKey] = _CYCLE[0]; }
-  else { window.matrixOverrides[instId][colKey] = _CYCLE[idx+1]; }
-  if(!Object.keys(window.matrixOverrides[instId]).length) delete window.matrixOverrides[instId];
-  localStorage.setItem('be_crm_matrix_overrides', JSON.stringify(window.matrixOverrides));
+  const next = idx >= _CYCLE.length-1 ? '' : idx === -1 ? _CYCLE[0] : _CYCLE[idx+1];
+  setProductStatus(instId, colKey, next); // saved on the record; the matrix redraws from the local mirror at once
   renderSubscriptionMatrix();
 }
 
@@ -8603,6 +8662,8 @@ function renderSubscriptionMatrix() {
     .map(id=>state.institutions.find(i=>i.id===id)).filter(Boolean);
 
   function getStatus(instId, key) {
+    const rec = (state.institutions.find(i => i.id === instId) || {}).productStatus; // hand-set on the record wins
+    if (rec && rec[key]) return rec[key];
     const ov = (window.matrixOverrides||{})[instId]?.[key];
     if (ov) return ov;
     const cd = (window.COMP_DATA||{})[instId];
@@ -9935,7 +9996,7 @@ function getMergedProducts(instId){
 
     // Vendor  colKey mapping for override lookup
     const VENDOR_COL = { 'Springer Nature':'springer','Wiley':'wiley','Taylor & Francis':'tf','Clarivate':'wos','IEEE':'ieee','ACM':'acm','CAS / ACS':'scifinder' };
-    const instOverrides = window.matrixOverrides && window.matrixOverrides[instId] ? window.matrixOverrides[instId] : {};
+    const instOverrides = { ...(((state.institutions.find(i => i.id === instId) || {}).productStatus) || {}), ...((window.matrixOverrides && window.matrixOverrides[instId]) || {}) };
 
     const cardId = 'cp-card-'+instId;
     const thStyle = 'padding:8px 10px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#94a3b8;border-bottom:1px solid var(--border);white-space:nowrap';
@@ -9961,12 +10022,7 @@ function getMergedProducts(instId){
         const statusCell = editing && colKey ? `
           <td style="padding:6px 8px;border-bottom:1px solid var(--border)">
             <select onchange="
-              const v=this.value;
-              if(!window.matrixOverrides['${instId}']) window.matrixOverrides['${instId}']={};
-              if(v===''){delete window.matrixOverrides['${instId}']['${colKey}'];}
-              else{window.matrixOverrides['${instId}']['${colKey}']=v;}
-              if(!Object.keys(window.matrixOverrides['${instId}']).length) delete window.matrixOverrides['${instId}'];
-              localStorage.setItem('be_crm_matrix_overrides',JSON.stringify(window.matrixOverrides));
+              setProductStatus('${instId}','${colKey}',this.value);
               rebuildCpCard_${instId}();
             " style="font-size:11px;padding:3px 6px;border-radius:6px;border:1px solid rgba(255,255,255,.15);background:#1e2a3a;color:#fff;cursor:pointer;width:100%">
               ${EDIT_STATES.map(s=>`<option value="${s.v}" ${(ov||'')===(s.v)?'selected':''}>${s.label}</option>`).join('')}
