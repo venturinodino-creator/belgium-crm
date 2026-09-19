@@ -5209,7 +5209,6 @@ function renderDetail() {
       <div style="text-align:center;min-width:70px"><div style="font-size:22px;font-weight:700;color:var(--primary)">${contacts.length}</div><div style="font-size:11px;color:var(--muted)">Total Contacts</div></div>
       <div style="text-align:center;min-width:70px"><div style="font-size:22px;font-weight:700;color:var(--success)">${contacts.filter(c=>c.status==='active').length}</div><div style="font-size:11px;color:var(--muted)">Active</div></div>
       <div style="text-align:center;min-width:70px"><div style="font-size:22px;font-weight:700;color:var(--danger)">${contacts.filter(c=>cxPriority(c)==='high').length}</div><div style="font-size:11px;color:var(--muted)">High Priority</div></div>
-      <div style="text-align:center;min-width:70px"><div style="font-size:22px;font-weight:700;color:var(--info)">${contacts.filter(c=>c.quality==='verified').length}</div><div style="font-size:11px;color:var(--muted)">Verified</div></div>
     </div>`;
 
   // Which decision-maker seats have a named contact, and who is missing.
