@@ -194,6 +194,45 @@ tbody td{padding:9px 14px;vertical-align:middle;color:var(--text)}
 .news-story-card[open] .news-story-expand-label::before{content:'Hide details'}
 .news-story-card:not([open]) .news-story-expand-label::before{content:'Full analysis ▾'}
 .news-story-detail{padding:2px 14px 14px;border-top:1px solid var(--border)}
+.news-story-link{font-size:10.5px;color:var(--accent2);text-decoration:none;font-weight:700;white-space:nowrap}
+.news-story-link:hover{text-decoration:underline}
+/*  NEWS — AT A GLANCE / SIGNALS  */
+.news-glance{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;margin:0 0 12px}
+.news-glance-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.news-glance-title{font-size:11px;font-weight:800;letter-spacing:.6px;color:var(--text);text-transform:uppercase}
+.news-glance-sub{font-size:10px;color:var(--muted);margin-left:auto;font-weight:600}
+.news-glance-row{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-top:1px solid var(--border)}
+.news-glance-row:first-of-type{border-top:none}
+.news-glance-text{font-size:11.5px;color:var(--text2);line-height:1.45;flex:1;min-width:0}
+.news-glance-text b{color:var(--text);font-weight:800}
+.news-sig{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:800;letter-spacing:.4px;padding:2px 7px;border-radius:9px;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
+.news-sig-threat{background:rgba(220,38,38,.15);color:#f87171;border:1px solid rgba(220,38,38,.35)}
+.news-sig-opportunity{background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.35)}
+.news-sig-watch{background:rgba(148,163,184,.13);color:#94a3b8;border:1px solid rgba(148,163,184,.3)}
+.news-kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px;margin:12px 0}
+.news-kpi{background:var(--bg3);border-radius:9px;padding:10px 11px;border-left:3px solid var(--border2)}
+.news-kpi-val{font-size:20px;font-weight:800;color:var(--text);line-height:1.1}
+.news-kpi-lab{font-size:9px;color:var(--muted);font-weight:700;letter-spacing:.4px;margin-top:2px;text-transform:uppercase}
+.news-splitbar{display:flex;height:16px;border-radius:8px;overflow:hidden;background:var(--bg3);margin:4px 0 6px}
+.news-splitbar span{display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#0b1220}
+.news-chiprow{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.news-chip{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:11px;background:rgba(255,255,255,.05);border:1px solid var(--border2);color:var(--text2)}
+.news-chip i{font-style:normal;font-size:9px;color:var(--muted);font-weight:700}
+.news-sigcard{border:1px solid var(--border);border-left-width:3px;border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--bg3)}
+.news-sigcard.threat{border-left-color:#dc2626}
+.news-sigcard.opportunity{border-left-color:#10b981}
+.news-sigcard-top{display:flex;align-items:center;gap:7px;margin-bottom:4px;flex-wrap:wrap}
+.news-sigcard-co{font-size:10px;font-weight:800;color:var(--text);letter-spacing:.3px}
+.news-sigcard-date{font-size:10px;color:var(--muted);margin-left:auto}
+.news-sigcard-title{font-size:12px;font-weight:700;color:var(--text);line-height:1.35;margin-bottom:3px}
+.news-sigcard-why{font-size:11px;color:var(--text2);line-height:1.45;margin:0 0 5px}
+.news-sigcard-why b{color:var(--muted);font-weight:800;text-transform:uppercase;font-size:9px;letter-spacing:.4px}
+.news-sigcard-foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.news-sechead{display:flex;align-items:center;gap:8px;margin:16px 0 8px}
+.news-sechead h4{font-size:12px;font-weight:800;color:var(--text);margin:0;letter-spacing:.3px}
+.news-sechead .news-sechead-count{font-size:10px;color:var(--muted);font-weight:700}
+.news-sechead .news-sechead-rule{flex:1;height:1px;background:var(--border)}
+.news-more-toggle{font-size:10.5px;color:var(--accent2);font-weight:700;cursor:pointer;background:none;border:none;padding:4px 0;font-family:inherit}
 /*  FORM  */
 .fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
 .fg label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
@@ -1404,14 +1443,17 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
     <div class="nav-item" data-view="institutions" onclick="nav('institutions')">
       <div class="nav-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div> Institutions
     </div>
+    <div class="nav-item" data-view="map" onclick="nav('map')">
+      <div class="nav-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></div> Map
+    </div>
+    <div class="nav-item" data-view="subscriptions" onclick="nav('subscriptions')">
+      <div class="nav-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div> Competitor Matrix
+    </div>
     <div class="nav-item" data-view="whitespace" onclick="nav('whitespace')" title="Universities and medical centres with no active Pure subscription" style="position:relative">
       <div class="nav-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></div>
       <span style="flex:1">White Space</span>
       <span id="nav-whitespace-pinned" style="display:none;background:#60a5fa;color:#0b1220;border-radius:99px;font-size:10px;font-weight:700;padding:1px 6px;min-width:18px;text-align:center;margin-right:4px"></span>
       <span id="nav-whitespace-badge" style="display:none;background:#fb923c;color:#fff;border-radius:99px;font-size:10px;font-weight:700;padding:1px 6px;min-width:18px;text-align:center"></span>
-    </div>
-    <div class="nav-item" data-view="map" onclick="nav('map')">
-      <div class="nav-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></div> Map
     </div>
     <div class="nav-item" data-view="contacts" onclick="nav('contacts')">
       <div class="nav-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M16 10h.01"/><path d="M8 14h.01"/><path d="M16 14h.01"/></svg></div> Contacts
@@ -1420,9 +1462,6 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
       <div class="nav-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg></div>
       <span style="flex:1">New Contacts</span>
       <span id="nav-pending-badge" style="display:none;background:#a855f7;color:#fff;border-radius:99px;font-size:10px;font-weight:700;padding:1px 6px;min-width:18px;text-align:center"></span>
-    </div>
-    <div class="nav-item" data-view="subscriptions" onclick="nav('subscriptions')">
-      <div class="nav-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div> Competitor Matrix
     </div>
     <div class="nav-item" data-view="ai-insights" onclick="nav('ai-insights')">
       <div class="nav-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 0 0-5 5c0 1.7.7 2.6 1.5 3.5.6.6 1 1.2 1.2 2.1M12 2a5 5 0 0 1 5 5c0 1.7-.7 2.6-1.5 3.5-.6.6-1 1.2-1.2 2.1M9.7 12.6h4.6M9.9 16h4.2M10.5 19h3"/></svg></div> LeapSpace Insights
@@ -2750,30 +2789,12 @@ async function showNewsSummaryModal() {
     overviewParts.push(`${hiringTotal} competitor role${hiringTotal === 1 ? ' is' : 's are'} currently open across ${hiringCompanyCount} tracked compan${hiringCompanyCount === 1 ? 'y' : 'ies'}.`);
   }
 
-  const tilesHtml = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin:14px 0">
-    <div onclick="scrollToNewsCategory('all')" title="Jump to Today's Stories" style="cursor:pointer;background:var(--bg3);border-radius:10px;padding:12px;border-left:3px solid var(--accent2);transition:background .15s" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='var(--bg3)'">
-      <div style="font-size:22px;font-weight:800;color:var(--text)">${total}</div>
-      <div style="font-size:10px;color:var(--muted);font-weight:600;margin-top:2px">LIVE STORIES</div>
-    </div>
-    ${catOrder.map(k => `<div onclick="scrollToNewsCategory('${k}')" title="${counts[k] ? 'Jump to ' + esc(NEWS_CATEGORIES[k].label) : 'No stories in this category yet'}" style="cursor:pointer;background:var(--bg3);border-radius:10px;padding:12px;border-left:3px solid ${NEWS_CATEGORIES[k].color};transition:background .15s" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='var(--bg3)'">
-      <div style="font-size:22px;font-weight:800;color:var(--text)">${counts[k] || 0}</div>
-      <div style="font-size:10px;color:var(--muted);font-weight:600;margin-top:2px">${esc(NEWS_CATEGORIES[k].label.toUpperCase())}</div>
-    </div>`).join('')}
-  </div>`;
-
-  const barsHtml = `<div style="margin:14px 0">${catOrder.map(k => {
-    const v = counts[k] || 0;
-    const pct = Math.round((v / maxCount) * 100);
-    return `<div onclick="scrollToNewsCategory('${k}')" title="${v ? 'Jump to ' + esc(NEWS_CATEGORIES[k].label) : 'No stories in this category yet'}" style="cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:6px">
-      <span style="width:160px;font-size:11px;color:var(--muted);flex-shrink:0">${esc(NEWS_CATEGORIES[k].label)}</span>
-      <div style="flex:1;background:var(--bg3);border-radius:6px;height:14px;overflow:hidden">
-        <div style="width:${pct}%;height:100%;background:${NEWS_CATEGORIES[k].color}"></div>
-      </div>
-      <span style="width:20px;text-align:right;font-size:11px;font-weight:700;color:var(--text)">${v}</span>
-    </div>`;
-  }).join('')}</div>`;
-
   const sorted = articles.slice().sort((a, b) => (b.publishedDate || b.foundDate || '').localeCompare(a.publishedDate || a.foundDate || ''));
+
+  // Threat/opportunity classification for the whole live set, computed once
+  // and shared by the glance strip, the analytics tiles, the two signal
+  // sections, and the PDF.
+  const model = buildNewsSignalModel(sorted);
 
   // The AI-synthesized cross-article overview (data/news-overview.json,
   // refreshed every scan run) — this is the "read this instead of every
@@ -2827,21 +2848,34 @@ async function showNewsSummaryModal() {
     </div>`;
   }).join('') : `<div class="news-empty">No open competitor roles tracked right now.</div>`;
 
+  // Order is the whole point of this screen: the six-bullet glance strip and
+  // the KPI row answer "what's happening" before any prose is read, then
+  // threats and opportunities give the two calls a rep acts on. The
+  // AI-written market overview is genuinely useful but it's four paragraphs,
+  // so it sits behind a toggle rather than between the reader and the
+  // headlines.
   if (body) body.innerHTML = `
-    <p style="font-size:12.5px;color:var(--text2);line-height:1.6;margin:0">${overviewParts.join(' ')}</p>
-    ${overviewCardHtml}
-    ${tilesHtml}
-    ${barsHtml}
-    <h4 id="news-group-all" style="font-size:12px;color:var(--text);margin:16px 0 4px">Today's Stories — Full Analysis</h4>
+    ${buildNewsGlanceHtml(model)}
+    ${buildNewsAnalyticsHtml(model, total, counts, catOrder)}
+    ${buildSignalSectionHtml(model.threats, 'threat', 3)}
+    ${buildSignalSectionHtml(model.opportunities, 'opportunity', 3)}
+    <details class="news-story-card" style="margin-top:16px">
+      <summary><span class="news-more-toggle">Full market overview &amp; context ▾</span></summary>
+      <div style="padding:2px 12px 10px">
+        ${overviewCardHtml}
+        <p style="font-size:11.5px;color:var(--muted);line-height:1.6;margin:8px 0 0">${overviewParts.join(' ')}</p>
+      </div>
+    </details>
+    <div class="news-sechead" style="margin-top:16px"><h4 id="news-group-all">All stories — full analysis</h4><span class="news-sechead-count">${total}</span><span class="news-sechead-rule"></span></div>
     <div>${storiesHtml}</div>
-    <h4 style="font-size:12px;color:var(--text);margin:20px 0 4px">Competitor Hiring — Open Roles</h4>
+    <div class="news-sechead" style="margin-top:18px"><h4>Competitor hiring — open roles</h4><span class="news-sechead-count">${hiringTotal}</span><span class="news-sechead-rule"></span></div>
     ${hiringTilesHtml}
     <div>${hiringListHtml}</div>`;
 
   // Cache the computed summary so the "Download PDF" button can render an
   // identical, source-linked report instantly via print-to-PDF, with no
   // re-fetch and no async gap that could detach it from the click gesture.
-  _newsSummaryPrintData = { total, catOrder, counts, overviewParts, overview, sorted, hiringTotal, hiringCatOrder, hiringCounts, hiringSorted };
+  _newsSummaryPrintData = { total, catOrder, counts, overviewParts, overview, sorted, model, hiringTotal, hiringCatOrder, hiringCounts, hiringSorted };
 }
 
 // Jumps the News Summary modal to a given category's group of stories —
@@ -2858,7 +2892,10 @@ function scrollToNewsCategory(key) {
   // Hex, not the CSS var — this gets string-concatenated with an alpha
   // suffix below for a plain inline backgroundColor, where var(--accent2)
   // wouldn't resolve.
-  const flashColor = key === 'all' ? '#8b5cf6' : (NEWS_CATEGORIES[key] || {}).color;
+  const flashColor = key === 'all' ? '#8b5cf6'
+    : key === 'threats' ? '#dc2626'
+    : key === 'opportunities' ? '#10b981'
+    : (NEWS_CATEGORIES[key] || {}).color;
   if (flashColor) {
     target.style.transition = 'background-color .3s';
     const prevBg = target.style.backgroundColor;
@@ -2878,6 +2915,251 @@ function firstClause(text, maxLen) {
   const cut = t.slice(0, maxLen);
   const lastSpace = cut.lastIndexOf(' ');
   return (lastSpace > maxLen * 0.6 ? cut.slice(0, lastSpace) : cut).trim() + '…';
+}
+
+// -- Signal layer: threat / opportunity classification -------------------
+// Each story already carries a 4-dimension impact score; what the feed never
+// said out loud was the one thing a sales agent needs in the first two
+// seconds -- is this someone attacking Elsevier's position, or an opening to
+// sell into? These helpers derive that call from the scores already on the
+// record plus who the story is about, so nothing has to be re-generated
+// server-side.
+const NEWS_COMPETITOR_NAMES = new Set([
+  'Clarivate', 'Digital Science', 'Springer Nature', 'Wiley', 'Elicit',
+  'scite', 'Consensus', 'SciSpace', 'Paperguide',
+  'IGI Global Scientific Publishing', 'IEEE', 'Allen Institute for AI',
+  'Google', 'Google Cloud', 'OpenAI', 'Anthropic', 'Salesforce', 'Microsoft',
+  'Meta', 'Amazon', 'Semantic Scholar', 'OpenAlex', 'Google Scholar',
+]);
+
+const NEWS_SIGNALS = {
+  threat:      { key: 'threat',      label: 'Threat',      color: '#dc2626', text: '#f87171' },
+  opportunity: { key: 'opportunity', label: 'Opportunity', color: '#10b981', text: '#34d399' },
+  watch:       { key: 'watch',       label: 'Watch',       color: '#94a3b8', text: '#94a3b8' },
+};
+
+function newsNum(v, fallback) { const n = Number(v); return Number.isFinite(n) ? n : fallback; }
+
+// A story is competitor-side if it's filed under Competitor Announcements or
+// its subject is a named rival -- an Anthropic or Clarivate launch is
+// pressure on Elsevier, whereas the same scores on a Dutch university story
+// describe an account that's growing.
+function newsIsCompetitor(a) {
+  return a.category === 'competitor_announcements' || NEWS_COMPETITOR_NAMES.has(a.institution);
+}
+
+function newsSignalKey(a) {
+  const imp = a.impact || {};
+  const threat = newsNum(imp.threat, 3), commercial = newsNum(imp.commercial, 3);
+  if (newsIsCompetitor(a)) {
+    if (threat >= 3) return 'threat';
+    return commercial >= 4 ? 'opportunity' : 'watch';
+  }
+  if (threat > commercial) return 'threat';
+  return commercial >= 3 ? 'opportunity' : 'watch';
+}
+
+// Ranking for "what do I read first" -- commercial upside and urgency weigh
+// heaviest, since those are what a rep acts on this week.
+function newsPriority(a) {
+  const imp = a.impact || {};
+  return newsNum(imp.commercial, 3) * 2
+       + newsNum(imp.urgency, 3) * 1.5
+       + newsNum(imp.threat, 3)
+       + newsNum(imp.novelty, 3) * 0.5;
+}
+
+function newsCompany(a) {
+  return a.institution || (Array.isArray(a.entities) && a.entities[0]) || a.sourceName || 'Unknown';
+}
+
+// Pulls the first complete sentence and word-boundary-truncates it, so a
+// one-line summary reads as a sentence rather than a severed paragraph.
+function newsOneLine(text, maxLen) {
+  const t = String(text || '').replace(/\s+/g, ' ').trim();
+  if (!t) return '';
+  const m = t.match(/^(.+?[.!?])(\s|$)/);
+  return firstClause(m ? m[1] : t, maxLen);
+}
+
+// One pass over the live set that every surface below (glance strip, KPI
+// tiles, threat/opportunity sections, and the PDF) reads from, so the modal
+// and the downloaded report can never disagree about the numbers.
+function buildNewsSignalModel(articles) {
+  const rows = (articles || []).map(a => ({
+    a,
+    signal: newsSignalKey(a),
+    priority: newsPriority(a),
+    company: newsCompany(a),
+    urgency: newsNum((a.impact || {}).urgency, 3),
+  }));
+  const byPriority = rows.slice().sort((x, y) =>
+    (y.priority - x.priority) ||
+    String(y.a.publishedDate || y.a.foundDate || '').localeCompare(String(x.a.publishedDate || x.a.foundDate || ''))
+  );
+  const companyCounts = {};
+  rows.forEach(r => { companyCounts[r.company] = (companyCounts[r.company] || 0) + 1; });
+
+  // The feed routinely carries a dozen near-identical write-ups of one
+  // announcement (15 of 24 live articles were the same Anthropic story in
+  // production). The glance strip therefore shows the strongest story per
+  // company and counts the rest as "+N related", so six bullets cover six
+  // distinct developments instead of one story six times.
+  const seenCompany = new Set();
+  const glance = byPriority.filter(r => !seenCompany.has(r.company) && seenCompany.add(r.company));
+
+  return {
+    rows, byPriority, glance, companyCounts,
+    threats: byPriority.filter(r => r.signal === 'threat'),
+    opportunities: byPriority.filter(r => r.signal === 'opportunity'),
+    watch: byPriority.filter(r => r.signal === 'watch'),
+    actNow: rows.filter(r => r.urgency >= 4).length,
+    companyCount: Object.keys(companyCounts).length,
+    topCompanies: Object.entries(companyCounts).sort((a, b) => b[1] - a[1]).slice(0, 8),
+  };
+}
+
+// Reorders a signal list so the first slots go to distinct companies before
+// any company gets a second slot. The feed carries many write-ups of the same
+// announcement, and without this the three visible threat cards were three
+// retellings of one Anthropic story while an unrelated rival sat hidden
+// behind the "show more" toggle. Nothing is dropped -- the duplicates just
+// move down.
+function newsDistinctFirst(list) {
+  const seen = new Set(), first = [], rest = [];
+  list.forEach(r => {
+    if (seen.has(r.company)) { rest.push(r); return; }
+    seen.add(r.company);
+    first.push(r);
+  });
+  return first.concat(rest);
+}
+
+function newsReadLink(a, label) {
+  const href = a.url ? safeHref(a.url) : '';
+  if (!href) return '';
+  return '<a class="news-story-link" href="' + esc(href) + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">' + esc(label || 'Read') + ' \u2197</a>';
+}
+
+// The 10-second read: one line per development, tagged threat or
+// opportunity, company name first, with the article one click away.
+function buildNewsGlanceHtml(model) {
+  if (!model.rows.length) {
+    return `<div class="news-glance"><div class="news-glance-head"><span class="news-glance-title">At a glance</span></div>
+      <div class="news-glance-text">No live stories in the feed. The scan runs every morning at 07:00 UTC.</div></div>`;
+  }
+  const rows = model.glance.slice(0, 6).map(r => {
+    const sig = NEWS_SIGNALS[r.signal];
+    const more = (model.companyCounts[r.company] || 1) - 1;
+    const line = newsOneLine(r.a.bottomLine || r.a.whyItMatters || r.a.title, 120);
+    return `<div class="news-glance-row">
+      <span class="news-sig news-sig-${sig.key}">${sig.label}</span>
+      <span class="news-glance-text"><b>${esc(r.company)}</b> &mdash; ${esc(line)}${more ? ` <i style="color:var(--muted);font-style:normal;font-size:10px">+${more} related</i>` : ''}</span>
+      ${newsReadLink(r.a, 'Read')}
+    </div>`;
+  }).join('');
+  return `<div class="news-glance">
+    <div class="news-glance-head">
+      <span class="news-glance-title">&#9889; At a glance</span>
+      <span class="news-glance-sub">${model.threats.length} threat${model.threats.length === 1 ? '' : 's'} &middot; ${model.opportunities.length} opportunit${model.opportunities.length === 1 ? 'y' : 'ies'}</span>
+    </div>
+    ${rows}
+  </div>`;
+}
+
+// KPI tiles, a single threat/opportunity split bar, and the companies
+// driving the feed -- the whole analytics read without scrolling.
+function buildNewsAnalyticsHtml(model, total, counts, catOrder) {
+  const kpis = [
+    { v: total, l: 'Live stories', c: '#8b5cf6', jump: 'all' },
+    { v: model.threats.length, l: 'Threats', c: '#dc2626', jump: 'threats' },
+    { v: model.opportunities.length, l: 'Opportunities', c: '#10b981', jump: 'opportunities' },
+    { v: model.actNow, l: 'Act this week', c: '#d97706', jump: 'threats' },
+    { v: model.companyCount, l: 'Companies', c: '#1d4ed8', jump: 'all' },
+  ].map(k => `<div class="news-kpi" style="border-left-color:${k.c};cursor:pointer" onclick="scrollToNewsCategory('${k.jump}')" title="Jump to section">
+      <div class="news-kpi-val" style="color:${k.c}">${k.v}</div>
+      <div class="news-kpi-lab">${esc(k.l)}</div>
+    </div>`).join('');
+
+  const t = model.threats.length, o = model.opportunities.length, w = model.watch.length;
+  const sum = Math.max(1, t + o + w);
+  const seg = (n, color, label) => n ? `<span style="width:${(n / sum) * 100}%;background:${color}" title="${label}: ${n}">${(n / sum) > 0.12 ? n : ''}</span>` : '';
+  const splitBar = `<div class="news-splitbar">
+    ${seg(t, '#dc2626', 'Threats')}${seg(o, '#10b981', 'Opportunities')}${seg(w, '#94a3b8', 'Watch')}
+  </div>
+  <div style="display:flex;gap:12px;font-size:9.5px;color:var(--muted);font-weight:700">
+    <span style="color:#f87171">&#9679; ${t} threat${t === 1 ? '' : 's'}</span>
+    <span style="color:#34d399">&#9679; ${o} opportunit${o === 1 ? 'y' : 'ies'}</span>
+    <span>&#9679; ${w} watch</span>
+  </div>`;
+
+  const chips = model.topCompanies.map(([name, n]) => {
+    const tally = model.rows.filter(r => r.company === name)
+      .reduce((acc, r) => { acc[r.signal] = (acc[r.signal] || 0) + 1; return acc; }, {});
+    const key = (tally.threat || 0) >= (tally.opportunity || 0) ? (tally.threat ? 'threat' : 'watch') : 'opportunity';
+    return `<span class="news-chip" style="border-color:${NEWS_SIGNALS[key].color}55"><span style="color:${NEWS_SIGNALS[key].text}">&#9679;</span>${esc(name)}<i>${n}</i></span>`;
+  }).join('');
+
+  const catChips = catOrder.filter(k => counts[k]).map(k => `<span class="news-chip" onclick="scrollToNewsCategory('${k}')" style="cursor:pointer;border-color:${NEWS_CATEGORIES[k].color}55"><span style="color:${NEWS_CATEGORIES[k].color}">&#9679;</span>${esc(NEWS_CATEGORIES[k].label)}<i>${counts[k]}</i></span>`).join('');
+
+  return `<div class="news-kpi-grid">${kpis}</div>
+    <div style="margin:10px 0 4px">${splitBar}</div>
+    ${chips ? `<div class="news-analysis-label" style="margin-top:12px">Who's driving the news</div><div class="news-chiprow">${chips}</div>` : ''}
+    ${catChips ? `<div class="news-analysis-label" style="margin-top:12px">By category &mdash; click to jump</div><div class="news-chiprow">${catChips}</div>` : ''}`;
+}
+
+// A threat or opportunity card: who, what happened in one line, what it
+// means for Elsevier in one line, and the article itself.
+function buildSignalCardHtml(r) {
+  const a = r.a;
+  const cat = NEWS_CATEGORIES[a.category] || { label: a.categoryLabel || 'News', color: '#64748b' };
+  const imp = a.impact || {};
+  const isThreat = r.signal === 'threat';
+  const scoreLabel = isThreat ? 'Severity' : 'Upside';
+  const scoreColor = isThreat ? '#f87171' : '#34d399';
+  const score = Math.max(1, Math.min(5, newsNum(imp[isThreat ? 'threat' : 'commercial'], 3)));
+  const dots = [1, 2, 3, 4, 5].map(n => `<span class="news-impact-dot" style="${n <= score ? `background:${scoreColor}` : ''}"></span>`).join('');
+  const what = newsOneLine(a.bottomLine || a.description || a.title, 150);
+  const why = newsOneLine(a.whyItMatters || a.elsevierRelevance || '', 190);
+
+  return `<div class="news-sigcard ${r.signal}">
+    <div class="news-sigcard-top">
+      <span class="news-sig news-sig-${r.signal}">${NEWS_SIGNALS[r.signal].label}</span>
+      <span class="news-sigcard-co">${esc(r.company)}</span>
+      <span class="news-topic-tag" style="background:${cat.color}22;color:${cat.color}">${esc(cat.label)}</span>
+      <span class="news-sigcard-date">${esc(a.publishedDate || a.foundDate || '')}</span>
+    </div>
+    <div class="news-sigcard-title">${esc(a.title || '')}</div>
+    <p class="news-sigcard-why">${esc(what)}</p>
+    ${why ? `<p class="news-sigcard-why"><b>For Elsevier:</b> ${esc(why)}</p>` : ''}
+    <div class="news-sigcard-foot">
+      <span style="display:flex;align-items:center;gap:5px"><span class="news-impact-dim-label">${scoreLabel}</span><span class="news-impact-dots">${dots}</span></span>
+      <span style="margin-left:auto">${newsReadLink(a, 'Read full article')}</span>
+    </div>
+  </div>`;
+}
+
+// Shows the strongest few cards outright and hides the tail behind a
+// <details>, so the section stays short by default but nothing is lost.
+function buildSignalSectionHtml(list, kind, shownCount) {
+  const shown = shownCount || 3;
+  const sig = NEWS_SIGNALS[kind];
+  const anchor = kind === 'threat' ? 'threats' : 'opportunities';
+  const title = kind === 'threat' ? '&#9888; Threats' : '&#8599; Opportunities';
+  const noun = kind === 'threat'
+    ? { one: 'threat', many: 'threats' }
+    : { one: 'opportunity', many: 'opportunities' };
+  const heading = `<div id="news-group-${anchor}" class="news-sechead"><h4 style="color:${sig.text}">${title}</h4><span class="news-sechead-count">${list.length}</span><span class="news-sechead-rule"></span></div>`;
+  if (!list.length) {
+    return heading + `<div class="news-empty" style="font-size:11.5px">Nothing in this bucket right now.</div>`;
+  }
+  const ordered = newsDistinctFirst(list);
+  const head = ordered.slice(0, shown).map(buildSignalCardHtml).join('');
+  const tail = ordered.slice(shown);
+  const rest = tail.length
+    ? `<details class="news-story-card" style="border-color:${sig.color}44"><summary><span class="news-more-toggle">Show ${tail.length} more ${tail.length === 1 ? noun.one : noun.many} &#9662;</span></summary><div style="padding:10px 12px 4px">${tail.map(buildSignalCardHtml).join('')}</div></details>`
+    : '';
+  return heading + head + rest;
 }
 
 const NEWS_IMPACT_DIMS = [
@@ -2970,7 +3252,8 @@ function buildStoryCardHtml(a) {
         <span class="news-story-expand"><span class="news-story-expand-label"></span></span>
       </div>
       <div style="font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:2px">${esc(a.title || '')}</div>
-      <p style="font-size:11.5px;color:var(--muted);line-height:1.45;margin:0 0 4px">${esc(a.bottomLine || '')}</p>
+      <p style="font-size:11.5px;color:var(--muted);line-height:1.45;margin:0 0 4px">${esc(newsOneLine(a.bottomLine, 165))}</p>
+      ${newsReadLink(a, 'Read full article')}
     </summary>
     <div class="news-story-detail">
       <div class="news-analysis-section" style="margin-top:10px"><div class="news-analysis-label">Key Findings</div><ul>${findings}</ul></div>
@@ -3003,7 +3286,7 @@ function _hexToRgb(hex) {
 function downloadNewsSummaryPdf() {
   if (!_newsSummaryPrintData) return;
   if (!window.jspdf || !window.jspdf.jsPDF) { toast('PDF library failed to load — check your connection and try again', 'warn'); return; }
-  const { total, catOrder, counts, overviewParts, overview, sorted, hiringTotal, hiringCatOrder, hiringCounts, hiringSorted } = _newsSummaryPrintData;
+  const { total, catOrder, counts, overviewParts, overview, sorted, model, hiringTotal, hiringCatOrder, hiringCounts, hiringSorted } = _newsSummaryPrintData;
 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit: 'pt', format: 'a4' });
@@ -3106,6 +3389,106 @@ function downloadNewsSummaryPdf() {
   function impactText(impact) {
     if (!impact) return '';
     return `Novelty ${impact.novelty}/5    Commercial ${impact.commercial}/5    Threat ${impact.threat}/5    Urgency ${impact.urgency}/5`;
+  }
+
+  // The printed equivalent of the modal's glance strip: one tagged line per
+  // development, strongest story per company, the whole block clickable
+  // through to the article.
+  function glanceSection(m) {
+    if (!m || !m.rows.length) return;
+    sectionHeading('At a Glance');
+    m.glance.slice(0, 6).forEach(r => {
+      const sig = NEWS_SIGNALS[r.signal];
+      const label = sig.label.toUpperCase();
+      const more = (m.companyCounts[r.company] || 1) - 1;
+      const text = r.company + ' \u2014 ' + newsOneLine(r.a.bottomLine || r.a.whyItMatters || r.a.title, 165)
+        + (more ? '  (+' + more + ' related)' : '');
+
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5);
+      const tagW = doc.getTextWidth(label) + 10;
+      // The link cue has to stay inside WinAnsi -- jsPDF's built-in Helvetica
+      // has no glyph for an arrow, and an out-of-encoding character prints as
+      // garbage rather than failing loudly.
+      const readLabel = 'Read';
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(8);
+      const readW = r.a.url ? doc.getTextWidth(readLabel) : 0;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+      const textX = marginX + tagW + 10;
+      const textW = contentW - tagW - 10 - (readW ? readW + 10 : 0);
+      const lines = doc.splitTextToSize(text, textW);
+      const blockH = Math.max(14, lines.length * 11.5);
+      ensureSpace(blockH + 5);
+
+      categoryTag(marginX, y, label, sig.color);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(51, 51, 51);
+      doc.text(lines, textX, y + 9);
+      if (r.a.url) {
+        const rx = marginX + contentW - readW;
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(29, 78, 216);
+        doc.text(readLabel, rx, y + 9);
+        doc.setDrawColor(29, 78, 216); doc.setLineWidth(0.5);
+        doc.line(rx, y + 10.5, rx + readW, y + 10.5);
+        doc.link(textX, y, contentW - tagW - 10, blockH, { url: r.a.url });
+      }
+      y += blockH + 5;
+    });
+    y += 2;
+  }
+
+  // One printed threat/opportunity block: who, what, what it means for
+  // Elsevier, how hard it lands, and a live link to the source.
+  function signalSection(list, kind) {
+    const sig = NEWS_SIGNALS[kind];
+    sectionHeading((kind === 'threat' ? 'Threats' : 'Opportunities') + ' (' + list.length + ')');
+    if (!list.length) {
+      bodyParagraph('Nothing in this bucket right now.', { color: [136, 136, 136], gap: 10 });
+      return;
+    }
+    newsDistinctFirst(list).slice(0, 8).forEach(r => {
+      const a = r.a;
+      const cat = NEWS_CATEGORIES[a.category] || { label: a.categoryLabel || 'News', color: '#64748b' };
+      const dateStr = a.publishedDate || a.foundDate || '';
+
+      ensureSpace(18);
+      let tx = marginX;
+      tx += categoryTag(tx, y, sig.label.toUpperCase(), sig.color) + 5;
+      tx += categoryTag(tx, y, r.company, '#334155') + 5;
+      categoryTag(tx, y, cat.label, cat.color);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(136, 136, 136);
+      doc.text(dateStr, marginX + contentW - doc.getTextWidth(dateStr), y + 9);
+      y += 17;
+
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5); doc.setTextColor(17, 17, 17);
+      const titleLines = doc.splitTextToSize(a.title || '(untitled)', contentW);
+      ensureSpace(titleLines.length * 13);
+      doc.text(titleLines, marginX, y + 9);
+      y += titleLines.length * 13 + 2;
+
+      bodyParagraph(newsOneLine(a.bottomLine || a.description || '', 210), { size: 9, gap: 3 });
+      const why = newsOneLine(a.whyItMatters || a.elsevierRelevance || '', 260);
+      if (why) bodyParagraph('For Elsevier: ' + why, { size: 9, gap: 3 });
+
+      const scoreLabel = kind === 'threat' ? 'Severity' : 'Upside';
+      const score = newsNum((a.impact || {})[kind === 'threat' ? 'threat' : 'commercial'], 3);
+      bodyParagraph(scoreLabel + ' ' + score + '/5', { size: 8.5, color: [120, 120, 120], gap: 3 });
+
+      if (a.url) {
+        ensureSpace(14);
+        const linkLabel = 'Read full article \u2014 ' + (a.sourceName || 'Source');
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(29, 78, 216);
+        const lw = doc.getTextWidth(linkLabel);
+        doc.text(linkLabel, marginX, y + 8);
+        doc.setDrawColor(29, 78, 216); doc.setLineWidth(0.5);
+        doc.line(marginX, y + 9.5, marginX + lw, y + 9.5);
+        doc.link(marginX, y - 1, lw, 12, { url: a.url });
+        y += 14;
+      }
+
+      ensureSpace(10);
+      doc.setDrawColor(229, 229, 229); doc.setLineWidth(0.5);
+      doc.line(marginX, y, marginX + contentW, y);
+      y += 10;
+    });
   }
 
   function overviewSection(ov, articles) {
@@ -3265,14 +3648,28 @@ function downloadNewsSummaryPdf() {
   doc.text(dateStr, marginX, y);
   y += 20;
 
-  bodyParagraph(overviewParts.join(' '), { size: 10.5, color: [51, 51, 51], gap: 10 });
+  glanceSection(model);
 
-  overviewSection(overview, sorted);
-
-  tiles([{ count: total, label: 'Live Stories', color: '#1d4ed8' }, ...catOrder.map(k => ({ count: counts[k] || 0, label: NEWS_CATEGORIES[k].label, color: NEWS_CATEGORIES[k].color }))]);
+  tiles([
+    { count: total, label: 'Live Stories', color: '#8b5cf6' },
+    { count: model ? model.threats.length : 0, label: 'Threats', color: '#dc2626' },
+    { count: model ? model.opportunities.length : 0, label: 'Opportunities', color: '#10b981' },
+    { count: model ? model.actNow : 0, label: 'Act This Week', color: '#d97706' },
+  ]);
   y += 6;
 
-  sectionHeading("Today's Stories — Full Analysis");
+  if (model) {
+    signalSection(model.threats, 'threat');
+    signalSection(model.opportunities, 'opportunity');
+  }
+
+  overviewSection(overview, sorted);
+  bodyParagraph(overviewParts.join(' '), { size: 9.5, color: [102, 102, 102], gap: 10 });
+
+  tiles(catOrder.map(k => ({ count: counts[k] || 0, label: NEWS_CATEGORIES[k].label, color: NEWS_CATEGORIES[k].color })));
+  y += 6;
+
+  sectionHeading("All Stories — Full Analysis");
   if (sorted.length) {
     sorted.slice(0, 40).forEach(a => storyAnalysisBlock(a));
   } else {
@@ -4381,6 +4778,10 @@ function renderMap() {
     onmouseout="if(!this.classList.contains('mf-active')){this.style.borderColor='rgba(255,255,255,.08)';this.style.color='rgba(255,255,255,.45)';this.style.background='rgba(255,255,255,.03)'}"
   `;
 
+  // The White Space folder is not a type, so it gets its own filter button
+  // after the type ones, carrying the pinned count; hidden when nothing is pinned.
+  const mapPinnedCount = state.institutions.filter(i => wsIsPinned(i.id)).length;
+
   document.getElementById('content').innerHTML = `
     <style>
       .mf-active{background:rgba(255,255,255,.1)!important;border-color:rgba(255,255,255,.22)!important;color:#fff!important;box-shadow:0 2px 8px rgba(0,0,0,.3)!important}
@@ -4394,6 +4795,11 @@ function renderMap() {
           <span style="width:7px;height:7px;border-radius:50%;background:${TYPE_COLORS_MAP[k]};display:inline-block;flex-shrink:0;box-shadow:0 0 8px ${TYPE_COLORS_MAP[k]}"></span>
           ${v.replace(' Inst.','')}
         </button>`).join('')}
+      ${mapPinnedCount ? `
+        <button class="map-filter-btn" ${filterBtnStyle('whitespace', WS_PINNED_STATUS.color)} title="Accounts pinned to the White Space folder by hand">
+          <span style="width:7px;height:7px;border-radius:50%;background:${WS_PINNED_STATUS.color};display:inline-block;flex-shrink:0;box-shadow:0 0 8px ${WS_PINNED_STATUS.color}"></span>
+          White Space (${mapPinnedCount})
+        </button>` : ''}
     </div>
     <div id="map-container" style="height:calc(100vh - 186px);border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.06);box-shadow:0 12px 48px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04)"></div>`;
 
@@ -4469,12 +4875,19 @@ function renderMap() {
       });
 
       marker._instType = inst.type;
+      marker._instPinned = wsIsPinned(inst.id);
       marker._instCol = col;
       _mapMarkers.push(marker);
     });
   }, 50);
 }
 
+// Which markers a map filter keeps: a type, the White Space folder, or all.
+function mapMarkerMatches(m, type) {
+  if (type === 'all') return true;
+  if (type === 'whitespace') return !!m._instPinned;
+  return m._instType === type;
+}
 function setMapFilter(type) {
   _mapActiveFilter = type;
   // Update button styles
@@ -4488,7 +4901,7 @@ function setMapFilter(type) {
   if (active) { active.classList.add('mf-active'); active.style.background='rgba(255,255,255,.1)'; active.style.borderColor='rgba(255,255,255,.22)'; active.style.color='#fff'; }
   // Show/hide markers
   _mapMarkers.forEach(m => {
-    if (type === 'all' || m._instType === type) {
+    if (mapMarkerMatches(m, type)) {
       if (!_fullMap.hasLayer(m)) m.addTo(_fullMap);
     } else {
       if (_fullMap.hasLayer(m)) _fullMap.removeLayer(m);
@@ -5053,8 +5466,19 @@ function renderWhiteSpace() {
   const all = eligible.filter(i => !wsIsRemoved(i.id));
   const counts = { all: all.length, greenfield: 0, rival: 0, unknown: 0, pinned: all.filter(i => wsIsPinned(i.id)).length, removed: eligible.length - all.length };
   all.forEach(i => counts[wsBucket(i.id)]++);
+  // One hover hint per chip, worded for the selected product so the Scopus
+  // view never says "No Pure". Mirrors the bucket rules in wsBucket/wsHasRival.
+  const rivalName = state.wsProduct === 'pure' ? 'a rival CRIS such as Esploro, Converis or Symplectic' : 'Web of Science or Dimensions';
+  const chipHint = {
+    all:        'Every institution on the ' + prod.label + ' white space list: no active ' + prod.label + ', or pinned here by hand',
+    greenfield: 'Verified: no ' + prod.label + ' and no competing product installed. An open opportunity with nothing to displace',
+    rival:      'Verified: no ' + prod.label + ', but ' + rivalName + ' is already installed. Winning means replacing the incumbent',
+    unknown:    'Not yet researched. No evidence either way, so the institution may have ' + prod.label + ', a rival, or nothing',
+    pinned:     'Accounts a rep moved into the White Space folder by hand via the Type dropdown. They stay listed whatever their ' + prod.label + ' status and also count in one of the other buckets',
+    removed:    'Accounts a rep removed from the ' + prod.label + ' white space list. Use its Restore button to put it back',
+  };
   const chip = (key, label) =>
-    '<button class="ws-chip' + (state.wsFilter === key ? ' active' : '') + '" onclick="state.wsFilter=\'' + key + '\';renderWhiteSpace()">' +
+    '<button class="ws-chip' + (state.wsFilter === key ? ' active' : '') + '" title="' + esc(chipHint[key] || '') + '" onclick="state.wsFilter=\'' + key + '\';renderWhiteSpace()">' +
     esc(label) + ' <b>' + counts[key] + '</b></button>';
 
   const toolbar =
@@ -6468,6 +6892,20 @@ function renderNewsArticles() {
   }).join('');
 }
 
+// "N new articles found" counted everything that passed the relevance
+// filter, including stories Google surfaced so late that the scan archived
+// them immediately -- which read as a lie on days when the feed shrank.
+// Older state files carry no breakdown, so fall back to the single number.
+function _scanAddedSummary(state) {
+  const total = state.lastAddedCount || 0;
+  if (!total) return 'No new articles found';
+  const live = state.lastAddedLive;
+  if (typeof live !== 'number') return `${total} new article${total === 1 ? '' : 's'} found`;
+  const archived = state.lastAddedArchived || 0;
+  const head = `${live} new article${live === 1 ? '' : 's'} added to the feed`;
+  return archived ? `${head} · ${archived} older one${archived === 1 ? '' : 's'} filed straight to the archive` : head;
+}
+
 async function renderNewsScanStatus() {
   const el = document.getElementById('news-scan-status');
   if (!el) return;
@@ -6476,7 +6914,7 @@ async function renderNewsScanStatus() {
     const state = res.ok ? await res.json() : null;
     if (!state || !state.lastRun) { el.innerHTML = '<p style="font-size:12px;color:var(--muted)">No scan recorded yet.</p>'; return; }
     el.innerHTML = `<p style="font-size:12px;color:var(--text)">Last scan: <strong>${_relativeTime(state.lastRun)}</strong></p>
-      <p style="font-size:12px;color:var(--muted);margin-top:3px">${state.lastAddedCount||0} new article${state.lastAddedCount===1?'':'s'} found</p>
+      <p style="font-size:12px;color:var(--muted);margin-top:3px">${_scanAddedSummary(state)}</p>
       ${state.error ? `<p style="font-size:11px;color:#f87171;margin-top:6px">${esc(state.error)}</p>` : ''}`;
   } catch(e) { el.innerHTML = '<p style="font-size:12px;color:var(--muted)">Status unavailable.</p>'; }
 }
@@ -8023,7 +8461,9 @@ window.matrixOverrides = {};
 try { window.matrixOverrides = JSON.parse(localStorage.getItem('be_crm_matrix_overrides')||'{}'); } catch(e){}
 let _matrixEditMode = false;
 
-const _CYCLE = ['yes','likely','expiring','unknown','no'];
+// A click on a status icon flips it through these three: ✓ has it, ✕ does
+// not, ? unverified. Anything else (likely, expiring, cancelled) starts at ✓.
+const _CYCLE = ['yes','no','unknown'];
 const _OV_BADGES = { active:'', expiring:'', unconfirmed:'?', cancelled:'', none:'—', likely:'~' };
 const _OV_TITLES = { active:'Active', expiring:'Cancelling', unconfirmed:'Unconfirmed', cancelled:'Cancelled', none:'Not subscribed', likely:'Likely active' };
 const _COL_LABELS = { springer:'SpringerLink', wiley:'Wiley Online', tf:'Taylor & Francis', wos:'Web of Science', ieee:'IEEE Xplore', acm:'ACM Digital Library', scifinder:'SciFinder-N' };
@@ -8035,11 +8475,10 @@ function toggleMatrixEdit(){
 
 function cycleCell(instId, colKey, ev){
   if(ev) ev.stopPropagation();
-  if(!_matrixEditMode) return;
-  const inst = state.institutions.find(i => i.id === instId);
-  const cur = ((inst && inst.productStatus) || {})[colKey] || ((window.matrixOverrides || {})[instId] || {})[colKey];
+  if(state.currentRole !== 'admin') return;
+  const cur = getProductStatus(instId, colKey); // record, then local override, then researched data
   const idx = _CYCLE.indexOf(cur);
-  const next = idx >= _CYCLE.length-1 ? '' : idx === -1 ? _CYCLE[0] : _CYCLE[idx+1];
+  const next = idx === -1 || idx >= _CYCLE.length-1 ? _CYCLE[0] : _CYCLE[idx+1];
   setProductStatus(instId, colKey, next); // saved on the record; the matrix redraws from the local mirror at once
   renderSubscriptionMatrix();
 }
@@ -8671,6 +9110,7 @@ function renderSubscriptionMatrix() {
   };
 
   const isEditing = _matrixEditMode;
+  const canEdit = state.currentRole === 'admin'; // a click on an icon flips it, no edit mode needed
 
   document.getElementById('topbar-actions').innerHTML = `<div style="display:flex;gap:8px;align-items:center">
     <button class="btn ${isEditing?'btn-primary':'btn-outline'}" onclick="toggleMatrixEdit()" style="font-size:12px;padding:6px 14px">
@@ -8737,10 +9177,10 @@ function renderSubscriptionMatrix() {
     const s = getStatus(instId, col.key);
     const st = STATUS[s] || STATUS.unknown;
     const renewal = getRenewal(instId, col.key);
-    const tdClick = isEditing ? `onclick="event.stopPropagation();cycleCell('${instId}','${col.key}',event)"` : '';
-    return `<td ${tdClick} style="cursor:${isEditing?'pointer':'default'};text-align:center;padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.04);border-right:1px solid rgba(255,255,255,.04);vertical-align:middle">
+    const tdClick = canEdit ? `onclick="event.stopPropagation();cycleCell('${instId}','${col.key}',event)"` : '';
+    return `<td ${tdClick} style="cursor:${canEdit?'pointer':'default'};text-align:center;padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.04);border-right:1px solid rgba(255,255,255,.04);vertical-align:middle">
       <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
-        <span title="${st.label}" style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:${st.bg};border:1.5px solid ${st.border};font-size:12px;font-weight:800;color:${st.text};transition:all .15s;box-shadow:none" onmouseenter="this.style.boxShadow='${st.glow}';this.style.transform='scale(1.2)'" onmouseleave="this.style.boxShadow='none';this.style.transform='scale(1)'">${st.icon}</span>
+        <span title="${st.label}${canEdit ? ' — click to change: ✓ has it → ✕ does not → ? unverified' : ''}" style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:${st.bg};border:1.5px solid ${st.border};font-size:12px;font-weight:800;color:${st.text};transition:all .15s;box-shadow:none" onmouseenter="this.style.boxShadow='${st.glow}';this.style.transform='scale(1.2)'" onmouseleave="this.style.boxShadow='none';this.style.transform='scale(1)'">${st.icon}</span>
         ${renewal ? `<span style="font-size:9px;color:rgba(255,255,255,.4);font-weight:500">${renewal}</span>` : ''}
       </div>
     </td>`;
@@ -8969,10 +9409,10 @@ function renderSubscriptionMatrix() {
       const s = getStatus(inst.id, col.key);
       const st = STATUS[s] || STATUS.unknown;
       const renewal = getRenewal(inst.id, col.key);
-      const tdEditAttr = isEditing ? `onclick="event.stopPropagation();cycleCell('${inst.id}','${col.key}',event)"` : '';
-      html += `<td class="cmx-elsevier-bg" ${tdEditAttr} style="cursor:${isEditing?'pointer':'default'};text-align:center;padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.04);border-right:1px solid rgba(251,146,60,.1);vertical-align:middle">
+      const tdEditAttr = canEdit ? `onclick="event.stopPropagation();cycleCell('${inst.id}','${col.key}',event)"` : '';
+      html += `<td class="cmx-elsevier-bg" ${tdEditAttr} style="cursor:${canEdit?'pointer':'default'};text-align:center;padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.04);border-right:1px solid rgba(251,146,60,.1);vertical-align:middle">
         <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
-          <span title="${st.label}" style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:${st.bg};border:1.5px solid ${st.border};font-size:12px;font-weight:800;color:${st.text};transition:all .15s;box-shadow:none" onmouseenter="this.style.boxShadow='${st.glow}';this.style.transform='scale(1.2)'" onmouseleave="this.style.boxShadow='none';this.style.transform='scale(1)'">${st.icon}</span>
+          <span title="${st.label}${canEdit ? ' — click to change: ✓ has it → ✕ does not → ? unverified' : ''}" style="display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:${st.bg};border:1.5px solid ${st.border};font-size:12px;font-weight:800;color:${st.text};transition:all .15s;box-shadow:none" onmouseenter="this.style.boxShadow='${st.glow}';this.style.transform='scale(1.2)'" onmouseleave="this.style.boxShadow='none';this.style.transform='scale(1)'">${st.icon}</span>
           ${renewal ? `<span style="font-size:9px;color:#fb923c;font-weight:600;background:rgba(251,146,60,.12);padding:1px 5px;border-radius:3px;letter-spacing:.02em">${renewal}</span>` : ''}
         </div>
       </td>`;
@@ -9691,7 +10131,12 @@ async function loadDigestNews() {
       const summaryText = digestHasOwnSummary(a)
         ? (a.summary || a.elsevierRelevance || a.bottomLine || a.description)
         : '';
-      return `<div style="padding:12px 18px;border-bottom:1px solid var(--border);cursor:pointer" onclick="${safeOpenUrlOnclick(a.url)}">
+      // Same guard as the news cards: an article whose Google id has been
+      // retired carries no url, and safeOpenUrlOnclick('') would expand to
+      // window.open("") and open a blank tab. Articles can age into that
+      // state while still inside the 14-day live window.
+      const rowHref = safeHref(a.url);
+      return `<div style="padding:12px 18px;border-bottom:1px solid var(--border);cursor:${rowHref ? 'pointer' : 'default'}"${rowHref ? ` onclick="${safeOpenUrlOnclick(a.url)}"` : ''}>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
           <span class="news-topic-tag" style="background:${cat.color}22;color:${cat.color}">${esc(cat.label)}</span>
           ${a.institution ? `<span style="font-size:11px;color:var(--muted)">${esc(a.institution)}</span>` : ''}
@@ -9699,6 +10144,7 @@ async function loadDigestNews() {
         </div>
         <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">${esc(a.title || '')}</div>
         ${summaryText ? `<p style="font-size:12px;color:var(--text2);line-height:1.4;margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${esc(summaryText)}</p>` : ''}
+        ${rowHref ? '' : `<p style="font-size:11px;color:var(--muted);font-style:italic;margin:4px 0 0">Original link expired</p>`}
       </div>`;
     }).join('');
   } catch(e) {
