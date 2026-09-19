@@ -1533,7 +1533,7 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
             <option value="medical">Medical Center</option>
             <option value="research">Research Institute</option>
             <option value="ngo">NGO / Foundation</option>
-            <option value="whitespace" title="Move this institution out of the main Institutions list into the White Space folder, whatever its Pure / Scopus / SciVal status">White Space</option>
+            <option value="whitespace" title="Keep this institution in the White Space folder regardless of its Pure / Scopus / SciVal status">White Space</option>
           </select>
         </div>
         <div class="fg"><label>City *</label><input id="mi-city" placeholder="Ghent"></div>
@@ -4984,14 +4984,17 @@ function renderInstitutions() {
   let insts = state.institutions.filter(i=>{
     if(state.instSearch && !`${i.name} ${i.short} ${i.city} ${i.description}`.toLowerCase().includes(state.instSearch.toLowerCase())) return false;
     // "whitespace" is the pinned-to-White-Space folder, not a stored type.
-    // Pinning *moves* the account there: it leaves the main list and the
-    // per-type views and shows only under this folder (and in White Space).
     if(state.instType==='whitespace') return wsIsPinned(i.id);
+    // Moving an account to the folder takes it out of the main list and the
+    // per-type views; it is reachable under the White Space option and on
+    // the White Space page.
     if(wsIsPinned(i.id)) return false;
     if(state.instType && i.type!==state.instType) return false;
     return true;
   });
   insts = sortInstList(insts, state.instSort, instSortVal);
+  // Shown on the White Space filter option so the folder's size is visible
+  // without selecting it, and next to the result count as a link.
   const pinnedCount = state.institutions.filter(i=>wsIsPinned(i.id)).length;
 
   const toolbar = `
@@ -5006,13 +5009,13 @@ function renderInstitutions() {
         <option value="medical" ${state.instType==='medical'?'selected':''}> Medical Center</option>
         <option value="research" ${state.instType==='research'?'selected':''}>Research Institute</option>
         <option value="ngo" ${state.instType==='ngo'?'selected':''}> NGO / Foundation</option>
-        <option value="whitespace" ${state.instType==='whitespace'?'selected':''}>White Space folder${pinnedCount?' ('+pinnedCount+')':''}</option>
+        <option value="whitespace" ${state.instType==='whitespace'?'selected':''}>White Space${pinnedCount?' ('+pinnedCount+')':''}</option>
       </select>
-      <span style="font-size:12px;color:var(--muted)">${insts.length} result${insts.length!==1?'s':''}${state.instType!=='whitespace' && pinnedCount ? ` · <a class="ext-link" onclick="state.instType='whitespace';state.instPage=1;renderInstitutions()" title="Accounts moved to the White Space folder via the Type dropdown">${pinnedCount} in White Space folder</a>` : ''}</span>
+      <span style="font-size:12px;color:var(--muted)">${insts.length} result${insts.length!==1?'s':''}${state.instType!=='whitespace' && pinnedCount ? ` · <a class="ext-link" onclick="state.instType='whitespace';state.instPage=1;renderInstitutions()" title="Open the White Space folder">${pinnedCount} in White Space</a>` : ''}</span>
     </div>`;
 
   if(!insts.length) {
-    document.getElementById('content').innerHTML = toolbar + `<div class="empty"><div class="ei"></div><h3>No institutions found</h3><p>${state.instType==='whitespace' ? 'Nothing has been moved here yet. Set an institution’s Type to White Space to move it into this folder.' : 'Try adjusting your search or filters.'}</p></div>`;
+    document.getElementById('content').innerHTML = toolbar + `<div class="empty"><div class="ei"></div><h3>No institutions found</h3><p>${state.instType==='whitespace' ? 'Nothing has been moved to the White Space folder yet. Hover an institution and click its White Space button.' : 'Try adjusting your search or filters.'}</p></div>`;
     return;
   }
 
@@ -6601,7 +6604,7 @@ async function saveInstitution() {
   // never having reached it, is gone. The toast needs to say so plainly
   // rather than imply it's safely saved.
   toast(
-    synced ? ((isEdit ? 'Institution updated' : 'Institution added') + (pinWs ? ' — moved to the White Space folder' : '')) : 'Not saved to the shared database — retry before reloading or this change will be lost',
+    synced ? ((isEdit ? 'Institution updated' : 'Institution added') + (pinWs ? ' — now in the White Space folder' : '')) : 'Not saved to the shared database — retry before reloading or this change will be lost',
     synced ? 'ok' : 'err'
   );
 }
@@ -6873,8 +6876,13 @@ function renderNewsArticles() {
   feed.innerHTML = filtered.slice(0, 80).map(a => {
     const cat = NEWS_CATEGORIES[a.category] || { label: a.categoryLabel || 'News', color: '#64748b' };
     const badgeLabel = a.institution || cat.label;
+    // Google retires RSS article ids after a week or two, and the id is all
+    // an unresolved link has -- those articles are marked linkExpired by the
+    // scan and carry no url. Without this guard the tile still looked
+    // clickable and safeOpenUrlOnclick('') would open a blank tab.
     const hrefUrl = esc(safeHref(a.url));
-    return `<div class="news-card" onclick="${safeOpenUrlOnclick(a.url)}">
+    const hasLink = !!hrefUrl;
+    return `<div class="news-card"${hasLink ? ` onclick="${safeOpenUrlOnclick(a.url)}"` : ' style="cursor:default"'}>
       <div class="news-card-top">
         <span class="news-source-badge" style="background:${cat.color}22;color:${cat.color}">${esc(badgeLabel)}</span>
         <span class="news-topic-tag">${esc(cat.label)}</span>
@@ -6885,7 +6893,9 @@ function renderNewsArticles() {
       ${a.description ? `<p>${esc(a.description)}</p>` : ''}
       ${a.elsevierRelevance ? `<p style="color:#38bdf8;font-size:12px;font-style:italic;margin-top:6px">Why it matters: ${esc(a.elsevierRelevance)}</p>` : ''}
       <div class="news-card-footer">
-        <a href="${hrefUrl}" target="_blank" onclick="event.stopPropagation()">Read full article </a>
+        ${hasLink
+          ? `<a href="${hrefUrl}" target="_blank" onclick="event.stopPropagation()">Read full article </a>`
+          : `<span style="color:var(--muted);font-size:11px;font-style:italic">Original link expired</span>`}
         ${a.sourceName ? `<span style="color:var(--muted);font-size:11px">· ${esc(a.sourceName)}</span>` : ''}
       </div>
     </div>`;
@@ -8451,6 +8461,7 @@ async function bootstrapApp() {
   }
   window.renderInstitutions = preserveFocus(window.renderInstitutions, 'inst-search-input');
   window.renderContacts = preserveFocus(window.renderContacts, 'contact-search-input');
+  window.renderSubscriptionMatrix = preserveFocus(window.renderSubscriptionMatrix, 'cmx-search-input');
 })();
 
 bootstrapApp();
