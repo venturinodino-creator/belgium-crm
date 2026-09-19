@@ -39,7 +39,7 @@ const MAX_SEARCHES = 10;
 
 const args = process.argv.slice(2);
 const flag = (name, dflt) => { const i = args.indexOf(name); return i !== -1 && args[i + 1] ? args[i + 1] : dflt; };
-const BATCH = Math.max(1, parseInt(flag('--batch', '6'), 10) || 6);
+const BATCH = Math.max(1, parseInt(flag('--batch', '10'), 10) || 10);
 const ONLY_INST = flag('--inst', '').split(',').map(s => s.trim()).filter(Boolean);
 const DRY_RUN = args.includes('--dry-run');
 
