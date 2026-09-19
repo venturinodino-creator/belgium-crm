@@ -1066,6 +1066,8 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
 .ws-more{font-size:10.5px;color:var(--muted,#8a93a3)}
 .ws-status-pick{font-size:10px;font-weight:600;border-radius:99px;padding:2px 8px;cursor:pointer;font-family:inherit;line-height:1.4}
 .ws-status-pick option{background:#0f172a;color:#e2e8f0}
+.rfp-status-pick{display:inline-block;border-radius:5px;padding:3px 8px;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;white-space:nowrap;cursor:pointer;font-family:inherit}
+.rfp-status-pick option{background:#0f172a;color:#e2e8f0;text-transform:none}
 .ws-act{margin-left:auto;opacity:.65}
 .ws-card:hover .ws-act,tr:hover .ws-act{opacity:1}
 .ws-chip.active[onclick*="removed"]{background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.45);color:#fca5a5}
@@ -7003,6 +7005,27 @@ const RFP_STATUSES = {
 // inside the Monitoring group but sorts below Lost. (crm_tenders currently
 // holds rows with status 'closed'.)
 const rfpStatusKey = s => RFP_STATUSES[s] ? s : 'identified';
+// The status badge on an RFP row is a picker for admins: choose Monitoring,
+// Active Deal, Submitted, Won, Lost or Closed and it is saved on the tender
+// (crm_tenders.status, so it holds on every device) and the summary cards at
+// the top of the page recount at once. Viewers see the plain badge.
+function rfpStatusPicker(r) {
+  const key = rfpStatusKey(r.status), st = RFP_STATUSES[key];
+  const badge = `<span style="display:inline-block;background:${st.bg};color:${st.color};border:1px solid ${st.color}33;border-radius:5px;padding:3px 10px;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;white-space:nowrap">${st.label}</span>`;
+  if (state.currentRole !== 'admin') return badge;
+  return `<select class="rfp-status-pick" style="background:${st.bg};color:${st.color};border:1px solid ${st.color}55" title="Set the status of this tender — saved on the record, on every device" onclick="event.stopPropagation()" onchange="event.stopPropagation();rfpSetStatus('${esc(r.id)}', this.value)">` +
+    Object.entries(RFP_STATUSES).map(([k, m]) => `<option value="${k}"${k === key ? ' selected' : ''}>${esc(m.label)}</option>`).join('') + '</select>';
+}
+async function rfpSetStatus(id, value) {
+  const list = getRFPs();
+  const r = list.find(x => x.id === id);
+  if (!r || !RFP_STATUSES[value]) return;
+  r.status = value;
+  saveRFPs(list);
+  renderRFPOpps(); // the summary cards recount from the same list
+  try { await supaUpsertRfp(r); syncBadge(true); toast(`${String(r.title || 'Tender').slice(0, 60)} — ${RFP_STATUSES[value].label}`, 'ok'); }
+  catch (e) { console.error(e); syncBadge(true, 'err'); toast('Status not saved to the shared database — it only survives in this browser until it is retried.', 'err'); }
+}
 
 // The table opens already sorted by Status, so a plain toggle would read the
 // first click on Status as "reverse" and bury the Active Deals at the bottom.
@@ -7194,7 +7217,7 @@ function renderRFPOpps() {
         ${r.deadline ? `<div style="font-size:11px;color:#475569;margin-top:4px">Deadline ${fmtDate(r.deadline)}${overdue?' <span style="color:#f87171">⚠ overdue</span>':''}</div>` : ''}
       </td>
       <td style="padding:16px 14px;vertical-align:top">
-        <span style="display:inline-block;background:${st.bg};color:${st.color};border:1px solid ${st.color}33;border-radius:5px;padding:3px 10px;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;white-space:nowrap">${st.label}</span>
+        ${rfpStatusPicker(r)}
       </td>
       <td style="padding:16px 14px;vertical-align:top;color:#475569;font-size:12px;font-weight:600">${r.value?'€'+Number(r.value).toLocaleString():'—'}</td>
       <td style="padding:16px 14px;vertical-align:top;max-width:260px">
