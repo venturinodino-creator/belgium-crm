@@ -1064,6 +1064,9 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
 .wp-warn{font-size:9px;color:#fbbf24;border:1px solid rgba(251,191,36,.4);border-radius:4px;padding:0 4px;margin-left:4px;white-space:nowrap}
 
 .ws-more{font-size:10.5px;color:var(--muted,#8a93a3)}
+.ws-act{margin-left:auto;opacity:.65}
+.ws-card:hover .ws-act,tr:hover .ws-act{opacity:1}
+.ws-chip.active[onclick*="removed"]{background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.45);color:#fca5a5}
 
 /* ── Analytics ─────────────────────────────────────────────
    One filter row scopes every chart below it. Marks are thin, gridlines are
@@ -4650,6 +4653,40 @@ function wsSortVal(i, field) {
 }
 
 function wsInfo(id) { return (state.whitespace || {})[id] || {}; }
+// Institutions a rep has taken off the list by hand ("not a prospect", "data
+// is wrong", "already in a deal"). Kept per product because dropping a Pure
+// target says nothing about Scopus. Stored in localStorage like the dismissed
+// news feed; the "Removed" chip in the toolbar shows them so they can be restored.
+const WS_REMOVED_KEY = 'be_crm_ws_removed';
+function wsRemovedIds() {
+  try { const all = JSON.parse(localStorage.getItem(WS_REMOVED_KEY) || '{}'); return all[state.wsProduct] || []; }
+  catch (e) { return []; }
+}
+function wsIsRemoved(id) { return wsRemovedIds().includes(id); }
+function wsSaveRemoved(ids) {
+  let all = {};
+  try { all = JSON.parse(localStorage.getItem(WS_REMOVED_KEY) || '{}'); } catch (e) {}
+  all[state.wsProduct] = ids;
+  localStorage.setItem(WS_REMOVED_KEY, JSON.stringify(all));
+}
+function wsRemove(id) {
+  const prod = WS_PRODUCTS[state.wsProduct] || WS_PRODUCTS.pure;
+  const inst = state.institutions.find(i => i.id === id);
+  if (!confirm('Remove ' + (inst ? inst.name : 'this institution') + ' from the ' + prod.label + ' white space? You can restore it from the "Removed" chip.')) return;
+  const ids = wsRemovedIds();
+  if (!ids.includes(id)) { ids.push(id); wsSaveRemoved(ids); }
+  updateWhiteSpaceBadge();
+  renderWhiteSpace();
+  toast('Removed from ' + prod.label + ' white space', 'ok');
+}
+function wsRestore(id) {
+  wsSaveRemoved(wsRemovedIds().filter(x => x !== id));
+  const left = wsRemovedIds().length;
+  if (!left && state.wsFilter === 'removed') state.wsFilter = 'all';
+  updateWhiteSpaceBadge();
+  renderWhiteSpace();
+  toast('Restored to white space', 'ok');
+}
 // The researched `incumbent` is the competing CRIS an institution runs, which
 // only displaces Pure — Esploro is not an alternative to Scopus or SciVal, so
 // it must not colour those two views. No incumbent data is held for the
@@ -4732,6 +4769,12 @@ const WS_PRODUCTS = {
             sub: 'Institutions with no evidence of SciVal — the strongest are those already paying for Scopus',
             caveat: 'SciVal has no public register, so "Unverified" means no evidence either way. The best prospects are institutions that hold Scopus but show no SciVal — worth checking against Elsevier records.' },
 };
+// Remove / Restore control shared by the grid card footer and the table row.
+function wsRowAction(id) {
+  return wsIsRemoved(id)
+    ? '<button class="btn btn-outline btn-sm ws-act" onclick="event.stopPropagation();wsRestore(\'' + id + '\')" title="Put this institution back on the target list">Restore</button>'
+    : '<button class="btn btn-ghost btn-sm ws-act" onclick="event.stopPropagation();wsRemove(\'' + id + '\')" title="Take this institution off the target list">Remove</button>';
+}
 function wsSetProduct(p) { state.wsProduct = p; state.wsFilter = 'all'; renderWhiteSpace(); }
 function renderWhiteSpace() {
   const prod = WS_PRODUCTS[state.wsProduct] || WS_PRODUCTS.pure;
@@ -4754,7 +4797,11 @@ function renderWhiteSpace() {
     if (WS_EXCLUDE_IDS.has(i.id)) return false;
     const pureStatus = getProductStatus(i.id, state.wsProduct);
     if (!(pureStatus in WS_STATUS)) return false; // yes/likely/expiring already have or probably have Pure
-    if (state.wsFilter !== 'all' && wsBucket(i.id) !== state.wsFilter) return false;
+    if (state.wsFilter === 'removed') { if (!wsIsRemoved(i.id)) return false; }
+    else {
+      if (wsIsRemoved(i.id)) return false;
+      if (state.wsFilter !== 'all' && wsBucket(i.id) !== state.wsFilter) return false;
+    }
     if (state.wsSearch) {
       const hay = (i.name + ' ' + (i.short || '') + ' ' + i.city + ' ' + (wsInfo(i.id).why || '') + ' ' +
         wsContacts(i.id).map(c => c.name + ' ' + c.title).join(' ')).toLowerCase();
@@ -4764,9 +4811,10 @@ function renderWhiteSpace() {
   });
   insts = sortInstList(insts, state.wsSort, wsSortVal);
 
-  const all = state.institutions.filter(i =>
+  const eligible = state.institutions.filter(i =>
     WS_ELIGIBLE_TYPES.includes(i.type) && !WS_EXCLUDE_IDS.has(i.id) && getProductStatus(i.id, state.wsProduct) in WS_STATUS);
-  const counts = { all: all.length, greenfield: 0, rival: 0, unknown: 0 };
+  const all = eligible.filter(i => !wsIsRemoved(i.id));
+  const counts = { all: all.length, greenfield: 0, rival: 0, unknown: 0, removed: eligible.length - all.length };
   all.forEach(i => counts[wsBucket(i.id)]++);
   const chip = (key, label) =>
     '<button class="ws-chip' + (state.wsFilter === key ? ' active' : '') + '" onclick="state.wsFilter=\'' + key + '\';renderWhiteSpace()">' +
@@ -4779,7 +4827,8 @@ function renderWhiteSpace() {
           'oninput="state.wsSearch=this.value;renderWhiteSpace()">' +
       '</div>' +
       '<div class="ws-chips">' + chip('all', 'All') + chip('greenfield', 'Greenfield') +
-        chip('rival', 'Displacement') + chip('unknown', 'Unverified') + '</div>' +
+        chip('rival', 'Displacement') + chip('unknown', 'Unverified') +
+        (counts.removed ? chip('removed', 'Removed') : '') + '</div>' +
       '<span style="font-size:12px;color:var(--muted);margin-left:auto">' + insts.length +
         ' target' + (insts.length !== 1 ? 's' : '') + '</span>' +
     '</div>' +
@@ -4821,7 +4870,8 @@ function renderWhiteSpace() {
               '</div>').join('') +
             (cx.length > 3 ? '<div class="ws-more">+' + (cx.length - 3) + ' more</div>' : '') + '</div>'
             : '<div class="ws-people ws-none">No contact yet — the nightly discovery scans fill these in</div>') +
-          '<div class="ic-footer"><span>' + (wsDossierContacts(i.id).length ? cx.length + ' researched · ' + crm + ' in CRM' : crm + ' in CRM') + '</span></div>' +
+          '<div class="ic-footer"><span>' + (wsDossierContacts(i.id).length ? cx.length + ' researched · ' + crm + ' in CRM' : crm + ' in CRM') + '</span>' +
+            wsRowAction(i.id) + '</div>' +
         '</div>';
       }).join('') + '</div>';
 
@@ -4849,7 +4899,8 @@ function renderWhiteSpace() {
           '<td>' + esc(i.city) + '</td>' +
           '<td>' + cx.length + '</td>' +
           '<td onclick="event.stopPropagation()" style="white-space:nowrap">' +
-            (i.website ? '<a class="ext-link" href="' + esc(safeHref(i.website)) + '" target="_blank">Website</a>' : '') + '</td>' +
+            (i.website ? '<a class="ext-link" href="' + esc(safeHref(i.website)) + '" target="_blank">Website</a> ' : '') +
+            wsRowAction(i.id) + '</td>' +
         '</tr>';
       }).join('') + '</tbody></table></div>';
 
@@ -4888,7 +4939,8 @@ function exportWhiteSpaceContacts() {
   const insts = state.institutions.filter(i =>
     WS_ELIGIBLE_TYPES.includes(i.type) && !WS_EXCLUDE_IDS.has(i.id) &&
     getProductStatus(i.id, state.wsProduct) in WS_STATUS &&
-    (state.wsFilter === 'all' || wsBucket(i.id) === state.wsFilter));
+    (state.wsFilter === 'removed' ? wsIsRemoved(i.id) :
+      !wsIsRemoved(i.id) && (state.wsFilter === 'all' || wsBucket(i.id) === state.wsFilter)));
   const prod = WS_PRODUCTS[state.wsProduct] || WS_PRODUCTS.pure;
   const out = [['Name', 'Role', 'Institution', 'Type', 'City', 'Email', 'Email status', 'Phone', prod.label + ' status', 'Incumbent', 'Indexed works', 'Source']];
   // An institution nobody has a name for still gets a row: on an outreach
@@ -4924,7 +4976,10 @@ function updateWhiteSpaceBadge() {
   // badge sits in the nav and is read from every screen, so it has to mean one
   // stable thing. It also only recomputes on a full render(), so following the
   // in-view product toggle would leave it showing a stale count.
-  const count = state.institutions.filter(i => WS_ELIGIBLE_TYPES.includes(i.type) && !WS_EXCLUDE_IDS.has(i.id) && getProductStatus(i.id, 'pure') in WS_STATUS).length;
+  let removedPure = [];
+  try { removedPure = (JSON.parse(localStorage.getItem(WS_REMOVED_KEY) || '{}').pure) || []; } catch (e) {}
+  const count = state.institutions.filter(i => WS_ELIGIBLE_TYPES.includes(i.type) && !WS_EXCLUDE_IDS.has(i.id) &&
+    !removedPure.includes(i.id) && getProductStatus(i.id, 'pure') in WS_STATUS).length;
   badge.textContent = count;
   badge.title = count + ' institutions with no Pure tenancy';
   badge.style.display = count > 0 ? 'inline-block' : 'none';
