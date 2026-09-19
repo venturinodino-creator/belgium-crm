@@ -17,7 +17,7 @@ on:
     inputs:
       batch:
         description: 'Institutions to search this run'
-        default: '6'
+        default: '10'
         required: false
       dry_run:
         description: 'Search and log only, insert nothing (true/false)'
@@ -51,7 +51,7 @@ jobs:
           EXTRA=""
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then EXTRA="--dry-run"; fi
           if [ -n "${{ github.event.inputs.inst }}" ]; then EXTRA="$EXTRA --inst ${{ github.event.inputs.inst }}"; fi
-          node scripts/discover-roles.js --batch "${{ github.event.inputs.batch || '6' }}" $EXTRA
+          node scripts/discover-roles.js --batch "${{ github.event.inputs.batch || '10' }}" $EXTRA
       - name: Commit state
         run: |
           git config user.email "actions@github.com"
