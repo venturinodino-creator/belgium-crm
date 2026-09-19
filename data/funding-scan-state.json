@@ -1,0 +1,132 @@
+{
+  "orgIds": {
+    "05f950310": {
+      "id": "openorgs____::ccc0a066b56d2cfaf90c2ae369df16f5",
+      "name": "KU Leuven",
+      "via": "ror"
+    },
+    "00cv9y106": {
+      "id": "openorgs____::5f31346d444a7f06a28c880fb170b0f6",
+      "name": "Ghent University",
+      "via": "ror"
+    },
+    "008x57b05": {
+      "id": "openorgs____::e7be6597b7e02ac19f6db81fef321e3d",
+      "name": "University of Antwerp",
+      "via": "ror"
+    },
+    "006e5kg04": {
+      "id": "openorgs____::6363a88f20cca34629ae690d539f9b67",
+      "name": "Vrije Universiteit Brussel",
+      "via": "ror"
+    },
+    "04nbhqj75": {
+      "id": "openorgs____::89d1e5147df8b579a8fb7a2ced11f722",
+      "name": "Hasselt University",
+      "via": "ror"
+    },
+    "02495e989": {
+      "id": "openorgs____::73e124d9d4f37ce3a694e2b09faf0f28",
+      "name": "Université Catholique de Louvain",
+      "via": "ror"
+    },
+    "00afp2z80": {
+      "id": "openorgs____::ce672cf6d82805707d55c79097b70bda",
+      "name": "University of Liège",
+      "via": "ror"
+    },
+    "01r9htc13": {
+      "id": "openorgs____::6f26a1be56976cb781e94429eb02530e",
+      "name": "Université Libre de Bruxelles",
+      "via": "ror"
+    },
+    "03d1maw17": {
+      "id": "openorgs____::679dfd74893a4fb26000d18be1bc5fd3",
+      "name": "University of Namur",
+      "via": "ror"
+    },
+    "02qnnz951": {
+      "id": "openorgs____::5efc358bd32549ffb10c2f31c0d7efa2",
+      "name": "University of Mons",
+      "via": "ror"
+    },
+    "00xmkp704": {
+      "id": "openorgs____::0278a5de3889f93bdcb71a8a5401dcb2",
+      "name": "Ghent University Hospital",
+      "via": "ror"
+    },
+    "01hwamj44": {
+      "id": "openorgs____::297dce176fe5addc5178505da62c74f4",
+      "name": "Antwerp University Hospital",
+      "via": "ror"
+    },
+    "044s61914": {
+      "id": "openorgs____::a8f7b138a3a5ece70c76d34b68ebc28d",
+      "name": "Centre Hospitalier Universitaire de Liège",
+      "via": "ror"
+    },
+    "03s4khd80": {
+      "id": "openorgs____::a3062fb3000e5b5e01f8263dd4c5f17f",
+      "name": "Cliniques Universitaires Saint-Luc",
+      "via": "ror"
+    },
+    "05e8s8534": {
+      "id": "openorgs____::c619c0d2166568ccafe578db447e3f5c",
+      "name": "Institut Jules Bordet",
+      "via": "ror"
+    },
+    "00ntbvq76": {
+      "id": "openorgs____::4819e5302035c11df8b628581d11a4ec",
+      "name": "CHU Dinant Godinne UCL Namur",
+      "via": "ror"
+    },
+    "02kcbn207": {
+      "id": "openorgs____::c29cd3c66218bbe0db46425cbae8b4a6",
+      "name": "Imec",
+      "via": "ror"
+    },
+    "02ndjfz59": {
+      "id": "openorgs____::a3a3ba9f084e105174d98e7e68a232a1",
+      "name": "Flanders Make (Belgium)",
+      "via": "ror"
+    },
+    "04ejags36": {
+      "id": "openorgs____::9275a862b37b47c96b355f72992f2c29",
+      "name": "Sciensano (Belgium)",
+      "via": "ror"
+    },
+    "02y22ws83": {
+      "id": "openorgs____::e945f0c35e14acbebbc2a69fc8e79362",
+      "name": "Royal Belgian Institute of Natural Sciences",
+      "via": "ror"
+    },
+    "058qm9p63": {
+      "id": "openorgs____::b03ff70daa7bdb2c6c54f542db688faf",
+      "name": "Royal Meteorological Institute of Belgium",
+      "via": "ror"
+    },
+    "00hjks330": {
+      "id": "openorgs____::31a1744f20a1646bfff28f2bfe0551aa",
+      "name": "Royal Observatory of Belgium",
+      "via": "ror"
+    },
+    "03vfw8w96": {
+      "id": "openorgs____::988c23cd1458b24be06dbf6e289e9459",
+      "name": "Royal Belgian Institute for Space Aeronomy",
+      "via": "ror"
+    },
+    "03qtxy027": {
+      "id": "openorgs____::65ead68aa42b6f2920a731b77f0858b3",
+      "name": "Research Foundation - Flanders",
+      "via": "ror"
+    },
+    "05fsa3j22": {
+      "id": "openorgs____::7f78a4cc91a00d0c9a855b55ffbdafc4",
+      "name": "Vlaamse Liga tegen Kanker",
+      "via": "ror"
+    }
+  },
+  "lastRun": "2026-09-19T20:44:08.580Z",
+  "lastScanned": 25,
+  "lastFailed": 0
+}

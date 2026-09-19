@@ -1,0 +1,44 @@
+name: Weekly Funding Scan
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: funding-scan-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run funding scan (OpenAIRE projects per institution)
+        run: node scripts/funding-scan.js
+      - name: Commit updated funding data
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add data/funding.json data/funding-scan-state.json
+          if git diff --staged --quiet; then
+            echo "Nothing to commit"
+            exit 0
+          fi
+          git commit -m "funding: auto-scan $(date +%Y-%m-%d)"
+          for attempt in 1 2 3; do
+            if git pull --rebase origin main && git push; then
+              echo "Pushed successfully"
+              exit 0
+            fi
+            echo "Push attempt $attempt failed (likely a concurrent run) — retrying"
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 5))
+          done
+          echo "::warning::Could not push funding-scan results after 3 attempts; the next weekly run will pick them up."
