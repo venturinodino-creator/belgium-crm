@@ -14,7 +14,7 @@
     "itinera"
   ],
   "lastWebSearches": 0,
-  "cursor": 31,
+  "cursor": 21,
   "institutions": 49,
   "perInstitution": [
     {
@@ -57,5 +57,6 @@
       "instId": "itinera",
       "error": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfDA7DHooVS7j3cFKUDCv\"}"
     }
-  ]
+  ],
+  "error": "Anthropic API credit balance too low on 2026-09-19; institutions 21-30 were not searched and the cursor was rewound"
 }

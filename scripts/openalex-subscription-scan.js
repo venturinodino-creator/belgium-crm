@@ -265,7 +265,9 @@ async function main() {
     }
   }
 
+  let apiError = null; // an account-level API error: stop, do not burn the rotation
   for (const inst of batch) {
+    if (apiError) break;
     try {
       const { items, searches } = await checkPrompt(inst.name, institutionPrompt(inst));
       searchesTotal += searches; candidates += items.length;
@@ -280,10 +282,18 @@ async function main() {
     } catch (e) {
       errors[inst.id] = e.message;
       console.warn(`[openalex-subscription-scan] ${inst.name} failed: ${e.message}`);
+      if (/credit balance|billing|insufficient/i.test(e.message)) {
+        apiError = e.message.slice(0, 200);
+        console.error(`[openalex-subscription-scan] Anthropic API refused the call for the account, not the institution — stopping this run. ${apiError}`);
+        if (process.env.GITHUB_ACTIONS) console.log('::error::Anthropic API credit balance is too low; top up at console.anthropic.com. No institution was searched this run.');
+      }
     }
   }
 
-  if (!ONLY_INST.length) cursor = (cursor + batch.length) % order.length;
+  // Only move on when something was actually searched: a run where every
+  // call failed leaves the cursor where it was, so the batch is retried.
+  const searchedOk = batch.filter(i => !errors[i.id]).length;
+  if (!ONLY_INST.length && searchedOk > 0) cursor = (cursor + batch.length) % order.length;
 
   if (DRY_RUN) {
     console.log(`[openalex-subscription-scan] Dry run — would add ${added}, update ${updated} (${candidates} finding(s), ${searchesTotal} searches). Nothing written.`);
@@ -302,6 +312,7 @@ async function main() {
     nationalLastRun,
     checked,
     errors,
+    error: apiError || undefined,
   });
   const withSignal = Object.values(checked).filter(c => c.result !== 'none').length;
   console.log(`[openalex-subscription-scan] Done — ${added} new, ${updated} updated from ${candidates} finding(s) across ${batch.length} institution(s)${nationalDue ? ' + national' : ''}; ${Object.keys(checked).length}/${order.length} institutions checked so far, ${withSignal} with a signal.`);

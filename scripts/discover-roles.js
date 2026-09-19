@@ -214,7 +214,9 @@ async function main() {
   const candidates = [];
   const perInst = [];
   let totalSearches = 0;
+  let apiError = null; // an account-level API error: stop, do not burn the rotation
   for (const inst of batch) {
+    if (apiError) break;
     const domain = domainHints[inst.id] || domainFromWebsite(inst.website || '');
     let result;
     try {
@@ -222,6 +224,11 @@ async function main() {
     } catch (e) {
       console.warn(`  ⚠ ${inst.name}: ${e.message}`);
       perInst.push({ instId: inst.id, error: e.message });
+      if (/credit balance|billing|insufficient/i.test(e.message)) {
+        apiError = e.message.slice(0, 200);
+        console.error(`[discover-roles] Anthropic API refused the call for the account, not the institution — stopping this run. ${apiError}`);
+        if (process.env.GITHUB_ACTIONS) console.log('::error::Anthropic API credit balance is too low; top up at console.anthropic.com. No institution was searched this run.');
+      }
       continue;
     }
     totalSearches += result.searches;
@@ -248,7 +255,10 @@ async function main() {
     perInst.push({ instId: inst.id, named: result.people.length, kept, searches: result.searches });
     await sleep(2000);
   }
-  if (!ONLY_INST.length) cursor = (cursor + batch.length) % order.length;
+  // Only move on when something was actually searched: a run where every
+  // call failed leaves the cursor where it was, so the batch is retried.
+  const searchedOk = perInst.filter(pi => !pi.error).length;
+  if (!ONLY_INST.length && searchedOk > 0) cursor = (cursor + batch.length) % order.length;
 
   console.log(`\nFound ${candidates.length} new candidate(s):`);
   for (const c of candidates) console.log(`  ${(c.first + ' ' + c.last).padEnd(28)} ${c.department.padEnd(40)} ${c.title.slice(0, 40).padEnd(42)} ${c.email}${c.constructed ? '  (email constructed)' : ''}`);
@@ -270,6 +280,7 @@ async function main() {
     saveJSON(STATE_FILE, {
       lastRun: new Date().toISOString(),
       lastAddedCount: added,
+      error: apiError || undefined,
       lastBatch: batch.map(i => i.id),
       lastWebSearches: totalSearches,
       cursor, institutions: order.length,
