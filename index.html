@@ -1876,7 +1876,8 @@ function dbToInst(r) {
     libraryDirector: r.library_director||'', warmth: r.warmth||'',
     contractValue: r.contract_value||'', renewalDate: r.renewal_date||'',
     products: r.products||'', nextAction: r.next_action||'',
-    nextActionDate: r.next_action_date||'', lat: r.lat, lng: r.lng
+    nextActionDate: r.next_action_date||'', lat: r.lat, lng: r.lng,
+    wsPinned: !!r.ws_pinned
   };
 }
 
@@ -1902,7 +1903,8 @@ function instToDB(inst) {
     renewal_date: inst.renewalDate||null, products: inst.products||null,
     next_action: inst.nextAction||null,
     next_action_date: inst.nextActionDate||null,
-    lat: inst.lat||null, lng: inst.lng||null
+    lat: inst.lat||null, lng: inst.lng||null,
+    ws_pinned: !!inst.wsPinned
   };
 }
 
@@ -2079,6 +2081,10 @@ async function load() {
     state.institutions = SEED_INSTITUTIONS
       .map(seed => dbInstById[seed.id] ? { ...seed, ...dbInstById[seed.id] } : { ...seed })
       .filter(x => x.type !== 'university' || APPROVED_UNIVERSITIES.has(x.id));
+    // Pins used to live only in this browser; they now live on the institution
+    // row so the folder follows the user across devices. Push any local pins
+    // up once (not awaited: the page must not wait on it).
+    wsMigrateLegacyPins();
     // Merge seed emails into contacts loaded from Supabase
     const seedEmailMap = Object.fromEntries(SEED_CONTACTS.map(c => [c.id, c.email]));
     state.contacts = contRows.map(dbToContact).map(c => ({
@@ -4731,20 +4737,50 @@ function wsSaveRemoved(ids) {
 // so icons, map colours and analytics keep working. Stored in localStorage
 // like the Removed list; a pinned account is never also in the Removed list.
 const WS_PINNED_KEY = 'be_crm_ws_pinned';
-function wsPinnedIds() {
+// The pin lives on the institution row (crm_institutions.ws_pinned) so the
+// folder is the same on every device. WS_PINNED_KEY is only the pre-2026-09-19
+// local copy: read as a fallback until wsMigrateLegacyPins() has pushed it up.
+function wsLegacyPinnedIds() {
   try { const v = JSON.parse(localStorage.getItem(WS_PINNED_KEY) || '[]'); return Array.isArray(v) ? v : []; }
   catch (e) { return []; }
 }
+function wsPinnedIds() {
+  const ids = state.institutions.filter(i => i.wsPinned).map(i => i.id);
+  for (const id of wsLegacyPinnedIds()) if (!ids.includes(id) && state.institutions.some(i => i.id === id)) ids.push(id);
+  return ids;
+}
 function wsIsPinned(id) { return wsPinnedIds().includes(id); }
+// One-time: pins this browser held locally go onto the rows. Runs after the
+// institutions are loaded; if a write fails (a viewer cannot write), the local
+// copy is kept and tried again next load.
+async function wsMigrateLegacyPins() {
+  const legacy = wsLegacyPinnedIds();
+  if (!legacy.length) return;
+  let ok = true;
+  for (const id of legacy) {
+    const inst = state.institutions.find(i => i.id === id);
+    if (!inst) continue;
+    if (inst.wsPinned) continue;
+    inst.wsPinned = true;
+    try { await supaUpsertInst(inst); } catch (e) { ok = false; console.warn('White Space pin not saved to Supabase:', e.message); }
+  }
+  if (ok) localStorage.removeItem(WS_PINNED_KEY);
+}
 function wsPinnedBadge(id) {
   if (!wsIsPinned(id)) return '';
   const c = WS_PINNED_STATUS.color;
   return '<span class="badge" style="font-size:10px;background:' + c + '22;color:' + c + ';border:1px solid ' + c + '55" title="Pinned to the White Space folder via the Type dropdown">White Space</span>';
 }
 function wsSetPinned(id, on) {
-  const ids = wsPinnedIds().filter(x => x !== id);
-  if (on) ids.push(id);
-  localStorage.setItem(WS_PINNED_KEY, JSON.stringify(ids));
+  const inst = state.institutions.find(i => i.id === id);
+  if (inst && !!inst.wsPinned !== on) {
+    inst.wsPinned = on;
+    save();
+    supaUpsertInst(inst).then(() => syncBadge(true)).catch(e => { console.error(e); syncBadge(true, 'err'); toast('White Space folder change not saved to the shared database — it only survives in this browser until it is retried.', 'err'); });
+  }
+  // Keep the legacy local list in step so a not-yet-migrated browser agrees.
+  const legacy = wsLegacyPinnedIds();
+  if (legacy.length) localStorage.setItem(WS_PINNED_KEY, JSON.stringify(legacy.filter(x => x !== id)));
   if (!on) return;
   // Pinning is the rep saying "this is a target" — clear any earlier removal
   // for every product so the pin actually shows up.
