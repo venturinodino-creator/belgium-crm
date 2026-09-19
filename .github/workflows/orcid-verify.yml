@@ -1,0 +1,62 @@
+name: Daily ORCID Verification
+
+# Checks each contact waiting in the New Contacts queue against the ORCID
+# public registry (name plus employer). An unambiguous match is recorded on
+# the pending row and, where the ORCID record publishes an email at the
+# institution, replaces a constructed address. Each row is checked once.
+
+on:
+  schedule:
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Pending contacts to check this run'
+        default: '150'
+        required: false
+      dry_run:
+        description: 'Look up and log only, write nothing (true/false)'
+        default: 'false'
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: orcid-verify-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Verify pending contacts against ORCID
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          EXTRA=""
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then EXTRA="--dry-run"; fi
+          node scripts/orcid-verify.js --limit "${{ github.event.inputs.limit || '150' }}" $EXTRA
+      - name: Commit state
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          [ -f data/orcid-scan-state.json ] || { echo "No state file (dry run)"; exit 0; }
+          git add data/orcid-scan-state.json
+          if git diff --staged --quiet; then
+            echo "Nothing to commit"
+            exit 0
+          fi
+          git commit -m "orcid-verify: auto-run $(date +%Y-%m-%d)"
+          for attempt in 1 2 3; do
+            if git pull --rebase origin main && git push; then
+              exit 0
+            fi
+            git rebase --abort 2>/dev/null || true
+            sleep $((attempt * 5))
+          done
+          echo "::warning::Could not push orcid-verify state after 3 attempts; the rows themselves are already saved in Supabase."
