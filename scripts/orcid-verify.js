@@ -54,22 +54,43 @@ async function supaPatch(table, id, patch) {
 }
 
 const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
-const STOP = new Set(['university', 'universiteit', 'universitet', 'universite', 'universitaire', 'of', 'the', 'de', 'van', 'voor', 'for', 'and', 'en', 'og', 'et', 'des', 'der', 'die', 'institute', 'instituut', 'institut', 'center', 'centre', 'centrum', 'research', 'onderzoek', 'medical', 'medisch', 'hospital', 'ziekenhuis', 'college', 'applied', 'sciences', 'school', 'royal', 'koninklijk', 'koninklijke', 'national', 'nationaal', 'netherlands', 'nederland', 'nederlands', 'nederlandse', 'danish', 'denmark', 'danmark', 'belgium', 'belgian', 'belgique', 'belgie', 'flanders', 'vlaams', 'vlaamse', 'technology', 'technische', 'technical', 'library', 'bibliotheek', 'foundation', 'stichting', 'academy', 'academie']);
+// Words that say nothing about which institution an employer entry names.
+const STOP = new Set(['university', 'universiteit', 'universitet', 'universite', 'universitaire', 'universitair', 'of', 'the', 'de', 'van', 'voor', 'for', 'and', 'en', 'og', 'et', 'des', 'der', 'die', 'institute', 'instituut', 'institut', 'center', 'centre', 'centrum', 'research', 'onderzoek', 'medical', 'medisch', 'hospital', 'ziekenhuis', 'hospitalet', 'college', 'applied', 'sciences', 'science', 'school', 'royal', 'koninklijk', 'koninklijke', 'national', 'nationaal', 'netherlands', 'nederland', 'nederlands', 'nederlandse', 'danish', 'denmark', 'danmark', 'belgium', 'belgian', 'belgique', 'belgie', 'flanders', 'vlaams', 'vlaamse', 'technology', 'technische', 'technical', 'tekniske', 'library', 'bibliotheek', 'foundation', 'stichting', 'fonden', 'academy', 'academie', 'region', 'regionh', 'campus', 'location', 'department', 'faculty', 'business', 'health', 'group', 'unit', 'lab', 'laboratory', 'section', 'division']);
+// Words that mark an institution as something other than the plain city
+// university: "Vrije Universiteit Amsterdam" is not "University of Amsterdam".
+const NOT_PLAIN = ['vrije', 'technische', 'technical', 'tekniske', 'umc', 'medical', 'medisch', 'hospital', 'hospitalet', 'ziekenhuis', 'business', 'applied', 'hogeschool', 'professionshojskole', 'college', 'polytechnic', 'it universit', 'katholieke', 'catholique', 'libre'];
+const PLAIN_UNI = /^(university of|universiteit van|universiteit|universite de|universite|universitet i|)\s*([a-z]+)( university| universitet| universiteit)?$/;
 
-// The distinctive words of an institution's names: "delft", "twente",
-// "radboud", "aarhus". An ORCID employer entry that shares one of them, or
-// contains the whole name or short name, counts as this institution.
-function instKeys(inst) {
-  const words = new Set();
-  [inst.name, inst.short].forEach(n => norm(n).split(' ').forEach(w => { if (w.length >= 4 && !STOP.has(w)) words.add(w); }));
-  return { words, short: norm(inst.short), name: norm(inst.name) };
+// What identifies an institution in an ORCID employer entry: the whole
+// name or short name; a distinctive word ("delft", "radboud", "wageningen",
+// "imec"); or, for the plain city university, the city word next to a
+// "univers-" word with none of the qualifiers that mark a different one.
+// City words on their own are not enough (Copenhagen has six institutions),
+// and an entry naming another city in the region is never a match.
+function instKeys(inst, cities) {
+  cities = cities || new Set();
+  const words = new Set(), cityWords = new Set();
+  const n = norm(inst.name), s = norm(inst.short);
+  [n, s].forEach(x => x.split(' ').forEach(w => {
+    if (w.length < 3 || STOP.has(w)) return;
+    if (cities.has(w)) cityWords.add(w); else words.add(w);
+  }));
+  norm(inst.city).split(' ').forEach(w => { if (w.length >= 4 && cities.has(w)) cityWords.add(w); });
+  const plain = PLAIN_UNI.test(n) && !NOT_PLAIN.some(q => n.includes(q));
+  return { words, cityWords, cities, short: s, name: n, plainUniversity: plain };
 }
 function employerMatches(entry, keys) {
   const e = norm(entry);
   if (!e) return false;
-  if (keys.name && e.includes(keys.name)) return true;
-  if (keys.short && keys.short.length >= 3 && e.split(' ').includes(keys.short)) return true;
-  return e.split(' ').some(w => keys.words.has(w));
+  const toks = e.split(' ');
+  if (keys.name && keys.name.length >= 6 && e.includes(keys.name)) return true;
+  if (keys.short && keys.short.length >= 3 && toks.includes(keys.short)) return true;
+  const ours = toks.some(w => keys.cityWords.has(w));
+  const other = toks.some(w => keys.cities.has(w) && !keys.cityWords.has(w));
+  if (other && !ours) return false;
+  if (toks.some(w => keys.words.has(w))) return true;
+  if (ours && keys.plainUniversity && /\buniver/.test(e) && !NOT_PLAIN.some(q => e.includes(q))) return true;
+  return false;
 }
 
 function orcidQuery(first, last) {
@@ -90,22 +111,35 @@ async function lookup(first, last) {
   throw new Error('ORCID unavailable after retries');
 }
 
+// The institution's own email domain, from its website ("www.tue.nl" ->
+// "tue.nl"), so only an address there can fill a blank.
+function instDomain(inst) {
+  const m = String(inst.website || '').toLowerCase().match(/^(?:https?:\/\/)?(?:www\.)?([a-z0-9.-]+\.[a-z]{2,})/);
+  return m ? m[1] : '';
+}
+
 // One person: returns { orcid, employer, email, elsewhere, ambiguous }.
-async function verify(first, last, inst, currentEmail) {
-  const keys = instKeys(inst);
+// `email` is a published address at the institution's own domain (or the
+// domain of the address the CRM already holds), never one from another
+// employer on the same record.
+async function verify(first, last, inst, currentEmail, cities) {
+  const keys = instKeys(inst, cities);
   const results = await lookup(first, last);
   const here = results.filter(r => (r['institution-name'] || []).some(n => employerMatches(n, keys)));
   if (here.length !== 1) return { orcid: null, elsewhere: results.length, ambiguous: here.length > 1 };
   const r = here[0];
-  const domain = (currentEmail || '').split('@')[1] || '';
-  const pub = (r.email || []).find(e => domain ? e.toLowerCase().endsWith('@' + domain.toLowerCase()) : /@/.test(e)) || null;
+  const domains = [((currentEmail || '').split('@')[1] || '').toLowerCase(), instDomain(inst)].filter(Boolean);
+  const pub = (r.email || []).find(e => domains.some(d => e.toLowerCase().endsWith('@' + d) || e.toLowerCase().endsWith('.' + d))) || null;
   return { orcid: r['orcid-id'], employer: (r['institution-name'] || []).find(n => employerMatches(n, keys)), email: pub, elsewhere: results.length - 1, ambiguous: false };
 }
 
 async function main() {
   if (!SUPA_SERVICE_KEY) { console.error('SUPABASE_SERVICE_ROLE_KEY missing'); process.exit(1); }
-  const insts = await supaAll(`crm_institutions?select=id,name,short&region=eq.${REGION}`);
+  const insts = await supaAll(`crm_institutions?select=id,name,short,city,website&region=eq.${REGION}`);
   const instById = Object.fromEntries(insts.map(i => [i.id, i]));
+  // Every city word in the region, so a city alone never identifies an institution.
+  const cities = new Set();
+  insts.forEach(i => norm(i.city).split(' ').forEach(w => { if (w.length >= 4 && !STOP.has(w)) cities.add(w); }));
   const pending = (await supaAll(`pending_contacts?select=id,first,last,email,notes,institution_id,institution_name&region=eq.${REGION}&status=eq.pending&orcid_checked_at=is.null&order=created_at.desc`))
     .map(r => ({ table: 'pending_contacts', id: r.id, first: r.first, last: r.last, email: r.email, notes: r.notes, instId: r.institution_id, instName: r.institution_name }));
   const crm = (await supaAll(`crm_contacts?select=id,first,last,email,notes,inst_id&region=eq.${REGION}&orcid_checked_at=is.null&order=last.asc`))
@@ -121,7 +155,7 @@ async function main() {
     const patch = { orcid_checked_at: new Date().toISOString() };
     let line;
     try {
-      const v = await verify(c.first, c.last, inst, c.email);
+      const v = await verify(c.first, c.last, inst, c.email, cities);
       if (v.orcid) {
         patch.orcid = v.orcid;
         verified++;
