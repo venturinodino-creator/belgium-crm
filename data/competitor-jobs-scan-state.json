@@ -1,14 +1,14 @@
 {
-  "lastRun": "2026-09-18T19:14:23.042Z",
-  "totalOpenRoles": 28,
+  "lastRun": "2026-09-19T11:49:56.736Z",
+  "totalOpenRoles": 29,
   "openByRegion": {
-    "domestic": 1,
+    "domestic": 2,
     "remote": 27,
     "europe": 35,
-    "global": 166
+    "global": 167
   },
-  "totalListed": 28,
-  "newCount": 26,
+  "totalListed": 29,
+  "newCount": 1,
   "reopenedCount": 0,
   "closedCount": 0,
   "archivedCount": 0,
@@ -30,7 +30,7 @@
       "global": 0
     },
     "Clarivate": {
-      "total": 182,
+      "total": 183,
       "beOrRemote": 9,
       "domestic": 0,
       "remote": 9,
@@ -38,7 +38,7 @@
       "global": 11
     },
     "Springer Nature": {
-      "total": 76,
+      "total": 75,
       "beOrRemote": 0,
       "domestic": 0,
       "remote": 0,
@@ -54,7 +54,7 @@
       "global": 5
     },
     "OpenAI": {
-      "total": 814,
+      "total": 818,
       "beOrRemote": 8,
       "domestic": 0,
       "remote": 8,
@@ -62,12 +62,12 @@
       "global": 67
     },
     "Anthropic": {
-      "total": 605,
+      "total": 609,
       "beOrRemote": 0,
       "domestic": 0,
       "remote": 0,
       "europe": 19,
-      "global": 81
+      "global": 82
     },
     "Elicit": {
       "total": 10,
@@ -78,6 +78,14 @@
       "global": 0
     },
     "scite": {
+      "total": 0,
+      "beOrRemote": 0,
+      "domestic": 0,
+      "remote": 0,
+      "europe": 0,
+      "global": 0
+    },
+    "Consensus": {
       "total": 0,
       "beOrRemote": 0,
       "domestic": 0,
@@ -110,7 +118,7 @@
       "global": 0
     },
     "IEEE": {
-      "total": 0,
+      "total": 1,
       "beOrRemote": 0,
       "domestic": 0,
       "remote": 0,
@@ -118,23 +126,15 @@
       "global": 0
     },
     "Google": {
-      "total": 1,
-      "beOrRemote": 1,
-      "domestic": 1,
+      "total": 3,
+      "beOrRemote": 2,
+      "domestic": 2,
       "remote": 0,
       "europe": 0,
       "global": 0
     }
   },
-  "errors": {
-    "Consensus": "fetch failed"
-  },
-  "untracked": [
-    {
-      "company": "Consensus",
-      "reason": "Web search failed this run: fetch failed",
-      "url": "https://consensus.app/home/careers/"
-    }
-  ],
+  "errors": {},
+  "untracked": [],
   "source": "Company career-page ATS APIs (Greenhouse/Ashby/SmartRecruiters/Pinpoint/Workday), plus a Claude web search for companies without one — see file header"
 }
