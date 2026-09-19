@@ -1,9 +1,9 @@
 {
-  "lastRun": "2026-09-18T11:53:03.566554Z",
+  "lastRun": "2026-09-19T11:36:09.055064Z",
   "lastNewCount": 0,
   "sourcesReached": 11,
   "sourcesTotal": 13,
-  "itemsExamined": 511,
+  "itemsExamined": 467,
   "failedSources": [
     {
       "institution": "UMons",
@@ -11,9 +11,9 @@
       "error": "<urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>"
     },
     {
-      "institution": "Ghent University",
-      "url": "https://www.ugent.be/en/news-events",
-      "error": "<urlopen error timed out>"
+      "institution": "KBR (Royal Library of Belgium)",
+      "url": "https://www.kbr.be/en/news/",
+      "error": "HTTP 415"
     }
   ],
   "seenUrls": [
