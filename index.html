@@ -1599,6 +1599,7 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
         <div class="fg"><label>Email</label><input id="mc-email" type="text" placeholder="j.devries@institution.nl"></div>
         <div class="fg"><label>Phone</label><input id="mc-phone" placeholder="+31 20 123 4567"></div>
         <div class="fg full"><label>LinkedIn URL</label><input id="mc-linkedin" placeholder="https://linkedin.com/in/..."></div>
+        <div class="fg full"><label>ORCID iD</label><input id="mc-orcid" placeholder="0000-0002-1825-0097"></div>
         <div class="fg full"><label>Research Area / Expertise</label><input id="mc-research" placeholder="Neuroscience, Drug Discovery, AI..."></div>
         <div class="fg"><label>Status</label>
           <select id="mc-status">
@@ -1946,6 +1947,7 @@ function dbToContact(r) {
     id: r.id, instId: r.inst_id, first: r.first||'', last: r.last||'',
     title: r.title||'', dept: r.dept||'', email: r.email||'',
     phone: r.phone||'', linkedin: r.linkedin||'', research: r.research||'',
+    orcid: r.orcid||'',
     status: r.status||'active', priority: r.priority||'medium',
     quality: r.quality||'verified', lastContact: r.last_contact||'', notes: r.notes||''
   };
@@ -1974,6 +1976,7 @@ function contactToDB(contact) {
     id: contact.id, inst_id: contact.instId, first: contact.first, last: contact.last,
     title: contact.title||null, dept: contact.dept||null, email: contact.email||null,
     phone: contact.phone||null, linkedin: contact.linkedin||null,
+    orcid: contact.orcid||null,
     research: contact.research||null, status: contact.status||'active',
     priority: contact.priority||'medium', quality: contact.quality||'verified',
     last_contact: contact.lastContact||null, notes: contact.notes||null
@@ -2426,6 +2429,13 @@ function runContactsSync() {
 //  UTILS 
 function uid() { return 'id_' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
 function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+// ORCID iD link, shown where a contact's name and employer were matched to a
+// record in the ORCID registry by scripts/orcid-verify.js.
+function orcidLink(id, compact) {
+  if (!id) return '';
+  const clean = String(id).replace(/^https?:\/\/orcid\.org\//, '');
+  return '<a href="https://orcid.org/' + esc(clean) + '" target="_blank" onclick="event.stopPropagation()" title="ORCID iD ' + esc(clean) + ' \u2014 name and employer matched to the ORCID registry" style="display:inline-flex;align-items:center;gap:3px;margin-left:' + (compact ? '0' : '8px') + ';font-size:10px;font-weight:700;color:#a6ce39;text-decoration:none;vertical-align:middle"><span style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:#a6ce39;color:#fff;font-size:9px;font-style:italic;font-family:Georgia,serif">iD</span>' + (compact ? '' : 'ORCID') + '</a>';
+}
 // Only http(s) URLs pass through — blocks a javascript:/data: URI from an
 // external data source (RSS feed, scraped job posting, etc.) ever being
 // opened via window.open().
@@ -3867,6 +3877,11 @@ const DSH_AGENTS = [
       statusEl: 'agent-funding-lastrun', view: 'institutions', workflow: 'funding-scan.yml',
     },
     {
+      id: 'agent-orcid', name: 'ORCID Verification', icon: '🪪',
+      status: 'active', cadence: 'Daily · 09:00 UTC · GitHub Actions', source: 'ORCID public registry',
+      statusEl: 'agent-orcid-lastrun', view: 'contacts', workflow: 'orcid-verify.yml',
+    },
+    {
       id: 'agent-tenders', name: 'Tender / RFP Scraper', icon: '📄',
       status: 'active', cadence: 'Daily · 06:30 UTC · GitHub Actions', source: 'TED Europa',
       statusEl: 'agent-tenders-lastrun', view: 'rfp', workflow: 'tenders.yml',
@@ -4621,6 +4636,7 @@ function _syncAgentFrom(elId, jsonPath, extra) {
 function syncAgentStatus() {
   _syncAgentFrom('agent-discovery-lastrun', 'data/staff-scan-state.json', d => d.lastAddedCount != null ? ` · +${d.lastAddedCount}` : '');
   _syncAgentFrom('agent-roles-lastrun', 'data/roles-scan-state.json', d => d.error ? ` · ${d.error}` : d.lastAddedCount != null ? ` · +${d.lastAddedCount}` : '');
+  _syncAgentFrom('agent-orcid-lastrun', 'data/orcid-scan-state.json', d => d.lastChecked != null ? ` · ${d.lastChecked} checked, ${d.lastVerified} verified` + (d.remaining ? `, ${d.remaining} to go` : '') : '');
   _syncAgentFrom('agent-tenders-lastrun', 'data/tenders-scan-state.json', d => d.lastNewCount ? ` · +${d.lastNewCount}` : '');
   _syncAgentFrom('agent-research-output-lastrun', 'data/research-output.json', d => d.window ? ` · ${d.window.from}–${d.window.to}` : '');
   _syncAgentFrom('agent-funding-lastrun', 'data/funding-scan-state.json', d => d.lastScanned != null ? ` · ${d.lastScanned} institutions` : '');
@@ -6143,7 +6159,7 @@ function renderDetail() {
         <div><div style="font-weight:600">${esc(c.first)} ${esc(c.last)}</div>
         <div style="font-size:11px;color:${senior?'var(--text)':'var(--muted)'};font-weight:${senior?600:400}">${esc(c.title||'')}</div></div></div></td>
       <td style="font-size:12px;color:var(--muted)">${esc(c.dept||'—')}</td>
-      <td>${c.email?`<a class="ext-link" href="mailto:${esc(c.email)}">${esc(c.email)}</a>`:'—'}</td>
+      <td>${c.email?`<a class="ext-link" href="mailto:${esc(c.email)}">${esc(c.email)}</a>`:'—'}${orcidLink(c.orcid)}</td>
       <td><span class="badge b-${prio}"${senior?' title="High priority: decision-maker role"':''}>${prio}</span></td>
       <td><span class="badge b-${c.quality}">${c.quality==='verified'?'Verified':'Seed'}</span></td>
       <td onclick="event.stopPropagation()" style="white-space:nowrap">
@@ -6551,7 +6567,7 @@ function renderContacts() {
         <div style="font-size:11px;color:${senior?'var(--text)':'var(--muted)'};font-weight:${senior?600:400}">${esc(c.title||'')}</div></div></div></td>
       ${showInst ? `<td style="font-size:12px"><a href="#" style="color:var(--info);text-decoration:none" onclick="event.preventDefault();nav('detail',{instId:'${inst.id}'})">${esc(inst.short||inst.name||'—')}</a></td>` : ''}
       <td style="font-size:12px;color:var(--muted)">${esc(c.dept||'—')}</td>
-      <td>${c.email?`<a class="ext-link" href="mailto:${esc(c.email)}">${esc(c.email)}</a>`:'<span style="color:var(--muted);font-size:12px">—</span>'}</td>
+      <td>${c.email?`<a class="ext-link" href="mailto:${esc(c.email)}">${esc(c.email)}</a>`:'<span style="color:var(--muted);font-size:12px">—</span>'}${orcidLink(c.orcid)}</td>
       <td><span class="badge b-${prio}"${senior?' title="High priority: decision-maker role"':''}>${prio}</span></td>
       <td><span class="badge b-${c.quality}" style="font-size:10px">${c.quality==='verified'?'Verified':'Seed'}</span></td>
       <td style="white-space:nowrap">
@@ -6827,6 +6843,7 @@ function openEditContact(id) {
   document.getElementById('mc-email').value=c.email||'';
   document.getElementById('mc-phone').value=c.phone||'';
   document.getElementById('mc-linkedin').value=c.linkedin||'';
+  document.getElementById('mc-orcid').value=c.orcid||'';
   document.getElementById('mc-research').value=c.research||'';
   document.getElementById('mc-status').value=c.status||'prospect';
   document.getElementById('mc-priority').value=c.priority||'medium';
@@ -6846,6 +6863,7 @@ async function saveContact() {
     email: document.getElementById('mc-email').value.trim(),
     phone: document.getElementById('mc-phone').value.trim(),
     linkedin: document.getElementById('mc-linkedin').value.trim(),
+    orcid: document.getElementById('mc-orcid').value.trim().replace(/^https?:\/\/orcid\.org\//, ''),
     research: document.getElementById('mc-research').value.trim(),
     status: document.getElementById('mc-status').value,
     priority: document.getElementById('mc-priority').value,
@@ -11309,6 +11327,7 @@ async function renderPendingContacts() {
       <td style="padding:12px 14px">
         <div style="font-weight:600;font-size:13px">${esc(c.first)} ${esc(c.last)}</div>
         <div style="font-size:11px;color:var(--muted);margin-top:2px">${esc(c.title||'')}</div>
+        ${c.orcid ? '<div style="margin-top:3px">' + orcidLink(c.orcid) + '</div>' : ''}
       </td>
       <td style="padding:12px 14px;font-size:12px;color:var(--muted)">${esc(c.department||'')}</td>
       <td style="padding:12px 14px">
@@ -11384,7 +11403,7 @@ async function acceptOnePendingContact(c) {
     id: uid(),
     first: c.first, last: c.last, title: c.title,
     dept: c.department, instId: c.institution_id,
-    email: c.email, linkedin: c.linkedin,
+    email: c.email, linkedin: c.linkedin, orcid: c.orcid || '',
     research: c.research, status: 'prospect',
     priority: 'medium', quality: 'seed',
     notes: 'Added via contact discovery agent. Source: ' + (c.source_url || ''),
