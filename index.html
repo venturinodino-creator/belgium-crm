@@ -4630,7 +4630,7 @@ function initStatCardDrag() {
   });
 }
 
-const DASH_WIDGET_DEFAULT_ORDER = ['w-yourday','w-attention','w-posture','w-types','w-highprio','w-renewals','w-agents','w-map'];
+const DASH_WIDGET_DEFAULT_ORDER = ['w-attention','w-yourday','w-posture','w-types','w-highprio','w-renewals','w-agents','w-map'];
 function getDashWidgetOrder() {
   let order;
   try { order = JSON.parse(localStorage.getItem('be_crm_widget_order')); if(!Array.isArray(order)||!order.length) order=null; }
