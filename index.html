@@ -1403,6 +1403,7 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
     <div class="nav-item" data-view="whitespace" onclick="nav('whitespace')" title="Universities and medical centres with no active Pure subscription" style="position:relative">
       <div class="nav-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></div>
       <span style="flex:1">White Space</span>
+      <span id="nav-whitespace-pinned" style="display:none;background:#60a5fa;color:#0b1220;border-radius:99px;font-size:10px;font-weight:700;padding:1px 6px;min-width:18px;text-align:center;margin-right:4px"></span>
       <span id="nav-whitespace-badge" style="display:none;background:#fb923c;color:#fff;border-radius:99px;font-size:10px;font-weight:700;padding:1px 6px;min-width:18px;text-align:center"></span>
     </div>
     <div class="nav-item" data-view="map" onclick="nav('map')">
@@ -1492,6 +1493,7 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
             <option value="medical">Medical Center</option>
             <option value="research">Research Institute</option>
             <option value="ngo">NGO / Foundation</option>
+            <option value="whitespace" title="Move this institution out of the main Institutions list into the White Space folder, whatever its Pure / Scopus / SciVal status">White Space</option>
           </select>
         </div>
         <div class="fg"><label>City *</label><input id="mi-city" placeholder="Ghent"></div>
@@ -1828,23 +1830,41 @@ async function supaFetch(path, opts={}) {
     const { data } = await supabaseClient.auth.getSession();
     if (data && data.session && data.session.access_token) authKey = data.session.access_token;
   }
-  const res = await fetch(SUPA_URL + '/rest/v1/' + finalPath, {
-    ...opts,
-    body,
-    headers: {
-      'apikey': SUPA_KEY,
-      'Authorization': 'Bearer ' + authKey,
-      'Content-Type': 'application/json',
-      'Prefer': opts.method && opts.method !== 'GET' ? 'return=representation' : '',
-      ...(opts.headers||{})
+  const headers = {
+    'apikey': SUPA_KEY,
+    'Authorization': 'Bearer ' + authKey,
+    'Content-Type': 'application/json',
+    'Prefer': opts.method && opts.method !== 'GET' ? 'return=representation' : '',
+    ...(opts.headers||{})
+  };
+  const url = SUPA_URL + '/rest/v1/' + finalPath;
+  if (method !== 'GET') {
+    const res = await fetch(url, { ...opts, body, headers });
+    if(!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
     }
-  });
-  if(!res.ok) {
-    const err = await res.text();
-    throw new Error(err);
+    const text = await res.text();
+    return text ? JSON.parse(text) : null;
   }
-  const text = await res.text();
-  return text ? JSON.parse(text) : null;
+  // PostgREST answers at most 1,000 rows per request. A region with more
+  // contacts than that (Denmark passed it on 2026-09-19) used to show exactly
+  // 1,000 and silently lose the rest, so reads page until a short page
+  // arrives. A 416 means the range starts past the end: also the end.
+  const out = [];
+  for (let from = 0; ; from += 1000) {
+    const res = await fetch(url, { ...opts, headers: { ...headers, 'Range-Unit': 'items', 'Range': from + '-' + (from + 999) } });
+    if (res.status === 416) return out;
+    if(!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+    const text = await res.text();
+    const page = text ? JSON.parse(text) : null;
+    if (!Array.isArray(page)) return from === 0 ? page : out; // a single object or nothing
+    out.push(...page);
+    if (page.length < 1000) return out;
+  }
 }
 
 // Map DB row (snake_case)  CRM institution object (camelCase)
@@ -3850,6 +3870,27 @@ function dshEnsurePalette() {
   });
 }
 
+// One extra row under "Institutions by Type" for the accounts pinned to the
+// White Space folder by hand. It is a folder, not a type, so it sits after the
+// type rows in the same blue as the Pinned chip and badge, and opens the
+// Institutions page filtered to that folder. Nothing is rendered when no
+// account is pinned.
+function dshPinnedRow(total) {
+  const n = state.institutions.filter(i => wsIsPinned(i.id)).length;
+  if (!n) return '';
+  const c = WS_PINNED_STATUS.color;
+  return `<div class="bk-row" onclick="state.instType='whitespace';state.instPage=1;nav('institutions')" title="View the accounts pinned to the White Space folder">
+      <div style="width:36px;height:36px;border-radius:9px;background:${c}1f;border:1px solid ${c}40;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;color:${c}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5"/><path d="M9 11V6a3 3 0 0 1 6 0v5l2 3H7z"/></svg></div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:12.5px;font-weight:600;color:#f1f5f9">White Space folder</span>
+          <span style="font-size:11px;color:rgba(255,255,255,.32)">${Math.round(n / (total || 1) * 100)}% pinned</span>
+        </div>
+        <div class="bk-bar"><div class="bk-fill" data-w="${Math.round(n / (total || 1) * 100)}" style="width:0;background:linear-gradient(90deg,${c},#93c5fd)"></div></div>
+      </div>
+      <div style="font-size:18px;font-weight:800;color:#f8fafc;letter-spacing:-1px;min-width:24px;text-align:right;flex-shrink:0">${n}</div>
+    </div>`;
+}
 function renderDashboard() {
   document.getElementById('page-title').textContent = 'Dashboard';
   document.getElementById('page-sub').textContent = DSH_REGION_SUB;
@@ -3891,7 +3932,7 @@ function renderDashboard() {
       </div>
       <div style="font-size:18px;font-weight:800;color:#f8fafc;letter-spacing:-1px;min-width:24px;text-align:right;flex-shrink:0">${n}</div>
     </div>`;
-  }).join('');
+  }).join('') + dshPinnedRow(inst.length);
 
   const hpRows = cont.filter(c => c.priority === 'high').slice(0, 5).map(c => {
     const i2 = getInst(c.instId);
@@ -4519,10 +4560,16 @@ function renderInstitutions() {
 
   let insts = state.institutions.filter(i=>{
     if(state.instSearch && !`${i.name} ${i.short} ${i.city} ${i.description}`.toLowerCase().includes(state.instSearch.toLowerCase())) return false;
+    // "whitespace" is the pinned-to-White-Space folder, not a stored type.
+    // Pinning *moves* the account there: it leaves the main list and the
+    // per-type views and shows only under this folder (and in White Space).
+    if(state.instType==='whitespace') return wsIsPinned(i.id);
+    if(wsIsPinned(i.id)) return false;
     if(state.instType && i.type!==state.instType) return false;
     return true;
   });
   insts = sortInstList(insts, state.instSort, instSortVal);
+  const pinnedCount = state.institutions.filter(i=>wsIsPinned(i.id)).length;
 
   const toolbar = `
     <div class="toolbar">
@@ -4536,12 +4583,13 @@ function renderInstitutions() {
         <option value="medical" ${state.instType==='medical'?'selected':''}> Medical Center</option>
         <option value="research" ${state.instType==='research'?'selected':''}>Research Institute</option>
         <option value="ngo" ${state.instType==='ngo'?'selected':''}> NGO / Foundation</option>
+        <option value="whitespace" ${state.instType==='whitespace'?'selected':''}>White Space folder${pinnedCount?' ('+pinnedCount+')':''}</option>
       </select>
-      <span style="font-size:12px;color:var(--muted)">${insts.length} result${insts.length!==1?'s':''}</span>
+      <span style="font-size:12px;color:var(--muted)">${insts.length} result${insts.length!==1?'s':''}${state.instType!=='whitespace' && pinnedCount ? ` · <a class="ext-link" onclick="state.instType='whitespace';state.instPage=1;renderInstitutions()" title="Accounts moved to the White Space folder via the Type dropdown">${pinnedCount} in White Space folder</a>` : ''}</span>
     </div>`;
 
   if(!insts.length) {
-    document.getElementById('content').innerHTML = toolbar + `<div class="empty"><div class="ei"></div><h3>No institutions found</h3><p>Try adjusting your search or filters.</p></div>`;
+    document.getElementById('content').innerHTML = toolbar + `<div class="empty"><div class="ei"></div><h3>No institutions found</h3><p>${state.instType==='whitespace' ? 'Nothing has been moved here yet. Set an institution’s Type to White Space to move it into this folder.' : 'Try adjusting your search or filters.'}</p></div>`;
     return;
   }
 
@@ -4551,7 +4599,7 @@ function renderInstitutions() {
       return `<div class="ic" onclick="nav('detail',{instId:'${i.id}'})">
         <div class="ic-head">
           <div class="ic-icon ${i.type}">${TYPE_ICON[i.type]||`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>`}</div>
-          <span class="badge b-${i.type}" style="font-size:10px">${TYPE_LABEL[i.type]||i.type}</span>
+          <span style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end"><span class="badge b-${i.type}" style="font-size:10px">${TYPE_LABEL[i.type]||i.type}</span>${wsPinnedBadge(i.id)}</span>
         </div>
         <h3>${esc(i.name)}</h3>
         ${i.short?`<div class="short">${esc(i.short)}</div>`:''}
@@ -4574,7 +4622,7 @@ function renderInstitutions() {
       const cc = contactsForInst(i.id).length;
       return `<tr onclick="nav('detail',{instId:'${i.id}'})">
         <td><div class="name-cell"><span style="font-size:18px">${TYPE_ICON[i.type]||`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>`}</span><div><div style="font-weight:600">${esc(i.name)}</div><div style="font-size:11px;color:var(--muted)">${esc(i.short||'')}</div></div></div></td>
-        <td><span class="badge b-${i.type}">${TYPE_LABEL[i.type]}</span></td>
+        <td><span class="badge b-${i.type}">${TYPE_LABEL[i.type]}</span> ${wsPinnedBadge(i.id)}</td>
         <td><span style="display:inline-flex;vertical-align:middle;margin-right:3px;opacity:.55"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>${esc(i.city)}</td>
         <td>${i.founded||'—'}</td>
         <td>${cc} contact${cc!==1?'s':''}</td>
@@ -4625,8 +4673,13 @@ const WS_STATUS = {
   cancelled:{ label: 'Cancelled',  color: '#f87171' },
   unknown:  { label: 'Unverified', color: '#fbbf24' },
 };
+// A hand-pinned account (see WS_PINNED_KEY) can sit on the list with a status
+// the list would otherwise hide, e.g. an active Pure tenancy; it gets its own
+// badge rather than crashing on a colour WS_STATUS has no entry for.
+const WS_PINNED_STATUS = { label: 'Pinned', color: '#60a5fa' };
+function wsStatusOf(id, product) { return WS_STATUS[getProductStatus(id, product)] || WS_PINNED_STATUS; }
 function wsStatusLabel(code) {
-  if (code !== 'no') return (WS_STATUS[code] || {}).label || code;
+  if (code !== 'no') return (WS_STATUS[code] || WS_PINNED_STATUS).label;
   return 'No ' + ((WS_PRODUCTS[state.wsProduct] || WS_PRODUCTS.pure).label);
 }
 
@@ -4669,15 +4722,56 @@ function wsSaveRemoved(ids) {
   all[state.wsProduct] = ids;
   localStorage.setItem(WS_REMOVED_KEY, JSON.stringify(all));
 }
+// Institutions a rep has put on the list by hand: picking "White Space" as the
+// Type in the Add/Edit Institution modal pins the account here for every
+// product, whatever the competitor matrix says about it. The real organisation
+// type is kept on the record (the pin is a folder, not a kind of institution),
+// so icons, map colours and analytics keep working. Stored in localStorage
+// like the Removed list; a pinned account is never also in the Removed list.
+const WS_PINNED_KEY = 'be_crm_ws_pinned';
+function wsPinnedIds() {
+  try { const v = JSON.parse(localStorage.getItem(WS_PINNED_KEY) || '[]'); return Array.isArray(v) ? v : []; }
+  catch (e) { return []; }
+}
+function wsIsPinned(id) { return wsPinnedIds().includes(id); }
+function wsPinnedBadge(id) {
+  if (!wsIsPinned(id)) return '';
+  const c = WS_PINNED_STATUS.color;
+  return '<span class="badge" style="font-size:10px;background:' + c + '22;color:' + c + ';border:1px solid ' + c + '55" title="Pinned to the White Space folder via the Type dropdown">White Space</span>';
+}
+function wsSetPinned(id, on) {
+  const ids = wsPinnedIds().filter(x => x !== id);
+  if (on) ids.push(id);
+  localStorage.setItem(WS_PINNED_KEY, JSON.stringify(ids));
+  if (!on) return;
+  // Pinning is the rep saying "this is a target" — clear any earlier removal
+  // for every product so the pin actually shows up.
+  let all = {};
+  try { all = JSON.parse(localStorage.getItem(WS_REMOVED_KEY) || '{}'); } catch (e) {}
+  Object.keys(all).forEach(k => { all[k] = (all[k] || []).filter(x => x !== id); });
+  localStorage.setItem(WS_REMOVED_KEY, JSON.stringify(all));
+}
+// The one place that decides whether an institution belongs on the White Space
+// list for a product: an eligible, non-excluded org that is either pinned by
+// hand or has a no / cancelled / unverified status for that product. Every
+// list, count, export and badge goes through this so they can never disagree.
+function wsIsTarget(i, product) {
+  if (!WS_ELIGIBLE_TYPES.includes(i.type) || WS_EXCLUDE_IDS.has(i.id)) return false;
+  return wsIsPinned(i.id) || getProductStatus(i.id, product) in WS_STATUS;
+}
 function wsRemove(id) {
   const prod = WS_PRODUCTS[state.wsProduct] || WS_PRODUCTS.pure;
   const inst = state.institutions.find(i => i.id === id);
   if (!confirm('Remove ' + (inst ? inst.name : 'this institution') + ' from the ' + prod.label + ' white space? You can restore it from the "Removed" chip.')) return;
+  // Removing is the stronger statement, so a hand-pinned account loses its pin
+  // here rather than sitting in both lists (pinning clears removals the same way).
+  const wasPinned = wsIsPinned(id);
+  if (wasPinned) wsSetPinned(id, false);
   const ids = wsRemovedIds();
   if (!ids.includes(id)) { ids.push(id); wsSaveRemoved(ids); }
   updateWhiteSpaceBadge();
   renderWhiteSpace();
-  toast('Removed from ' + prod.label + ' white space', 'ok');
+  toast('Removed from ' + prod.label + ' white space' + (wasPinned ? ' and unpinned' : ''), 'ok');
 }
 function wsRestore(id) {
   wsSaveRemoved(wsRemovedIds().filter(x => x !== id));
@@ -4713,6 +4807,16 @@ function wsBucket(id) {
   const st = getProductStatus(id, state.wsProduct);
   if (st === 'unknown') return 'unknown';
   return wsHasRival(id) ? 'rival' : 'greenfield';
+}
+// The toolbar chip filter: the three buckets, plus "pinned" for accounts a rep
+// pinned by hand (which can sit in any bucket). "removed" is handled by the caller.
+// This predicate, the Pinned chip and its count landed inside an unrelated
+// commit ("Rotating agents: stop on an account-level API error", #56) when
+// two sessions shared this checkout; see the follow-up commit for the intent.
+function wsMatchesFilter(id) {
+  if (state.wsFilter === 'all') return true;
+  if (state.wsFilter === 'pinned') return wsIsPinned(id);
+  return wsBucket(id) === state.wsFilter;
 }
 const WS_BUCKET_LABEL = {
   greenfield: { label: 'Greenfield',   color: '#4ade80', hint: 'No Pure and no competing CRIS' },
@@ -4769,11 +4873,33 @@ const WS_PRODUCTS = {
             sub: 'Institutions with no evidence of SciVal — the strongest are those already paying for Scopus',
             caveat: 'SciVal has no public register, so "Unverified" means no evidence either way. The best prospects are institutions that hold Scopus but show no SciVal — worth checking against Elsevier records.' },
 };
-// Remove / Restore control shared by the grid card footer and the table row.
+// Pin / Unpin from the card itself, the same pin the Type dropdown sets. An
+// account that is only on the list because of the pin drops off it when unpinned.
+function wsTogglePin(id) {
+  const on = !wsIsPinned(id);
+  wsSetPinned(id, on);
+  if (!on && state.wsFilter === 'pinned' && !wsPinnedIds().length) state.wsFilter = 'all';
+  const inst = state.institutions.find(i => i.id === id);
+  // Called from the White Space cards and from the detail page header, so
+  // redraw whichever is open (render() also refreshes the nav badge).
+  render();
+  toast((inst ? inst.name : 'Institution') + (on ? ' pinned to White Space' : ' unpinned from White Space'), 'ok');
+}
+// Pin/Unpin button for the detail page topbar, same pin as the cards.
+function wsPinButton(id) {
+  return wsIsPinned(id)
+    ? '<button class="btn btn-outline" onclick="wsTogglePin(\'' + id + '\')" title="Unpin from the White Space folder — it stays only if its product status still qualifies">Unpin from White Space</button>'
+    : '<button class="btn btn-outline" onclick="wsTogglePin(\'' + id + '\')" title="Keep this account in the White Space folder whatever its product status">Pin to White Space</button>';
+}
+// Pin/Unpin and Remove/Restore controls shared by the grid card footer and the table row.
 function wsRowAction(id) {
-  return wsIsRemoved(id)
-    ? '<button class="btn btn-outline btn-sm ws-act" onclick="event.stopPropagation();wsRestore(\'' + id + '\')" title="Put this institution back on the target list">Restore</button>'
-    : '<button class="btn btn-ghost btn-sm ws-act" onclick="event.stopPropagation();wsRemove(\'' + id + '\')" title="Take this institution off the target list">Remove</button>';
+  const pin = wsIsPinned(id)
+    ? '<button class="btn btn-outline btn-sm" onclick="event.stopPropagation();wsTogglePin(\'' + id + '\')" title="Unpin — the account stays only if its product status still qualifies">Unpin</button>'
+    : '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();wsTogglePin(\'' + id + '\')" title="Pin — keep this account in the White Space folder whatever its product status">Pin</button>';
+  const rm = wsIsRemoved(id)
+    ? '<button class="btn btn-outline btn-sm" onclick="event.stopPropagation();wsRestore(\'' + id + '\')" title="Put this institution back on the target list">Restore</button>'
+    : '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();wsRemove(\'' + id + '\')" title="Take this institution off the target list">Remove</button>';
+  return '<span class="ws-act" style="display:inline-flex;gap:4px">' + pin + rm + '</span>';
 }
 function wsSetProduct(p) { state.wsProduct = p; state.wsFilter = 'all'; renderWhiteSpace(); }
 function renderWhiteSpace() {
@@ -4792,15 +4918,18 @@ function renderWhiteSpace() {
     '</div>' +
     '<button class="btn btn-outline" onclick="exportWhiteSpaceContacts()" title="Download the current target list, one row per contact">Export CSV</button>';
 
+  // The Removed chip only renders while something is removed. A removal can be
+  // cleared from outside this view (pinning via the Institution modal), which
+  // would otherwise leave the view stuck on a filter that no longer has a chip
+  // and show an empty "Nothing in this slice" with no obvious way back.
+  if (state.wsFilter === 'removed' && !state.institutions.some(i => wsIsTarget(i, state.wsProduct) && wsIsRemoved(i.id))) state.wsFilter = 'all';
+
   let insts = state.institutions.filter(i => {
-    if (!WS_ELIGIBLE_TYPES.includes(i.type)) return false;
-    if (WS_EXCLUDE_IDS.has(i.id)) return false;
-    const pureStatus = getProductStatus(i.id, state.wsProduct);
-    if (!(pureStatus in WS_STATUS)) return false; // yes/likely/expiring already have or probably have Pure
+    if (!wsIsTarget(i, state.wsProduct)) return false; // yes/likely/expiring already have or probably have the product
     if (state.wsFilter === 'removed') { if (!wsIsRemoved(i.id)) return false; }
     else {
       if (wsIsRemoved(i.id)) return false;
-      if (state.wsFilter !== 'all' && wsBucket(i.id) !== state.wsFilter) return false;
+      if (!wsMatchesFilter(i.id)) return false;
     }
     if (state.wsSearch) {
       const hay = (i.name + ' ' + (i.short || '') + ' ' + i.city + ' ' + (wsInfo(i.id).why || '') + ' ' +
@@ -4811,10 +4940,9 @@ function renderWhiteSpace() {
   });
   insts = sortInstList(insts, state.wsSort, wsSortVal);
 
-  const eligible = state.institutions.filter(i =>
-    WS_ELIGIBLE_TYPES.includes(i.type) && !WS_EXCLUDE_IDS.has(i.id) && getProductStatus(i.id, state.wsProduct) in WS_STATUS);
+  const eligible = state.institutions.filter(i => wsIsTarget(i, state.wsProduct));
   const all = eligible.filter(i => !wsIsRemoved(i.id));
-  const counts = { all: all.length, greenfield: 0, rival: 0, unknown: 0, removed: eligible.length - all.length };
+  const counts = { all: all.length, greenfield: 0, rival: 0, unknown: 0, pinned: all.filter(i => wsIsPinned(i.id)).length, removed: eligible.length - all.length };
   all.forEach(i => counts[wsBucket(i.id)]++);
   const chip = (key, label) =>
     '<button class="ws-chip' + (state.wsFilter === key ? ' active' : '') + '" onclick="state.wsFilter=\'' + key + '\';renderWhiteSpace()">' +
@@ -4827,7 +4955,7 @@ function renderWhiteSpace() {
           'oninput="state.wsSearch=this.value;renderWhiteSpace()">' +
       '</div>' +
       '<div class="ws-chips">' + chip('all', 'All') + chip('greenfield', 'Greenfield') +
-        chip('rival', 'Displacement') + chip('unknown', 'Unverified') +
+        chip('rival', 'Displacement') + chip('unknown', 'Unverified') + chip('pinned', 'Pinned') +
         (counts.removed ? chip('removed', 'Removed') : '') + '</div>' +
       '<span style="font-size:12px;color:var(--muted);margin-left:auto">' + insts.length +
         ' target' + (insts.length !== 1 ? 's' : '') + '</span>' +
@@ -4845,7 +4973,7 @@ function renderWhiteSpace() {
     document.getElementById('content').innerHTML = toolbar +
       '<div class="inst-grid">' + insts.map(i => {
         const info = wsInfo(i.id), bk = WS_BUCKET_LABEL[wsBucket(i.id)];
-        const st = WS_STATUS[getProductStatus(i.id, state.wsProduct)];
+        const st = wsStatusOf(i.id, state.wsProduct);
         const works = wsWorks(i.id), cx = wsContacts(i.id), crm = contactsForInst(i.id).length;
         return '<div class="ic ws-card" onclick="nav(\'detail\',{instId:\'' + i.id + '\'})">' +
           '<div class="ic-head">' +
@@ -4886,7 +5014,7 @@ function renderWhiteSpace() {
         '<th class="sortable-th' + sortThStyle('city', state.wsSort) + '" onclick="toggleSort(state.wsSort,\'city\',renderWhiteSpace)">City' + sortArrow('city', state.wsSort) + '</th>' +
         '<th>Contacts</th><th>Actions</th>' +
       '</tr></thead><tbody>' + insts.map(i => {
-        const info = wsInfo(i.id), st = WS_STATUS[getProductStatus(i.id, state.wsProduct)];
+        const info = wsInfo(i.id), st = wsStatusOf(i.id, state.wsProduct);
         const works = wsWorks(i.id), cx = wsContacts(i.id);
         return '<tr onclick="nav(\'detail\',{instId:\'' + i.id + '\'})">' +
           '<td><div class="name-cell"><span style="font-size:18px">' + (TYPE_ICON[i.type] || '') + '</span><div>' +
@@ -4937,10 +5065,9 @@ function renderWhiteSpace() {
 // filtered down to is what lands in the CSV.
 function exportWhiteSpaceContacts() {
   const insts = state.institutions.filter(i =>
-    WS_ELIGIBLE_TYPES.includes(i.type) && !WS_EXCLUDE_IDS.has(i.id) &&
-    getProductStatus(i.id, state.wsProduct) in WS_STATUS &&
+    wsIsTarget(i, state.wsProduct) &&
     (state.wsFilter === 'removed' ? wsIsRemoved(i.id) :
-      !wsIsRemoved(i.id) && (state.wsFilter === 'all' || wsBucket(i.id) === state.wsFilter)));
+      !wsIsRemoved(i.id) && wsMatchesFilter(i.id)));
   const prod = WS_PRODUCTS[state.wsProduct] || WS_PRODUCTS.pure;
   const out = [['Name', 'Role', 'Institution', 'Type', 'City', 'Email', 'Email status', 'Phone', prod.label + ' status', 'Incumbent', 'Indexed works', 'Source']];
   // An institution nobody has a name for still gets a row: on an outreach
@@ -4978,11 +5105,19 @@ function updateWhiteSpaceBadge() {
   // in-view product toggle would leave it showing a stale count.
   let removedPure = [];
   try { removedPure = (JSON.parse(localStorage.getItem(WS_REMOVED_KEY) || '{}').pure) || []; } catch (e) {}
-  const count = state.institutions.filter(i => WS_ELIGIBLE_TYPES.includes(i.type) && !WS_EXCLUDE_IDS.has(i.id) &&
-    !removedPure.includes(i.id) && getProductStatus(i.id, 'pure') in WS_STATUS).length;
+  const targets = state.institutions.filter(i => wsIsTarget(i, 'pure') && !removedPure.includes(i.id));
+  const count = targets.length;
   badge.textContent = count;
   badge.title = count + ' institutions with no Pure tenancy';
   badge.style.display = count > 0 ? 'inline-block' : 'none';
+  // A second, blue badge for the hand-pinned accounts among them, in the same
+  // colour as the Pinned chip and card badge; hidden when nothing is pinned.
+  const pinnedBadge = document.getElementById('nav-whitespace-pinned');
+  if (!pinnedBadge) return;
+  const pinned = targets.filter(i => wsIsPinned(i.id)).length;
+  pinnedBadge.textContent = pinned;
+  pinnedBadge.title = pinned + ' pinned by hand';
+  pinnedBadge.style.display = pinned > 0 ? 'inline-block' : 'none';
 }
 
 //  INSTITUTION DETAIL 
@@ -5258,6 +5393,7 @@ function renderDetail() {
   document.getElementById('page-sub').textContent = inst.city + ' · ' + (TYPE_LABEL[inst.type]||inst.type);
   document.getElementById('topbar-actions').innerHTML = `
     <button class="btn btn-outline" onclick="nav('org-map',{instId:'${inst.id}'})" title="Visual org chart: who sits where">🗺 Org Map</button>
+    ${wsPinButton(inst.id)}
     <button class="btn btn-outline" data-admin-only onclick="openEditInstitution('${inst.id}')"> Edit</button>
     <button class="btn btn-accent" data-admin-only onclick="openAddContact('${inst.id}')">+ Add Contact</button>`;
 
@@ -5339,6 +5475,7 @@ function renderDetail() {
             <h2>${esc(inst.name)}</h2>
             <div style="margin-top:4px;display:flex;gap:8px;flex-wrap:wrap">
               <span class="badge b-${inst.type}">${TYPE_LABEL[inst.type]||inst.type}</span>
+              ${wsPinnedBadge(inst.id)}
               <span style="font-size:12px;color:var(--muted)"><span style="display:inline-flex;vertical-align:middle;margin-right:3px;opacity:.55"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span> ${esc(inst.city)}</span>
               ${inst.founded?`<span style="font-size:12px;color:var(--muted)">Est. ${inst.founded}</span>`:''}
               ${networkBadges}
@@ -5848,7 +5985,7 @@ function openEditInstitution(id) {
   document.getElementById('mi-title').textContent = 'Edit Institution';
   document.getElementById('mi-name').value = i.name||'';
   document.getElementById('mi-short').value = i.short||'';
-  document.getElementById('mi-type').value = i.type||'university';
+  document.getElementById('mi-type').value = wsIsPinned(id) ? 'whitespace' : (i.type||'university');
   document.getElementById('mi-city').value = i.city||'';
   document.getElementById('mi-founded').value = i.founded||'';
   document.getElementById('mi-website').value = i.website||'';
@@ -5872,10 +6009,16 @@ async function saveInstitution() {
   const name = document.getElementById('mi-name').value.trim();
   const city = document.getElementById('mi-city').value.trim();
   if(!name || !city) { toast('Name and city are required.','err'); return; }
+  // "White Space" in the Type dropdown is a folder, not an organisation type:
+  // it pins the account to the White Space list and leaves the stored type
+  // alone (a new record defaults to research, the broadest Pure prospect).
+  const typeChoice = document.getElementById('mi-type').value;
+  const pinWs = typeChoice === 'whitespace';
+  const existing = state.editInstId ? getInst(state.editInstId) : null;
   const data = {
     name, city,
     short: document.getElementById('mi-short').value.trim(),
-    type: document.getElementById('mi-type').value,
+    type: pinWs ? ((existing && existing.type) || 'research') : typeChoice,
     founded: document.getElementById('mi-founded').value.trim()||'',
     website: document.getElementById('mi-website').value.trim(),
     description: document.getElementById('mi-desc').value.trim(),
@@ -5890,6 +6033,7 @@ async function saveInstitution() {
     state.institutions.push(data);
     savedInst = data;
   }
+  wsSetPinned(savedInst.id, pinWs);
   // Save competitor data
   if(state.editInstId) {
     const instId = state.editInstId;
@@ -5924,7 +6068,7 @@ async function saveInstitution() {
   // never having reached it, is gone. The toast needs to say so plainly
   // rather than imply it's safely saved.
   toast(
-    synced ? (isEdit ? 'Institution updated' : 'Institution added') : 'Not saved to the shared database — retry before reloading or this change will be lost',
+    synced ? ((isEdit ? 'Institution updated' : 'Institution added') + (pinWs ? ' — moved to the White Space folder' : '')) : 'Not saved to the shared database — retry before reloading or this change will be lost',
     synced ? 'ok' : 'err'
   );
 }
@@ -7276,7 +7420,7 @@ function anWsBucket(id) {
   return rival ? 'rival' : 'greenfield';
 }
 function anWhiteSpaceList(s) {
-  return s.insts.filter(i => WS_ELIGIBLE_TYPES.includes(i.type) && !WS_EXCLUDE_IDS.has(i.id) && getProductStatus(i.id, 'pure') in WS_STATUS);
+  return s.insts.filter(i => wsIsTarget(i, 'pure'));
 }
 // A segmented bar with one span per status. The counts sit in the legend, so
 // the colours are an aid to comparison rather than the only way to read it.
@@ -7303,13 +7447,14 @@ function anKpis(s) {
   const elsevier = s.insts.filter(i => AN_PRODUCTS.some(p => p.elsevier && anHas(i.id, p.key))).length;
   const ws = anWhiteSpaceList(s);
   const green = ws.filter(i => anWsBucket(i.id) === 'greenfield').length;
+  const wsPinned = ws.filter(i => wsIsPinned(i.id)).length;
   const openRfps = s.rfps.filter(anRfpOpen).length;
   const tiles = [
     { l: 'Accounts',            v: String(n),              s: typeSub || 'in scope' },
     { l: 'Contacts',            v: String(s.contacts.length), s: `${anPct(withEmail, s.contacts.length)}% with an email on file` },
     { l: 'Decision-maker seats', v: avgCov + '%',          s: `${strong} of ${n} accounts at 80% or more` },
     { l: 'Elsevier footprint',  v: String(elsevier),       s: `of ${n} run Scopus, SciVal or Pure` },
-    { l: 'Pure white space',    v: String(ws.length),      s: `${green} greenfield · no Pure tenancy` },
+    { l: 'Pure white space',    v: String(ws.length),      s: `${green} greenfield · no Pure tenancy` + (wsPinned ? ` · ${wsPinned} pinned` : '') },
     { l: 'Tenders',             v: String(s.rfps.length),  s: `${openRfps} open · ${AN_RANGE_LABEL[state.anRange]}` },
   ];
   // Only once there is something behind them.
@@ -7424,12 +7569,18 @@ function anWhiteSpace(s) {
   const subs = { greenfield: 'no rival CRIS either', rival: 'a rival CRIS is installed', unknown: 'not yet verified' };
   const rows = Object.entries(WS_BUCKET_LABEL).map(([k, m]) =>
     anRow(anLabel(m.label, subs[k]), `${b[k]}<em>${anPct(b[k], list.length)}%</em>`, b[k] / list.length * 100, m.color)).join('');
+  // Hand-pinned accounts overlap the buckets above (a pin says nothing about
+  // the CRIS), so they get their own row rather than a fourth slice.
+  const pinned = list.filter(i => wsIsPinned(i.id)).length;
+  const pinnedRow = pinned
+    ? anRow(anLabel(WS_PINNED_STATUS.label, 'kept on the list by hand'), `${pinned}<em>${anPct(pinned, list.length)}%</em>`, pinned / list.length * 100, WS_PINNED_STATUS.color)
+    : '';
   const top = list.map(i => ({ inst: i, works: anWorks(i.id) })).filter(r => r.works !== null).sort((a, b) => b.works - a.works).slice(0, 5);
   const topRows = top.length
     ? '<div class="an-step" style="padding:12px 0 2px">Biggest unmanaged output</div>' +
       top.map(r => anRow(anInstLink(r.inst), `${anNum(r.works)}<em>works</em>`, r.works / top[0].works * 100, '#fb923c', { swatch: false })).join('')
     : '';
-  return anCard('Pure white space', `${list.length} universities and medical centres with no Pure tenancy`, rows + topRows, { action: open });
+  return anCard('Pure white space', `${list.length} universities and medical centres with no Pure tenancy` + (pinned ? ` · ${pinned} pinned` : ''), rows + pinnedRow + topRows, { action: open });
 }
 
 function anGaps(s) {
