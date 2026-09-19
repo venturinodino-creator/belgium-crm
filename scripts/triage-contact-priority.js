@@ -151,11 +151,18 @@ const authHeaders = {
 };
 
 async function fetchContacts() {
-  const res = await supaFetch(
-    `${SUPA_URL}/rest/v1/crm_contacts?select=id,first,last,title,priority&region=eq.${REGION}`,
-    { headers: authHeaders });
-  if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text()).slice(0, 300)}`);
-  return res.json();
+  // PostgREST answers at most 1,000 rows per request; page until a short page.
+  const out = [];
+  for (let from = 0; ; from += 1000) {
+    const res = await supaFetch(
+      `${SUPA_URL}/rest/v1/crm_contacts?select=id,first,last,title,priority&region=eq.${REGION}`,
+      { headers: { ...authHeaders, 'Range-Unit': 'items', Range: `${from}-${from + 999}` } });
+    if (res.status === 416) return out;
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text()).slice(0, 300)}`);
+    const rows = await res.json();
+    out.push(...rows);
+    if (rows.length < 1000) return out;
+  }
 }
 
 async function updatePriority(id, priority) {
