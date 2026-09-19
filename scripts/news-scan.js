@@ -48,6 +48,9 @@ const RELEVANCE_MODEL = 'claude-haiku-4-5';
 // budget — capped much lower than the old plain-summary pass, with max_tokens
 // raised to match.
 const MAX_ANALYSIS_BATCH = 20;
+// Ceiling on link resolutions retried per run, so a large backlog is
+// worked through over several days rather than in one long burst.
+const MAX_URL_BACKFILL = 40;
 const ANALYSIS_MAX_TOKENS = 8192;
 // Both filterRelevance and backfillAnalysis used to send their whole batch
 // (up to MAX_ANALYSIS_BATCH) in a single call. In production, a batch of 17
@@ -419,6 +422,124 @@ async function fetchGoogleNewsRss(query) {
   return merged;
 }
 
+// Google News RSS hands out its own redirect links
+// (news.google.com/rss/articles/CBMi...), never the publisher's. Those work in
+// a browser but show google.com in the address bar, can't be copied into an
+// email as a source, and rot when Google retires an id. Older ids had the
+// target URL base64'd inside them; current ones are opaque, so the only way
+// across is Google's own decode endpoint: the article page carries a
+// signature and timestamp, which authorise one batchexecute call that returns
+// the real URL.
+//
+// Best-effort by design. Every failure path returns null and the caller keeps
+// the Google link, so a Google-side change degrades the links rather than
+// breaking the scan.
+const URL_RESOLVE_TIMEOUT_MS = 20000;
+// The decode endpoint serves a different (signature-free) page to an
+// obvious bot UA, so these two calls specifically pose as a browser. The RSS
+// fetch above keeps its honest identifying UA.
+const BROWSER_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36';
+
+function googleNewsArticleId(url) {
+  const m = String(url || '').match(/news\.google\.com\/(?:rss\/)?articles\/([^?/]+)/);
+  return m ? m[1] : null;
+}
+
+function isGoogleNewsUrl(url) { return !!googleNewsArticleId(url); }
+
+async function fetchWithTimeout(url, options) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), URL_RESOLVE_TIMEOUT_MS);
+  try {
+    return await fetch(url, { ...options, signal: ctrl.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// Returns { url } on success, { expired: true } when Google has retired the
+// id, or {} when it merely didn't work this time. The distinction matters:
+// Google drops RSS article ids after a week or two and then answers 400 for
+// both the decode call AND the reader clicking the stored link, so an
+// unresolved link is not a link that still works -- it is already dead, and
+// should be marked rather than retried forever.
+async function resolvePublisherUrl(googleUrl) {
+  const id = googleNewsArticleId(googleUrl);
+  if (!id) return {};
+  try {
+    const pageRes = await fetchWithTimeout('https://news.google.com/rss/articles/' + id, {
+      headers: { 'User-Agent': BROWSER_UA },
+    });
+    if (pageRes.status === 400 || pageRes.status === 404) return { expired: true };
+    if (!pageRes.ok) return {};
+    const page = await pageRes.text();
+    const sg = page.match(/data-n-a-sg="([^"]+)"/);
+    const ts = page.match(/data-n-a-ts="([^"]+)"/);
+    if (!sg || !ts) return {};
+
+    const inner = JSON.stringify(['garturlreq',
+      [['X', 'X', ['X', 'X'], null, null, 1, 1, 'US:en', null, 1, null, null, null, null, null, 0, 1],
+        'X', 'X', 1, [1, 1, 1], 1, 1, null, 0, 0, null, 0],
+      id, Number(ts[1]), sg[1]]);
+    const body = new URLSearchParams({ 'f.req': JSON.stringify([[['Fbv4je', inner, null, 'generic']]]) });
+
+    const res = await fetchWithTimeout('https://news.google.com/_/DotsSplashUi/data/batchexecute', {
+      method: 'POST',
+      headers: {
+        'User-Agent': BROWSER_UA,
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+      },
+      body,
+    });
+    if (!res.ok) return {};
+    const text = await res.text();
+    for (const line of text.split('\n')) {
+      if (!line.includes('garturlres')) continue;
+      let outer;
+      try { outer = JSON.parse(line); } catch { continue; }
+      for (const part of outer) {
+        try {
+          const url = JSON.parse(part[2])[1];
+          if (typeof url === 'string' && /^https?:\/\//.test(url)) return { url };
+        } catch { /* not the payload element; keep looking */ }
+      }
+    }
+    return {};
+  } catch (e) {
+    return {};
+  }
+}
+
+// Rewrites `url` in place to the publisher's, keeping the original Google link
+// in `googleNewsUrl` so an article that fails today can be retried on a later
+// run (and so the id, which is derived from that link, stays explicable).
+async function resolveArticleUrls(list, label) {
+  const pending = list.filter(a => isGoogleNewsUrl(a.url));
+  if (!pending.length) return 0;
+  console.log(`[news-scan] resolving ${pending.length} ${label} link(s) to publisher URLs...`);
+  let ok = 0, expired = 0;
+  for (let i = 0; i < pending.length; i++) {
+    const a = pending[i];
+    const res = await resolvePublisherUrl(a.url);
+    if (res.url) {
+      if (!a.googleNewsUrl) a.googleNewsUrl = a.url;
+      a.url = res.url.slice(0, 500);
+      ok++;
+    } else if (res.expired) {
+      // The id is gone, so the stored link is dead too. Clear it and mark it,
+      // which both stops the retry loop and lets the UI say "original link
+      // expired" instead of offering a click that 400s.
+      if (!a.googleNewsUrl) a.googleNewsUrl = a.url;
+      a.url = '';
+      a.linkExpired = true;
+      expired++;
+    }
+    if (i < pending.length - 1) await sleep(REQUEST_DELAY_MS);
+  }
+  console.log(`[news-scan] resolved ${ok}/${pending.length} ${label} link(s)` + (expired ? `, ${expired} retired by Google` : ''));
+  return ok;
+}
+
 function isRecent(pubDate) {
   if (!pubDate) return true; // don't drop items Google didn't date
   const d = new Date(pubDate);
@@ -614,8 +735,17 @@ async function main() {
   // duplicate. Found in the Netherlands CRM on 2026-09-12, where one run put
   // 13 articles through that round trip: 13 approved by the filter, none
   // reaching the feed, the archive unchanged at 103.
-  const archivedUrlsAtStart = readJSON(ARCHIVE_FILE, []).map(a => a.url).filter(Boolean);
-  const existingUrls = new Set([...articles.map(a => a.url), ...archivedUrlsAtStart]);
+  const archivedIdsAtStart = readJSON(ARCHIVE_FILE, []).map(a => a.id);
+  // Keyed on id (derived from the Google RSS link), not on url: url now
+  // holds the resolved publisher address, which never matches item.link.
+  //
+  // The archive counts as "already seen" too. Checking only the live feed
+  // meant every archived story was rediscovered on each run, re-sent to the
+  // paid relevance filter, and then dropped again as an already-archived
+  // duplicate -- 13 articles took that round trip on 2026-09-12, with the
+  // live feed gaining none of them and the archive staying at 103.
+  const archivedIdsAtStart = readJSON(ARCHIVE_FILE, []).map(a => a.id);
+  const existingIds = new Set([...articles.map(a => a.id), ...archivedIdsAtStart]);
   const candidateCounts = {};
   const freshCandidates = [];
 
@@ -654,7 +784,7 @@ async function main() {
 
       for (const item of items) {
         if (!isRecent(item.pubDate)) continue;
-        if (existingUrls.has(item.link)) continue;
+        if (existingIds.has(makeId(item.link))) continue;
         // For per-institution queries, require the institution name (or one of
         // its aliases — see institutionMatches) to actually appear in the
         // title/description — Google News RSS relevance ranking is loose.
@@ -670,7 +800,13 @@ async function main() {
           // decode to two literal spaces — collapse those before slicing so
           // a raw-description fallback (an article not yet backfilled with
           // an AI-written bottomLine) never shows doubled whitespace.
-          description: String(item.description || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().slice(0, 400),
+          // Decoded a SECOND time, after the tags come off. Google News wraps
+          // the description in an escaped <a> tag, so one pass only unwraps
+          // the markup and leaves the text's own entities encoded -- that is
+          // why "&nbsp;&nbsp;" kept reaching the UI despite the earlier
+          // decode fix. JS \s covers the resulting \u00a0, so the collapse
+          // below turns them into ordinary spaces.
+          description: decodeEntities(String(item.description || '').replace(/<[^>]*>/g, '')).replace(/\s+/g, ' ').trim().slice(0, 400),
           institution: job.inst,
           category: category.key,
           categoryLabel: category.label,
@@ -680,16 +816,22 @@ async function main() {
           foundDate: new Date().toISOString().slice(0, 10),
           autoDiscovered: true,
         });
-        existingUrls.add(item.link);
+        existingIds.add(makeId(item.link));
         console.log(`  + [${category.key}] ${item.title}`);
       }
     }
     candidateCounts[category.key] = categoryCandidates;
   }
 
-  console.log(`[news-scan] ${freshCandidates.length} keyword-matched candidate(s) found (skipping ${articles.length} live + ${archivedUrlsAtStart.length} archived already known) — running Elsevier-relevance filter...`);
+  console.log(`[news-scan] ${freshCandidates.length} keyword-matched candidate(s) found (skipping ${articles.length} live + ${archivedIdsAtStart.length} archived already known) — running Elsevier-relevance filter...`);
   const relevant = await filterRelevance(freshCandidates);
+  await resolveArticleUrls(relevant, 'new');
   for (const article of relevant) articles.unshift(article);
+
+  // Anything still on a Google link -- stored before this existed, or a
+  // resolution that failed earlier -- gets retried, newest first and capped
+  // so one run can't balloon into hundreds of requests.
+  await resolveArticleUrls(articles.filter(a => isGoogleNewsUrl(a.url)).slice(0, MAX_URL_BACKFILL), 'stored');
   const totalAdded = relevant.length;
 
   // A stale bare entry (e.g. saved by an old fallback/error path) can end up
@@ -717,6 +859,15 @@ async function main() {
     }
     if (archivedCount > 0) saveJSON(ARCHIVE_FILE, archive);
   }
+
+  // A story Google surfaces late (published more than ARCHIVE_AGE_DAYS ago)
+  // is added and archived in the same pass, so it never appears in the feed.
+  // Counting those as "new articles found" made the News page report 5 new
+  // on a run where the feed actually shrank by 2 -- so the two are now
+  // counted separately.
+  const addedIds = new Set(relevant.map(a => a.id));
+  const addedLive = live.filter(a => addedIds.has(a.id)).length;
+  const addedStraightToArchive = totalAdded - addedLive;
 
   const trimmed = live.slice(0, MAX_STORED_ARTICLES);
   if (totalAdded > 0 || archivedCount > 0 || backfilledCount > 0 || dedupedCount > 0) saveJSON(DATA_FILE, trimmed);
@@ -760,6 +911,8 @@ async function main() {
   saveJSON(STATE_FILE, {
     lastRun: new Date().toISOString(),
     lastAddedCount: totalAdded,
+    lastAddedLive: addedLive,
+    lastAddedArchived: addedStraightToArchive,
     lastCandidateCount: freshCandidates.length,
     lastArchivedCount: archivedCount,
     lastBackfilledCount: backfilledCount,

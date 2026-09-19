@@ -197,7 +197,10 @@ function looksLikePersonName(n) {
   if (/[@\d]|https?:/.test(n)) return false;
   if (NON_PERSON_RE.test(n)) return false;
   const words = n.split(/\s+/).filter(Boolean);
-  if (words.length < 2 || words.length > 5) return false;
+  // Cap of 6, not 5: a double-barrelled Dutch surname with a stray space
+  // around its hyphen — "Karen van Oudenhoven- van der Zee" (SCP's
+  // executive board page, verified 2026-09-13) — splits into 6 tokens.
+  if (words.length < 2 || words.length > 6) return false;
   // at least two capitalised words (handles "van Daele", "De Wilde")
   return words.filter(w => /^[A-ZÀ-Þ]/.test(w)).length >= 2;
 }
@@ -338,6 +341,29 @@ function extractPeople(html) {
     const a = strip(hp[1]), b = strip(hp[2]);
     if (looksLikePersonName(normalizePersonName(a)) && !looksLikePersonName(normalizePersonName(b))) add(a, b, '');
     else if (looksLikePersonName(normalizePersonName(b)) && !looksLikePersonName(normalizePersonName(a))) add(b, a, '');
+  }
+
+  // 5. A name wrapped in a link/span/strong tag, immediately followed by its
+  //    role in parentheses, inside flowing prose rather than a table/card/
+  //    list — no mailto to anchor on, e.g. "<a ...>Prof. Geert Kops</a>
+  //    (director) and <a ...>Jeroen den Hertog</a> (managing director)
+  //    maintains a flat organisation..." (Hubrecht Institute, verified
+  //    2026-09-13) or "<span ...>Karen van Oudenhoven-van der Zee</span>
+  //    (Director)." (SCP's executive board page, same date). Scoped tight —
+  //    the parenthetical must open right after the tag closes — so it can't
+  //    misfire on an unrelated tag followed unrelatedly by parenthesised text.
+  const linkRoleRe = /<(?:a|span|strong|b)\b[^>]*>([\s\S]{3,60}?)<\/(?:a|span|strong|b)>\s*\(([^)]{3,60})\)/gi;
+  let lr;
+  while ((lr = linkRoleRe.exec(html))) add(lr[1], lr[2], '');
+
+  // 6. <figcaption>Name<br>Role</figcaption> media-caption cards — no mailto
+  //    and no punctuation between name and role, just a line break inside a
+  //    tag method 3/4 don't scan (ZonMw's board page, verified 2026-09-13).
+  const figRe = /<figcaption[^>]*>([\s\S]{3,200}?)<\/figcaption>/gi;
+  let fc;
+  while ((fc = figRe.exec(html))) {
+    const lines = fc[1].split(/<br\s*\/?>/i).map(strip).filter(Boolean);
+    if (lines.length >= 2) add(lines[0], lines[1], '');
   }
 
   return [...found.values()];
