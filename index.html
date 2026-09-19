@@ -1736,7 +1736,7 @@ let state = {
   currentRole: null, // 'admin' | 'viewer' | null (not signed in yet)
   currentEmail: null, // signed-in address
   view: 'dashboard',
-  anRange: localStorage.getItem('crm_an_range') || '12m', // Analytics: 30d | 90d | 12m | all
+  anRange: localStorage.getItem('be_crm_an_range') || localStorage.getItem('crm_an_range') || '12m', // Analytics: 30d | 90d | 12m | all
   anType: '',                                            // Analytics: institution-type filter
   pipelineStage: 'all',
   instView: 'grid', // grid | table
@@ -1756,7 +1756,7 @@ let state = {
   contactInst: '',
   contactPriority: '',
   contactDept: '',
-  contactView: localStorage.getItem('crm_contacts_view') || 'list',
+  contactView: localStorage.getItem('be_crm_contacts_view') || localStorage.getItem('crm_contacts_view') || 'list',
   detailInstId: null,
   editInstId: null,
   editContactId: null,
@@ -3433,7 +3433,7 @@ function dshPosture(id) {
 // ── Momentum ────────────────────────────────────────────────
 // Each visit stores the headline figures; the next visit diffs against them so
 // the page can say what moved, not only what is.
-const DSH_SNAP_KEY = 'crm_dash_snapshot';
+const DSH_SNAP_KEY = 'be_crm_dash_snapshot';
 let _dshSnap = null;
 function dshLoadSnapshot() {
   try { _dshSnap = JSON.parse(localStorage.getItem(DSH_SNAP_KEY)); } catch(e) { _dshSnap = null; }
@@ -4803,7 +4803,9 @@ function renderWhiteSpace() {
             '<div class="ic-icon ' + i.type + '">' + (TYPE_ICON[i.type] || '') + '</div>' +
             '<span class="badge b-' + i.type + '" style="font-size:10px">' + (TYPE_LABEL[i.type] || i.type) + '</span>' +
             '<span class="badge" style="font-size:10px;background:' + st.color + '22;color:' + st.color + ';border:1px solid ' + st.color + '55">' + esc(wsStatusLabel(getProductStatus(i.id, state.wsProduct))) + '</span>' +
-            '<span class="badge" title="' + esc(bk.hint) + '" style="font-size:10px;background:' + bk.color + '22;color:' + bk.color + ';border:1px solid ' + bk.color + '55">' + bk.label + '</span>' +
+            // The bucket only adds information once the status is verified: an
+            // unverified status is the unverified bucket, so one badge is enough.
+            (getProductStatus(i.id, state.wsProduct) === 'unknown' ? '' : '<span class="badge" title="' + esc(bk.hint) + '" style="font-size:10px;background:' + bk.color + '22;color:' + bk.color + ';border:1px solid ' + bk.color + '55">' + bk.label + '</span>') +
           '</div>' +
           '<h3>' + esc(i.name) + '</h3>' +
           (i.short ? '<div class="short">' + esc(i.short) + '</div>' : '') +
@@ -5577,7 +5579,7 @@ const CX_PRIORITY_META = {
   low:    {label:'Low',    bg:'rgba(255,255,255,.06)',fg:'var(--muted2)', bd:'var(--border2)'},
 };
 
-function cxSetView(v) { state.contactView = v; localStorage.setItem('crm_contacts_view', v); renderContacts(); }
+function cxSetView(v) { state.contactView = v; localStorage.setItem('be_crm_contacts_view', v); renderContacts(); }
 function cxClearFilters() {
   state.contactSearch=''; state.contactInst=''; state.contactPriority='';
   state.contactDept=''; state.contactPage=1; renderContacts();
@@ -6347,6 +6349,8 @@ async function renderHiringScanStatus() {
           <a href="${esc(safeHref(u.url))}" target="_blank" style="color:var(--text);font-weight:600;text-decoration:none">${esc(u.company)}</a>
           <div style="color:var(--muted)">${esc(u.reason)}</div>
         </div>`).join('');
+    } else if (untrackedEl) {
+      untrackedEl.innerHTML = '<p style="font-size:12px;color:var(--muted)">Every tracked company was covered in the last scan.</p>';
     }
   } catch(e) { el.innerHTML = '<p style="font-size:12px;color:var(--muted)">Status unavailable.</p>'; }
 }
@@ -7159,7 +7163,7 @@ function anGrowBars() {
 
 function anSetRange(r) {
   state.anRange = r;
-  try { localStorage.setItem('crm_an_range', r); } catch (e) {}
+  try { localStorage.setItem('be_crm_an_range', r); } catch (e) {}
   renderAnalytics();
 }
 function anSetType(t) { state.anType = t; renderAnalytics(); }
@@ -7928,15 +7932,20 @@ if (!window.COMP_DATA) {
   } catch(e) {}
 })();
 
-// Notes persistence — global so inline oninput handlers can reach them
+// Notes persistence — global so inline oninput handlers can reach them.
+// Region-prefixed: the three CRMs share one origin, so an unprefixed key
+// leaked notes between them. The old key is read as a fallback once.
+function _matrixNotes() {
+  try { return JSON.parse(localStorage.getItem('be_crm_matrix_notes') || localStorage.getItem('crm_matrix_notes') || '{}'); }
+  catch (e) { return {}; }
+}
 function getNotes(instId) {
-  const stored = JSON.parse(localStorage.getItem('crm_matrix_notes')||'{}');
-  return stored[instId] || '';
+  return _matrixNotes()[instId] || '';
 }
 function saveNote(instId, val) {
-  const stored = JSON.parse(localStorage.getItem('crm_matrix_notes')||'{}');
+  const stored = _matrixNotes();
   if (val.trim()) { stored[instId] = val; } else { delete stored[instId]; }
-  localStorage.setItem('crm_matrix_notes', JSON.stringify(stored));
+  localStorage.setItem('be_crm_matrix_notes', JSON.stringify(stored));
 }
 
 /* ─── OpenAlex subscription agent findings (data/openalex-subscriptions.json) ─── */
@@ -8295,7 +8304,7 @@ function renderOpenAlex() {
 let _cmxSearch = '';
 let _cmxStatusFilter = null;
 let _cmxSort = { key: null, dir: 1 };
-let _cmxView = localStorage.getItem('crm_matrix_view') || 'table';
+let _cmxView = localStorage.getItem('be_crm_matrix_view') || localStorage.getItem('crm_matrix_view') || 'table';
 
 function cmxSetSearch(v) { _cmxSearch = v; renderSubscriptionMatrix(); }
 function cmxToggleStatusFilter(key) { _cmxStatusFilter = (_cmxStatusFilter === key) ? null : key; renderSubscriptionMatrix(); }
@@ -8305,7 +8314,7 @@ function cmxSort(key) {
   renderSubscriptionMatrix();
 }
 function cmxClearFilters() { _cmxSearch = ''; _cmxStatusFilter = null; renderSubscriptionMatrix(); }
-function cmxSetView(v) { _cmxView = v; localStorage.setItem('crm_matrix_view', v); renderSubscriptionMatrix(); }
+function cmxSetView(v) { _cmxView = v; localStorage.setItem('be_crm_matrix_view', v); renderSubscriptionMatrix(); }
 
 function renderSubscriptionMatrix() {
   document.getElementById('page-title').textContent = 'Competitor Matrix';
