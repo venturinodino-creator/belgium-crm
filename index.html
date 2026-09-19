@@ -1415,6 +1415,22 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
 .dg-cat-n{font-size:12px;font-weight:800;color:var(--text2);text-align:right;font-variant-numeric:tabular-nums}
 .dg-note{font-size:11px;line-height:1.5;color:var(--muted);margin:0;padding-top:10px;border-top:1px solid var(--border)}
 
+/* Digest "Your Day" card — today's CRM activity and what wants an action */
+.dgx-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:8px}
+.dgx-stat{background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:8px;padding:9px 11px}
+.dgx-stat b{display:block;font-size:18px;font-weight:700;color:var(--text2);letter-spacing:-.4px;line-height:1.15}
+.dgx-stat span{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.dgx-sec{padding:13px 18px;border-top:1px solid var(--border)}
+.dgx-sec h4{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:0 0 6px}
+.dgx-item{display:flex;align-items:baseline;gap:9px;padding:7px 0;font-size:12.5px;color:var(--text);cursor:pointer;border-bottom:1px solid var(--border)}
+.dgx-item:last-child{border-bottom:none}
+.dgx-item:hover .dgx-who{color:var(--accent)}
+.dgx-who{font-weight:600;flex-shrink:0}
+.dgx-what{color:var(--muted2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.dgx-when{font-size:10.5px;color:var(--muted);flex-shrink:0;font-variant-numeric:tabular-nums}
+.dgx-empty{font-size:12px;color:var(--muted);padding:3px 0}
+
+
 /* Back to Dashboard — sits above #content so view renderers cannot clear it.
    Matches the padding of .content so the two line up, and tightens the gap
    below itself only when it is actually showing. */
@@ -9992,6 +10008,7 @@ async function renderDailyDigest() {
 
   document.getElementById('content').innerHTML = `
     <div style="max-width:900px">
+      ${digestActivityHtml()}
       <div class="card" style="padding:0;overflow:hidden;margin-bottom:20px">
         <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
           <h3 style="font-size:14px;margin:0">News Summary</h3>
@@ -10010,6 +10027,108 @@ async function renderDailyDigest() {
 
   loadDigestNews();
   loadDigestHiring();
+}
+
+// ── digest analytics ────────────────────────────────────────
+// The Analytics screen answers "how are we doing"; this card answers the
+// digest's own question — "what about today". Same state, same helpers, but
+// scoped to the day and to the things that want an action before it closes.
+// Anything dated uses today's local date, matching digestIsToday().
+function digestActivityHtml() {
+  const today = anISO(new Date());
+  const acts = state.interactions.filter(a => String(a.date || '').slice(0, 10) === today);
+  const touched = new Set(acts.map(a => a.instId));
+  const rfps = (typeof getRFPs === 'function' ? getRFPs() : state.rfps) || [];
+  const rfpsToday = rfps.filter(r => String(r.foundDate || r.publishedDate || r.createdAt || '').slice(0, 10) === today);
+  const openOpps = state.opportunities.filter(o => !['closed-won', 'closed-lost'].includes(o.stage));
+
+  // Anything with a date on it that has come round — next actions on the
+  // account, and open deals whose close date has arrived or passed.
+  const due = [];
+  state.institutions.forEach(i => {
+    if (i.nextAction && i.nextActionDate && i.nextActionDate <= today) {
+      due.push({ instId: i.id, who: i.short || i.name, what: i.nextAction, date: i.nextActionDate });
+    }
+  });
+  openOpps.forEach(o => {
+    if (o.closeDate && o.closeDate <= today) {
+      const i = getInst(o.instId);
+      due.push({ instId: o.instId, who: i.short || i.name || '—', what: `${o.name} · expected to close`, date: o.closeDate });
+    }
+  });
+  due.sort((a, b) => a.date.localeCompare(b.date));
+
+  // Open money sitting on accounts nobody has spoken to in a month.
+  const last = {};
+  state.interactions.forEach(a => {
+    if (a.date && (!last[a.instId] || a.date > last[a.instId])) last[a.instId] = a.date;
+  });
+  const quiet = state.institutions
+    .filter(i => openOpps.some(o => o.instId === i.id))
+    .map(i => ({
+      inst: i,
+      days: anDaysSince(last[i.id]),
+      val: openOpps.filter(o => o.instId === i.id).reduce((a, o) => a + (parseFloat(o.value) || 0), 0),
+    }))
+    .filter(x => x.days === null || x.days >= 30)
+    .sort((a, b) => (b.days === null ? 1e6 : b.days) - (a.days === null ? 1e6 : a.days))
+    .slice(0, 5);
+
+  const overdue = due.filter(d => d.date < today).length;
+  const mix = {};
+  acts.forEach(a => { const t = a.type || 'other'; mix[t] = (mix[t] || 0) + 1; });
+  const topType = Object.entries(mix).sort((a, b) => b[1] - a[1])[0];
+
+  const lead = acts.length
+    ? `<b>${acts.length} interaction${acts.length === 1 ? '' : 's'}</b> logged today across
+       ${touched.size} account${touched.size === 1 ? '' : 's'}${topType && acts.length > 1 ? `, mostly ${esc(topType[0])}` : ''}.`
+    : `Nothing logged in the CRM today yet.`;
+  const leadDue = due.length
+    ? ` ${due.length} thing${due.length === 1 ? '' : 's'} ${due.length === 1 ? 'is' : 'are'} due${overdue ? `, ${overdue} of them overdue` : ''}.`
+    : ` Nothing is due.`;
+
+  const stats = [
+    { n: String(acts.length), l: 'Interactions' },
+    { n: String(touched.size), l: 'Accounts touched' },
+    { n: String(due.length), l: 'Due today' },
+    { n: String(rfpsToday.length), l: 'New tenders' },
+  ].map(s => `<div class="dgx-stat"><b>${s.n}</b><span>${s.l}</span></div>`).join('');
+
+  const dueRows = due.length
+    ? due.slice(0, 6).map(d => `<div class="dgx-item" onclick="nav('detail',{instId:'${d.instId}'})">
+        <span class="dgx-who">${esc(d.who)}</span>
+        <span class="dgx-what">${esc(d.what)}</span>
+        <span class="dgx-when">${d.date < today ? anDaysSince(d.date) + 'd overdue' : 'today'}</span>
+      </div>`).join('') + (due.length > 6 ? `<div class="dgx-empty">+${due.length - 6} more</div>` : '')
+    : `<div class="dgx-empty">Nothing scheduled for today or earlier.</div>`;
+
+  const quietRows = quiet.length
+    ? quiet.map(q => `<div class="dgx-item" onclick="nav('detail',{instId:'${q.inst.id}'})">
+        <span class="dgx-who">${esc(q.inst.short || q.inst.name)}</span>
+        <span class="dgx-what">${anMoney(q.val)} open</span>
+        <span class="dgx-when">${q.days === null ? 'never contacted' : q.days + 'd ago'}</span>
+      </div>`).join('')
+    : `<div class="dgx-empty">${openOpps.length
+        ? 'Every account with an open deal was touched in the last 30 days.'
+        : 'No open deals to chase.'}</div>`;
+
+  const tenderNote = rfpsToday.length
+    ? `${rfpsToday.length} new tender${rfpsToday.length === 1 ? '' : 's'} today: ${rfpsToday.slice(0, 2).map(r => esc(r.institution || r.title || 'untitled')).join(', ')}${rfpsToday.length > 2 ? ` +${rfpsToday.length - 2} more` : ''}.`
+    : 'No new tenders today.';
+
+  return `<div class="card" style="padding:0;overflow:hidden;margin-bottom:20px">
+    <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+      <h3 style="font-size:14px;margin:0">Your Day</h3>
+      <button class="an-link" onclick="nav('analytics')">Open Analytics &rarr;</button>
+    </div>
+    <div class="dg-summary">
+      <p class="dg-lead">${lead}${leadDue}</p>
+      <div class="dgx-stats">${stats}</div>
+      <p class="dg-note">${tenderNote}</p>
+    </div>
+    <div class="dgx-sec"><h4>Due today or overdue</h4>${dueRows}</div>
+    <div class="dgx-sec"><h4>Open deals going quiet</h4>${quietRows}</div>
+  </div>`;
 }
 
 // Condenses the feed into a few plain sentences and counts. Only fields the
