@@ -80,14 +80,26 @@ async function supaFetch(url, options = {}) {
   }
 }
 
+// PostgREST answers at most 1,000 rows per request; every region's contact
+// table is past or near that, so table reads page until a short page arrives.
+async function supaFetchAll(url) {
+  const out = [];
+  for (let from = 0; ; from += 1000) {
+    const res = await supaFetch(url, {
+      headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}`, 'Range-Unit': 'items', Range: `${from}-${from + 999}` },
+    });
+    if (res.status === 416) return out;
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const rows = await res.json();
+    out.push(...rows);
+    if (rows.length < 1000) return out;
+  }
+}
+
 async function fetchLivePending() {
   if (!SUPA_SERVICE_KEY) return null;
   try {
-    const res = await supaFetch(`${SUPA_URL}/rest/v1/pending_contacts?select=id,first,last,institution_id,institution_name,department,created_at,status&region=eq.belgium`, {
-      headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}` }
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.json();
+    return await supaFetchAll(`${SUPA_URL}/rest/v1/pending_contacts?select=id,first,last,institution_id,institution_name,department,created_at,status&region=eq.belgium`);
   } catch (e) {
     console.error('Could not fetch live pending_contacts, falling back to local file:', e.message);
     return null;
@@ -97,11 +109,7 @@ async function fetchLivePending() {
 async function fetchLiveContacts() {
   if (!SUPA_SERVICE_KEY) return null;
   try {
-    const res = await supaFetch(`${SUPA_URL}/rest/v1/crm_contacts?select=id,status,priority,quality,inst_id&region=eq.belgium`, {
-      headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}` }
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.json();
+    return await supaFetchAll(`${SUPA_URL}/rest/v1/crm_contacts?select=id,status,priority,quality,inst_id&region=eq.belgium`);
   } catch (e) {
     console.error('Could not fetch live crm_contacts, falling back to seed data:', e.message);
     return null;
@@ -116,11 +124,7 @@ async function fetchLiveContacts() {
 async function fetchInstitutionOverrides() {
   if (!SUPA_SERVICE_KEY) return {};
   try {
-    const res = await supaFetch(`${SUPA_URL}/rest/v1/crm_institutions?select=id,warmth,contract_value,renewal_date,products&region=eq.belgium`, {
-      headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}` }
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const rows = await res.json();
+    const rows = await supaFetchAll(`${SUPA_URL}/rest/v1/crm_institutions?select=id,warmth,contract_value,renewal_date,products&region=eq.belgium`);
     return Object.fromEntries(rows.map(r => [r.id, r]));
   } catch (e) {
     console.error('Could not fetch crm_institutions overrides:', e.message);
@@ -131,11 +135,7 @@ async function fetchInstitutionOverrides() {
 async function fetchOpportunities() {
   if (!SUPA_SERVICE_KEY) return [];
   try {
-    const res = await supaFetch(`${SUPA_URL}/rest/v1/crm_opportunities?select=id,inst_id,name,stage,value,close_date&region=eq.belgium`, {
-      headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}` }
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.json();
+    return await supaFetchAll(`${SUPA_URL}/rest/v1/crm_opportunities?select=id,inst_id,name,stage,value,close_date&region=eq.belgium`);
   } catch (e) {
     console.error('Could not fetch crm_opportunities:', e.message);
     return [];
@@ -145,11 +145,7 @@ async function fetchOpportunities() {
 async function fetchInteractions() {
   if (!SUPA_SERVICE_KEY) return [];
   try {
-    const res = await supaFetch(`${SUPA_URL}/rest/v1/crm_interactions?select=id,inst_id,contact_id,date,type&region=eq.belgium`, {
-      headers: { apikey: SUPA_SERVICE_KEY, Authorization: `Bearer ${SUPA_SERVICE_KEY}` }
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.json();
+    return await supaFetchAll(`${SUPA_URL}/rest/v1/crm_interactions?select=id,inst_id,contact_id,date,type&region=eq.belgium`);
   } catch (e) {
     console.error('Could not fetch crm_interactions:', e.message);
     return [];
