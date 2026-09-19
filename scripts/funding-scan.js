@@ -9,10 +9,17 @@
 // a per-organisation query; OpenAIRE indexes the same CORDIS records and
 // serves them by organisation, with the national funders in the same call.
 //
-// Institution resolution: data/research-focus.json carries each
-// institution's ROR id (from OpenAlex). OpenAIRE's organisations endpoint
-// maps a ROR id to its own organisation id, which the projects endpoint
-// filters on. Those ids are cached in data/funding-scan-state.json.
+// Why match by name phrase rather than organisation id: OpenAIRE holds one
+// university as many organisation records (the deduplicated "openorgs"
+// record with the ROR id, plus "pending_org" fragments carrying each
+// funder's own spelling — STICHTING KATHOLIEKE UNIVERSITEIT BRABANT, AALBORG
+// UNIVERSITET, WAGENINGEN UNIVERSITY), and most projects hang off the
+// fragments. The ROR record for the University of Copenhagen holds 3 of its
+// 3,900 projects. relOrganizationName searches across all of them; quoted,
+// it is a phrase match, so "Utrecht University" no longer pulls in "HU
+// University of Applied Sciences Utrecht". A few institutions whose funder
+// spelling differs from their English name are undercounted (Radboud), and
+// the card links to the same OpenAIRE search so the figure can be checked.
 //
 // A grant amount is the project's total funded amount, not this
 // institution's share — the API does not split it by participant, and the
@@ -22,8 +29,8 @@ const fs = require('fs');
 const path = require('path');
 
 const API = 'https://api.openaire.eu/graph/v1';
-const COUNTRY = 'BE'; // ISO country code for the name-search fallback
 const FOCUS_PATH = path.join(__dirname, '..', 'data', 'research-focus.json');
+const INST_PATH = path.join(__dirname, '..', 'data', 'institutions.json');
 const OUT_PATH = path.join(__dirname, '..', 'data', 'funding.json');
 const STATE_PATH = path.join(__dirname, '..', 'data', 'funding-scan-state.json');
 const LOOKBACK_YEARS = 3;
@@ -48,29 +55,34 @@ async function apiGet(url, attempt = 0) {
 
 function readJSON(p, fallback) { try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch (e) { return fallback; } }
 
-// OpenAIRE does not carry a ROR pid for every organisation it knows (CWI,
-// Deltares and Sanquin all resolve by name but not by ROR), so fall back to a
-// name search restricted to this country and accept an exact name match.
-async function resolveOrg(ror, name) {
-  const json = await apiGet(`${API}/organizations?pid=${encodeURIComponent('https://ror.org/' + ror)}&pageSize=1`);
-  const org = (json.results || [])[0];
-  if (org) return { id: org.id, name: org.legalName || org.legalShortName, via: 'ror' };
-  if (!name) return null;
-  await sleep(PAUSE_MS);
-  const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-  const byName = await apiGet(`${API}/organizations?search=${encodeURIComponent(name)}&countryCode=${COUNTRY}&pageSize=10`);
-  const want = norm(name);
-  const hit = (byName.results || []).find(o => [o.legalName, o.legalShortName, ...(o.alternativeNames || [])].some(n => norm(n) === want));
-  return hit ? { id: hit.id, name: hit.legalName || hit.legalShortName, via: 'name' } : null;
+function projectUrl(p) { return `https://explore.openaire.eu/search/project?projectId=${encodeURIComponent(p.id)}`; }
+function searchUrl(name) { return `https://explore.openaire.eu/search/find/projects?fv0=${encodeURIComponent('"' + name + '"')}&f0=q`; }
+
+function projectsUrl(name, fromDate, page, size) {
+  return `${API}/projects?relOrganizationName=${encodeURIComponent('"' + name + '"')}&fromStartDate=${fromDate}&pageSize=${size}&page=${page}&sortBy=startDate%20DESC`;
 }
 
-function projectUrl(p) { return `https://explore.openaire.eu/search/project?projectId=${encodeURIComponent(p.id)}`; }
+// The names to try, in order: the OpenAlex display name, the CRM's own name,
+// and the part of the CRM name before an em-dash ("ASTRON — Netherlands
+// Institute for Radio Astronomy" is filed under ASTRON). The first that
+// returns anything wins. Short names and acronyms are never used: a phrase
+// search for "FORCE", "BRIGHT" or "Research Foundation" matches anything.
+function candidateNames(rf, inst) {
+  const seen = new Set();
+  const usable = n => n.length >= 8 && n.split(/\s+/).length >= 2 && !/^[A-Z0-9 .&-]+$/.test(n);
+  const raw = [rf && rf.openalexName, inst && inst.name];
+  if (inst && inst.name && /\s—\s/.test(inst.name)) raw.push(inst.name.split(/\s—\s/)[0]);
+  return raw
+    // Commas and quotes inside the phrase make the API answer 400.
+    .map(n => String(n || '').replace(/[,;"'()]+/g, ' ').replace(/\s+/g, ' ').trim())
+    .filter(n => usable(n) && !seen.has(n.toLowerCase()) && seen.add(n.toLowerCase()));
+}
 
-async function scanInstitution(orgId, fromDate) {
+async function scanInstitution(name, fromDate) {
   const projects = [];
   let numFound = 0;
   for (let page = 1; page <= MAX_PAGES; page++) {
-    const json = await apiGet(`${API}/projects?relOrganizationId=${encodeURIComponent(orgId)}&fromStartDate=${fromDate}&pageSize=100&page=${page}&sortBy=startDate%20DESC`);
+    const json = await apiGet(projectsUrl(name, fromDate, page, 100));
     numFound = (json.header && json.header.numFound) || 0;
     projects.push(...(json.results || []));
     if (page * 100 >= numFound) break;
@@ -89,6 +101,17 @@ async function scanInstitution(orgId, fromDate) {
     if (amt) { fundedTotal += amt; fundedKnown++; }
     if (!p.endDate || p.endDate >= today) active++;
   }
+  // The counts above cover the fetched projects only; a large university has
+  // more than the 300 fetched. Ask the API how many have already ended (a
+  // project with no end date on record counts as running, as above) and
+  // take the rest as active.
+  if (numFound > projects.length) {
+    try {
+      await sleep(PAUSE_MS);
+      const ended = await apiGet(`${API}/projects?relOrganizationName=${encodeURIComponent('"' + name + '"')}&fromStartDate=${fromDate}&toEndDate=${today}&pageSize=1`);
+      if (ended.header && typeof ended.header.numFound === 'number') active = Math.max(0, numFound - ended.header.numFound);
+    } catch (e) { /* keep the count over the fetched projects */ }
+  }
   const top = projects.slice(0, TOP_PROJECTS).map(p => {
     const f = (p.fundings || [])[0] || {};
     return {
@@ -106,32 +129,44 @@ async function scanInstitution(orgId, fromDate) {
 async function main() {
   const focus = readJSON(FOCUS_PATH, null);
   if (!focus) { console.error('data/research-focus.json missing — run research-focus-scan first'); process.exit(1); }
-  const state = readJSON(STATE_PATH, { orgIds: {} });
+  const instList = readJSON(INST_PATH, []);
+  const instById = Object.fromEntries((Array.isArray(instList) ? instList : []).map(i => [i.id, i]));
+  const state = readJSON(STATE_PATH, {});
   const previous = readJSON(OUT_PATH, { institutions: {} });
   const from = new Date(); from.setFullYear(from.getFullYear() - LOOKBACK_YEARS);
   const fromDate = from.toISOString().slice(0, 10);
   const out = {
     generatedAt: new Date().toISOString(),
-    source: 'OpenAIRE Graph API (projects by organisation; CORDIS and national funders)',
+    source: 'OpenAIRE Graph API (projects by organisation name; CORDIS and national funders)',
     since: fromDate,
     institutions: {},
   };
-  let ok = 0, skipped = 0, failed = 0;
-  for (const [instId, rf] of Object.entries(focus.institutions || {})) {
+  // Every CRM institution is tried, whether or not OpenAlex knows it.
+  const ids = Array.from(new Set([...Object.keys(focus.institutions || {}), ...Object.keys(instById)]));
+  let ok = 0, empty = 0, failed = 0;
+  for (const instId of ids) {
     if (ONLY.length && !ONLY.includes(instId)) continue;
-    if (!rf || !rf.ror) { out.institutions[instId] = { notFound: true, reason: 'No ROR id resolved for this organisation, so OpenAIRE cannot be queried.' }; skipped++; continue; }
+    const rf = (focus.institutions || {})[instId];
+    const names = candidateNames(rf, instById[instId]);
+    if (!names.length) { out.institutions[instId] = { notFound: true, reason: 'No name to search OpenAIRE with.' }; empty++; continue; }
     try {
-      let org = state.orgIds[rf.ror];
-      if (!org) { org = await resolveOrg(rf.ror, rf.openalexName); await sleep(PAUSE_MS); }
-      if (!org) { out.institutions[instId] = { notFound: true, reason: `OpenAIRE has no organisation record for ROR ${rf.ror}.`, ror: rf.ror }; skipped++; continue; }
-      state.orgIds[rf.ror] = org;
-      const rec = await scanInstitution(org.id, fromDate);
-      out.institutions[instId] = { ror: rf.ror, openaireId: org.id, openaireName: org.name, since: fromDate, ...rec,
-        sourceUrl: `https://explore.openaire.eu/search/advanced/projects?relorganizationid=${encodeURIComponent(org.id)}` };
-      ok++;
+      let rec = null, used = '';
+      for (const name of names) {
+        used = name;
+        try { rec = await scanInstitution(name, fromDate); }
+        catch (e) {
+          // A phrase the API will not parse (HTTP 400) is a miss for that
+          // name, not a failed institution: try the next spelling.
+          if (!/HTTP 400/.test(e.message)) throw e;
+          rec = { numFound: 0, fetched: 0, active: 0, fundedTotal: 0, fundedKnown: 0, byFunder: {}, projects: [], rejected: true };
+        }
+        await sleep(PAUSE_MS);
+        if (rec.numFound > 0) break;
+      }
+      out.institutions[instId] = { query: used, since: fromDate, ...rec, sourceUrl: searchUrl(used) };
+      if (rec.numFound > 0) ok++; else empty++;
       const funders = Object.entries(rec.byFunder).sort((a, b) => b[1].count - a[1].count).slice(0, 3).map(([k, v]) => `${k} ${v.count}`).join(', ');
-      console.log(`  ✓ ${(org.name || instId).padEnd(52)} ${String(rec.numFound).padStart(5)} projects since ${fromDate}, ${rec.active} active — ${funders}`);
-      await sleep(PAUSE_MS);
+      console.log(`  ${rec.numFound ? '✓' : '·'} ${used.padEnd(52)} ${String(rec.numFound).padStart(5)} projects since ${fromDate}, ${rec.active} active — ${funders}`);
     } catch (e) {
       failed++;
       const prev = (previous.institutions || {})[instId];
@@ -139,12 +174,12 @@ async function main() {
       console.log(`  ✗ ${instId}: ${e.message}`);
     }
   }
-  console.log(`\nDone: ${ok} scanned, ${skipped} without an OpenAIRE record, ${failed} failed.`);
+  console.log(`\nDone: ${ok} with projects, ${empty} with none, ${failed} failed.`);
   if (DRY_RUN) { console.log('(dry run — not written)'); return; }
   if (ONLY.length) out.institutions = { ...(previous.institutions || {}), ...out.institutions };
   fs.writeFileSync(OUT_PATH, JSON.stringify(out, null, 2) + '\n');
   state.lastRun = new Date().toISOString();
-  state.lastScanned = ok; state.lastFailed = failed;
+  state.lastScanned = ok; state.lastEmpty = empty; state.lastFailed = failed;
   fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2) + '\n');
   console.log(`Wrote ${OUT_PATH}`);
 }

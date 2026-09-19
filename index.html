@@ -4844,7 +4844,7 @@ function buildInstFunding(instId) {
   const meta = state.fundingMeta || {};
   const foot = (inner) => '<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:10px;color:var(--muted)">' + inner + '</div>';
   if (!fd) return '';
-  if (fd.notFound) return ''; // nothing to show, and the reason is in data/funding.json
+  if (fd.notFound || !fd.numFound) return ''; // nothing to show; the reason is in data/funding.json
   if (fd.fetchError && !fd.numFound) return '<div style="font-size:12px;color:var(--muted)">Funding data temporarily unavailable (fetch error on last scan).</div>';
   const since = fd.since ? new Date(fd.since).toLocaleDateString('en-GB', { year: 'numeric', month: 'short' }) : '';
   const funders = Object.entries(fd.byFunder || {}).sort((a, b) => b[1].count - a[1].count);

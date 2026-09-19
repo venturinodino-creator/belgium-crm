@@ -1,33 +1,46 @@
 {
-  "generatedAt": "2026-09-19T20:43:33.602Z",
-  "source": "OpenAIRE Graph API (projects by organisation; CORDIS and national funders)",
+  "generatedAt": "2026-09-19T21:06:33.921Z",
+  "source": "OpenAIRE Graph API (projects by organisation name; CORDIS and national funders)",
   "since": "2023-09-19",
   "institutions": {
     "kuleuven": {
-      "ror": "05f950310",
-      "openaireId": "openorgs____::ccc0a066b56d2cfaf90c2ae369df16f5",
-      "openaireName": "KU Leuven",
+      "query": "KU Leuven",
       "since": "2023-09-19",
-      "numFound": 396,
+      "numFound": 420,
       "fetched": 300,
-      "active": 286,
-      "fundedTotal": 1235711724.4,
-      "fundedKnown": 300,
+      "active": 392,
+      "fundedTotal": 1192022627.4,
+      "fundedKnown": 290,
       "byFunder": {
         "EC": {
           "name": "European Commission",
-          "count": 293,
-          "amount": 1231121579.4
+          "count": 278,
+          "amount": 1182977959.4
+        },
+        "UKRI": {
+          "name": "UK Research and Innovation",
+          "count": 3,
+          "amount": 3993032
         },
         "ANR": {
           "name": "French National Research Agency (ANR)",
-          "count": 6,
-          "amount": 2394645
+          "count": 8,
+          "amount": 2856136
+        },
+        "NWO": {
+          "name": "Netherlands Organisation for Scientific Research (NWO)",
+          "count": 9,
+          "amount": 0
         },
         "WT": {
           "name": "Wellcome Trust",
           "count": 1,
           "amount": 2195500
+        },
+        "CF": {
+          "name": "Carlsberg Foundation",
+          "count": 1,
+          "amount": 0
         }
       },
       "projects": [
@@ -200,18 +213,16 @@
           "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3Aab41628f39f932b8618b753e7e2d7c96"
         }
       ],
-      "sourceUrl": "https://explore.openaire.eu/search/advanced/projects?relorganizationid=openorgs____%3A%3Accc0a066b56d2cfaf90c2ae369df16f5"
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22KU%20Leuven%22&f0=q"
     },
     "ugent": {
-      "ror": "00cv9y106",
-      "openaireId": "openorgs____::5f31346d444a7f06a28c880fb170b0f6",
-      "openaireName": "Ghent University",
+      "query": "Ghent University",
       "since": "2023-09-19",
-      "numFound": 244,
-      "fetched": 244,
-      "active": 230,
-      "fundedTotal": 1098936805,
-      "fundedKnown": 243,
+      "numFound": 248,
+      "fetched": 248,
+      "active": 233,
+      "fundedTotal": 1100972804,
+      "fundedKnown": 247,
       "byFunder": {
         "EC": {
           "name": "European Commission",
@@ -220,8 +231,8 @@
         },
         "ANR": {
           "name": "French National Research Agency (ANR)",
-          "count": 9,
-          "amount": 2681766
+          "count": 12,
+          "amount": 4605225
         },
         "UKRI": {
           "name": "UK Research and Innovation",
@@ -237,6 +248,11 @@
           "name": "CHIST-ERA",
           "count": 1,
           "amount": 0
+        },
+        "SNSF": {
+          "name": "Swiss National Science Foundation",
+          "count": 1,
+          "amount": 112540
         }
       },
       "projects": [
@@ -409,23 +425,26 @@
           "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A0afd94de3ff2531385aaceaceafa80da"
         }
       ],
-      "sourceUrl": "https://explore.openaire.eu/search/advanced/projects?relorganizationid=openorgs____%3A%3A5f31346d444a7f06a28c880fb170b0f6"
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Ghent%20University%22&f0=q"
     },
     "uantwerpen": {
-      "ror": "008x57b05",
-      "openaireId": "openorgs____::e7be6597b7e02ac19f6db81fef321e3d",
-      "openaireName": "University of Antwerp",
+      "query": "University of Antwerp",
       "since": "2023-09-19",
-      "numFound": 150,
-      "fetched": 150,
-      "active": 134,
-      "fundedTotal": 509016186,
-      "fundedKnown": 149,
+      "numFound": 154,
+      "fetched": 154,
+      "active": 135,
+      "fundedTotal": 509368456,
+      "fundedKnown": 153,
       "byFunder": {
         "EC": {
           "name": "European Commission",
           "count": 144,
           "amount": 506695055
+        },
+        "SNSF": {
+          "name": "Swiss National Science Foundation",
+          "count": 4,
+          "amount": 352270
         },
         "ANR": {
           "name": "French National Research Agency (ANR)",
@@ -613,28 +632,41 @@
           "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A1c5cf8c9a10a9f0fe6efa6b2cbb1e52d"
         }
       ],
-      "sourceUrl": "https://explore.openaire.eu/search/advanced/projects?relorganizationid=openorgs____%3A%3Ae7be6597b7e02ac19f6db81fef321e3d"
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22University%20of%20Antwerp%22&f0=q"
     },
     "vub": {
-      "ror": "006e5kg04",
-      "openaireId": "openorgs____::6363a88f20cca34629ae690d539f9b67",
-      "openaireName": "Vrije Universiteit Brussel",
+      "query": "Vrije Universiteit Brussel",
       "since": "2023-09-19",
-      "numFound": 152,
-      "fetched": 152,
-      "active": 146,
-      "fundedTotal": 583513901.6,
-      "fundedKnown": 152,
+      "numFound": 156,
+      "fetched": 156,
+      "active": 150,
+      "fundedTotal": 583658284.6,
+      "fundedKnown": 153,
       "byFunder": {
         "EC": {
           "name": "European Commission",
           "count": 146,
           "amount": 582024748
         },
+        "NWO": {
+          "name": "Netherlands Organisation for Scientific Research (NWO)",
+          "count": 2,
+          "amount": 0
+        },
+        "SNSF": {
+          "name": "Swiss National Science Foundation",
+          "count": 1,
+          "amount": 144383
+        },
         "ANR": {
           "name": "French National Research Agency (ANR)",
           "count": 6,
           "amount": 1489153.6
+        },
+        "CF": {
+          "name": "Carlsberg Foundation",
+          "count": 1,
+          "amount": 0
         }
       },
       "projects": [
@@ -807,12 +839,10 @@
           "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A1b27d653f23547852013ebaf590db742"
         }
       ],
-      "sourceUrl": "https://explore.openaire.eu/search/advanced/projects?relorganizationid=openorgs____%3A%3A6363a88f20cca34629ae690d539f9b67"
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Vrije%20Universiteit%20Brussel%22&f0=q"
     },
     "uhasselt": {
-      "ror": "04nbhqj75",
-      "openaireId": "openorgs____::89d1e5147df8b579a8fb7a2ced11f722",
-      "openaireName": "Hasselt University",
+      "query": "Hasselt University",
       "since": "2023-09-19",
       "numFound": 30,
       "fetched": 30,
@@ -996,212 +1026,20 @@
           "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3Ac0d9945cf10ad932323656d2536c7f53"
         }
       ],
-      "sourceUrl": "https://explore.openaire.eu/search/advanced/projects?relorganizationid=openorgs____%3A%3A89d1e5147df8b579a8fb7a2ced11f722"
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Hasselt%20University%22&f0=q"
     },
     "uclouvain": {
-      "ror": "02495e989",
-      "openaireId": "openorgs____::73e124d9d4f37ce3a694e2b09faf0f28",
-      "openaireName": "Université Catholique de Louvain",
-      "since": "2023-09-19",
-      "numFound": 94,
-      "fetched": 94,
-      "active": 87,
-      "fundedTotal": 600102904.1,
-      "fundedKnown": 94,
-      "byFunder": {
-        "EC": {
-          "name": "European Commission",
-          "count": 88,
-          "amount": 598481798
-        },
-        "ANR": {
-          "name": "French National Research Agency (ANR)",
-          "count": 6,
-          "amount": 1621106.1
-        }
-      },
-      "projects": [
-        {
-          "id": "corda_____he::005962ae0aa46f133632cb981d448a90",
-          "code": "101311769",
-          "acronym": "OCTAGON",
-          "title": "Standardisation, characterisation and modelling composite processes and environment-induced deformations",
-          "funder": "EC",
-          "stream": "Horizon Europe Framework Programme - HORIZON TMA MSCA Doctoral Networks",
-          "call": "HORIZON-MSCA-2025-DN-01",
-          "start": "2027-01-01",
-          "end": "2030-12-31",
-          "amount": 3535960,
-          "currency": "EUR",
-          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A005962ae0aa46f133632cb981d448a90"
-        },
-        {
-          "id": "corda_____he::65bddc179b4d9483209470692be71c27",
-          "code": "101300167",
-          "acronym": "MaGyQ",
-          "title": "Machine learning models via differential Geometry and Quantum theory",
-          "funder": "EC",
-          "stream": "Horizon Europe Framework Programme - HORIZON TMA MSCA Staff Exchanges",
-          "call": "HORIZON-MSCA-2025-SE-01",
-          "start": "2027-01-01",
-          "end": "2030-12-31",
-          "amount": 285570,
-          "currency": "EUR",
-          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A65bddc179b4d9483209470692be71c27"
-        },
-        {
-          "id": "anr_________::ab68de59c828d42ae98867eb173d399f",
-          "code": "ANR-25-CE28-0842",
-          "acronym": "REPETI",
-          "title": "Repetition-induced perceived truth of (mis)information",
-          "funder": "ANR",
-          "stream": "null",
-          "call": "",
-          "start": "2026-02-02",
-          "end": "",
-          "amount": 278814,
-          "currency": "EUR",
-          "url": "https://explore.openaire.eu/search/project?projectId=anr_________%3A%3Aab68de59c828d42ae98867eb173d399f"
-        },
-        {
-          "id": "corda_____he::0c500ad7ef086129021c4920f53870d2",
-          "code": "101312168",
-          "acronym": "IDEAS",
-          "title": "Improving Drug Efficacy with next-generation AmorphouS materials and trained experts",
-          "funder": "EC",
-          "stream": "Horizon Europe Framework Programme - HORIZON TMA MSCA Doctoral Networks",
-          "call": "HORIZON-MSCA-2025-DN-01",
-          "start": "2026-11-01",
-          "end": "2030-10-31",
-          "amount": 4315970,
-          "currency": "EUR",
-          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A0c500ad7ef086129021c4920f53870d2"
-        },
-        {
-          "id": "corda_____he::1568d99a762e103070455b4540e79c83",
-          "code": "101299479",
-          "acronym": "Green-Mem",
-          "title": "Pioneering Membrane Solutions for a Sustainable Future",
-          "funder": "EC",
-          "stream": "Horizon Europe Framework Programme - HORIZON TMA MSCA Staff Exchanges",
-          "call": "HORIZON-MSCA-2025-SE-01",
-          "start": "2026-07-01",
-          "end": "2030-06-30",
-          "amount": 1222440,
-          "currency": "EUR",
-          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A1568d99a762e103070455b4540e79c83"
-        },
-        {
-          "id": "corda_____he::16b70debbdf4349fa8a1ca03cdcf0b14",
-          "code": "101292931",
-          "acronym": "RADNEXT 2030",
-          "title": "Accelerators and other Research Infrastructures for Radiation Effects Research",
-          "funder": "EC",
-          "stream": "Horizon Europe Framework Programme - HORIZON  Research and Innovation Actions",
-          "call": "HORIZON-INFRA-2025-01",
-          "start": "2026-06-01",
-          "end": "2030-05-31",
-          "amount": 5000000,
-          "currency": "EUR",
-          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A16b70debbdf4349fa8a1ca03cdcf0b14"
-        },
-        {
-          "id": "corda_____he::1d8a44a52db208d65d5417f53e49b185",
-          "code": "101312540",
-          "acronym": "POLY4EV",
-          "title": "Sustainable Polymers for Electric Vehicles",
-          "funder": "EC",
-          "stream": "Horizon Europe Framework Programme - HORIZON TMA MSCA Doctoral Networks",
-          "call": "HORIZON-MSCA-2025-DN-01",
-          "start": "2026-11-01",
-          "end": "2030-10-31",
-          "amount": 4565140,
-          "currency": "EUR",
-          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A1d8a44a52db208d65d5417f53e49b185"
-        },
-        {
-          "id": "corda_____he::265ab9692c38a2505a4dfca362089a6e",
-          "code": "101299906",
-          "acronym": "REACT",
-          "title": "Reactivating Experience: Art, Culture Industry and Authoritarianism in the Digital Age",
-          "funder": "EC",
-          "stream": "Horizon Europe Framework Programme - HORIZON TMA MSCA Staff Exchanges",
-          "call": "HORIZON-MSCA-2025-SE-01",
-          "start": "2026-11-01",
-          "end": "2030-10-31",
-          "amount": 1783560,
-          "currency": "EUR",
-          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A265ab9692c38a2505a4dfca362089a6e"
-        },
-        {
-          "id": "corda_____he::2794df23c9cf56456f30701e988cbee8",
-          "code": "101228872",
-          "acronym": "HUMAN RHYTHM",
-          "title": "From biology to culture: Clarifying how humans categorize rhythm across the lifespan, senses, social learning and brain networks",
-          "funder": "EC",
-          "stream": "Horizon Europe Framework Programme - European Research Council - HORIZON ERC Grants",
-          "call": "ERC-2025-COG",
-          "start": "2026-06-01",
-          "end": "2031-05-31",
-          "amount": 1999300,
-          "currency": "EUR",
-          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A2794df23c9cf56456f30701e988cbee8"
-        },
-        {
-          "id": "corda_____he::27e9f70bc3850dbc6f4f28cf4bcad72c",
-          "code": "101226229",
-          "acronym": "ENERPOL",
-          "title": "Using smart contracts and policies to reduce energy-related risk and inequality among households",
-          "funder": "EC",
-          "stream": "Horizon Europe Framework Programme - HORIZON TMA MSCA Doctoral Networks",
-          "call": "HORIZON-MSCA-2024-DN-01",
-          "start": "2026-03-01",
-          "end": "2030-02-28",
-          "amount": 3937970,
-          "currency": "EUR",
-          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A27e9f70bc3850dbc6f4f28cf4bcad72c"
-        },
-        {
-          "id": "corda_____he::55e0f1118364ffc4a9ba9b7129eefd6c",
-          "code": "101275935",
-          "acronym": "iRIS",
-          "title": "Intelligent Research Infrastructure Sustainability",
-          "funder": "EC",
-          "stream": "Horizon Europe Framework Programme - HORIZON  Research and Innovation Actions",
-          "call": "HORIZON-INFRA-2025-01",
-          "start": "2026-11-01",
-          "end": "2030-12-31",
-          "amount": 4998180,
-          "currency": "EUR",
-          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A55e0f1118364ffc4a9ba9b7129eefd6c"
-        },
-        {
-          "id": "corda_____he::63726adde421925f6fd7539b15d086c0",
-          "code": "101236384",
-          "acronym": "GRAVITY",
-          "title": "New Technologies for Next-Generation Gravitational-Wave Detectors",
-          "funder": "EC",
-          "stream": "Horizon Europe Framework Programme - HORIZON TMA MSCA Staff Exchanges",
-          "call": "HORIZON-MSCA-2024-SE-01",
-          "start": "2026-01-01",
-          "end": "2029-12-31",
-          "amount": 400800,
-          "currency": "EUR",
-          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A63726adde421925f6fd7539b15d086c0"
-        }
-      ],
-      "sourceUrl": "https://explore.openaire.eu/search/advanced/projects?relorganizationid=openorgs____%3A%3A73e124d9d4f37ce3a694e2b09faf0f28"
+      "notFound": true,
+      "reason": "No name to search OpenAIRE with."
     },
     "uliege": {
-      "ror": "00afp2z80",
-      "openaireId": "openorgs____::ce672cf6d82805707d55c79097b70bda",
-      "openaireName": "University of Liège",
+      "query": "University of Liège",
       "since": "2023-09-19",
-      "numFound": 87,
-      "fetched": 87,
-      "active": 80,
-      "fundedTotal": 438260160,
-      "fundedKnown": 87,
+      "numFound": 89,
+      "fetched": 89,
+      "active": 82,
+      "fundedTotal": 438915249,
+      "fundedKnown": 89,
       "byFunder": {
         "EC": {
           "name": "European Commission",
@@ -1210,8 +1048,8 @@
         },
         "ANR": {
           "name": "French National Research Agency (ANR)",
-          "count": 7,
-          "amount": 2532785
+          "count": 9,
+          "amount": 3187874
         },
         "UKRI": {
           "name": "UK Research and Innovation",
@@ -1389,18 +1227,16 @@
           "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A90cc7beb1dfae21b719f36e30c825a53"
         }
       ],
-      "sourceUrl": "https://explore.openaire.eu/search/advanced/projects?relorganizationid=openorgs____%3A%3Ace672cf6d82805707d55c79097b70bda"
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22University%20of%20Li%C3%A8ge%22&f0=q"
     },
     "ulb": {
-      "ror": "01r9htc13",
-      "openaireId": "openorgs____::6f26a1be56976cb781e94429eb02530e",
-      "openaireName": "Université Libre de Bruxelles",
+      "query": "Université Libre de Bruxelles",
       "since": "2023-09-19",
-      "numFound": 88,
-      "fetched": 88,
-      "active": 80,
-      "fundedTotal": 323746513,
-      "fundedKnown": 88,
+      "numFound": 92,
+      "fetched": 92,
+      "active": 83,
+      "fundedTotal": 324363684,
+      "fundedKnown": 91,
       "byFunder": {
         "EC": {
           "name": "European Commission",
@@ -1409,8 +1245,18 @@
         },
         "ANR": {
           "name": "French National Research Agency (ANR)",
-          "count": 6,
-          "amount": 2640192
+          "count": 7,
+          "amount": 2990589
+        },
+        "SNSF": {
+          "name": "Swiss National Science Foundation",
+          "count": 2,
+          "amount": 266774
+        },
+        "NWO": {
+          "name": "Netherlands Organisation for Scientific Research (NWO)",
+          "count": 1,
+          "amount": 0
         },
         "UKRI": {
           "name": "UK Research and Innovation",
@@ -1588,12 +1434,10 @@
           "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A93fb6ec074a16fb8a5b97f5447202bc2"
         }
       ],
-      "sourceUrl": "https://explore.openaire.eu/search/advanced/projects?relorganizationid=openorgs____%3A%3A6f26a1be56976cb781e94429eb02530e"
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Universit%C3%A9%20Libre%20de%20Bruxelles%22&f0=q"
     },
     "unamur": {
-      "ror": "03d1maw17",
-      "openaireId": "openorgs____::679dfd74893a4fb26000d18be1bc5fd3",
-      "openaireName": "University of Namur",
+      "query": "University of Namur",
       "since": "2023-09-19",
       "numFound": 17,
       "fetched": 17,
@@ -1777,12 +1621,10 @@
           "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3Ae497304ee6a28f44afa78dc744f88391"
         }
       ],
-      "sourceUrl": "https://explore.openaire.eu/search/advanced/projects?relorganizationid=openorgs____%3A%3A679dfd74893a4fb26000d18be1bc5fd3"
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22University%20of%20Namur%22&f0=q"
     },
     "umons": {
-      "ror": "02qnnz951",
-      "openaireId": "openorgs____::5efc358bd32549ffb10c2f31c0d7efa2",
-      "openaireName": "University of Mons",
+      "query": "University of Mons",
       "since": "2023-09-19",
       "numFound": 17,
       "fetched": 17,
@@ -1976,16 +1818,10 @@
           "url": "https://explore.openaire.eu/search/project?projectId=anr_________%3A%3A3c2f20f4ba48db25819a9a709f73dc5b"
         }
       ],
-      "sourceUrl": "https://explore.openaire.eu/search/advanced/projects?relorganizationid=openorgs____%3A%3A5efc358bd32549ffb10c2f31c0d7efa2"
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22University%20of%20Mons%22&f0=q"
     },
     "uzleuven": {
-      "notFound": true,
-      "reason": "No ROR id resolved for this organisation, so OpenAIRE cannot be queried."
-    },
-    "uzgent": {
-      "ror": "00xmkp704",
-      "openaireId": "openorgs____::0278a5de3889f93bdcb71a8a5401dcb2",
-      "openaireName": "Ghent University Hospital",
+      "query": "UZ Leuven University Hospitals Leuven",
       "since": "2023-09-19",
       "numFound": 0,
       "fetched": 0,
@@ -1994,12 +1830,22 @@
       "fundedKnown": 0,
       "byFunder": {},
       "projects": [],
-      "sourceUrl": "https://explore.openaire.eu/search/advanced/projects?relorganizationid=openorgs____%3A%3A0278a5de3889f93bdcb71a8a5401dcb2"
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22UZ%20Leuven%20University%20Hospitals%20Leuven%22&f0=q"
+    },
+    "uzgent": {
+      "query": "Ghent University Hospital",
+      "since": "2023-09-19",
+      "numFound": 0,
+      "fetched": 0,
+      "active": 0,
+      "fundedTotal": 0,
+      "fundedKnown": 0,
+      "byFunder": {},
+      "projects": [],
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Ghent%20University%20Hospital%22&f0=q"
     },
     "uza": {
-      "ror": "01hwamj44",
-      "openaireId": "openorgs____::297dce176fe5addc5178505da62c74f4",
-      "openaireName": "Antwerp University Hospital",
+      "query": "Antwerp University Hospital",
       "since": "2023-09-19",
       "numFound": 3,
       "fetched": 3,
@@ -2057,17 +1903,22 @@
           "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A3d5ede6196f3cb6ed87ec37b97d12025"
         }
       ],
-      "sourceUrl": "https://explore.openaire.eu/search/advanced/projects?relorganizationid=openorgs____%3A%3A297dce176fe5addc5178505da62c74f4"
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Antwerp%20University%20Hospital%22&f0=q"
     },
     "uzbrussel": {
-      "notFound": true,
-      "reason": "OpenAIRE has no organisation record for ROR 038f7y939.",
-      "ror": "038f7y939"
+      "query": "UZ Brussel",
+      "since": "2023-09-19",
+      "numFound": 0,
+      "fetched": 0,
+      "active": 0,
+      "fundedTotal": 0,
+      "fundedKnown": 0,
+      "byFunder": {},
+      "projects": [],
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22UZ%20Brussel%22&f0=q"
     },
     "chuliege": {
-      "ror": "044s61914",
-      "openaireId": "openorgs____::a8f7b138a3a5ece70c76d34b68ebc28d",
-      "openaireName": "Centre Hospitalier Universitaire de Liège",
+      "query": "Centre Hospitalier Universitaire de Liège",
       "since": "2023-09-19",
       "numFound": 4,
       "fetched": 4,
@@ -2139,12 +1990,10 @@
           "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3Ad58e7f765fb589f8353e9a317b1ef79a"
         }
       ],
-      "sourceUrl": "https://explore.openaire.eu/search/advanced/projects?relorganizationid=openorgs____%3A%3Aa8f7b138a3a5ece70c76d34b68ebc28d"
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Centre%20Hospitalier%20Universitaire%20de%20Li%C3%A8ge%22&f0=q"
     },
     "saintluc": {
-      "ror": "03s4khd80",
-      "openaireId": "openorgs____::a3062fb3000e5b5e01f8263dd4c5f17f",
-      "openaireName": "Cliniques Universitaires Saint-Luc",
+      "query": "Cliniques Universitaires Saint-Luc",
       "since": "2023-09-19",
       "numFound": 3,
       "fetched": 3,
@@ -2202,27 +2051,38 @@
           "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A8b4c2153ab40537ecc112a53ed38ae68"
         }
       ],
-      "sourceUrl": "https://explore.openaire.eu/search/advanced/projects?relorganizationid=openorgs____%3A%3Aa3062fb3000e5b5e01f8263dd4c5f17f"
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Cliniques%20Universitaires%20Saint-Luc%22&f0=q"
     },
     "erasme": {
-      "notFound": true,
-      "reason": "No ROR id resolved for this organisation, so OpenAIRE cannot be queried."
+      "query": "Hôpital Erasme",
+      "since": "2023-09-19",
+      "numFound": 0,
+      "fetched": 0,
+      "active": 0,
+      "fundedTotal": 0,
+      "fundedKnown": 0,
+      "byFunder": {},
+      "projects": [],
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22H%C3%B4pital%20Erasme%22&f0=q"
     },
     "bordet": {
-      "ror": "05e8s8534",
-      "openaireId": "openorgs____::c619c0d2166568ccafe578db447e3f5c",
-      "openaireName": "Institut Jules Bordet",
+      "query": "Institut Jules Bordet",
       "since": "2023-09-19",
-      "numFound": 5,
-      "fetched": 5,
-      "active": 5,
-      "fundedTotal": 70312550,
-      "fundedKnown": 5,
+      "numFound": 6,
+      "fetched": 6,
+      "active": 6,
+      "fundedTotal": 70921302,
+      "fundedKnown": 6,
       "byFunder": {
         "EC": {
           "name": "European Commission",
           "count": 5,
           "amount": 70312550
+        },
+        "ANR": {
+          "name": "French National Research Agency (ANR)",
+          "count": 1,
+          "amount": 608752
         }
       },
       "projects": [
@@ -2239,6 +2099,20 @@
           "amount": 28734100,
           "currency": "EUR",
           "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3Afbb78e96d08e0095cd8ef91524df869c"
+        },
+        {
+          "id": "anr_________::f1c645a8d83aaf3d12acf6f927664276",
+          "code": "ANR-24-EPPM-0013",
+          "acronym": "SURPASS-TNBC",
+          "title": "Modeling early anti-tumor immune SURveillance Pathways and resistAnce mechanism for perSonaliSed treatment and innovation in Triple Negative Breast Cancers",
+          "funder": "ANR",
+          "stream": "null",
+          "call": "",
+          "start": "2025-05-16",
+          "end": "",
+          "amount": 608752,
+          "currency": "EUR",
+          "url": "https://explore.openaire.eu/search/project?projectId=anr_________%3A%3Af1c645a8d83aaf3d12acf6f927664276"
         },
         {
           "id": "corda_____he::6b8663e55a484222f20d82b004255ac8",
@@ -2297,12 +2171,10 @@
           "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A7e5922821e57d8c12522fb17b88faaf9"
         }
       ],
-      "sourceUrl": "https://explore.openaire.eu/search/advanced/projects?relorganizationid=openorgs____%3A%3Ac619c0d2166568ccafe578db447e3f5c"
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Institut%20Jules%20Bordet%22&f0=q"
     },
     "chunamur": {
-      "ror": "00ntbvq76",
-      "openaireId": "openorgs____::4819e5302035c11df8b628581d11a4ec",
-      "openaireName": "CHU Dinant Godinne UCL Namur",
+      "query": "CHU UCL Namur Godinne",
       "since": "2023-09-19",
       "numFound": 0,
       "fetched": 0,
@@ -2311,12 +2183,14 @@
       "fundedKnown": 0,
       "byFunder": {},
       "projects": [],
-      "sourceUrl": "https://explore.openaire.eu/search/advanced/projects?relorganizationid=openorgs____%3A%3A4819e5302035c11df8b628581d11a4ec"
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22CHU%20UCL%20Namur%20Godinne%22&f0=q"
     },
     "imec": {
-      "ror": "02kcbn207",
-      "openaireId": "openorgs____::c29cd3c66218bbe0db46425cbae8b4a6",
-      "openaireName": "Imec",
+      "notFound": true,
+      "reason": "No name to search OpenAIRE with."
+    },
+    "vib": {
+      "query": "VIB Vlaams Instituut voor Biotechnologie",
       "since": "2023-09-19",
       "numFound": 0,
       "fetched": 0,
@@ -2325,16 +2199,10 @@
       "fundedKnown": 0,
       "byFunder": {},
       "projects": [],
-      "sourceUrl": "https://explore.openaire.eu/search/advanced/projects?relorganizationid=openorgs____%3A%3Ac29cd3c66218bbe0db46425cbae8b4a6"
-    },
-    "vib": {
-      "notFound": true,
-      "reason": "No ROR id resolved for this organisation, so OpenAIRE cannot be queried."
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22VIB%20Vlaams%20Instituut%20voor%20Biotechnologie%22&f0=q"
     },
     "flandersmake": {
-      "ror": "02ndjfz59",
-      "openaireId": "openorgs____::a3a3ba9f084e105174d98e7e68a232a1",
-      "openaireName": "Flanders Make (Belgium)",
+      "query": "Flanders Make Belgium",
       "since": "2023-09-19",
       "numFound": 13,
       "fetched": 13,
@@ -2518,23 +2386,26 @@
           "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3Ae870dbd1c35f280567f3ca91e7e42d43"
         }
       ],
-      "sourceUrl": "https://explore.openaire.eu/search/advanced/projects?relorganizationid=openorgs____%3A%3Aa3a3ba9f084e105174d98e7e68a232a1"
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Flanders%20Make%20Belgium%22&f0=q"
     },
     "sciensano": {
-      "ror": "04ejags36",
-      "openaireId": "openorgs____::9275a862b37b47c96b355f72992f2c29",
-      "openaireName": "Sciensano (Belgium)",
+      "query": "Sciensano Belgium",
       "since": "2023-09-19",
-      "numFound": 23,
-      "fetched": 23,
-      "active": 20,
-      "fundedTotal": 296470424,
-      "fundedKnown": 23,
+      "numFound": 24,
+      "fetched": 24,
+      "active": 21,
+      "fundedTotal": 296738184,
+      "fundedKnown": 24,
       "byFunder": {
         "EC": {
           "name": "European Commission",
           "count": 23,
           "amount": 296470424
+        },
+        "UKRI": {
+          "name": "UK Research and Innovation",
+          "count": 1,
+          "amount": 267760
         }
       },
       "projects": [
@@ -2693,30 +2564,28 @@
           "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3Ad342754d506414f02b9f15902b73104d"
         },
         {
-          "id": "corda_____he::1f5009578998aeb9c1615b01cc6cf931",
-          "code": "101136676",
-          "acronym": "ASFaVIP",
-          "title": "UNDERSTANDING PERFORMANCE CHARACTERISTICS OF LIVE ATTENUATED VACCINES FOR THE PREVENTION AND CONTROL OF AFRICAN SWINE FEVER IN WILD BOAR AND DOMESTIC PIGS",
-          "funder": "EC",
-          "stream": "Horizon Europe Framework Programme - HORIZON  Research and Innovation Actions",
-          "call": "HORIZON-CL6-2023-FARM2FORK-01",
-          "start": "2024-01-01",
-          "end": "2026-12-31",
-          "amount": 6306190,
-          "currency": "EUR",
-          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A1f5009578998aeb9c1615b01cc6cf931"
+          "id": "ukri________::846cd52830c1cf981cbabaa4328232cd",
+          "code": "UKRI884",
+          "acronym": "",
+          "title": "Biocide Impact on Antimicrobial Resistance in Enterobacteriales in One Health settings",
+          "funder": "UKRI",
+          "stream": "MRC",
+          "call": "",
+          "start": "2025-03-30",
+          "end": "2027-09-30",
+          "amount": 267760,
+          "currency": "GBP",
+          "url": "https://explore.openaire.eu/search/project?projectId=ukri________%3A%3A846cd52830c1cf981cbabaa4328232cd"
         }
       ],
-      "sourceUrl": "https://explore.openaire.eu/search/advanced/projects?relorganizationid=openorgs____%3A%3A9275a862b37b47c96b355f72992f2c29"
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Sciensano%20Belgium%22&f0=q"
     },
     "rbins": {
-      "ror": "02y22ws83",
-      "openaireId": "openorgs____::e945f0c35e14acbebbc2a69fc8e79362",
-      "openaireName": "Royal Belgian Institute of Natural Sciences",
+      "query": "Institute of Natural Sciences",
       "since": "2023-09-19",
-      "numFound": 13,
-      "fetched": 13,
-      "active": 11,
+      "numFound": 14,
+      "fetched": 14,
+      "active": 12,
       "fundedTotal": 79518713.5,
       "fundedKnown": 13,
       "byFunder": {
@@ -2729,6 +2598,11 @@
           "name": "French National Research Agency (ANR)",
           "count": 2,
           "amount": 327289.5
+        },
+        "NWO": {
+          "name": "Netherlands Organisation for Scientific Research (NWO)",
+          "count": 1,
+          "amount": 0
         }
       },
       "projects": [
@@ -2901,12 +2775,10 @@
           "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3Ada205f8176b796f31dde2509c2489f56"
         }
       ],
-      "sourceUrl": "https://explore.openaire.eu/search/advanced/projects?relorganizationid=openorgs____%3A%3Ae945f0c35e14acbebbc2a69fc8e79362"
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Institute%20of%20Natural%20Sciences%22&f0=q"
     },
     "rmi": {
-      "ror": "058qm9p63",
-      "openaireId": "openorgs____::b03ff70daa7bdb2c6c54f542db688faf",
-      "openaireName": "Royal Meteorological Institute of Belgium",
+      "query": "Royal Meteorological Institute of Belgium",
       "since": "2023-09-19",
       "numFound": 1,
       "fetched": 1,
@@ -2936,12 +2808,10 @@
           "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A131463c3d2cb2384ac2e6fabc52770f2"
         }
       ],
-      "sourceUrl": "https://explore.openaire.eu/search/advanced/projects?relorganizationid=openorgs____%3A%3Ab03ff70daa7bdb2c6c54f542db688faf"
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Royal%20Meteorological%20Institute%20of%20Belgium%22&f0=q"
     },
     "rob": {
-      "ror": "00hjks330",
-      "openaireId": "openorgs____::31a1744f20a1646bfff28f2bfe0551aa",
-      "openaireName": "Royal Observatory of Belgium",
+      "query": "Royal Observatory of Belgium",
       "since": "2023-09-19",
       "numFound": 3,
       "fetched": 3,
@@ -2999,24 +2869,46 @@
           "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A9013770ed4a9adad04e554d1abae21c1"
         }
       ],
-      "sourceUrl": "https://explore.openaire.eu/search/advanced/projects?relorganizationid=openorgs____%3A%3A31a1744f20a1646bfff28f2bfe0551aa"
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Royal%20Observatory%20of%20Belgium%22&f0=q"
     },
     "solvay": {
-      "notFound": true,
-      "reason": "No ROR id resolved for this organisation, so OpenAIRE cannot be queried."
+      "query": "International Solvay Institutes for Physics and Chemistry",
+      "since": "2023-09-19",
+      "numFound": 0,
+      "fetched": 0,
+      "active": 0,
+      "fundedTotal": 0,
+      "fundedKnown": 0,
+      "byFunder": {},
+      "projects": [],
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22International%20Solvay%20Institutes%20for%20Physics%20and%20Chemistry%22&f0=q"
     },
     "vito": {
-      "notFound": true,
-      "reason": "No ROR id resolved for this organisation, so OpenAIRE cannot be queried."
+      "query": "VITO Flemish Institute for Technological Research",
+      "since": "2023-09-19",
+      "numFound": 0,
+      "fetched": 0,
+      "active": 0,
+      "fundedTotal": 0,
+      "fundedKnown": 0,
+      "byFunder": {},
+      "projects": [],
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22VITO%20Flemish%20Institute%20for%20Technological%20Research%22&f0=q"
     },
     "royalacademiesbelgium": {
-      "notFound": true,
-      "reason": "No ROR id resolved for this organisation, so OpenAIRE cannot be queried."
+      "query": "Royal Academies for Science and the Arts of Belgium",
+      "since": "2023-09-19",
+      "numFound": 0,
+      "fetched": 0,
+      "active": 0,
+      "fundedTotal": 0,
+      "fundedKnown": 0,
+      "byFunder": {},
+      "projects": [],
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Royal%20Academies%20for%20Science%20and%20the%20Arts%20of%20Belgium%22&f0=q"
     },
     "bira": {
-      "ror": "03vfw8w96",
-      "openaireId": "openorgs____::988c23cd1458b24be06dbf6e289e9459",
-      "openaireName": "Royal Belgian Institute for Space Aeronomy",
+      "query": "Royal Belgian Institute for Space Aeronomy",
       "since": "2023-09-19",
       "numFound": 7,
       "fetched": 7,
@@ -3130,26 +3022,38 @@
           "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3Abf58dd89b42a85f34e21b8bd1e857230"
         }
       ],
-      "sourceUrl": "https://explore.openaire.eu/search/advanced/projects?relorganizationid=openorgs____%3A%3A988c23cd1458b24be06dbf6e289e9459"
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Royal%20Belgian%20Institute%20for%20Space%20Aeronomy%22&f0=q"
     },
     "egmont": {
-      "notFound": true,
-      "reason": "OpenAIRE has no organisation record for ROR 04y6cx804.",
-      "ror": "04y6cx804"
+      "query": "Egmont Institute Royal Institute for International Relations",
+      "since": "2023-09-19",
+      "numFound": 0,
+      "fetched": 0,
+      "active": 0,
+      "fundedTotal": 0,
+      "fundedKnown": 0,
+      "byFunder": {},
+      "projects": [],
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Egmont%20Institute%20Royal%20Institute%20for%20International%20Relations%22&f0=q"
     },
     "bruegel": {
       "notFound": true,
-      "reason": "OpenAIRE has no organisation record for ROR 03e6bna46.",
-      "ror": "03e6bna46"
+      "reason": "No name to search OpenAIRE with."
     },
     "itinera": {
-      "notFound": true,
-      "reason": "No ROR id resolved for this organisation, so OpenAIRE cannot be queried."
+      "query": "Itinera Institute",
+      "since": "2023-09-19",
+      "numFound": 0,
+      "fetched": 0,
+      "active": 0,
+      "fundedTotal": 0,
+      "fundedKnown": 0,
+      "byFunder": {},
+      "projects": [],
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Itinera%20Institute%22&f0=q"
     },
     "fwo": {
-      "ror": "03qtxy027",
-      "openaireId": "openorgs____::65ead68aa42b6f2920a731b77f0858b3",
-      "openaireName": "Research Foundation - Flanders",
+      "query": "Research Foundation - Flanders",
       "since": "2023-09-19",
       "numFound": 12,
       "fetched": 12,
@@ -3333,56 +3237,592 @@
           "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A3ffad51013d93b9a755b9378f8cbb7cd"
         }
       ],
-      "sourceUrl": "https://explore.openaire.eu/search/advanced/projects?relorganizationid=openorgs____%3A%3A65ead68aa42b6f2920a731b77f0858b3"
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Research%20Foundation%20-%20Flanders%22&f0=q"
     },
     "fnrs": {
       "notFound": true,
-      "reason": "No ROR id resolved for this organisation, so OpenAIRE cannot be queried."
+      "reason": "No name to search OpenAIRE with."
     },
     "kbf": {
-      "notFound": true,
-      "reason": "OpenAIRE has no organisation record for ROR 02am44w88.",
-      "ror": "02am44w88"
+      "query": "King Baudouin Foundation",
+      "since": "2023-09-19",
+      "numFound": 0,
+      "fetched": 0,
+      "active": 0,
+      "fundedTotal": 0,
+      "fundedKnown": 0,
+      "byFunder": {},
+      "projects": [],
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22King%20Baudouin%20Foundation%22&f0=q"
     },
     "kotk": {
-      "ror": "05fsa3j22",
-      "openaireId": "openorgs____::7f78a4cc91a00d0c9a855b55ffbdafc4",
-      "openaireName": "Vlaamse Liga tegen Kanker",
+      "query": "Kom op tegen Kanker",
+      "since": "2023-09-19",
+      "numFound": 0,
+      "fetched": 0,
+      "active": 0,
+      "fundedTotal": 0,
+      "fundedKnown": 0,
+      "byFunder": {},
+      "projects": [],
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Kom%20op%20tegen%20Kanker%22&f0=q"
+    },
+    "fondationcontrelecancer": {
+      "query": "Fondation contre le Cancer / Stichting tegen Kanker",
+      "since": "2023-09-19",
+      "numFound": 0,
+      "fetched": 0,
+      "active": 0,
+      "fundedTotal": 0,
+      "fundedKnown": 0,
+      "byFunder": {},
+      "projects": [],
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Fondation%20contre%20le%20Cancer%20%2F%20Stichting%20tegen%20Kanker%22&f0=q"
+    },
+    "azdelta": {
+      "query": "AZ Delta",
+      "since": "2023-09-19",
+      "numFound": 0,
+      "fetched": 0,
+      "active": 0,
+      "fundedTotal": 0,
+      "fundedKnown": 0,
+      "byFunder": {},
+      "projects": [],
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22AZ%20Delta%22&f0=q"
+    },
+    "craw": {
+      "query": "Centre wallon de Recherches agronomiques",
+      "since": "2023-09-19",
+      "numFound": 0,
+      "fetched": 0,
+      "active": 0,
+      "fundedTotal": 0,
+      "fundedKnown": 0,
+      "byFunder": {},
+      "projects": [],
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Centre%20wallon%20de%20Recherches%20agronomiques%22&f0=q"
+    },
+    "chucharleroi": {
+      "query": "CHU de Charleroi réseau HUmani",
+      "since": "2023-09-19",
+      "numFound": 0,
+      "fetched": 0,
+      "active": 0,
+      "fundedTotal": 0,
+      "fundedKnown": 0,
+      "byFunder": {},
+      "projects": [],
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22CHU%20de%20Charleroi%20r%C3%A9seau%20HUmani%22&f0=q"
+    },
+    "saintpierre": {
+      "query": "CHU Saint-Pierre",
+      "since": "2023-09-19",
+      "numFound": 0,
+      "fetched": 0,
+      "active": 0,
+      "fundedTotal": 0,
+      "fundedKnown": 0,
+      "byFunder": {},
+      "projects": [],
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22CHU%20Saint-Pierre%22&f0=q"
+    },
+    "ilvo": {
+      "query": "Flanders Research Institute for Agriculture Fisheries and Food",
       "since": "2023-09-19",
       "numFound": 1,
       "fetched": 1,
       "active": 1,
-      "fundedTotal": 3350100,
+      "fundedTotal": 295100,
       "fundedKnown": 1,
       "byFunder": {
-        "EC": {
-          "name": "European Commission",
+        "ANR": {
+          "name": "French National Research Agency (ANR)",
           "count": 1,
-          "amount": 3350100
+          "amount": 295100
         }
       },
       "projects": [
         {
-          "id": "corda_____he::4ffbd60c1f152cff284f69816d71b38d",
-          "code": "101215179",
-          "acronym": "FORCE",
-          "title": "Fostering Oncology Research by Charities in Europe",
-          "funder": "EC",
-          "stream": "Horizon Europe Framework Programme - HORIZON Coordination and Support Actions",
-          "call": "HORIZON-MISS-2024-CANCER-01",
-          "start": "2025-06-01",
-          "end": "2029-05-31",
-          "amount": 3350100,
+          "id": "anr_________::5b6dd3c6c614956653f89fe7cb5ac955",
+          "code": "ANR-25-AGRE-0002",
+          "acronym": "VALORAGRO",
+          "title": "Valorisation of agricultural production wastes through fermentation into pig and poultry feed",
+          "funder": "ANR",
+          "stream": "null",
+          "call": "",
+          "start": "2025-09-01",
+          "end": "",
+          "amount": 295100,
           "currency": "EUR",
-          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A4ffbd60c1f152cff284f69816d71b38d"
+          "url": "https://explore.openaire.eu/search/project?projectId=anr_________%3A%3A5b6dd3c6c614956653f89fe7cb5ac955"
         }
       ],
-      "sourceUrl": "https://explore.openaire.eu/search/advanced/projects?relorganizationid=openorgs____%3A%3A7f78a4cc91a00d0c9a855b55ffbdafc4"
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Flanders%20Research%20Institute%20for%20Agriculture%20Fisheries%20and%20Food%22&f0=q"
     },
-    "fondationcontrelecancer": {
-      "notFound": true,
-      "reason": "OpenAIRE has no organisation record for ROR 01h3dr788.",
-      "ror": "01h3dr788"
+    "itg": {
+      "query": "Institute of Tropical Medicine Antwerp",
+      "since": "2023-09-19",
+      "numFound": 20,
+      "fetched": 20,
+      "active": 19,
+      "fundedTotal": 93946500,
+      "fundedKnown": 20,
+      "byFunder": {
+        "EC": {
+          "name": "European Commission",
+          "count": 20,
+          "amount": 93946500
+        }
+      },
+      "projects": [
+        {
+          "id": "corda_____he::93c795a6e93365abf7a2638cd0d61fc5",
+          "code": "101312211",
+          "acronym": "PACT",
+          "title": "Parasite Adaptive skills and how to Counter Them",
+          "funder": "EC",
+          "stream": "Horizon Europe Framework Programme - HORIZON TMA MSCA Doctoral Networks",
+          "call": "HORIZON-MSCA-2025-DN-01",
+          "start": "2027-03-01",
+          "end": "2031-02-28",
+          "amount": 4441750,
+          "currency": "EUR",
+          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A93c795a6e93365abf7a2638cd0d61fc5"
+        },
+        {
+          "id": "corda_____he::4bc2fadb2e5c7e8d603a40999b582631",
+          "code": "101287826",
+          "acronym": "ComBaScale",
+          "title": "COMMUNITY-BASED SCALE UP OF INTEGRATED COMMUNITY HEALTH WORKER-LED CARDIOVASCULAR RISK FACTOR MANAGEMENT - ComBaScale",
+          "funder": "EC",
+          "stream": "Horizon Europe Framework Programme - HORIZON  Research and Innovation Actions",
+          "call": "HORIZON-HLTH-2025-01",
+          "start": "2026-09-01",
+          "end": "2031-08-31",
+          "amount": 3999620,
+          "currency": "EUR",
+          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A4bc2fadb2e5c7e8d603a40999b582631"
+        },
+        {
+          "id": "corda_____he::88532d714e3dc971fa28073b9520c126",
+          "code": "101290754",
+          "acronym": "IMPACT",
+          "title": "Innovative Monoclonal antibody against Poxviruses for Advanced CounTermeasures",
+          "funder": "EC",
+          "stream": "Horizon Europe Framework Programme - HORIZON  Research and Innovation Actions",
+          "call": "HORIZON-HLTH-2025-01",
+          "start": "2026-06-01",
+          "end": "2030-05-31",
+          "amount": 9999920,
+          "currency": "EUR",
+          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A88532d714e3dc971fa28073b9520c126"
+        },
+        {
+          "id": "corda_____he::8895f2219a3d823b44c561f31d15020d",
+          "code": "101276256",
+          "acronym": "MOSAIC",
+          "title": "MOnitoring Sugar-feeding Activity in Insects for bioactive Compound identification",
+          "funder": "EC",
+          "stream": "Horizon Europe Framework Programme - HORIZON TMA MSCA Postdoctoral Fellowships - European Fellowships",
+          "call": "HORIZON-MSCA-2025-PF",
+          "start": "2026-06-01",
+          "end": "2028-05-31",
+          "amount": 216240,
+          "currency": "EUR",
+          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A8895f2219a3d823b44c561f31d15020d"
+        },
+        {
+          "id": "corda_____he::c9855d2d8b8404116ec4f4ed491fe780",
+          "code": "101248873",
+          "acronym": "ACT4KIDS-TB",
+          "title": "Actiphage-supported Clinical Tools for Knowledge-driven Innovations in Diagnostic Solutions for TB in young children",
+          "funder": "EC",
+          "stream": "Horizon Europe Framework Programme - HORIZON JU Research and Innovation Actions",
+          "call": "HORIZON-JU-GH-EDCTP3-2025-04-two-stage",
+          "start": "2026-08-01",
+          "end": "2030-07-31",
+          "amount": 2059160,
+          "currency": "EUR",
+          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3Ac9855d2d8b8404116ec4f4ed491fe780"
+        },
+        {
+          "id": "corda_____he::e1ad6b529af5968a28e67d508cd596f0",
+          "code": "101248831",
+          "acronym": "WANETAM-4",
+          "title": "West African Network of Excellence  for TB, AIDS and Malaria",
+          "funder": "EC",
+          "stream": "Horizon Europe Framework Programme - HORIZON JU Coordination and Support Actions",
+          "call": "HORIZON-JU-GH-EDCTP3-2025-03-two-stage",
+          "start": "2026-07-01",
+          "end": "2031-06-30",
+          "amount": 12751900,
+          "currency": "EUR",
+          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3Ae1ad6b529af5968a28e67d508cd596f0"
+        },
+        {
+          "id": "corda_____he::fd0e7e12a9610256d925a3df72084913",
+          "code": "101300018",
+          "acronym": "OASIS",
+          "title": "Open African Secondary data research for climate-resilient Service delivery",
+          "funder": "EC",
+          "stream": "Horizon Europe Framework Programme - HORIZON TMA MSCA Staff Exchanges",
+          "call": "HORIZON-MSCA-2025-SE-01",
+          "start": "2026-09-01",
+          "end": "2030-08-31",
+          "amount": 606210,
+          "currency": "EUR",
+          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3Afd0e7e12a9610256d925a3df72084913"
+        },
+        {
+          "id": "corda_____he::05fbcc513a76207b4f7e5a3242945ad7",
+          "code": "101159477",
+          "acronym": "REACH-OUT",
+          "title": "Closing the immunization gap by reaching zero-dose children through improved equitable and cost-effective vaccine delivery strategies",
+          "funder": "EC",
+          "stream": "Horizon Europe Framework Programme - HORIZON JU Research and Innovation Actions",
+          "call": "HORIZON-JU-GH-EDCTP3-2023-02-two-stage",
+          "start": "2025-01-01",
+          "end": "2028-12-31",
+          "amount": 5214140,
+          "currency": "EUR",
+          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A05fbcc513a76207b4f7e5a3242945ad7"
+        },
+        {
+          "id": "corda_____he::585a9bd4ae2a1487aecb18b87afaa82e",
+          "code": "101190800",
+          "acronym": "SAHRI-Fellowship",
+          "title": "sub-Saharan Africa Health Research and Innovation Fellowship Program (SAHRI Fellowship Program)",
+          "funder": "EC",
+          "stream": "Horizon Europe Framework Programme - HORIZON JU Coordination and Support Actions",
+          "call": "HORIZON-JU-GH-EDCTP3-2024-02-two-stage",
+          "start": "2025-08-01",
+          "end": "2030-07-31",
+          "amount": 3499950,
+          "currency": "EUR",
+          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A585a9bd4ae2a1487aecb18b87afaa82e"
+        },
+        {
+          "id": "corda_____he::7d4098c00a47ae14935e4b1a76ac4123",
+          "code": "101190782",
+          "acronym": "TASP",
+          "title": "Tuberculosis Antimicrobial Stewardship Program (TASP): tackling Bedaquiline-resistant tuberculosis",
+          "funder": "EC",
+          "stream": "Horizon Europe Framework Programme - HORIZON JU Research and Innovation Actions",
+          "call": "HORIZON-JU-GH-EDCTP3-2024-01-two-stage",
+          "start": "2025-06-01",
+          "end": "2030-05-31",
+          "amount": 5999990,
+          "currency": "EUR",
+          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A7d4098c00a47ae14935e4b1a76ac4123"
+        },
+        {
+          "id": "corda_____he::cf7880931badbe809c5c428de45bd36c",
+          "code": "101190662",
+          "acronym": "CAD LUS4TB",
+          "title": "Computer assisted diagnosis with lung ultrasound for community based pulmonary tuberculosis triage in Benin, Mali and South-Africa",
+          "funder": "EC",
+          "stream": "Horizon Europe Framework Programme - HORIZON JU Research and Innovation Actions",
+          "call": "HORIZON-JU-GH-EDCTP3-2024-01-two-stage",
+          "start": "2025-09-01",
+          "end": "2030-08-31",
+          "amount": 6809790,
+          "currency": "EUR",
+          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3Acf7880931badbe809c5c428de45bd36c"
+        },
+        {
+          "id": "corda_____he::d390890032d1bb03c98ec708c5e9911d",
+          "code": "101190742",
+          "acronym": "TEBULA",
+          "title": "Telacebec to Control Buruli Ulcer and Leprosy in Africa (TEBULA)",
+          "funder": "EC",
+          "stream": "Horizon Europe Framework Programme - HORIZON JU Research and Innovation Actions",
+          "call": "HORIZON-JU-GH-EDCTP3-2024-01-two-stage",
+          "start": "2025-06-01",
+          "end": "2029-05-31",
+          "amount": 5768420,
+          "currency": "EUR",
+          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3Ad390890032d1bb03c98ec708c5e9911d"
+        }
+      ],
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Institute%20of%20Tropical%20Medicine%20Antwerp%22&f0=q"
+    },
+    "inbo": {
+      "query": "Research Institute for Nature and Forest",
+      "since": "2023-09-19",
+      "numFound": 1,
+      "fetched": 1,
+      "active": 1,
+      "fundedTotal": 35951.1,
+      "fundedKnown": 1,
+      "byFunder": {
+        "ANR": {
+          "name": "French National Research Agency (ANR)",
+          "count": 1,
+          "amount": 35951.1
+        }
+      },
+      "projects": [
+        {
+          "id": "anr_________::ce16fc0e300d82568c884d7f27f9db2b",
+          "code": "ANR-25-MRS1-0006",
+          "acronym": "BUILD-GENDIV",
+          "title": "Building a Global Training Network for Applied Conservation of Genetic Diversity",
+          "funder": "ANR",
+          "stream": "null",
+          "call": "",
+          "start": "2025-06-01",
+          "end": "",
+          "amount": 35951.1,
+          "currency": "EUR",
+          "url": "https://explore.openaire.eu/search/project?projectId=anr_________%3A%3Ace16fc0e300d82568c884d7f27f9db2b"
+        }
+      ],
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Research%20Institute%20for%20Nature%20and%20Forest%22&f0=q"
+    },
+    "rma": {
+      "query": "Royal Military Academy",
+      "since": "2023-09-19",
+      "numFound": 0,
+      "fetched": 0,
+      "active": 0,
+      "fundedTotal": 0,
+      "fundedKnown": 0,
+      "byFunder": {},
+      "projects": [],
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Royal%20Military%20Academy%22&f0=q"
+    },
+    "rmca": {
+      "query": "Royal Museum for Central Africa",
+      "since": "2023-09-19",
+      "numFound": 1,
+      "fetched": 1,
+      "active": 1,
+      "fundedTotal": 783604,
+      "fundedKnown": 1,
+      "byFunder": {
+        "UKRI": {
+          "name": "UK Research and Innovation",
+          "count": 1,
+          "amount": 783604
+        }
+      },
+      "projects": [
+        {
+          "id": "ukri________::95c4f64406bf48062977eb95c38afce8",
+          "code": "NE/Z504257/1",
+          "acronym": "",
+          "title": "Temporal Metagenomics of Population Declines",
+          "funder": "UKRI",
+          "stream": "NERC",
+          "call": "",
+          "start": "2025-03-31",
+          "end": "2028-03-30",
+          "amount": 783604,
+          "currency": "GBP",
+          "url": "https://explore.openaire.eu/search/project?projectId=ukri________%3A%3A95c4f64406bf48062977eb95c38afce8"
+        }
+      ],
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Royal%20Museum%20for%20Central%20Africa%22&f0=q"
+    },
+    "sckcen": {
+      "query": "SCK CEN Belgian Nuclear Research Centre",
+      "since": "2023-09-19",
+      "numFound": 0,
+      "fetched": 0,
+      "active": 0,
+      "fundedTotal": 0,
+      "fundedKnown": 0,
+      "byFunder": {},
+      "projects": [],
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22SCK%20CEN%20Belgian%20Nuclear%20Research%20Centre%22&f0=q"
+    },
+    "vki": {
+      "query": "Von Karman Institute for Fluid Dynamics",
+      "since": "2023-09-19",
+      "numFound": 13,
+      "fetched": 13,
+      "active": 12,
+      "fundedTotal": 215996787,
+      "fundedKnown": 13,
+      "byFunder": {
+        "EC": {
+          "name": "European Commission",
+          "count": 13,
+          "amount": 215996787
+        }
+      },
+      "projects": [
+        {
+          "id": "corda_____he::4db624c0ed1fbcef3955dc324b8528da",
+          "code": "101305306",
+          "acronym": "WiseNight 2026-2027",
+          "title": "Women in Science Night: Celebrate science, diversity and inclusion",
+          "funder": "EC",
+          "stream": "Horizon Europe Framework Programme - HORIZON Coordination and Support Actions",
+          "call": "HORIZON-MSCA-2025-CITIZENS-01",
+          "start": "2026-05-15",
+          "end": "2028-05-14",
+          "amount": 348493,
+          "currency": "EUR",
+          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A4db624c0ed1fbcef3955dc324b8528da"
+        },
+        {
+          "id": "corda_____he::6086b7a9d559aad74821885f21d0841f",
+          "code": "101256972",
+          "acronym": "PHARES",
+          "title": "Powerplant Hybrid Application for REegional Segment",
+          "funder": "EC",
+          "stream": "Horizon Europe Framework Programme - HORIZON JU Innovation Actions",
+          "call": "HORIZON-JU-Clean-Aviation-2025-01",
+          "start": "2026-01-01",
+          "end": "2030-12-31",
+          "amount": 69026900,
+          "currency": "EUR",
+          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A6086b7a9d559aad74821885f21d0841f"
+        },
+        {
+          "id": "corda_____he::8cec9e37297ede18eccb6e5ae9b634dc",
+          "code": "101256962",
+          "acronym": "TAKE OFF",
+          "title": "Technology And Knowledge for European Open Fan Flight",
+          "funder": "EC",
+          "stream": "Horizon Europe Framework Programme - HORIZON JU Innovation Actions",
+          "call": "HORIZON-JU-Clean-Aviation-2025-01",
+          "start": "2026-01-01",
+          "end": "2029-12-31",
+          "amount": 99997400,
+          "currency": "EUR",
+          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A8cec9e37297ede18eccb6e5ae9b634dc"
+        },
+        {
+          "id": "corda_____he::a40e00b8e6729ef7426c07f2bf7c4992",
+          "code": "101270147",
+          "acronym": "FUTURE",
+          "title": "FACILITIES FOR UNIFIED NEXT-GENERATION WIND TUNNEL TESTING AND RESEARCH IN EUROPE",
+          "funder": "EC",
+          "stream": "Horizon Europe Framework Programme - HORIZON  Research and Innovation Actions",
+          "call": "HORIZON-CL5-2025-04",
+          "start": "2026-06-01",
+          "end": "2030-05-31",
+          "amount": 15454500,
+          "currency": "EUR",
+          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3Aa40e00b8e6729ef7426c07f2bf7c4992"
+        },
+        {
+          "id": "corda_____he::c733bf787adeb2d0cdfccf0648c83e80",
+          "code": "101165479",
+          "acronym": "RE-TWIST",
+          "title": "REinforcement TWInning SysTems: from collaborative digital twins to model-based reinforcement learning",
+          "funder": "EC",
+          "stream": "Horizon Europe Framework Programme - European Research Council - HORIZON ERC Grants",
+          "call": "ERC-2024-STG",
+          "start": "2025-02-01",
+          "end": "2030-01-31",
+          "amount": 1500000,
+          "currency": "EUR",
+          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3Ac733bf787adeb2d0cdfccf0648c83e80"
+        },
+        {
+          "id": "corda_____he::05f3c4f55abe13675315c40395c7f2e5",
+          "code": "101146689",
+          "acronym": "DTWO",
+          "title": "Federated Digital Twins for Wind-Offshore",
+          "funder": "EC",
+          "stream": "Horizon Europe Framework Programme - HORIZON  Research and Innovation Actions",
+          "call": "HORIZON-CL5-2023-D3-02",
+          "start": "2024-06-01",
+          "end": "2027-05-31",
+          "amount": 6155050,
+          "currency": "EUR",
+          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A05f3c4f55abe13675315c40395c7f2e5"
+        },
+        {
+          "id": "corda_____he::36e4a7a30f5fd6eb93b68c115f0b05ff",
+          "code": "101138209",
+          "acronym": "eVTOLUTION",
+          "title": "EVTOL MULTI-FIDELITY HYBRID DESIGN AND OPTIMIZATION FOR LOW NOISE AND HIGH AERODYNAMIC PERFORMANCE",
+          "funder": "EC",
+          "stream": "Horizon Europe Framework Programme - HORIZON  Research and Innovation Actions",
+          "call": "HORIZON-CL5-2023-D5-01",
+          "start": "2024-01-01",
+          "end": "2027-12-31",
+          "amount": 3520000,
+          "currency": "EUR",
+          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A36e4a7a30f5fd6eb93b68c115f0b05ff"
+        },
+        {
+          "id": "corda_____he::4b49af184c4b4be071d7b815f467ff31",
+          "code": "101166386",
+          "acronym": "TRANSPARANT",
+          "title": "Technological Research Action Necessary for Safe PARrtitioning And Nuclear Transmutation",
+          "funder": "EC",
+          "stream": "Horizon Europe Framework Programme - EURATOM Research and Innovation Actions",
+          "call": "HORIZON-EURATOM-2023-NRT-01",
+          "start": "2024-09-01",
+          "end": "2028-11-30",
+          "amount": 5338800,
+          "currency": "EUR",
+          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A4b49af184c4b4be071d7b815f467ff31"
+        },
+        {
+          "id": "corda_____he::52ed476ad5e341b46232838eb3931dfb",
+          "code": "101169009",
+          "acronym": "H2POWRD",
+          "title": "Harnessing Hydrogen’s POtential With Rotating Detonation",
+          "funder": "EC",
+          "stream": "Horizon Europe Framework Programme - HORIZON TMA MSCA Doctoral Networks",
+          "call": "HORIZON-MSCA-2023-DN-01",
+          "start": "2024-10-01",
+          "end": "2028-09-30",
+          "amount": 4063540,
+          "currency": "EUR",
+          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A52ed476ad5e341b46232838eb3931dfb"
+        },
+        {
+          "id": "corda_____he::5751d9cd76f8a268ff152ae5db66f087",
+          "code": "101166337",
+          "acronym": "LESTO",
+          "title": "LEad fast reactor Safety design and TOols",
+          "funder": "EC",
+          "stream": "Horizon Europe Framework Programme - EURATOM Research and Innovation Actions",
+          "call": "HORIZON-EURATOM-2023-NRT-01",
+          "start": "2024-11-01",
+          "end": "2028-10-31",
+          "amount": 3998640,
+          "currency": "EUR",
+          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A5751d9cd76f8a268ff152ae5db66f087"
+        },
+        {
+          "id": "corda_____he::83e8602dbb86d57538ca9770b56f7825",
+          "code": "101138003",
+          "acronym": "HASTA",
+          "title": "Hydrogen Aircraft Sloshing Tank Advancement",
+          "funder": "EC",
+          "stream": "Horizon Europe Framework Programme - HORIZON  Research and Innovation Actions",
+          "call": "HORIZON-CL5-2023-D5-01",
+          "start": "2024-09-01",
+          "end": "2027-08-31",
+          "amount": 3294820,
+          "currency": "EUR",
+          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A83e8602dbb86d57538ca9770b56f7825"
+        },
+        {
+          "id": "corda_____he::9013770ed4a9adad04e554d1abae21c1",
+          "code": "101161923",
+          "acronym": "WiseNight 2024-2025",
+          "title": "Women In Science Night: Celebrate science, sustainability and gender diversity",
+          "funder": "EC",
+          "stream": "Horizon Europe Framework Programme - HORIZON Coordination and Support Actions",
+          "call": "HORIZON-MSCA-2023-CITIZENS-01",
+          "start": "2024-05-01",
+          "end": "2026-04-30",
+          "amount": 298654,
+          "currency": "EUR",
+          "url": "https://explore.openaire.eu/search/project?projectId=corda_____he%3A%3A9013770ed4a9adad04e554d1abae21c1"
+        }
+      ],
+      "sourceUrl": "https://explore.openaire.eu/search/find/projects?fv0=%22Von%20Karman%20Institute%20for%20Fluid%20Dynamics%22&f0=q"
     }
   }
 }
