@@ -1,19 +1,14 @@
 {
-  "lastRun": "2026-09-19T11:36:09.055064Z",
+  "lastRun": "2026-09-20T11:50:43.305100Z",
   "lastNewCount": 0,
-  "sourcesReached": 11,
+  "sourcesReached": 12,
   "sourcesTotal": 13,
-  "itemsExamined": 467,
+  "itemsExamined": 523,
   "failedSources": [
     {
       "institution": "UMons",
       "url": "https://web.umons.ac.be/fr/feed/",
       "error": "<urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>"
-    },
-    {
-      "institution": "KBR (Royal Library of Belgium)",
-      "url": "https://www.kbr.be/en/news/",
-      "error": "HTTP 415"
     }
   ],
   "seenUrls": [
