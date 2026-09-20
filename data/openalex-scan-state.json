@@ -1,18 +1,18 @@
 {
-  "lastRun": "2026-09-19T11:51:03.162Z",
+  "lastRun": "2026-09-20T12:15:35.289Z",
   "lastAddedCount": 0,
   "lastUpdatedCount": 0,
   "lastCandidateCount": 0,
-  "lastWebSearches": 0,
+  "lastWebSearches": 36,
   "lastBatch": [
-    "ulb",
-    "uantwerpen",
-    "unamur",
-    "vub",
-    "uza",
-    "azdelta"
+    "chucharleroi",
+    "chuliege",
+    "saintpierre",
+    "chunamur",
+    "saintluc",
+    "uzgent"
   ],
-  "cursor": 12,
+  "cursor": 18,
   "institutionsTotal": 49,
   "nationalLastRun": "2026-09-18T21:31:33.782Z",
   "checked": {
@@ -45,14 +45,37 @@
       "lastChecked": "2026-09-18",
       "result": "none",
       "searches": 6
+    },
+    "chucharleroi": {
+      "lastChecked": "2026-09-20",
+      "result": "none",
+      "searches": 6
+    },
+    "chuliege": {
+      "lastChecked": "2026-09-20",
+      "result": "none",
+      "searches": 6
+    },
+    "saintpierre": {
+      "lastChecked": "2026-09-20",
+      "result": "none",
+      "searches": 6
+    },
+    "chunamur": {
+      "lastChecked": "2026-09-20",
+      "result": "none",
+      "searches": 6
+    },
+    "saintluc": {
+      "lastChecked": "2026-09-20",
+      "result": "none",
+      "searches": 6
+    },
+    "uzgent": {
+      "lastChecked": "2026-09-20",
+      "result": "none",
+      "searches": 6
     }
   },
-  "errors": {
-    "ulb": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfCkGmoNC2HKfmWwHzxvK\"}",
-    "uantwerpen": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfCkPxkNo88gLEgLa1vsX\"}",
-    "unamur": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfCkPysqtfsVX1HAbGQ2G\"}",
-    "vub": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfCkPzZGaGQs5AMm44MdQ\"}",
-    "uza": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfCkQ1BDuVDHM1ipR7oWS\"}",
-    "azdelta": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfCkQ1pfk1jP6X5Fi8o2F\"}"
-  }
+  "errors": {}
 }
