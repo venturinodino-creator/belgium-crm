@@ -1792,7 +1792,6 @@ let state = {
   institutions: [],
   researchFocus: {}, // instId -> {fields, sourceUrl, worksCount, ...} from data/research-focus.json
   researchOutput: {}, // instId -> {worksTotal, byYear, oa, funders, publishers, elsevier, partners} from data/research-output.json
-  funding: {}, // instId -> {numFound, active, byFunder, projects[]} from data/funding.json (OpenAIRE)
   contacts: [],
   opportunities: [],
   interactions: [],
@@ -2106,9 +2105,8 @@ async function loadResearchFocus() {
   } catch (e) {}
 }
 // data/research-output.json (scripts/research-output-scan.js): the five-year
-// OpenAlex works picture per institution. data/funding.json
-// (scripts/funding-scan.js): recent grants per institution from OpenAIRE.
-// Both static, both loaded like research-focus.json.
+// OpenAlex works picture per institution, used for the White Space works
+// count. Static, loaded like research-focus.json.
 async function _loadStaticInstData(file, key, cacheKey) {
   try {
     const res = await fetch('data/' + file + '?t=' + Date.now());
@@ -2126,7 +2124,6 @@ async function _loadStaticInstData(file, key, cacheKey) {
   } catch (e) {}
 }
 async function loadResearchOutput() { return _loadStaticInstData('research-output.json', 'researchOutput', 'be_crm_research_output'); }
-async function loadFunding() { return _loadStaticInstData('funding.json', 'funding', 'be_crm_funding'); }
 // The White Space dossier is researched offline (see data/whitespace-contacts.json
 // for the method) and shipped as a static file, exactly like research-focus.json —
 // none of it is per-user state, so it does not belong in Supabase.
@@ -2149,7 +2146,6 @@ async function load() {
   showLoadingScreen();
   const researchFocusPromise = loadResearchFocus();
   const researchOutputPromise = loadResearchOutput();
-  const fundingPromise = loadFunding();
   const whiteSpacePromise = loadWhiteSpace();
   try {
     const [instRows, contRows, oppRows, intRows, rfpRows] = await Promise.all([
@@ -2221,7 +2217,6 @@ async function load() {
   }
   await researchFocusPromise;
   await researchOutputPromise;
-  await fundingPromise;
   await whiteSpacePromise;
   hideLoadingScreen();
 }
@@ -4801,90 +4796,6 @@ function buildInstResearchDonut(instId) {
   return '<div><div style="display:flex;align-items:center;gap:16px;max-width:380px">'+svg+'<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px">'+legend+'</div></div>'+footer+'</div>';
 }
 
-// Research Output card, from data/research-output.json (five-year OpenAlex
-// works picture). Every figure links to the works query that produced it.
-function _fmtCount(n) { return typeof n === 'number' ? n.toLocaleString('en-GB') : '—'; }
-function _fmtEur(n) {
-  if (typeof n !== 'number' || !n) return '—';
-  if (n >= 1e9) return '€' + (n / 1e9).toFixed(2) + 'bn';
-  if (n >= 1e6) return '€' + (n / 1e6).toFixed(1) + 'm';
-  if (n >= 1e3) return '€' + Math.round(n / 1e3) + 'k';
-  return '€' + Math.round(n);
-}
-function buildInstResearchOutput(instId) {
-  const ro = (state.researchOutput || {})[instId];
-  const meta = state.researchOutputMeta || {};
-  const foot = (inner) => '<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:10px;color:var(--muted)">' + inner + '</div>';
-  if (!ro) return '';
-  if (ro.notFound) return ''; // the Research Focus card already explains the missing OpenAlex record
-  if (ro.fetchError && !ro.worksTotal) return '<div style="font-size:12px;color:var(--muted)">Research output data temporarily unavailable (fetch error on last scan).</div>';
-  const years = ro.byYear || [];
-  const max = Math.max(1, ...years.map(y => y.count));
-  const thisYear = new Date().getFullYear();
-  const bars = years.map(y => {
-    const h = Math.max(2, Math.round((y.count / max) * 44));
-    const partial = y.year >= thisYear;
-    return '<div title="' + y.year + ': ' + _fmtCount(y.count) + ' works' + (partial ? ' (year to date)' : '') + '" style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1">' +
-      '<div style="font-size:9px;color:var(--muted)">' + _fmtCount(y.count) + '</div>' +
-      '<div style="width:100%;max-width:34px;height:' + h + 'px;border-radius:3px 3px 0 0;background:' + (partial ? 'rgba(59,130,246,.45)' : 'var(--primary)') + '"></div>' +
-      '<div style="font-size:10px;color:var(--muted)">' + y.year + '</div></div>';
-  }).join('');
-  const stat = (label, value, title) => '<div title="' + esc(title || '') + '" style="min-width:90px"><div style="font-size:18px;font-weight:700">' + value + '</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">' + label + '</div></div>';
-  const oaShare = ro.oa && typeof ro.oa.share === 'number' ? ro.oa.share + '%' : '—';
-  const elsShare = ro.elsevier && typeof ro.elsevier.share === 'number' ? ro.elsevier.share + '%' : '—';
-  const stats = '<div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:10px">' +
-    stat('Works ' + ro.window.from + '–' + ro.window.to, _fmtCount(ro.worksTotal), 'Works with at least one author affiliated to this institution') +
-    stat('Open access', oaShare, 'Share of those works with any open-access version (gold, hybrid, green, bronze, diamond)') +
-    stat('In Elsevier journals', elsShare, (ro.elsevier ? _fmtCount(ro.elsevier.count) : '—') + ' works published by Elsevier BV') +
-    '</div>';
-  const chips = (label, items, fmt) => items && items.length
-    ? '<div style="margin-top:8px"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">' + label + '</div><div style="display:flex;flex-wrap:wrap;gap:4px">' +
-      items.map(x => '<span style="font-size:11px;padding:2px 8px;border-radius:12px;background:var(--surface-2,rgba(148,163,184,.12));border:1px solid var(--border)">' + esc(x.name) + ' <span style="color:var(--muted)">' + fmt(x) + '</span></span>').join('') + '</div></div>'
-    : '';
-  const pct = x => ro.worksTotal ? Math.round((x.count / ro.worksTotal) * 100) + '%' : _fmtCount(x.count);
-  const body = stats +
-    '<div style="display:flex;align-items:flex-end;gap:6px;max-width:320px;height:78px">' + bars + '</div>' +
-    chips('Top funders', (ro.funders || []).slice(0, 6), x => _fmtCount(x.count)) +
-    chips('Publishes most with', (ro.publishers || []).slice(0, 5), pct) +
-    chips('Co-publishes most with', (ro.partners || []).slice(0, 5), x => _fmtCount(x.count));
-  const updated = meta.generatedAt ? new Date(meta.generatedAt).toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
-  return body + foot('Source: <a href="' + esc(ro.worksUrl || '#') + '" target="_blank" style="color:var(--primary)">OpenAlex works query ↗</a>' +
-    (updated ? ' &middot; scanned ' + updated : '') + (ro.stale ? ' &middot; last successful scan shown' : ''));
-}
-
-// Funding card, from data/funding.json (OpenAIRE projects per organisation:
-// CORDIS for Horizon Europe / ERC / MSCA, plus the national funders OpenAIRE
-// aggregates). Amounts are whole-project budgets, not this institution's share.
-function buildInstFunding(instId) {
-  const fd = (state.funding || {})[instId];
-  const meta = state.fundingMeta || {};
-  const foot = (inner) => '<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:10px;color:var(--muted)">' + inner + '</div>';
-  if (!fd) return '';
-  if (fd.notFound || !fd.numFound) return ''; // nothing to show; the reason is in data/funding.json
-  if (fd.fetchError && !fd.numFound) return '<div style="font-size:12px;color:var(--muted)">Funding data temporarily unavailable (fetch error on last scan).</div>';
-  const since = fd.since ? new Date(fd.since).toLocaleDateString('en-GB', { year: 'numeric', month: 'short' }) : '';
-  const funders = Object.entries(fd.byFunder || {}).sort((a, b) => b[1].count - a[1].count);
-  const stat = (label, value, title) => '<div title="' + esc(title || '') + '" style="min-width:90px"><div style="font-size:18px;font-weight:700">' + value + '</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">' + label + '</div></div>';
-  const stats = '<div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:10px">' +
-    stat('Projects since ' + since, _fmtCount(fd.numFound), 'Projects with a start date on or after ' + fd.since + ' in which this organisation participates') +
-    stat('Active', _fmtCount(fd.active), 'Projects whose end date has not passed') +
-    stat('Combined budgets', _fmtEur(fd.fundedTotal), 'Sum of the funded amounts of ' + _fmtCount(fd.fundedKnown) + ' projects with a published figure — whole-project budgets shared across all partners, not this institution\'s share') +
-    '</div>';
-  const chips = funders.length
-    ? '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">' + funders.slice(0, 6).map(([k, v]) =>
-        '<span title="' + esc(v.name || k) + '" style="font-size:11px;padding:2px 8px;border-radius:12px;background:var(--surface-2,rgba(148,163,184,.12));border:1px solid var(--border)">' + esc(k) + ' <span style="color:var(--muted)">' + _fmtCount(v.count) + '</span></span>').join('') + '</div>'
-    : '';
-  const rows = (fd.projects || []).slice(0, 6).map(pr =>
-    '<div style="display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-top:1px solid var(--border);font-size:12px">' +
-      '<div style="min-width:0"><a href="' + esc(pr.url) + '" target="_blank" style="color:var(--text);font-weight:600;text-decoration:none">' + esc(pr.acronym || pr.code || 'Project') + '</a>' +
-      ' <span style="color:var(--muted)">' + esc((pr.title || '').slice(0, 90)) + (pr.title && pr.title.length > 90 ? '…' : '') + '</span>' +
-      '<div style="font-size:10px;color:var(--muted)">' + esc(pr.funder) + (pr.stream ? ' · ' + esc(pr.stream.slice(0, 70)) : '') + (pr.start ? ' · ' + pr.start.slice(0, 4) + (pr.end ? '–' + pr.end.slice(0, 4) : '') : '') + '</div></div>' +
-      '<div style="white-space:nowrap;font-weight:600">' + _fmtEur(pr.amount) + '</div></div>').join('');
-  const updated = meta.generatedAt ? new Date(meta.generatedAt).toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
-  return stats + chips + rows + foot('Source: <a href="' + esc(fd.sourceUrl || 'https://explore.openaire.eu/') + '" target="_blank" style="color:var(--primary)">OpenAIRE projects for this organisation ↗</a>' +
-    (updated ? ' &middot; scanned ' + updated : '') + (fd.stale ? ' &middot; last successful scan shown' : ''));
-}
-
 let _dashDragSrc = null;
 function initDashDrag() {
   const widgets = document.querySelectorAll('.dash-widget');
@@ -6170,13 +6081,7 @@ function renderDetail() {
     </tr>`;
   }).join('') : `<tr><td colspan="6"><div class="empty" style="padding:30px"><div class="ei"><span style="display:inline-flex"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span></div><h3>No contacts yet</h3><p><button class="btn btn-accent btn-sm" onclick="openAddContact('${inst.id}')">+ Add first contact</button></p></div></td></tr>`;
 
-  let _rfHtml = '', _roHtml = '', _fdHtml = '';
-  try {
-    const _o = buildInstResearchOutput(inst.id);
-    if (_o) _roHtml = '<div class="card" style="margin-bottom:16px;padding:14px 18px"><div class="card-header" style="margin-bottom:10px"><span class="card-title">Research Output</span></div>' + _o + '</div>';
-    const _f = buildInstFunding(inst.id);
-    if (_f) _fdHtml = '<div class="card" style="margin-bottom:16px;padding:14px 18px"><div class="card-header" style="margin-bottom:10px"><span class="card-title">Funding</span></div>' + _f + '</div>';
-  } catch(e) { console.error(e); }
+  let _rfHtml = '';
   try {
     const _d = buildInstResearchDonut(inst.id);
     if (_d) _rfHtml = '<div class="card" style="margin-bottom:16px;padding:14px 18px"><div class="card-header" style="margin-bottom:10px"><span class="card-title">Research Focus</span></div>' + _d + '</div>';
@@ -6219,8 +6124,6 @@ function renderDetail() {
       ${keyRolesHtml}
     </div>
     ${_rfHtml}
-    ${_roHtml}
-    ${_fdHtml}
 
     ${iaAnalyticsHtml(inst, contacts)}
 
