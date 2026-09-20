@@ -1,79 +1,81 @@
 {
-  "lastRun": "2026-09-19T17:33:46.380Z",
-  "lastAddedCount": 26,
+  "lastRun": "2026-09-20T13:22:56.104Z",
+  "lastAddedCount": 30,
   "lastBatch": [
-    "uzleuven",
-    "bruegel",
-    "craw",
-    "egmont",
-    "flandersmake",
-    "ilvo",
-    "imec",
-    "itg",
-    "solvay",
-    "itinera"
+    "inbo",
+    "royalacademiesbelgium",
+    "bira",
+    "rbins",
+    "rmi",
+    "rma",
+    "rmca",
+    "rob",
+    "sciensano",
+    "sckcen"
   ],
-  "lastWebSearches": 82,
-  "cursor": 31,
+  "lastWebSearches": 100,
+  "cursor": 41,
   "institutions": 49,
   "perInstitution": [
     {
-      "instId": "uzleuven",
+      "instId": "inbo",
+      "named": 5,
+      "kept": 4,
+      "searches": 10
+    },
+    {
+      "instId": "royalacademiesbelgium",
+      "named": 9,
+      "kept": 9,
+      "searches": 10
+    },
+    {
+      "instId": "bira",
+      "named": 3,
+      "kept": 1,
+      "searches": 10
+    },
+    {
+      "instId": "rbins",
+      "named": 5,
+      "kept": 3,
+      "searches": 10
+    },
+    {
+      "instId": "rmi",
+      "named": 6,
+      "kept": 3,
+      "searches": 10
+    },
+    {
+      "instId": "rma",
       "named": 1,
       "kept": 1,
       "searches": 10
     },
     {
-      "instId": "bruegel",
-      "error": "fetch failed"
-    },
-    {
-      "instId": "craw",
-      "named": 3,
-      "kept": 3,
-      "searches": 10
-    },
-    {
-      "instId": "egmont",
+      "instId": "rmca",
       "named": 4,
       "kept": 0,
       "searches": 10
     },
     {
-      "instId": "flandersmake",
-      "named": 4,
+      "instId": "rob",
+      "named": 3,
       "kept": 3,
       "searches": 10
     },
     {
-      "instId": "ilvo",
+      "instId": "sciensano",
+      "named": 5,
+      "kept": 1,
+      "searches": 10
+    },
+    {
+      "instId": "sckcen",
       "named": 6,
       "kept": 5,
       "searches": 10
-    },
-    {
-      "instId": "imec",
-      "named": 9,
-      "kept": 4,
-      "searches": 10
-    },
-    {
-      "instId": "itg",
-      "named": 4,
-      "kept": 4,
-      "searches": 10
-    },
-    {
-      "instId": "solvay",
-      "named": 6,
-      "kept": 4,
-      "searches": 7
-    },
-    {
-      "instId": "itinera",
-      "named": 4,
-      "kept": 2,
-      "searches": 5
     }
   ]
 }
