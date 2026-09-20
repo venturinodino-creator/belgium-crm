@@ -5878,7 +5878,6 @@ function iaAnalyticsHtml(inst, contacts) {
   // Coverage of the whole list is not the question a rep has; coverage of
   // the leadership is, so that is what the tiles count.
   const leadReach = leaders.filter(c => c.email).length;
-  const noEmail = people.filter(c => !c.email).length;
   const reachPct = leaders.length ? Math.round(leadReach / leaders.length * 100) : 0;
 
   // ── subscription posture ───────────────────────────────────────────────
@@ -5969,13 +5968,7 @@ function iaAnalyticsHtml(inst, contacts) {
             <span class="ia-tile-l">Leaders with an email</span>
             <span class="ia-tile-s">${leaders.length ? (reachPct === 100 ? 'all reachable' : reachPct + '% of the leadership') : 'none identified yet'}</span>
           </button>
-          <button class="ia-tile" onclick="iaSetFilter('email','missing')" aria-pressed="${!!(f && f.kind === 'email' && f.value === 'missing')}">
-            <span class="ia-tile-n" style="color:${noEmail ? '#fb923c' : '#4ade80'}">${noEmail}</span>
-            <span class="ia-tile-l">No email at all</span>
-            <span class="ia-tile-s">${noEmail ? 'cannot be reached yet' : 'everyone reachable'}</span>
-          </button>
         </div>
-        ${dupeKeys.length ? `<button class="ia-flag" onclick="iaSetFilter('dupe',1)" aria-pressed="${!!(f && f.kind === 'dupe')}">⚠ ${dupeKeys.length} name${dupeKeys.length === 1 ? '' : 's'} stored twice — ${esc(dupeKeys.slice(0, 2).map(d => d.replace(/\b\w/g, m => m.toUpperCase())).join(', '))}${dupeKeys.length > 2 ? '…' : ''}<u>show the records</u></button>` : ''}
       </div>
 
       <div class="ia-panel ia-panel-link" onclick="nav('org-map',{instId:'${inst.id}'})" role="button" tabindex="0" onkeydown="if(event.key==='Enter')nav('org-map',{instId:'${inst.id}'})" title="Open the visual org chart for ${esc(inst.short || inst.name)}">
