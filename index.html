@@ -4682,7 +4682,7 @@ function initStatCardDrag() {
   });
 }
 
-const DASH_WIDGET_DEFAULT_ORDER = ['w-attention','w-yourday','w-posture','w-types','w-highprio','w-renewals','w-agents','w-map'];
+const DASH_WIDGET_DEFAULT_ORDER = ['w-attention','w-posture','w-types','w-highprio','w-renewals','w-agents','w-map'];
 function getDashWidgetOrder() {
   let order;
   try { order = JSON.parse(localStorage.getItem('be_crm_widget_order')); if(!Array.isArray(order)||!order.length) order=null; }
@@ -4701,8 +4701,6 @@ function buildDashWidgets(typeRows, hpRows, agentRows, postureRows, renewalRows,
   const handle = '';
   const _td2 = new Date().toISOString().slice(0,10);
   const WIDGETS = {
-    // Same card as the top of the Daily Digest, in widget dress.
-    'w-yourday': digestActivityHtml({ widget: true }),
     'w-attention': `<div class="card dash-widget w-wide" data-widget-id="w-attention" draggable="true">
       <div class="card-header"><span class="card-title">Needs Your Attention</span><span id="attn-count"></span>${handle}</div>
       <div id="attn-feed-body" style="display:flex;flex-direction:column;gap:2px">
@@ -10182,15 +10180,7 @@ function digestActivityHtml(opts) {
     ? `${rfpsToday.length} new tender${rfpsToday.length === 1 ? '' : 's'} today: ${rfpsToday.slice(0, 2).map(r => esc(r.institution || r.title || 'untitled')).join(', ')}${rfpsToday.length > 2 ? ` +${rfpsToday.length - 2} more` : ''}.`
     : 'No new tenders today.';
 
-  // On the dashboard the same card is a draggable widget in the board grid
-  // and links through to the digest; on the digest it links on to Analytics.
-  const head = (opts && opts.widget)
-    ? `<div class="card dash-widget w-wide" data-widget-id="w-yourday" draggable="true" style="padding:0;overflow:hidden">
-    <div class="card-header" style="margin:0;padding:14px 18px;border-bottom:1px solid var(--border)">
-      <span class="card-title">Your Day</span>
-      <button class="an-link" onclick="event.stopPropagation();nav('digest')">Open digest &rarr;</button>
-    </div>`
-    : `<div class="card" style="padding:0;overflow:hidden;margin-bottom:20px">
+  const head = `<div class="card" style="padding:0;overflow:hidden;margin-bottom:20px">
     <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
       <h3 style="font-size:14px;margin:0">Your Day</h3>
       <button class="an-link" onclick="nav('analytics')">Open Analytics &rarr;</button>
