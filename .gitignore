@@ -1,3 +1,15 @@
 __pycache__/
 *.pyc
 node_modules/
+
+# Local tooling state, test copies of the page (sign-in bypassed), local
+# helper scripts and their output, secrets and OS clutter
+.claude/
+.claude-flow/
+push.bat
+push_log.txt
+_test_ws.html
+.env
+.env.*
+.DS_Store
+Thumbs.db

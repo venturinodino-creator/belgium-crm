@@ -1,0 +1,20 @@
+# Line endings are the same on every machine: LF in the repository and in
+# every working copy, whatever core.autocrlf is set to locally. Without this
+# a Windows clone with autocrlf=true shows every file as modified, and a
+# Windows editor can push CRLF into a file that is LF everywhere else.
+* text=auto eol=lf
+
+# Windows batch files only run reliably with CRLF.
+*.bat text eol=crlf
+
+# Never touch binaries.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
