@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-19T20:42:13.384Z",
+  "generatedAt": "2026-09-21T10:56:01.354Z",
   "source": "OpenAlex API (works grouped by year, OA status, funder, publisher, co-author institution)",
   "window": {
     "from": 2022,
@@ -13,7 +13,7 @@
         "from": 2022,
         "to": 2026
       },
-      "worksTotal": 67418,
+      "worksTotal": 67466,
       "byYear": [
         {
           "year": 2022,
@@ -21,7 +21,7 @@
         },
         {
           "year": 2023,
-          "count": 14137
+          "count": 14138
         },
         {
           "year": 2024,
@@ -29,40 +29,40 @@
         },
         {
           "year": 2025,
-          "count": 14029
+          "count": 14033
         },
         {
           "year": 2026,
-          "count": 12069
+          "count": 12112
         }
       ],
       "oa": {
         "share": 78.6,
         "byStatus": {
-          "green": 20473,
-          "gold": 15732,
-          "closed": 14461,
-          "hybrid": 9522,
-          "bronze": 4339,
-          "diamond": 2891
+          "green": 20496,
+          "gold": 15734,
+          "closed": 14463,
+          "hybrid": 9541,
+          "bronze": 4340,
+          "diamond": 2892
         }
       },
       "funders": [
         {
           "name": "Fonds Wetenschappelijk Onderzoek",
-          "count": 12191
+          "count": 12198
         },
         {
           "name": "KU Leuven",
-          "count": 8928
+          "count": 8940
         },
         {
           "name": "Vlaamse regering",
-          "count": 8773
+          "count": 8787
         },
         {
           "name": "European Commission",
-          "count": 5983
+          "count": 5992
         },
         {
           "name": "National Natural Science Foundation of China",
@@ -74,7 +74,7 @@
         },
         {
           "name": "National Institutes of Health",
-          "count": 1346
+          "count": 1347
         },
         {
           "name": "Deutsche Forschungsgemeinschaft",
@@ -84,15 +84,15 @@
       "publishers": [
         {
           "name": "Elsevier BV",
-          "count": 12230
+          "count": 12253
         },
         {
           "name": "Springer Nature",
-          "count": 8231
+          "count": 8232
         },
         {
           "name": "Wiley",
-          "count": 4106
+          "count": 4109
         },
         {
           "name": "Springer Science+Business Media",
@@ -108,33 +108,33 @@
         }
       ],
       "elsevier": {
-        "count": 12230,
-        "share": 18.1
+        "count": 12253,
+        "share": 18.2
       },
       "partners": [
         {
           "name": "Vlaams Instituut voor Biotechnologie",
-          "count": 4577
+          "count": 4578
         },
         {
           "name": "Centre National de la Recherche Scientifique",
-          "count": 3440
+          "count": 3441
         },
         {
           "name": "University of London",
-          "count": 3268
+          "count": 3269
         },
         {
           "name": "Ghent University",
-          "count": 3152
+          "count": 3153
         },
         {
           "name": "Istituti di Ricovero e Cura a Carattere Scientifico",
-          "count": 2781
+          "count": 2783
         },
         {
           "name": "Universitair Ziekenhuis Leuven",
-          "count": 2658
+          "count": 2661
         }
       ],
       "apiUrl": "https://api.openalex.org/works?filter=authorships.institutions.id:I99464096,publication_year:2022-2026",
@@ -147,11 +147,11 @@
         "from": 2022,
         "to": 2026
       },
-      "worksTotal": 40213,
+      "worksTotal": 40229,
       "byYear": [
         {
           "year": 2022,
-          "count": 8418
+          "count": 8419
         },
         {
           "year": 2023,
@@ -167,28 +167,28 @@
         },
         {
           "year": 2026,
-          "count": 6113
+          "count": 6128
         }
       ],
       "oa": {
         "share": 79.9,
         "byStatus": {
-          "gold": 11734,
-          "green": 10440,
-          "closed": 8072,
-          "hybrid": 5693,
+          "gold": 11736,
+          "green": 10447,
+          "closed": 8073,
+          "hybrid": 5698,
           "bronze": 2935,
-          "diamond": 1339
+          "diamond": 1340
         }
       },
       "funders": [
         {
           "name": "Fonds Wetenschappelijk Onderzoek",
-          "count": 8157
+          "count": 8158
         },
         {
           "name": "Vlaamse regering",
-          "count": 5947
+          "count": 5949
         },
         {
           "name": "Universiteit Gent",
@@ -196,11 +196,11 @@
         },
         {
           "name": "European Commission",
-          "count": 3436
+          "count": 3437
         },
         {
           "name": "Bijzonder Onderzoeksfonds UGent",
-          "count": 2297
+          "count": 2298
         },
         {
           "name": "National Natural Science Foundation of China",
@@ -218,15 +218,15 @@
       "publishers": [
         {
           "name": "Elsevier BV",
-          "count": 8401
+          "count": 8406
         },
         {
           "name": "Springer Nature",
-          "count": 5793
+          "count": 5794
         },
         {
           "name": "Wiley",
-          "count": 3100
+          "count": 3102
         },
         {
           "name": "Springer Science+Business Media",
@@ -238,25 +238,25 @@
         },
         {
           "name": "Taylor & Francis",
-          "count": 1253
+          "count": 1254
         }
       ],
       "elsevier": {
-        "count": 8401,
+        "count": 8406,
         "share": 20.9
       },
       "partners": [
         {
           "name": "Ghent University Hospital",
-          "count": 7410
+          "count": 7416
         },
         {
           "name": "HOGENT University of Applied Sciences and Arts",
-          "count": 3639
+          "count": 3641
         },
         {
           "name": "KU Leuven",
-          "count": 3178
+          "count": 3179
         },
         {
           "name": "Vlaams Instituut voor Biotechnologie",
@@ -268,7 +268,7 @@
         },
         {
           "name": "Vrije Universiteit Brussel",
-          "count": 2050
+          "count": 2052
         }
       ],
       "apiUrl": "https://api.openalex.org/works?filter=authorships.institutions.id:I32597200,publication_year:2022-2026",
@@ -281,7 +281,7 @@
         "from": 2022,
         "to": 2026
       },
-      "worksTotal": 24281,
+      "worksTotal": 24294,
       "byYear": [
         {
           "year": 2022,
@@ -289,7 +289,7 @@
         },
         {
           "year": 2023,
-          "count": 5115
+          "count": 5116
         },
         {
           "year": 2024,
@@ -301,16 +301,16 @@
         },
         {
           "year": 2026,
-          "count": 4609
+          "count": 4621
         }
       ],
       "oa": {
         "share": 76.3,
         "byStatus": {
-          "gold": 6313,
-          "green": 5958,
-          "closed": 5758,
-          "hybrid": 3793,
+          "gold": 6315,
+          "green": 5963,
+          "closed": 5757,
+          "hybrid": 3800,
           "diamond": 1282,
           "bronze": 1177
         }
@@ -318,7 +318,7 @@
       "funders": [
         {
           "name": "Fonds Wetenschappelijk Onderzoek",
-          "count": 4671
+          "count": 4673
         },
         {
           "name": "Vlaamse regering",
@@ -352,19 +352,19 @@
       "publishers": [
         {
           "name": "Elsevier BV",
-          "count": 3901
+          "count": 3907
         },
         {
           "name": "Springer Nature",
-          "count": 3279
+          "count": 3280
         },
         {
           "name": "Wiley",
-          "count": 1550
+          "count": 1551
         },
         {
           "name": "Springer Science+Business Media",
-          "count": 1346
+          "count": 1347
         },
         {
           "name": "Multidisciplinary Digital Publishing Institute",
@@ -372,37 +372,37 @@
         },
         {
           "name": "Taylor & Francis",
-          "count": 935
+          "count": 936
         }
       ],
       "elsevier": {
-        "count": 3901,
+        "count": 3907,
         "share": 16.1
       },
       "partners": [
         {
           "name": "Antwerp University Hospital",
-          "count": 3413
+          "count": 3415
         },
         {
           "name": "KU Leuven",
-          "count": 2496
+          "count": 2497
         },
         {
           "name": "Ghent University",
-          "count": 1995
+          "count": 1996
         },
         {
           "name": "Centre National de la Recherche Scientifique",
-          "count": 1732
+          "count": 1739
         },
         {
           "name": "Ghent University Hospital",
-          "count": 1580
+          "count": 1587
         },
         {
           "name": "Vrije Universiteit Brussel",
-          "count": 1531
+          "count": 1536
         }
       ],
       "apiUrl": "https://api.openalex.org/works?filter=authorships.institutions.id:I149213910,publication_year:2022-2026",
@@ -415,15 +415,15 @@
         "from": 2022,
         "to": 2026
       },
-      "worksTotal": 21880,
+      "worksTotal": 21894,
       "byYear": [
         {
           "year": 2022,
-          "count": 3765
+          "count": 3766
         },
         {
           "year": 2023,
-          "count": 5492
+          "count": 5493
         },
         {
           "year": 2024,
@@ -435,16 +435,16 @@
         },
         {
           "year": 2026,
-          "count": 4106
+          "count": 4118
         }
       ],
       "oa": {
         "share": 74.4,
         "byStatus": {
           "gold": 5858,
-          "closed": 5599,
-          "green": 4974,
-          "hybrid": 3007,
+          "closed": 5597,
+          "green": 4980,
+          "hybrid": 3017,
           "diamond": 1245,
           "bronze": 1197
         }
@@ -452,7 +452,7 @@
       "funders": [
         {
           "name": "Fonds Wetenschappelijk Onderzoek",
-          "count": 3907
+          "count": 3908
         },
         {
           "name": "Vlaamse regering",
@@ -464,7 +464,7 @@
         },
         {
           "name": "Vrije Universiteit Brussel",
-          "count": 1376
+          "count": 1377
         },
         {
           "name": "Fonds De La Recherche Scientifique - FNRS",
@@ -472,11 +472,11 @@
         },
         {
           "name": "National Science Foundation",
-          "count": 1013
+          "count": 1014
         },
         {
           "name": "Deutsche Forschungsgemeinschaft",
-          "count": 832
+          "count": 833
         },
         {
           "name": "National Natural Science Foundation of China",
@@ -486,7 +486,7 @@
       "publishers": [
         {
           "name": "Elsevier BV",
-          "count": 3228
+          "count": 3238
         },
         {
           "name": "Springer Nature",
@@ -510,21 +510,21 @@
         }
       ],
       "elsevier": {
-        "count": 3228,
+        "count": 3238,
         "share": 14.8
       },
       "partners": [
         {
           "name": "Centre National de la Recherche Scientifique",
-          "count": 3007
+          "count": 3013
         },
         {
           "name": "Université Libre de Bruxelles",
-          "count": 2184
+          "count": 2189
         },
         {
           "name": "Ghent University",
-          "count": 2104
+          "count": 2106
         },
         {
           "name": "Universitair Ziekenhuis Brussel",
@@ -532,11 +532,11 @@
         },
         {
           "name": "Universidad Autónoma de Madrid",
-          "count": 1774
+          "count": 1778
         },
         {
           "name": "Consejo Superior de Investigaciones Científicas",
-          "count": 1741
+          "count": 1745
         }
       ],
       "apiUrl": "https://api.openalex.org/works?filter=authorships.institutions.id:I13469542,publication_year:2022-2026",
@@ -549,7 +549,7 @@
         "from": 2022,
         "to": 2026
       },
-      "worksTotal": 7908,
+      "worksTotal": 7917,
       "byYear": [
         {
           "year": 2022,
@@ -569,16 +569,16 @@
         },
         {
           "year": 2026,
-          "count": 1539
+          "count": 1548
         }
       ],
       "oa": {
-        "share": 80.4,
+        "share": 80.5,
         "byStatus": {
-          "green": 2347,
+          "green": 2350,
           "gold": 2040,
-          "closed": 1548,
-          "hybrid": 1076,
+          "closed": 1547,
+          "hybrid": 1083,
           "bronze": 487,
           "diamond": 410
         }
@@ -590,15 +590,15 @@
         },
         {
           "name": "Vlaamse regering",
-          "count": 1129
+          "count": 1131
         },
         {
           "name": "Universiteit Hasselt",
-          "count": 925
+          "count": 927
         },
         {
           "name": "European Commission",
-          "count": 678
+          "count": 679
         },
         {
           "name": "Bijzonder Onderzoeksfonds UGent",
@@ -620,7 +620,7 @@
       "publishers": [
         {
           "name": "Elsevier BV",
-          "count": 1580
+          "count": 1587
         },
         {
           "name": "Springer Nature",
@@ -632,11 +632,11 @@
         },
         {
           "name": "University of Oxford",
-          "count": 511
+          "count": 510
         },
         {
           "name": "Oxford University Press",
-          "count": 506
+          "count": 505
         },
         {
           "name": "Springer Science+Business Media",
@@ -644,25 +644,25 @@
         }
       ],
       "elsevier": {
-        "count": 1580,
+        "count": 1587,
         "share": 20
       },
       "partners": [
         {
           "name": "KU Leuven",
-          "count": 1841
+          "count": 1844
         },
         {
           "name": "University of Antwerp",
-          "count": 892
+          "count": 894
         },
         {
           "name": "Jessa Hospital",
-          "count": 584
+          "count": 583
         },
         {
           "name": "Maastricht University",
-          "count": 573
+          "count": 575
         },
         {
           "name": "Ghent University",
@@ -683,7 +683,7 @@
         "from": 2022,
         "to": 2026
       },
-      "worksTotal": 19509,
+      "worksTotal": 19519,
       "byYear": [
         {
           "year": 2022,
@@ -691,11 +691,11 @@
         },
         {
           "year": 2023,
-          "count": 3902
+          "count": 3907
         },
         {
           "year": 2024,
-          "count": 3848
+          "count": 3849
         },
         {
           "year": 2025,
@@ -703,48 +703,48 @@
         },
         {
           "year": 2026,
-          "count": 3516
+          "count": 3520
         }
       ],
       "oa": {
-        "share": 83.2,
+        "share": 83.3,
         "byStatus": {
-          "green": 6413,
-          "gold": 4670,
-          "closed": 3269,
-          "hybrid": 2552,
-          "diamond": 1527,
-          "bronze": 1078
+          "green": 6419,
+          "gold": 4671,
+          "closed": 3268,
+          "hybrid": 2553,
+          "diamond": 1528,
+          "bronze": 1080
         }
       },
       "funders": [
         {
           "name": "Fonds De La Recherche Scientifique - FNRS",
-          "count": 3526
+          "count": 3527
         },
         {
           "name": "European Commission",
-          "count": 1575
+          "count": 1577
         },
         {
           "name": "Fonds Wetenschappelijk Onderzoek",
-          "count": 1016
+          "count": 1017
         },
         {
           "name": "National Science Foundation",
-          "count": 897
+          "count": 898
         },
         {
           "name": "Deutsche Forschungsgemeinschaft",
-          "count": 835
+          "count": 837
         },
         {
           "name": "National Natural Science Foundation of China",
-          "count": 777
+          "count": 778
         },
         {
           "name": "Fonds pour la Formation à la Recherche dans l’Industrie et dans l’Agriculture",
-          "count": 739
+          "count": 740
         },
         {
           "name": "Université Catholique de Louvain",
@@ -754,7 +754,7 @@
       "publishers": [
         {
           "name": "Elsevier BV",
-          "count": 2912
+          "count": 2914
         },
         {
           "name": "Springer Nature",
@@ -778,13 +778,13 @@
         }
       ],
       "elsevier": {
-        "count": 2912,
+        "count": 2914,
         "share": 14.9
       },
       "partners": [
         {
           "name": "Centre National de la Recherche Scientifique",
-          "count": 2690
+          "count": 2695
         },
         {
           "name": "Cliniques Universitaires Saint-Luc",
@@ -792,19 +792,19 @@
         },
         {
           "name": "KU Leuven",
-          "count": 1365
+          "count": 1366
         },
         {
           "name": "Université Libre de Bruxelles",
-          "count": 1343
+          "count": 1348
         },
         {
           "name": "Helmholtz Association of German Research Centres",
-          "count": 1056
+          "count": 1061
         },
         {
           "name": "Vrije Universiteit Brussel",
-          "count": 998
+          "count": 1003
         }
       ],
       "apiUrl": "https://api.openalex.org/works?filter=authorships.institutions.id:I95674353,publication_year:2022-2026",
@@ -817,15 +817,15 @@
         "from": 2022,
         "to": 2026
       },
-      "worksTotal": 23719,
+      "worksTotal": 23755,
       "byYear": [
         {
           "year": 2022,
-          "count": 4357
+          "count": 4359
         },
         {
           "year": 2023,
-          "count": 4812
+          "count": 4813
         },
         {
           "year": 2024,
@@ -833,28 +833,28 @@
         },
         {
           "year": 2025,
-          "count": 4982
+          "count": 4983
         },
         {
           "year": 2026,
-          "count": 5147
+          "count": 5179
         }
       ],
       "oa": {
-        "share": 81.2,
+        "share": 81.1,
         "byStatus": {
-          "green": 8506,
+          "green": 8528,
           "gold": 6052,
-          "closed": 4465,
+          "closed": 4478,
           "hybrid": 2191,
-          "bronze": 1427,
+          "bronze": 1428,
           "diamond": 1078
         }
       },
       "funders": [
         {
           "name": "Fonds De La Recherche Scientifique - FNRS",
-          "count": 2937
+          "count": 2939
         },
         {
           "name": "European Commission",
@@ -862,7 +862,7 @@
         },
         {
           "name": "Université de Liège",
-          "count": 1101
+          "count": 1102
         },
         {
           "name": "National Science Foundation",
@@ -870,7 +870,7 @@
         },
         {
           "name": "Agence Nationale de la Recherche",
-          "count": 614
+          "count": 613
         },
         {
           "name": "National Aeronautics and Space Administration",
@@ -913,7 +913,7 @@
       ],
       "elsevier": {
         "count": 3358,
-        "share": 14.2
+        "share": 14.1
       },
       "partners": [
         {
@@ -930,7 +930,7 @@
         },
         {
           "name": "KU Leuven",
-          "count": 1264
+          "count": 1265
         },
         {
           "name": "Institut National de Recherche pour l'Agriculture, l'Alimentation et l'Environnement",
@@ -938,7 +938,7 @@
         },
         {
           "name": "Sorbonne Université",
-          "count": 1181
+          "count": 1180
         }
       ],
       "apiUrl": "https://api.openalex.org/works?filter=authorships.institutions.id:I157674565,publication_year:2022-2026",
@@ -951,7 +951,7 @@
         "from": 2022,
         "to": 2026
       },
-      "worksTotal": 22646,
+      "worksTotal": 22660,
       "byYear": [
         {
           "year": 2022,
@@ -959,28 +959,28 @@
         },
         {
           "year": 2023,
-          "count": 4691
+          "count": 4695
         },
         {
           "year": 2024,
-          "count": 4189
+          "count": 4190
         },
         {
           "year": 2025,
-          "count": 5383
+          "count": 5385
         },
         {
           "year": 2026,
-          "count": 3990
+          "count": 3997
         }
       ],
       "oa": {
         "share": 82.8,
         "byStatus": {
-          "green": 7414,
-          "gold": 5799,
-          "closed": 3886,
-          "hybrid": 2615,
+          "green": 7423,
+          "gold": 5801,
+          "closed": 3887,
+          "hybrid": 2617,
           "diamond": 1514,
           "bronze": 1418
         }
@@ -988,45 +988,45 @@
       "funders": [
         {
           "name": "Fonds De La Recherche Scientifique - FNRS",
-          "count": 3855
+          "count": 3858
         },
         {
           "name": "European Commission",
-          "count": 1964
+          "count": 1965
         },
         {
           "name": "Fonds Wetenschappelijk Onderzoek",
-          "count": 1528
+          "count": 1530
         },
         {
           "name": "National Science Foundation",
-          "count": 1147
+          "count": 1148
         },
         {
           "name": "Deutsche Forschungsgemeinschaft",
-          "count": 902
+          "count": 903
         },
         {
           "name": "Fonds pour la Formation à la Recherche dans l’Industrie et dans l’Agriculture",
-          "count": 734
+          "count": 735
         },
         {
           "name": "Belgian Federal Science Policy Office",
-          "count": 688
+          "count": 689
         },
         {
           "name": "Centre National de la Recherche Scientifique",
-          "count": 655
+          "count": 656
         }
       ],
       "publishers": [
         {
           "name": "Elsevier BV",
-          "count": 3284
+          "count": 3286
         },
         {
           "name": "Springer Nature",
-          "count": 2952
+          "count": 2955
         },
         {
           "name": "Springer Science+Business Media",
@@ -1034,7 +1034,7 @@
         },
         {
           "name": "Wiley",
-          "count": 1169
+          "count": 1170
         },
         {
           "name": "Multidisciplinary Digital Publishing Institute",
@@ -1046,29 +1046,29 @@
         }
       ],
       "elsevier": {
-        "count": 3284,
+        "count": 3286,
         "share": 14.5
       },
       "partners": [
         {
           "name": "Centre National de la Recherche Scientifique",
-          "count": 3360
+          "count": 3366
         },
         {
           "name": "Vrije Universiteit Brussel",
-          "count": 2139
+          "count": 2144
         },
         {
           "name": "Université Paris-Saclay",
-          "count": 1572
+          "count": 1577
         },
         {
           "name": "Board of the Swiss Federal Institutes of Technology",
-          "count": 1537
+          "count": 1541
         },
         {
           "name": "Charles University",
-          "count": 1478
+          "count": 1483
         },
         {
           "name": "University of Mons",
@@ -1085,7 +1085,7 @@
         "from": 2022,
         "to": 2026
       },
-      "worksTotal": 4232,
+      "worksTotal": 4233,
       "byYear": [
         {
           "year": 2022,
@@ -1105,14 +1105,14 @@
         },
         {
           "year": 2026,
-          "count": 913
+          "count": 914
         }
       ],
       "oa": {
-        "share": 74.2,
+        "share": 74.3,
         "byStatus": {
-          "green": 1332,
-          "closed": 1090,
+          "green": 1335,
+          "closed": 1088,
           "gold": 850,
           "hybrid": 536,
           "bronze": 231,
@@ -1122,7 +1122,7 @@
       "funders": [
         {
           "name": "Fonds De La Recherche Scientifique - FNRS",
-          "count": 681
+          "count": 682
         },
         {
           "name": "Université de Namur",
@@ -1130,7 +1130,7 @@
         },
         {
           "name": "European Commission",
-          "count": 244
+          "count": 245
         },
         {
           "name": "National Natural Science Foundation of China",
@@ -1138,7 +1138,7 @@
         },
         {
           "name": "Agence Nationale de la Recherche",
-          "count": 137
+          "count": 138
         },
         {
           "name": "Fonds pour la Formation à la Recherche dans l’Industrie et dans l’Agriculture",
@@ -1181,12 +1181,12 @@
       ],
       "elsevier": {
         "count": 637,
-        "share": 15.1
+        "share": 15
       },
       "partners": [
         {
           "name": "Centre National de la Recherche Scientifique",
-          "count": 535
+          "count": 536
         },
         {
           "name": "UCLouvain",
@@ -1219,7 +1219,7 @@
         "from": 2022,
         "to": 2026
       },
-      "worksTotal": 12168,
+      "worksTotal": 12170,
       "byYear": [
         {
           "year": 2022,
@@ -1227,7 +1227,7 @@
         },
         {
           "year": 2023,
-          "count": 2100
+          "count": 2099
         },
         {
           "year": 2024,
@@ -1239,18 +1239,18 @@
         },
         {
           "year": 2026,
-          "count": 2059
+          "count": 2062
         }
       ],
       "oa": {
         "share": 71.4,
         "byStatus": {
-          "green": 5935,
-          "closed": 3484,
+          "green": 5938,
+          "closed": 3482,
           "gold": 1353,
           "hybrid": 598,
           "diamond": 500,
-          "bronze": 298
+          "bronze": 299
         }
       },
       "funders": [
@@ -1290,7 +1290,7 @@
       "publishers": [
         {
           "name": "Elsevier BV",
-          "count": 895
+          "count": 896
         },
         {
           "name": "Springer Nature",
@@ -1314,7 +1314,7 @@
         }
       ],
       "elsevier": {
-        "count": 895,
+        "count": 896,
         "share": 7.4
       },
       "partners": [
@@ -1357,7 +1357,7 @@
         "from": 2022,
         "to": 2026
       },
-      "worksTotal": 22549,
+      "worksTotal": 22577,
       "byYear": [
         {
           "year": 2022,
@@ -1365,86 +1365,86 @@
         },
         {
           "year": 2023,
-          "count": 4270
+          "count": 4274
         },
         {
           "year": 2024,
-          "count": 4269
+          "count": 4270
         },
         {
           "year": 2025,
-          "count": 5061
+          "count": 5062
         },
         {
           "year": 2026,
-          "count": 5396
+          "count": 5418
         }
       ],
       "oa": {
         "share": 82.1,
         "byStatus": {
-          "green": 8919,
-          "closed": 4045,
-          "gold": 3976,
-          "hybrid": 2799,
+          "green": 8935,
+          "closed": 4044,
+          "gold": 3977,
+          "hybrid": 2810,
           "bronze": 1676,
-          "diamond": 1134
+          "diamond": 1135
         }
       },
       "funders": [
         {
           "name": "Fonds Wetenschappelijk Onderzoek",
-          "count": 3067
+          "count": 3071
         },
         {
           "name": "European Commission",
-          "count": 2065
+          "count": 2070
         },
         {
           "name": "Vlaamse regering",
-          "count": 1786
+          "count": 1787
         },
         {
           "name": "Universiteit Gent",
-          "count": 1698
+          "count": 1700
         },
         {
           "name": "Bijzonder Onderzoeksfonds UGent",
-          "count": 704
+          "count": 705
         },
         {
           "name": "Deutsche Forschungsgemeinschaft",
-          "count": 592
+          "count": 593
         },
         {
           "name": "National Natural Science Foundation of China",
-          "count": 516
+          "count": 517
         },
         {
           "name": "National Science Foundation",
-          "count": 514
+          "count": 516
         }
       ],
       "publishers": [
         {
           "name": "Elsevier BV",
-          "count": 3155
+          "count": 3164
         },
         {
           "name": "Springer Nature",
-          "count": 2467
+          "count": 2469
         },
         {
           "name": "Wiley",
-          "count": 1254
+          "count": 1255
         },
         {
           "name": "Springer Science+Business Media",
-          "count": 1106
+          "count": 1108
         },
         {
           "name": "Taylor & Francis",
-          "count": 904
+          "count": 906
         },
         {
           "name": "University of Oxford",
@@ -1452,33 +1452,33 @@
         }
       ],
       "elsevier": {
-        "count": 3155,
+        "count": 3164,
         "share": 14
       },
       "partners": [
         {
           "name": "Ghent University",
-          "count": 7816
+          "count": 7822
         },
         {
           "name": "KU Leuven",
-          "count": 2073
+          "count": 2074
         },
         {
           "name": "HOGENT University of Applied Sciences and Arts",
-          "count": 1990
+          "count": 1993
         },
         {
           "name": "University of Antwerp",
-          "count": 1588
+          "count": 1595
         },
         {
           "name": "University of London",
-          "count": 1570
+          "count": 1574
         },
         {
           "name": "Vrije Universiteit Brussel",
-          "count": 1334
+          "count": 1342
         }
       ],
       "apiUrl": "https://api.openalex.org/works?filter=authorships.institutions.id:I2801227569,publication_year:2022-2026",
@@ -1491,7 +1491,7 @@
         "from": 2022,
         "to": 2026
       },
-      "worksTotal": 5730,
+      "worksTotal": 5732,
       "byYear": [
         {
           "year": 2022,
@@ -1511,16 +1511,16 @@
         },
         {
           "year": 2026,
-          "count": 939
+          "count": 941
         }
       ],
       "oa": {
         "share": 73.1,
         "byStatus": {
-          "gold": 1559,
+          "gold": 1560,
           "closed": 1543,
           "hybrid": 979,
-          "green": 789,
+          "green": 790,
           "bronze": 659,
           "diamond": 201
         }
@@ -1528,15 +1528,15 @@
       "funders": [
         {
           "name": "Fonds Wetenschappelijk Onderzoek",
-          "count": 722
+          "count": 723
         },
         {
           "name": "Vlaamse regering",
-          "count": 472
+          "count": 473
         },
         {
           "name": "Universiteit Antwerpen",
-          "count": 379
+          "count": 380
         },
         {
           "name": "European Commission",
@@ -1548,7 +1548,7 @@
         },
         {
           "name": "AstraZeneca",
-          "count": 148
+          "count": 149
         },
         {
           "name": "Medical Research Council",
@@ -1562,7 +1562,7 @@
       "publishers": [
         {
           "name": "Elsevier BV",
-          "count": 1408
+          "count": 1409
         },
         {
           "name": "Springer Nature",
@@ -1570,7 +1570,7 @@
         },
         {
           "name": "Wiley",
-          "count": 478
+          "count": 479
         },
         {
           "name": "University of Oxford",
@@ -1586,13 +1586,13 @@
         }
       ],
       "elsevier": {
-        "count": 1408,
+        "count": 1409,
         "share": 24.6
       },
       "partners": [
         {
           "name": "University of Antwerp",
-          "count": 3416
+          "count": 3418
         },
         {
           "name": "KU Leuven",
@@ -1662,7 +1662,7 @@
       "funders": [
         {
           "name": "Fonds Wetenschappelijk Onderzoek",
-          "count": 341
+          "count": 342
         },
         {
           "name": "Vlaamse regering",
@@ -1670,7 +1670,7 @@
         },
         {
           "name": "Vrije Universiteit Brussel",
-          "count": 168
+          "count": 169
         },
         {
           "name": "European Commission",
@@ -1785,8 +1785,8 @@
       "oa": {
         "share": 75.1,
         "byStatus": {
-          "green": 919,
-          "closed": 754,
+          "green": 920,
+          "closed": 753,
           "gold": 578,
           "hybrid": 342,
           "bronze": 331,
@@ -1893,7 +1893,7 @@
         "from": 2022,
         "to": 2026
       },
-      "worksTotal": 5452,
+      "worksTotal": 5454,
       "byYear": [
         {
           "year": 2022,
@@ -1913,15 +1913,15 @@
         },
         {
           "year": 2026,
-          "count": 851
+          "count": 853
         }
       ],
       "oa": {
-        "share": 79.6,
+        "share": 79.5,
         "byStatus": {
           "gold": 1397,
           "green": 1134,
-          "closed": 1114,
+          "closed": 1116,
           "hybrid": 856,
           "bronze": 695,
           "diamond": 256
@@ -1968,7 +1968,7 @@
         },
         {
           "name": "Springer Nature",
-          "count": 660
+          "count": 662
         },
         {
           "name": "Wiley",
@@ -2031,7 +2031,7 @@
         "from": 2022,
         "to": 2026
       },
-      "worksTotal": 2107,
+      "worksTotal": 2109,
       "byYear": [
         {
           "year": 2022,
@@ -2051,17 +2051,17 @@
         },
         {
           "year": 2026,
-          "count": 297
+          "count": 299
         }
       ],
       "oa": {
-        "share": 73.1,
+        "share": 73.2,
         "byStatus": {
-          "gold": 611,
+          "gold": 612,
           "closed": 566,
           "green": 326,
           "bronze": 307,
-          "hybrid": 247,
+          "hybrid": 248,
           "diamond": 50
         }
       },
@@ -2080,7 +2080,7 @@
         },
         {
           "name": "Fonds De La Recherche Scientifique - FNRS",
-          "count": 100
+          "count": 101
         },
         {
           "name": "Gilead Sciences",
@@ -2102,7 +2102,7 @@
       "publishers": [
         {
           "name": "Elsevier BV",
-          "count": 788
+          "count": 789
         },
         {
           "name": "Springer Nature",
@@ -2126,13 +2126,13 @@
         }
       ],
       "elsevier": {
-        "count": 788,
+        "count": 789,
         "share": 37.4
       },
       "partners": [
         {
           "name": "Université Libre de Bruxelles",
-          "count": 1257
+          "count": 1259
         },
         {
           "name": "Istituti di Ricovero e Cura a Carattere Scientifico",
@@ -2140,11 +2140,11 @@
         },
         {
           "name": "Inserm",
-          "count": 354
+          "count": 355
         },
         {
           "name": "KU Leuven",
-          "count": 287
+          "count": 288
         },
         {
           "name": "Institut Gustave Roussy",
@@ -2152,7 +2152,7 @@
         },
         {
           "name": "Assistance Publique – Hôpitaux de Paris",
-          "count": 224
+          "count": 225
         }
       ],
       "apiUrl": "https://api.openalex.org/works?filter=authorships.institutions.id:I2801838318,publication_year:2022-2026",
@@ -2206,7 +2206,7 @@
         },
         {
           "name": "Pfizer",
-          "count": 31
+          "count": 32
         },
         {
           "name": "AstraZeneca",
@@ -2214,7 +2214,7 @@
         },
         {
           "name": "Gilead Sciences",
-          "count": 23
+          "count": 24
         },
         {
           "name": "Fonds Wetenschappelijk Onderzoek",
@@ -2299,7 +2299,7 @@
         "from": 2022,
         "to": 2026
       },
-      "worksTotal": 4960,
+      "worksTotal": 4964,
       "byYear": [
         {
           "year": 2022,
@@ -2315,20 +2315,20 @@
         },
         {
           "year": 2025,
-          "count": 1003
+          "count": 1005
         },
         {
           "year": 2026,
-          "count": 635
+          "count": 637
         }
       ],
       "oa": {
-        "share": 50.3,
+        "share": 50.4,
         "byStatus": {
           "closed": 2464,
-          "green": 1114,
+          "green": 1117,
           "gold": 737,
-          "hybrid": 418,
+          "hybrid": 419,
           "bronze": 146,
           "diamond": 81
         }
@@ -2374,7 +2374,7 @@
         },
         {
           "name": "Elsevier BV",
-          "count": 448
+          "count": 450
         },
         {
           "name": "Springer Nature",
@@ -2394,8 +2394,8 @@
         }
       ],
       "elsevier": {
-        "count": 448,
-        "share": 9
+        "count": 450,
+        "share": 9.1
       },
       "partners": [
         {
@@ -2404,15 +2404,15 @@
         },
         {
           "name": "Imec the Netherlands",
-          "count": 545
+          "count": 546
         },
         {
           "name": "Ghent University",
-          "count": 545
+          "count": 546
         },
         {
           "name": "Vrije Universiteit Brussel",
-          "count": 393
+          "count": 395
         },
         {
           "name": "Hasselt University",
@@ -2437,7 +2437,7 @@
         "from": 2022,
         "to": 2026
       },
-      "worksTotal": 2928,
+      "worksTotal": 2933,
       "byYear": [
         {
           "year": 2022,
@@ -2457,16 +2457,16 @@
         },
         {
           "year": 2026,
-          "count": 629
+          "count": 634
         }
       ],
       "oa": {
-        "share": 75.4,
+        "share": 75.5,
         "byStatus": {
-          "green": 992,
+          "green": 995,
           "closed": 719,
-          "gold": 546,
-          "hybrid": 295,
+          "gold": 547,
+          "hybrid": 296,
           "diamond": 276,
           "bronze": 100
         }
@@ -2486,7 +2486,7 @@
         },
         {
           "name": "European Commission",
-          "count": 302
+          "count": 304
         },
         {
           "name": "KU Leuven",
@@ -2508,7 +2508,7 @@
       "publishers": [
         {
           "name": "Elsevier BV",
-          "count": 686
+          "count": 687
         },
         {
           "name": "Springer Nature",
@@ -2532,13 +2532,13 @@
         }
       ],
       "elsevier": {
-        "count": 686,
+        "count": 687,
         "share": 23.4
       },
       "partners": [
         {
           "name": "KU Leuven",
-          "count": 1025
+          "count": 1028
         },
         {
           "name": "Ghent University",
@@ -2546,15 +2546,15 @@
         },
         {
           "name": "Vrije Universiteit Brussel",
-          "count": 464
+          "count": 465
         },
         {
           "name": "University of Antwerp",
-          "count": 388
+          "count": 389
         },
         {
           "name": "Hasselt University",
-          "count": 179
+          "count": 180
         },
         {
           "name": "HOGENT University of Applied Sciences and Arts",
@@ -2571,7 +2571,7 @@
         "from": 2022,
         "to": 2026
       },
-      "worksTotal": 2146,
+      "worksTotal": 2150,
       "byYear": [
         {
           "year": 2022,
@@ -2591,15 +2591,15 @@
         },
         {
           "year": 2026,
-          "count": 408
+          "count": 412
         }
       ],
       "oa": {
         "share": 91,
         "byStatus": {
-          "gold": 983,
-          "green": 593,
-          "hybrid": 230,
+          "gold": 984,
+          "green": 595,
+          "hybrid": 231,
           "closed": 193,
           "diamond": 82,
           "bronze": 65
@@ -2608,7 +2608,7 @@
       "funders": [
         {
           "name": "European Commission",
-          "count": 324
+          "count": 327
         },
         {
           "name": "Fonds Wetenschappelijk Onderzoek",
@@ -2616,7 +2616,7 @@
         },
         {
           "name": "Vlaamse regering",
-          "count": 105
+          "count": 106
         },
         {
           "name": "Belgian Federal Science Policy Office",
@@ -2646,7 +2646,7 @@
         },
         {
           "name": "Elsevier BV",
-          "count": 344
+          "count": 345
         },
         {
           "name": "BioMed Central",
@@ -2666,13 +2666,13 @@
         }
       ],
       "elsevier": {
-        "count": 344,
+        "count": 345,
         "share": 16
       },
       "partners": [
         {
           "name": "Ghent University",
-          "count": 484
+          "count": 485
         },
         {
           "name": "KU Leuven",
@@ -2705,35 +2705,35 @@
         "from": 2022,
         "to": 2026
       },
-      "worksTotal": 5272,
+      "worksTotal": 5297,
       "byYear": [
         {
           "year": 2022,
-          "count": 367
+          "count": 371
         },
         {
           "year": 2023,
-          "count": 2319
+          "count": 2322
         },
         {
           "year": 2024,
-          "count": 351
+          "count": 366
         },
         {
           "year": 2025,
-          "count": 1351
+          "count": 1353
         },
         {
           "year": 2026,
-          "count": 884
+          "count": 885
         }
       ],
       "oa": {
-        "share": 94.4,
+        "share": 94,
         "byStatus": {
           "green": 2967,
           "gold": 1531,
-          "closed": 295,
+          "closed": 320,
           "hybrid": 218,
           "diamond": 178,
           "bronze": 83
@@ -2750,7 +2750,7 @@
         },
         {
           "name": "Vlaamse regering",
-          "count": 140
+          "count": 141
         },
         {
           "name": "Koninklijk Belgisch Instituut voor Natuurwetenschappen",
@@ -2839,7 +2839,7 @@
         "from": 2022,
         "to": 2026
       },
-      "worksTotal": 1109,
+      "worksTotal": 1110,
       "byYear": [
         {
           "year": 2022,
@@ -2859,13 +2859,13 @@
         },
         {
           "year": 2026,
-          "count": 243
+          "count": 244
         }
       ],
       "oa": {
         "share": 91.9,
         "byStatus": {
-          "gold": 759,
+          "gold": 760,
           "green": 166,
           "closed": 90,
           "hybrid": 59,
@@ -3119,7 +3119,7 @@
         "from": 2022,
         "to": 2026
       },
-      "worksTotal": 1827,
+      "worksTotal": 1830,
       "byYear": [
         {
           "year": 2022,
@@ -3127,7 +3127,7 @@
         },
         {
           "year": 2023,
-          "count": 358
+          "count": 360
         },
         {
           "year": 2024,
@@ -3139,14 +3139,14 @@
         },
         {
           "year": 2026,
-          "count": 377
+          "count": 378
         }
       ],
       "oa": {
         "share": 96,
         "byStatus": {
           "gold": 1363,
-          "green": 230,
+          "green": 233,
           "hybrid": 128,
           "closed": 73,
           "bronze": 21,
@@ -3172,19 +3172,19 @@
         },
         {
           "name": "Fonds De La Recherche Scientifique - FNRS",
-          "count": 100
+          "count": 101
         },
         {
           "name": "Centre National d’Etudes Spatiales",
-          "count": 91
+          "count": 92
         },
         {
           "name": "National Oceanic and Atmospheric Administration",
-          "count": 76
+          "count": 77
         },
         {
           "name": "Centre National de la Recherche Scientifique",
-          "count": 73
+          "count": 74
         }
       ],
       "publishers": [
@@ -3224,7 +3224,7 @@
         },
         {
           "name": "Helmholtz Association of German Research Centres",
-          "count": 366
+          "count": 369
         },
         {
           "name": "Université Paris-Saclay",
@@ -3236,7 +3236,7 @@
         },
         {
           "name": "National Aeronautics and Space Administration",
-          "count": 338
+          "count": 340
         },
         {
           "name": "Institut National des Sciences de l'Univers",
@@ -3524,7 +3524,7 @@
         "from": 2022,
         "to": 2026
       },
-      "worksTotal": 1103,
+      "worksTotal": 1106,
       "byYear": [
         {
           "year": 2022,
@@ -3544,14 +3544,14 @@
         },
         {
           "year": 2026,
-          "count": 223
+          "count": 226
         }
       ],
       "oa": {
-        "share": 82.4,
+        "share": 82.5,
         "byStatus": {
           "gold": 352,
-          "green": 308,
+          "green": 311,
           "closed": 194,
           "hybrid": 137,
           "bronze": 71,
@@ -3565,7 +3565,7 @@
         },
         {
           "name": "Vlaamse regering",
-          "count": 267
+          "count": 268
         },
         {
           "name": "KU Leuven",
@@ -3599,19 +3599,19 @@
         },
         {
           "name": "Springer Nature",
-          "count": 152
+          "count": 153
         },
         {
           "name": "Multidisciplinary Digital Publishing Institute",
           "count": 123
         },
         {
-          "name": "Taylor & Francis",
+          "name": "Springer Science+Business Media",
           "count": 67
         },
         {
-          "name": "Springer Science+Business Media",
-          "count": 66
+          "name": "Taylor & Francis",
+          "count": 67
         },
         {
           "name": "Informa",
@@ -3637,7 +3637,7 @@
         },
         {
           "name": "Ghent University Hospital",
-          "count": 229
+          "count": 230
         },
         {
           "name": "University of Antwerp",
