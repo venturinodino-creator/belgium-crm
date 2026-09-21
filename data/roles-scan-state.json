@@ -1,81 +1,38 @@
 {
-  "lastRun": "2026-09-20T13:22:56.104Z",
-  "lastAddedCount": 30,
+  "lastRun": "2026-09-21T15:10:23.982Z",
+  "lastAddedCount": 14,
+  "error": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase cr",
   "lastBatch": [
-    "inbo",
-    "royalacademiesbelgium",
-    "bira",
-    "rbins",
-    "rmi",
-    "rma",
-    "rmca",
-    "rob",
-    "sciensano",
-    "sckcen"
+    "vib",
+    "vito",
+    "vki",
+    "fnrs",
+    "fondationcontrelecancer",
+    "kbf",
+    "kotk",
+    "fwo",
+    "ugent",
+    "uhasselt"
   ],
-  "lastWebSearches": 100,
-  "cursor": 41,
+  "lastWebSearches": 20,
+  "cursor": 2,
   "institutions": 49,
   "perInstitution": [
     {
-      "instId": "inbo",
-      "named": 5,
-      "kept": 4,
-      "searches": 10
-    },
-    {
-      "instId": "royalacademiesbelgium",
-      "named": 9,
+      "instId": "vib",
+      "named": 12,
       "kept": 9,
       "searches": 10
     },
     {
-      "instId": "bira",
-      "named": 3,
-      "kept": 1,
-      "searches": 10
-    },
-    {
-      "instId": "rbins",
-      "named": 5,
-      "kept": 3,
-      "searches": 10
-    },
-    {
-      "instId": "rmi",
-      "named": 6,
-      "kept": 3,
-      "searches": 10
-    },
-    {
-      "instId": "rma",
-      "named": 1,
-      "kept": 1,
-      "searches": 10
-    },
-    {
-      "instId": "rmca",
-      "named": 4,
-      "kept": 0,
-      "searches": 10
-    },
-    {
-      "instId": "rob",
-      "named": 3,
-      "kept": 3,
-      "searches": 10
-    },
-    {
-      "instId": "sciensano",
-      "named": 5,
-      "kept": 1,
-      "searches": 10
-    },
-    {
-      "instId": "sckcen",
+      "instId": "vito",
       "named": 6,
       "kept": 5,
       "searches": 10
+    },
+    {
+      "instId": "vki",
+      "error": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfGoCtVwpzykzsDy8Cvhw\"}"
     }
   ]
 }
