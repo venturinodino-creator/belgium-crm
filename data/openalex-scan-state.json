@@ -1,18 +1,18 @@
 {
-  "lastRun": "2026-09-20T12:15:35.289Z",
+  "lastRun": "2026-09-21T13:59:00.108Z",
   "lastAddedCount": 0,
   "lastUpdatedCount": 0,
   "lastCandidateCount": 0,
   "lastWebSearches": 36,
   "lastBatch": [
-    "chucharleroi",
-    "chuliege",
-    "saintpierre",
-    "chunamur",
-    "saintluc",
-    "uzgent"
+    "erasme",
+    "bordet",
+    "uzbrussel",
+    "uzleuven",
+    "bruegel",
+    "craw"
   ],
-  "cursor": 18,
+  "cursor": 24,
   "institutionsTotal": 49,
   "nationalLastRun": "2026-09-18T21:31:33.782Z",
   "checked": {
@@ -73,6 +73,36 @@
     },
     "uzgent": {
       "lastChecked": "2026-09-20",
+      "result": "none",
+      "searches": 6
+    },
+    "erasme": {
+      "lastChecked": "2026-09-21",
+      "result": "none",
+      "searches": 6
+    },
+    "bordet": {
+      "lastChecked": "2026-09-21",
+      "result": "none",
+      "searches": 6
+    },
+    "uzbrussel": {
+      "lastChecked": "2026-09-21",
+      "result": "none",
+      "searches": 6
+    },
+    "uzleuven": {
+      "lastChecked": "2026-09-21",
+      "result": "none",
+      "searches": 6
+    },
+    "bruegel": {
+      "lastChecked": "2026-09-21",
+      "result": "none",
+      "searches": 6
+    },
+    "craw": {
+      "lastChecked": "2026-09-21",
       "result": "none",
       "searches": 6
     }
