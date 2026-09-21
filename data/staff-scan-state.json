@@ -1,5 +1,5 @@
 {
-  "lastRun": "2026-09-20T12:36:44.858Z",
+  "lastRun": "2026-09-21T14:29:41.763Z",
   "lastAddedCount": 0,
   "sources": 40,
   "blockedSources": [
@@ -9,6 +9,15 @@
   "issues": [
     {
       "instId": "vib",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "rbins",
+      "url": "https://www.naturalsciences.be/nl/over-ons/bestuursorganen/directieraad",
+      "error": "fetch failed"
+    },
+    {
+      "instId": "rbins",
       "note": "no people extracted"
     },
     {
@@ -78,6 +87,15 @@
     },
     {
       "instId": "uzleuven",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "erasme",
+      "url": "https://www.erasme.be/en/organisation-and-governing-bodies",
+      "error": "fetch failed"
+    },
+    {
+      "instId": "erasme",
       "note": "no people extracted"
     }
   ]
