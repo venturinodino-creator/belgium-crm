@@ -1,18 +1,18 @@
 {
-  "lastRun": "2026-09-21T13:59:00.108Z",
+  "lastRun": "2026-09-22T12:24:58.483Z",
   "lastAddedCount": 0,
   "lastUpdatedCount": 0,
   "lastCandidateCount": 0,
-  "lastWebSearches": 36,
+  "lastWebSearches": 0,
   "lastBatch": [
-    "erasme",
-    "bordet",
-    "uzbrussel",
-    "uzleuven",
-    "bruegel",
-    "craw"
+    "egmont",
+    "flandersmake",
+    "ilvo",
+    "imec",
+    "itg",
+    "solvay"
   ],
-  "cursor": 24,
+  "cursor": 30,
   "institutionsTotal": 49,
   "nationalLastRun": "2026-09-18T21:31:33.782Z",
   "checked": {
@@ -107,5 +107,8 @@
       "searches": 6
     }
   },
-  "errors": {}
+  "errors": {
+    "egmont": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfJUQnNyY6mhAZUKWupFv\"}"
+  },
+  "error": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase cr"
 }
