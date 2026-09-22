@@ -1,15 +1,10 @@
 {
-  "lastRun": "2026-09-21T13:24:25.099541Z",
+  "lastRun": "2026-09-22T12:04:37.481024Z",
   "lastNewCount": 0,
-  "sourcesReached": 11,
+  "sourcesReached": 12,
   "sourcesTotal": 13,
-  "itemsExamined": 510,
+  "itemsExamined": 521,
   "failedSources": [
-    {
-      "institution": "UCLouvain",
-      "url": "https://uclouvain.be/fr/rss.xml",
-      "error": "<urlopen error [Errno 101] Network is unreachable>"
-    },
     {
       "institution": "UMons",
       "url": "https://web.umons.ac.be/fr/feed/",
