@@ -1,38 +1,26 @@
 {
-  "lastRun": "2026-09-21T15:10:23.982Z",
-  "lastAddedCount": 14,
+  "lastRun": "2026-09-22T13:24:09.765Z",
+  "lastAddedCount": 0,
   "error": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase cr",
   "lastBatch": [
-    "vib",
-    "vito",
-    "vki",
-    "fnrs",
-    "fondationcontrelecancer",
-    "kbf",
-    "kotk",
-    "fwo",
-    "ugent",
-    "uhasselt"
+    "kuleuven",
+    "uclouvain",
+    "uliege",
+    "umons",
+    "ulb",
+    "uantwerpen",
+    "unamur",
+    "vub",
+    "uza",
+    "azdelta"
   ],
-  "lastWebSearches": 20,
+  "lastWebSearches": 0,
   "cursor": 2,
   "institutions": 49,
   "perInstitution": [
     {
-      "instId": "vib",
-      "named": 12,
-      "kept": 9,
-      "searches": 10
-    },
-    {
-      "instId": "vito",
-      "named": 6,
-      "kept": 5,
-      "searches": 10
-    },
-    {
-      "instId": "vki",
-      "error": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfGoCtVwpzykzsDy8Cvhw\"}"
+      "instId": "kuleuven",
+      "error": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfJYvZh3A6qxwjutsqVVH\"}"
     }
   ]
 }
