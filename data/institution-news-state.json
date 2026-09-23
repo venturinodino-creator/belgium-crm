@@ -1,14 +1,24 @@
 {
-  "lastRun": "2026-09-22T12:04:37.481024Z",
+  "lastRun": "2026-09-23T12:17:03.165337Z",
   "lastNewCount": 0,
-  "sourcesReached": 12,
+  "sourcesReached": 10,
   "sourcesTotal": 13,
-  "itemsExamined": 521,
+  "itemsExamined": 329,
   "failedSources": [
+    {
+      "institution": "University of Liege",
+      "url": "https://www.news.uliege.be/",
+      "error": "<urlopen error timed out>"
+    },
     {
       "institution": "UMons",
       "url": "https://web.umons.ac.be/fr/feed/",
       "error": "<urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>"
+    },
+    {
+      "institution": "KBR (Royal Library of Belgium)",
+      "url": "https://www.kbr.be/en/news/",
+      "error": "HTTP 415"
     }
   ],
   "seenUrls": [
