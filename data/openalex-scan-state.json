@@ -1,18 +1,18 @@
 {
-  "lastRun": "2026-09-22T12:24:58.483Z",
+  "lastRun": "2026-09-23T12:36:32.130Z",
   "lastAddedCount": 0,
   "lastUpdatedCount": 0,
   "lastCandidateCount": 0,
   "lastWebSearches": 0,
   "lastBatch": [
-    "egmont",
-    "flandersmake",
-    "ilvo",
-    "imec",
-    "itg",
-    "solvay"
+    "itinera",
+    "inbo",
+    "royalacademiesbelgium",
+    "bira",
+    "rbins",
+    "rmi"
   ],
-  "cursor": 30,
+  "cursor": 36,
   "institutionsTotal": 49,
   "nationalLastRun": "2026-09-18T21:31:33.782Z",
   "checked": {
@@ -108,7 +108,7 @@
     }
   },
   "errors": {
-    "egmont": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfJUQnNyY6mhAZUKWupFv\"}"
+    "itinera": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfLP6pGkdn17isY7T2gRs\"}"
   },
   "error": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase cr"
 }
