@@ -1,18 +1,18 @@
 {
-  "lastRun": "2026-09-23T12:36:32.130Z",
+  "lastRun": "2026-09-24T12:35:08.458Z",
   "lastAddedCount": 0,
   "lastUpdatedCount": 0,
   "lastCandidateCount": 0,
   "lastWebSearches": 0,
   "lastBatch": [
-    "itinera",
-    "inbo",
-    "royalacademiesbelgium",
-    "bira",
-    "rbins",
-    "rmi"
+    "rma",
+    "rmca",
+    "rob",
+    "sciensano",
+    "sckcen",
+    "vib"
   ],
-  "cursor": 36,
+  "cursor": 42,
   "institutionsTotal": 49,
   "nationalLastRun": "2026-09-18T21:31:33.782Z",
   "checked": {
@@ -108,7 +108,7 @@
     }
   },
   "errors": {
-    "itinera": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfLP6pGkdn17isY7T2gRs\"}"
+    "rma": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfNGoaZqBm6rqGk8ExBFp\"}"
   },
   "error": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase cr"
 }
