@@ -1,18 +1,18 @@
 {
-  "lastRun": "2026-09-24T12:35:08.458Z",
+  "lastRun": "2026-09-25T12:36:37.518Z",
   "lastAddedCount": 0,
   "lastUpdatedCount": 0,
   "lastCandidateCount": 0,
   "lastWebSearches": 0,
   "lastBatch": [
-    "rma",
-    "rmca",
-    "rob",
-    "sciensano",
-    "sckcen",
-    "vib"
+    "vito",
+    "vki",
+    "fnrs",
+    "fondationcontrelecancer",
+    "kbf",
+    "kotk"
   ],
-  "cursor": 42,
+  "cursor": 48,
   "institutionsTotal": 49,
   "nationalLastRun": "2026-09-18T21:31:33.782Z",
   "checked": {
@@ -108,7 +108,7 @@
     }
   },
   "errors": {
-    "rma": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfNGoaZqBm6rqGk8ExBFp\"}"
+    "vito": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfQAj4Pa819B25912ya81\"}"
   },
   "error": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase cr"
 }
