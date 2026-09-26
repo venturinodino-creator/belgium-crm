@@ -1,11 +1,11 @@
 {
-  "lastRun": "2026-09-25T12:23:31.768Z",
+  "lastRun": "2026-09-26T11:54:29.634Z",
   "totalOpenRoles": 23,
   "openByRegion": {
     "domestic": 2,
     "remote": 21,
-    "europe": 38,
-    "global": 166
+    "europe": 36,
+    "global": 163
   },
   "totalListed": 30,
   "newCount": 0,
@@ -22,7 +22,7 @@
       "global": 0
     },
     "Allen Institute for AI": {
-      "total": 16,
+      "total": 19,
       "beOrRemote": 0,
       "domestic": 0,
       "remote": 0,
@@ -30,7 +30,7 @@
       "global": 0
     },
     "Clarivate": {
-      "total": 194,
+      "total": 192,
       "beOrRemote": 9,
       "domestic": 0,
       "remote": 9,
@@ -46,7 +46,7 @@
       "global": 2
     },
     "Wiley": {
-      "total": 77,
+      "total": 75,
       "beOrRemote": 6,
       "domestic": 0,
       "remote": 6,
@@ -54,20 +54,20 @@
       "global": 5
     },
     "OpenAI": {
-      "total": 829,
+      "total": 830,
       "beOrRemote": 4,
       "domestic": 0,
       "remote": 4,
-      "europe": 11,
-      "global": 62
+      "europe": 9,
+      "global": 60
     },
     "Anthropic": {
-      "total": 623,
+      "total": 619,
       "beOrRemote": 0,
       "domestic": 0,
       "remote": 0,
       "europe": 19,
-      "global": 85
+      "global": 84
     },
     "Elicit": {
       "total": 10,
@@ -79,48 +79,48 @@
     }
   },
   "errors": {
-    "scite": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfQ9j52u9NsF2NSkNzoWY\"}",
-    "Consensus": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfQ9j6Fa3ugU4iECCa6U2\"}",
-    "SciSpace": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfQ9j6tX4hhvwJC6vujWU\"}",
-    "Paperguide": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfQ9j7YxVX6CTJYERXrG4\"}",
-    "IGI Global Scientific Publishing": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfQ9j8E94PWSrmUY8Wmsq\"}",
-    "IEEE": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfQ9j8uZvd86kEqSzhVNZ\"}",
-    "Google": "Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CfQ9j9Zzvc69NoijQeGbw\"}"
+    "scite": "Anthropic API 401: {\"type\":\"error\",\"error\":{\"type\":\"authentication_error\",\"message\":\"API key is invalid.\"},\"request_id\":null}",
+    "Consensus": "Anthropic API 401: {\"type\":\"error\",\"error\":{\"type\":\"authentication_error\",\"message\":\"API key is invalid.\"},\"request_id\":null}",
+    "SciSpace": "Anthropic API 401: {\"type\":\"error\",\"error\":{\"type\":\"authentication_error\",\"message\":\"API key is invalid.\"},\"request_id\":null}",
+    "Paperguide": "Anthropic API 401: {\"type\":\"error\",\"error\":{\"type\":\"authentication_error\",\"message\":\"API key is invalid.\"},\"request_id\":null}",
+    "IGI Global Scientific Publishing": "Anthropic API 401: {\"type\":\"error\",\"error\":{\"type\":\"authentication_error\",\"message\":\"API key is invalid.\"},\"request_id\":null}",
+    "IEEE": "Anthropic API 401: {\"type\":\"error\",\"error\":{\"type\":\"authentication_error\",\"message\":\"API key is invalid.\"},\"request_id\":null}",
+    "Google": "Anthropic API 401: {\"type\":\"error\",\"error\":{\"type\":\"authentication_error\",\"message\":\"API key is invalid.\"},\"request_id\":null}"
   },
   "untracked": [
     {
       "company": "scite",
-      "reason": "Web search failed this run: Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to ",
+      "reason": "Web search failed this run: Anthropic API 401: {\"type\":\"error\",\"error\":{\"type\":\"authentication_error\",\"message\":\"API key is invalid.\"},\"request_id\":",
       "url": "https://scite.ai/jobs"
     },
     {
       "company": "Consensus",
-      "reason": "Web search failed this run: Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to ",
+      "reason": "Web search failed this run: Anthropic API 401: {\"type\":\"error\",\"error\":{\"type\":\"authentication_error\",\"message\":\"API key is invalid.\"},\"request_id\":",
       "url": "https://consensus.app/home/careers/"
     },
     {
       "company": "SciSpace",
-      "reason": "Web search failed this run: Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to ",
+      "reason": "Web search failed this run: Anthropic API 401: {\"type\":\"error\",\"error\":{\"type\":\"authentication_error\",\"message\":\"API key is invalid.\"},\"request_id\":",
       "url": "https://typeset.io/careers"
     },
     {
       "company": "Paperguide",
-      "reason": "Web search failed this run: Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to ",
+      "reason": "Web search failed this run: Anthropic API 401: {\"type\":\"error\",\"error\":{\"type\":\"authentication_error\",\"message\":\"API key is invalid.\"},\"request_id\":",
       "url": "https://paperguide.ai/"
     },
     {
       "company": "IGI Global Scientific Publishing",
-      "reason": "Web search failed this run: Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to ",
+      "reason": "Web search failed this run: Anthropic API 401: {\"type\":\"error\",\"error\":{\"type\":\"authentication_error\",\"message\":\"API key is invalid.\"},\"request_id\":",
       "url": "https://www.igi-global.com/about/staff/job-opportunities/"
     },
     {
       "company": "IEEE",
-      "reason": "Web search failed this run: Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to ",
+      "reason": "Web search failed this run: Anthropic API 401: {\"type\":\"error\",\"error\":{\"type\":\"authentication_error\",\"message\":\"API key is invalid.\"},\"request_id\":",
       "url": "https://ieee.taleo.net/careersection/2/jobsearch.ftl"
     },
     {
       "company": "Google",
-      "reason": "Web search failed this run: Anthropic API 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to ",
+      "reason": "Web search failed this run: Anthropic API 401: {\"type\":\"error\",\"error\":{\"type\":\"authentication_error\",\"message\":\"API key is invalid.\"},\"request_id\":",
       "url": "https://www.google.com/about/careers/applications/jobs/results/"
     }
   ],
