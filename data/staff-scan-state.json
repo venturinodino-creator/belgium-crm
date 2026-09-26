@@ -1,5 +1,5 @@
 {
-  "lastRun": "2026-09-25T12:56:18.152Z",
+  "lastRun": "2026-09-26T12:23:46.201Z",
   "lastAddedCount": 0,
   "sources": 40,
   "blockedSources": [
@@ -36,6 +36,25 @@
     },
     {
       "instId": "vub",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "uhasselt",
+      "url": "https://www.uhasselt.be/en/research/directorate-research-library-and-internationalisation/team-contact",
+      "error": "HTTP 502"
+    },
+    {
+      "instId": "uhasselt",
+      "url": "https://www.uhasselt.be/en/info-for/tech-transfer-office-for-companies-and-organisations/team-and-contact",
+      "error": "HTTP 502"
+    },
+    {
+      "instId": "uhasselt",
+      "url": "https://www.uhasselt.be/en/instituten-en/dsi/about-dsi",
+      "error": "HTTP 502"
+    },
+    {
+      "instId": "uhasselt",
       "note": "no people extracted"
     },
     {
