@@ -1,5 +1,5 @@
 {
-  "lastRun": "2026-09-27T13:15:41.905Z",
+  "lastRun": "2026-09-28T15:49:35.639Z",
   "lastAddedCount": 0,
   "sources": 40,
   "blockedSources": [
@@ -59,6 +59,15 @@
     },
     {
       "instId": "uzleuven",
+      "note": "no people extracted"
+    },
+    {
+      "instId": "chunamur",
+      "url": "https://www.chuuclnamur.be/nos-comites-et-instances/",
+      "error": "fetch failed"
+    },
+    {
+      "instId": "chunamur",
       "note": "no people extracted"
     }
   ]
