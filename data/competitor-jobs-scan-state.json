@@ -1,10 +1,10 @@
 {
-  "lastRun": "2026-09-28T14:39:21.056Z",
+  "lastRun": "2026-09-29T13:30:21.629Z",
   "totalOpenRoles": 23,
   "openByRegion": {
     "domestic": 2,
     "remote": 21,
-    "europe": 36,
+    "europe": 34,
     "global": 162
   },
   "totalListed": 30,
@@ -30,7 +30,7 @@
       "global": 0
     },
     "Clarivate": {
-      "total": 187,
+      "total": 185,
       "beOrRemote": 9,
       "domestic": 0,
       "remote": 9,
@@ -38,7 +38,7 @@
       "global": 12
     },
     "Springer Nature": {
-      "total": 77,
+      "total": 81,
       "beOrRemote": 0,
       "domestic": 0,
       "remote": 0,
@@ -46,15 +46,15 @@
       "global": 2
     },
     "Wiley": {
-      "total": 72,
+      "total": 71,
       "beOrRemote": 6,
       "domestic": 0,
       "remote": 6,
       "europe": 0,
-      "global": 5
+      "global": 4
     },
     "OpenAI": {
-      "total": 830,
+      "total": 838,
       "beOrRemote": 4,
       "domestic": 0,
       "remote": 4,
@@ -62,12 +62,12 @@
       "global": 59
     },
     "Anthropic": {
-      "total": 623,
+      "total": 627,
       "beOrRemote": 0,
       "domestic": 0,
       "remote": 0,
-      "europe": 20,
-      "global": 84
+      "europe": 18,
+      "global": 85
     },
     "Elicit": {
       "total": 10,
