@@ -3122,5 +3122,16 @@
     "email": "auriane.vanhecke@kbs-frb.be",
     "constructed": true,
     "source": "https://www.kbs-frb.be/en/About-us/Who-we-are/Staff"
+  },
+  {
+    "first": "Gijsbert",
+    "last": "Ooms",
+    "title": "digital portfolio manager",
+    "dept": "Library & Research Support",
+    "instId": "kbf",
+    "instName": "King Baudouin Foundation",
+    "email": "gijsbert.ooms@kbs-frb.be",
+    "constructed": true,
+    "source": "https://www.kbs-frb.be/en/About-us/Who-we-are/Staff"
   }
 ]
