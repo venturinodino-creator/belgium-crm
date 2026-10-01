@@ -1,0 +1,12 @@
+{
+  "name": "belgium-crm",
+  "private": true,
+  "description": "Dev tooling only. The site is the static files at the repo root; nothing here is built or shipped.",
+  "scripts": {
+    "test": "playwright test",
+    "serve": "node tests/support/static-server.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0"
+  }
+}
