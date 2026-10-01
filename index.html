@@ -88,6 +88,11 @@ body{
 .btn-danger{background:rgba(239,68,68,.12);color:#ef4444;border:1px solid rgba(239,68,68,.2)}
 .btn-danger:hover{background:rgba(239,68,68,.2)}
 .btn-sm{padding:5px 11px;font-size:11px;border-radius:5px}
+/* Admin-only controls are hidden for everyone who is not an admin. This lives in
+   the stylesheet, keyed on the role, so it holds through every partial
+   re-render. It used to be a script pass after render(), which every sort,
+   filter and view toggle bypassed, so the controls came back for viewers. */
+body:not([data-role="admin"]) [data-admin-only]{display:none !important}
 .btn-xs{padding:3px 8px;font-size:10px;border-radius:4px}
 /*  CARDS  */
 .card{background:var(--card);border-radius:var(--card-radius);border:1px solid var(--border);padding:18px}
@@ -3853,14 +3858,9 @@ function render() {
 // UX nicety only — the real enforcement is the RLS policies in Supabase.
 function applyRoleUI() {
   const isAdmin = state.currentRole === 'admin';
-  // The hide has to be !important: several classes force their own display
-  // with !important (every sidebar item is `display: flex !important`), and a
-  // stylesheet !important beats a plain inline style, which left the admin-only
-  // Import Contacts item visible to viewers.
-  document.querySelectorAll('[data-admin-only]').forEach(function(el){
-    if (isAdmin) el.style.removeProperty('display');
-    else el.style.setProperty('display', 'none', 'important');
-  });
+  // The stylesheet does the hiding (see the [data-admin-only] rule); this
+  // only tells it who is signed in.
+  document.body.dataset.role = isAdmin ? 'admin' : 'viewer';
 }
 
 //  DASHBOARD 
@@ -4434,7 +4434,7 @@ function renderDashboard() {
     return `<div class="recent-row" style="cursor:pointer" onclick="nav('${a.view}')">
       <div class="av" style="background:rgba(255,255,255,.06);position:relative">${a.icon}<span style="position:absolute;bottom:-1px;right:-1px;width:9px;height:9px;border-radius:50%;background:#4ade80;border:1.5px solid var(--card,#111a2e);box-shadow:0 0 6px #4ade80"></span></div>
       <div class="ri"><h4>${esc(a.name)}</h4><p>${esc(a.source)} · ${esc(a.cadence)}${a.statusEl ? ` · <span id="${a.statusEl}">checking…</span>` : ''}</p></div>
-      <button class="btn btn-xs btn-outline" id="${btnId}" onclick="event.stopPropagation(); runAgentNow('${a.workflow}','${btnId}','${esc(a.name)}')" title="Runs this agent's workflow now">Run now</button>
+      <button class="btn btn-xs btn-outline" data-admin-only id="${btnId}" onclick="event.stopPropagation(); runAgentNow('${a.workflow}','${btnId}','${esc(a.name)}')" title="Runs this agent's workflow now">Run now</button>
       <span class="badge" style="background:rgba(74,222,128,.12);color:#4ade80;border-color:#4ade8033">Active</span>
     </div>`;
   }).join('');
@@ -5121,8 +5121,8 @@ function renderInstitutions() {
           <span><span style="opacity:.6;display:inline-flex;margin-right:3px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>${cc} contact${cc!==1?'s':''}</span>
           <div class="ic-actions">
             ${wsMoveButton(i.id)}
-            <button class="btn btn-xs btn-outline" onclick="event.stopPropagation();openEditInstitution('${i.id}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-            <button class="btn btn-xs btn-danger" onclick="event.stopPropagation();confirmDeleteInst('${i.id}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+            <button class="btn btn-xs btn-outline" data-admin-only onclick="event.stopPropagation();openEditInstitution('${i.id}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+            <button class="btn btn-xs btn-danger" data-admin-only onclick="event.stopPropagation();confirmDeleteInst('${i.id}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
           </div>
         </div>
       </div>`;
@@ -5505,7 +5505,7 @@ function wsTogglePin(id) {
 // takes it out of the main list and the per-type views — or moves it back.
 function wsMoveButton(id) {
   const on = wsIsPinned(id);
-  return '<button class="btn btn-xs ' + (on ? 'btn-accent' : 'btn-outline') + '" onclick="event.stopPropagation();wsTogglePin(\'' + id + '\')" title="' +
+  return '<button class="btn btn-xs ' + (on ? 'btn-accent' : 'btn-outline') + '" data-admin-only onclick="event.stopPropagation();wsTogglePin(\'' + id + '\')" title="' +
     (on ? 'Move this institution back out of the White Space folder' : 'Move this institution to the White Space folder') + '">' +
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="3" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="21"/></svg>' +
     (on ? 'In White Space' : 'White Space') + '</button>';
@@ -5513,8 +5513,8 @@ function wsMoveButton(id) {
 // Pin/Unpin button for the detail page topbar, same pin as the cards.
 function wsPinButton(id) {
   return wsIsPinned(id)
-    ? '<button class="btn btn-outline" onclick="wsTogglePin(\'' + id + '\')" title="Unpin from the White Space folder — it stays only if its product status still qualifies">Unpin from White Space</button>'
-    : '<button class="btn btn-outline" onclick="wsTogglePin(\'' + id + '\')" title="Keep this account in the White Space folder whatever its product status">Pin to White Space</button>';
+    ? '<button class="btn btn-outline" data-admin-only onclick="wsTogglePin(\'' + id + '\')" title="Unpin from the White Space folder — it stays only if its product status still qualifies">Unpin from White Space</button>'
+    : '<button class="btn btn-outline" data-admin-only onclick="wsTogglePin(\'' + id + '\')" title="Keep this account in the White Space folder whatever its product status">Pin to White Space</button>';
 }
 // Pin/Unpin and Remove/Restore controls shared by the grid card footer and the table row.
 function wsRowAction(id) {
@@ -5524,7 +5524,7 @@ function wsRowAction(id) {
   const rm = wsIsRemoved(id)
     ? '<button class="btn btn-outline btn-sm" onclick="event.stopPropagation();wsRestore(\'' + id + '\')" title="Put this institution back on the target list">Restore</button>'
     : '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();wsRemove(\'' + id + '\')" title="Take this institution off the target list">Remove</button>';
-  return '<span class="ws-act" style="display:inline-flex;gap:4px">' + pin + rm + '</span>';
+  return '<span class="ws-act" data-admin-only style="display:inline-flex;gap:4px">' + pin + rm + '</span>';
 }
 function wsSetProduct(p) { state.wsProduct = p; state.wsFilter = 'all'; renderWhiteSpace(); }
 function renderWhiteSpace() {
@@ -6044,7 +6044,7 @@ function renderDetail() {
       </div>
       <div class="kr-bar"><div class="kr-fill" data-w="${_cov.pct}"></div></div>
       <div class="kr-slots">${_cov.slots.map(x => x.contact
-        ? `<div class="kr-slot on" onclick="event.stopPropagation();openEditContact('${x.contact.id}')" title="${esc(x.contact.title||'')}"><i></i><span class="kr-role">${esc(x.label)}</span><span class="kr-who">${esc(x.contact.first + ' ' + x.contact.last)}${x.count > 1 ? ` +${x.count - 1}` : ''}</span></div>`
+        ? `<div class="kr-slot on"${state.currentRole === 'admin' ? ` onclick="event.stopPropagation();openEditContact('${x.contact.id}')"` : ' style="cursor:default"'} title="${esc(x.contact.title||'')}"><i></i><span class="kr-role">${esc(x.label)}</span><span class="kr-who">${esc(x.contact.first + ' ' + x.contact.last)}${x.count > 1 ? ` +${x.count - 1}` : ''}</span></div>`
         : `<div class="kr-slot off"><i></i><span class="kr-role">${esc(x.label)}</span><span class="kr-who">missing</span></div>`).join('')}</div>
     </div>`;
 
@@ -6081,12 +6081,12 @@ function renderDetail() {
       <td><span class="badge b-${prio}"${senior?' title="High priority: decision-maker role"':''}>${prio}</span></td>
       <td><span class="badge b-${c.quality}">${c.quality==='verified'?'Verified':'Seed'}</span></td>
       <td onclick="event.stopPropagation()" style="white-space:nowrap">
-        <button class="btn btn-xs btn-outline" title="Log activity" onclick="openActivityLog(${jsStr(c.id)},${jsStr(c.first+' '+c.last)})">📋</button>
+        <button class="btn btn-xs btn-outline" data-admin-only title="Log activity" onclick="openActivityLog(${jsStr(c.id)},${jsStr(c.first+' '+c.last)})">📋</button>
         <button class="btn btn-xs btn-outline" data-admin-only onclick="openEditContact('${c.id}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
         <button class="btn btn-xs btn-danger" data-admin-only onclick="confirmDeleteContact('${c.id}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
       </td>
     </tr>`;
-  }).join('') : `<tr><td colspan="6"><div class="empty" style="padding:30px"><div class="ei"><span style="display:inline-flex"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span></div><h3>No contacts yet</h3><p><button class="btn btn-accent btn-sm" onclick="openAddContact('${inst.id}')">+ Add first contact</button></p></div></td></tr>`;
+  }).join('') : `<tr><td colspan="6"><div class="empty" style="padding:30px"><div class="ei"><span style="display:inline-flex"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span></div><h3>No contacts yet</h3><p><button class="btn btn-accent btn-sm" data-admin-only onclick="openAddContact('${inst.id}')">+ Add first contact</button></p></div></td></tr>`;
 
   // Account Info: the commercial facts about the relationship. A next action
   // whose date has come round is flagged here and listed on the Daily Digest.
@@ -6193,7 +6193,7 @@ function renderDetail() {
       <span class="card-title">Contacts at ${esc(inst.short||inst.name)}</span>
       <div style="display:flex;gap:8px">
         <button class="btn btn-outline btn-sm" onclick="nav('org-map',{instId:'${inst.id}'})" title="Visual org chart: who sits where">🗺 Org Map</button>
-        <button class="btn btn-accent btn-sm" onclick="openAddContact('${inst.id}')">+ Add Contact</button>
+        <button class="btn btn-accent btn-sm" data-admin-only onclick="openAddContact('${inst.id}')">+ Add Contact</button>
       </div>
     </div>
 
@@ -6394,7 +6394,7 @@ function renderInstitutionOrgMap() {
 
   function orgCardHtml(c) {
     const email = c.email ? `<div class="email"><a href="mailto:${esc(c.email)}" onclick="event.stopPropagation()">${esc(c.email)}</a></div>` : '';
-    return `<div class="orgmap-card" onclick="openEditContact('${c.id}')" title="Click to edit">
+    return `<div class="orgmap-card"${state.currentRole === 'admin' ? ` onclick="openEditContact('${c.id}')" title="Click to edit"` : ' style="cursor:default"'}>
       <div class="name">${esc(c.first)} ${esc(c.last)}</div>
       <div class="title">${esc(c.title || 'No title on file')}</div>
       ${email}
@@ -6536,7 +6536,7 @@ function renderContacts() {
       <td><span class="badge b-${prio}"${senior?' title="High priority: decision-maker role"':''}>${prio}</span></td>
       <td><span class="badge b-${c.quality}" style="font-size:10px">${c.quality==='verified'?'Verified':'Seed'}</span></td>
       <td style="white-space:nowrap">
-        <button class="btn btn-xs btn-outline" title="Log activity" onclick="openActivityLog(${jsStr(c.id)},${jsStr(c.first+' '+c.last)})"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1Z"/><path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="16" y2="15"/></svg></button>
+        <button class="btn btn-xs btn-outline" data-admin-only title="Log activity" onclick="openActivityLog(${jsStr(c.id)},${jsStr(c.first+' '+c.last)})"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1Z"/><path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="16" y2="15"/></svg></button>
         <button class="btn btn-xs btn-outline" data-admin-only onclick="openEditContact('${c.id}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
         <button class="btn btn-xs btn-danger" data-admin-only onclick="confirmDeleteContact('${c.id}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
       </td>
@@ -7743,7 +7743,7 @@ function refreshTenders() {
 function renderRFPOpps() {
   document.getElementById('page-title').textContent = 'RFP Opps';
   document.getElementById('page-sub').textContent = 'Belgium tenders where a specific Elsevier product aligns with what\'s being sought';
-  document.getElementById('topbar-actions').innerHTML = '<button id="refresh-tenders-btn" class="btn btn-accent" onclick="refreshTenders()" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Refresh Tenders</button>';
+  document.getElementById('topbar-actions').innerHTML = '<button id="refresh-tenders-btn" class="btn btn-accent" data-admin-only onclick="refreshTenders()" style="display:flex;align-items:center;gap:6px"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Refresh Tenders</button>';
 
   const rfps = getRFPs();
   const content = document.getElementById('content');
@@ -7752,7 +7752,7 @@ function renderRFPOpps() {
     content.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 24px;gap:16px">
       <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
       <p style="color:#475569;font-size:14px;margin:0">No tenders loaded — click Refresh Tenders to fetch from TED Europa</p>
-      <button class="btn btn-accent" onclick="refreshTenders()">Refresh Tenders</button>
+      <button class="btn btn-accent" data-admin-only onclick="refreshTenders()">Refresh Tenders</button>
     </div>`;
     return;
   }
@@ -7878,7 +7878,7 @@ function renderRFPOpps() {
         ${r.url ? `<a href="${esc(safeHref(r.url))}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;margin-top:6px;color:#00f5c4;font-size:11px;font-weight:600;text-decoration:none">View source<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>` : ''}
       </td>
       <td style="padding:16px 10px;vertical-align:top;white-space:nowrap">
-        <button onclick="deleteRFP('${r.id}')" title="Remove" style="background:none;border:none;cursor:pointer;color:#334155;padding:4px;border-radius:4px;opacity:.5;transition:opacity .15s" onmouseover="this.style.opacity=1;this.style.color='#ef4444'" onmouseout="this.style.opacity='.5';this.style.color='#334155'"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+        <button data-admin-only onclick="deleteRFP('${r.id}')" title="Remove" style="background:none;border:none;cursor:pointer;color:#334155;padding:4px;border-radius:4px;opacity:.5;transition:opacity .15s" onmouseover="this.style.opacity=1;this.style.color='#ef4444'" onmouseout="this.style.opacity='.5';this.style.color='#334155'"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
       </td>
     </tr>`;
   }).join('');
@@ -8994,7 +8994,7 @@ function deleteOpenAlexRow(instName) {
 function renderOpenAlex() {
   document.getElementById('page-title').textContent = 'OpenAlex Intelligence';
   document.getElementById('page-sub').textContent = 'Subscription details, pricing tiers, and Belgian institution intelligence — sourced & verified';
-  document.getElementById('topbar-actions').innerHTML = '<button id="refresh-openalex-subs-btn" class="btn btn-outline btn-sm" onclick="refreshOpenAlexSubs()">↻ Scan for Subscriptions</button>';
+  document.getElementById('topbar-actions').innerHTML = '<button id="refresh-openalex-subs-btn" class="btn btn-outline btn-sm" data-admin-only onclick="refreshOpenAlexSubs()">↻ Scan for Subscriptions</button>';
 
   /* ── PRICING TIERS (source: Q2 2026 Town Hall blog + member launch post) ── */
   const TIERS = [
@@ -11311,11 +11311,11 @@ async function renderPendingContacts() {
   const findLabel = selType === 'all' ? 'Find contacts now' : `Find ${TYPE_LABEL[selType]||selType} contacts now`;
 
   document.getElementById('topbar-actions').innerHTML = `
-    <button class="btn btn-outline" onclick="runContactDiscovery()" style="font-size:12px">
+    <button class="btn btn-outline" data-admin-only onclick="runContactDiscovery()" style="font-size:12px">
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
       ${esc(findLabel)}
     </button>
-    ${filtered.length ? `<button class="btn btn-accent" id="accept-all-btn" onclick="acceptAllPendingContacts(this, '${selType}')" style="font-size:12px;margin-left:8px">Accept All (${filtered.length})</button>` : ''}`;
+    ${filtered.length ? `<button class="btn btn-accent" data-admin-only id="accept-all-btn" onclick="acceptAllPendingContacts(this, '${selType}')" style="font-size:12px;margin-left:8px">Accept All (${filtered.length})</button>` : ''}`;
 
   const targetBar = buildScrapeTargetBar(selType, counts);
 
@@ -11357,8 +11357,8 @@ async function renderPendingContacts() {
       <td style="padding:12px 14px;font-size:11px;color:var(--muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.research||'')}</td>
       <td style="padding:12px 14px;font-size:11px">${c.source_url ? `<a href="${esc(safeHref(c.source_url))}" target="_blank" style="color:var(--muted)">Source</a>` : '—'}</td>
       <td style="padding:12px 14px;white-space:nowrap">
-        <button class="btn btn-primary" style="font-size:11px;padding:5px 12px;margin-right:6px" onclick="acceptPendingContact('${c.id}', this)">✓ Accept</button>
-        <button class="btn btn-danger" style="font-size:11px;padding:5px 12px" onclick="deletePendingContact('${c.id}', this)">✕ Delete</button>
+        <button class="btn btn-primary" data-admin-only style="font-size:11px;padding:5px 12px;margin-right:6px" onclick="acceptPendingContact('${c.id}', this)">✓ Accept</button>
+        <button class="btn btn-danger" data-admin-only style="font-size:11px;padding:5px 12px" onclick="deletePendingContact('${c.id}', this)">✕ Delete</button>
       </td>
     </tr>`).join('');
 
@@ -12174,6 +12174,7 @@ function render4GU() {
       const name = row.dataset.contactRowName || '';
       const btn = document.createElement('button');
       btn.className = 'alog-open-btn btn btn-xs btn-outline';
+      btn.setAttribute('data-admin-only', '');
       btn.dataset.contactId = id;
       btn.dataset.contactName = name;
       btn.title = 'Log activity';
