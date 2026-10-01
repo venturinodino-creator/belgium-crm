@@ -6082,6 +6082,31 @@ function renderDetail() {
     </tr>`;
   }).join('') : `<tr><td colspan="6"><div class="empty" style="padding:30px"><div class="ei"><span style="display:inline-flex"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span></div><h3>No contacts yet</h3><p><button class="btn btn-accent btn-sm" onclick="openAddContact('${inst.id}')">+ Add first contact</button></p></div></td></tr>`;
 
+  // Account Info: the commercial facts about the relationship. A next action
+  // whose date has come round is flagged here and listed on the Daily Digest.
+  const WARMTH = { cold:['Cold','badge-cold'], warm:['Warm','badge-warm'], hot:['Hot','badge-hot'] };
+  const _acctToday = new Date().toISOString().slice(0, 10);
+  const _acctDue = !inst.nextActionDate ? '' : inst.nextActionDate < _acctToday
+    ? ' <span class="action-due action-overdue">overdue</span>'
+    : inst.nextActionDate === _acctToday ? ' <span class="action-due action-today">today</span>' : '';
+  const acctCell = (label, val) => `<div class="acct-cell"><div class="acct-label">${label}</div><div class="acct-val">${val}</div></div>`;
+  const accountHtml = `
+    <div class="card" id="inst-account" style="margin-bottom:16px;padding:14px 18px">
+      <div class="card-header" style="margin-bottom:4px">
+        <span class="card-title">Account Info</span>
+        <button class="btn btn-outline btn-sm" data-admin-only onclick="openEditInstAccount('${inst.id}')">Edit Account Info</button>
+      </div>
+      <div class="acct-grid">
+        ${acctCell('Warmth', WARMTH[inst.warmth] ? `<span class="${WARMTH[inst.warmth][1]}">${WARMTH[inst.warmth][0]}</span>` : '—')}
+        ${acctCell('Contract value', inst.contractValue ? anMoney(inst.contractValue) : '—')}
+        ${acctCell('Renewal date', esc(inst.renewalDate || '—'))}
+        ${acctCell('Products', esc(inst.products || '—'))}
+        ${acctCell('Next action', inst.nextAction
+          ? esc(inst.nextAction) + (inst.nextActionDate ? `<div class="int-meta">${esc(inst.nextActionDate)}${_acctDue}</div>` : '')
+          : '—')}
+      </div>
+    </div>`;
+
   // Every Interaction logged for this Institution, newest first, whichever way
   // it was logged: from the Log Interaction control here or from a Contact's
   // own activity log.
@@ -6153,6 +6178,8 @@ function renderDetail() {
     ${_rfHtml}
 
     ${iaAnalyticsHtml(inst, contacts)}
+
+    ${accountHtml}
 
     ${interactionsHtml}
 
@@ -7532,13 +7559,26 @@ async function saveInstAccount() {
   const instId = document.getElementById('ma-inst-id').value;
   const inst = getInst(instId);
   if(!inst.id) return;
-  inst.warmth = document.getElementById('ma-warmth').value;
-  inst.products = document.getElementById('ma-products').value;
-  inst.contractValue = document.getElementById('ma-value').value;
-  inst.renewalDate = document.getElementById('ma-renewal').value;
-  inst.nextAction = document.getElementById('ma-action').value;
-  inst.nextActionDate = document.getElementById('ma-action-date').value;
-  save(); try { await supaUpsertInst(inst); syncBadge(true); } catch(e){ console.error(e); syncBadge(true,'err'); } closeModal('modal-acct'); toast('Account info saved'); render();
+  const updated = {
+    ...inst,
+    warmth: document.getElementById('ma-warmth').value,
+    products: document.getElementById('ma-products').value.trim(),
+    contractValue: document.getElementById('ma-value').value,
+    renewalDate: document.getElementById('ma-renewal').value,
+    nextAction: document.getElementById('ma-action').value.trim(),
+    nextActionDate: document.getElementById('ma-action-date').value,
+  };
+  // Database first: the page only takes the new values once they are really
+  // saved, so a refused write says so instead of looking like a success and
+  // reverting on reload.
+  try { await supaUpsertInst(updated); syncBadge(true); }
+  catch(e) {
+    console.error(e); syncBadge(true, 'err');
+    toast('Not saved to the shared database: ' + e.message, 'err');
+    return;
+  }
+  Object.assign(inst, updated);
+  save(); closeModal('modal-acct'); toast('Account info saved'); render();
 }
 
 //  PIPELINE PAGE 
