@@ -97,10 +97,6 @@ test.describe('the check is safe to run anywhere', () => {
   });
 
   test('a viewer sees no admin-only controls', async ({ page }) => {
-    // Known bug netherlands-crm#84: the sidebar's Import Contacts item stays visible to a
-    // viewer. Marked as an expected failure so the suite is green and so the
-    // fix has to remove this line to pass.
-    test.fail(true, 'Known bug netherlands-crm#84: Import Contacts is visible to a viewer');
     const { errors } = await openApp(page, { role: 'viewer' });
     await page.evaluate(() => nav('institutions'));
     await settle(page);
@@ -110,5 +106,13 @@ test.describe('the check is safe to run anywhere', () => {
       .map(e => (e.textContent.trim() || e.getAttribute('title') || e.id || e.tagName).slice(0, 60)));
     expect(visibleAdminControls).toEqual([]);
     expect(errors).toEqual([]);
+  });
+
+  test('an admin still sees the admin-only controls', async ({ page }) => {
+    await openApp(page, { role: 'admin' });
+    await settle(page);
+    // The sidebar's Import Contacts item is the one that leaked to viewers
+    // (netherlands-crm#84); the fix must not hide it from the people it is for.
+    await expect(page.locator('.nav-item[data-admin-only]').first()).toBeVisible();
   });
 });
