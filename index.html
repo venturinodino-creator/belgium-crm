@@ -3843,8 +3843,13 @@ function render() {
 // UX nicety only — the real enforcement is the RLS policies in Supabase.
 function applyRoleUI() {
   const isAdmin = state.currentRole === 'admin';
+  // The hide has to be !important: several classes force their own display
+  // with !important (every sidebar item is `display: flex !important`), and a
+  // stylesheet !important beats a plain inline style, which left the admin-only
+  // Import Contacts item visible to viewers.
   document.querySelectorAll('[data-admin-only]').forEach(function(el){
-    el.style.display = isAdmin ? '' : 'none';
+    if (isAdmin) el.style.removeProperty('display');
+    else el.style.setProperty('display', 'none', 'important');
   });
 }
 
