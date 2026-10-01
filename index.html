@@ -6017,6 +6017,7 @@ function renderDetail() {
   document.getElementById('topbar-actions').innerHTML = `
     <button class="btn btn-outline" onclick="nav('org-map',{instId:'${inst.id}'})" title="Visual org chart: who sits where">🗺 Org Map</button>
     ${wsPinButton(inst.id)}
+    <button class="btn btn-outline" data-admin-only onclick="openLogInteraction('${inst.id}')" title="Record a call, email or meeting with this institution">Log Interaction</button>
     <button class="btn btn-outline" data-admin-only onclick="openEditInstitution('${inst.id}')"> Edit</button>
     <button class="btn btn-accent" data-admin-only onclick="openAddContact('${inst.id}')">+ Add Contact</button>`;
 
@@ -6081,6 +6082,32 @@ function renderDetail() {
     </tr>`;
   }).join('') : `<tr><td colspan="6"><div class="empty" style="padding:30px"><div class="ei"><span style="display:inline-flex"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span></div><h3>No contacts yet</h3><p><button class="btn btn-accent btn-sm" onclick="openAddContact('${inst.id}')">+ Add first contact</button></p></div></td></tr>`;
 
+  // Every Interaction logged for this Institution, newest first, whichever way
+  // it was logged: from the Log Interaction control here or from a Contact's
+  // own activity log.
+  const INT_ICON = { email:'&#128231;', call:'&#128222;', meeting:'&#129309;', demo:'&#128421;&#65039;', proposal:'&#128196;', note:'&#128221;', other:'&#128172;' };
+  const instInteractions = state.interactions
+    .filter(n => n.instId === inst.id)
+    .sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.id || '').localeCompare(a.id || ''));
+  const interactionsHtml = `
+    <div class="card" id="inst-interactions" style="margin-bottom:16px;padding:14px 18px">
+      <div class="card-header" style="margin-bottom:10px">
+        <span class="card-title">Interactions${instInteractions.length ? ` <span style="color:var(--muted);font-weight:500">· ${instInteractions.length}</span>` : ''}</span>
+        <button class="btn btn-outline btn-sm" data-admin-only onclick="openLogInteraction('${inst.id}')">+ Log Interaction</button>
+      </div>
+      ${instInteractions.length ? `<div class="int-log">${instInteractions.map(n => {
+        const who = n.contactId ? state.contacts.find(c => c.id === n.contactId) : null;
+        return `<div class="int-row">
+          <div class="int-icon">${INT_ICON[n.type] || INT_ICON.other}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:600;color:var(--text2)">${esc(n.summary || n.type || '')}</div>
+            <div class="int-meta">${esc(n.date || 'undated')} · <span style="text-transform:capitalize">${esc(n.type || 'other')}</span>${who ? ' · ' + esc(who.first + ' ' + who.last) : ''}</div>
+          </div>
+          <button class="btn btn-xs btn-danger" data-admin-only title="Delete this interaction" aria-label="Delete this interaction" onclick="deleteInteraction(${jsStr(n.id)})">&#10005;</button>
+        </div>`;
+      }).join('')}</div>` : `<div style="font-size:12px;color:var(--muted);padding:6px 0">No interactions logged for this institution yet.</div>`}
+    </div>`;
+
   let _rfHtml = '';
   try {
     const _d = buildInstResearchDonut(inst.id);
@@ -6126,6 +6153,8 @@ function renderDetail() {
     ${_rfHtml}
 
     ${iaAnalyticsHtml(inst, contacts)}
+
+    ${interactionsHtml}
 
     <div class="card-header" style="margin-bottom:12px">
       <span class="card-title">Contacts at ${esc(inst.short||inst.name)}</span>
@@ -7443,14 +7472,29 @@ async function saveInteraction() {
     summary,
     contactId: document.getElementById('mi-contact').value
   };
+  // Database first: the Interaction is only added to the page once it is
+  // really saved, so a refused write can never look like a success and then
+  // vanish on reload. crm_interactions.inst_id has a foreign key to the sparse
+  // crm_institutions table, so the Institution's row has to exist first.
+  try {
+    await ensureInstitutionRow(log.instId);
+    await supaUpsertInteraction(log);
+    syncBadge(true);
+  } catch(e) {
+    console.error(e);
+    syncBadge(true, 'err');
+    toast('Not saved to the shared database: ' + e.message, 'err');
+    return;
+  }
   state.interactions.push(log);
   if(log.contactId) {
     const cx = state.contacts.find(x=>x.id===log.contactId);
     if(cx && (!cx.lastContact || log.date > cx.lastContact)) cx.lastContact = log.date;
   }
-  save(); try { await supaUpsertInteraction(log); syncBadge(true); } catch(e){ console.error(e); syncBadge(true,'err'); } closeModal('modal-int'); toast('Interaction logged'); render();
+  save(); closeModal('modal-int'); toast('Interaction logged'); render();
 }
 async function deleteInteraction(intId) {
+  if(!confirm('Delete this interaction? This cannot be undone.')) return;
   try {
     await supaDelete('crm_interactions', intId);
   } catch(e) {
@@ -12010,6 +12054,9 @@ function render4GU() {
       date, type: _selectedType, summary
     };
     try {
+      // Same foreign key as the Institution-level log: the Institution's row
+      // has to exist before an Interaction can point at it.
+      await ensureInstitutionRow(log.instId);
       await supaUpsertInteraction(log);
     } catch(e) {
       console.error(e);

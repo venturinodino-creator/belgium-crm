@@ -42,11 +42,13 @@ const supabaseModule = () => `
  * @param page   Playwright page
  * @param opts.role    'admin' | 'viewer' — the role the profiles table reports
  * @param opts.tables  rows to return per table name, e.g. { crm_contacts: [...] }
+ * @param opts.failWrites  table names whose writes the database refuses (status 500)
  * @returns { writes, leaks } — arrays filled in as the page runs
  */
 async function installStubs(page, opts = {}) {
   const role = opts.role || 'admin';
   const tables = opts.tables || {};
+  const failWrites = opts.failWrites || [];
   const writes = [];   // { method, table, query, body } for every non-GET to the database
   const leaks = [];    // external URLs that were passed through to the real network
 
@@ -85,6 +87,10 @@ async function installStubs(page, opts = {}) {
       let body = null;
       try { body = JSON.parse(req.postData() || 'null'); } catch (e) { body = req.postData(); }
       writes.push({ method: req.method(), table, query: url.search, body });
+      if (failWrites.includes(table)) {
+        return route.fulfill({ status: 500, headers: { ...CORS, 'content-type': 'application/json' },
+          body: JSON.stringify({ message: 'refused by the stubbed database' }) });
+      }
       return json(Array.isArray(body) ? body : body ? [body] : []);
     }
 
