@@ -4655,47 +4655,6 @@ function syncAgentStatus() {
   _syncAgentFrom('agent-hiring-lastrun', 'data/competitor-jobs-scan-state.json', d => d.totalOpenRoles != null ? ` · ${d.totalOpenRoles} open` : '');
 }
 
-let _scDragSrc = null;
-function initStatCardDrag() {
-  const grid = document.getElementById('stats-grid-drag');
-  if (!grid) return; // stat cards were replaced by the hero ledger
-  const cards = grid.querySelectorAll('.stat-card[data-sc-id]');
-  cards.forEach(card => {
-    card.addEventListener('dragstart', e => {
-      _scDragSrc = card;
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', card.dataset.scId);
-      setTimeout(() => card.classList.add('sc-dragging'), 0);
-    });
-    card.addEventListener('dragend', () => {
-      card.classList.remove('sc-dragging');
-      grid.querySelectorAll('.stat-card').forEach(c => c.classList.remove('sc-drag-over'));
-    });
-    card.addEventListener('dragover', e => {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-      if (card !== _scDragSrc) card.classList.add('sc-drag-over');
-    });
-    card.addEventListener('dragleave', e => {
-      if (!card.contains(e.relatedTarget)) card.classList.remove('sc-drag-over');
-    });
-    card.addEventListener('drop', e => {
-      e.preventDefault();
-      e.stopPropagation();
-      card.classList.remove('sc-drag-over');
-      if (!_scDragSrc || _scDragSrc === card) return;
-      // Reorder in the DOM immediately (no re-render flicker)
-      const allCards = [...grid.querySelectorAll('.stat-card[data-sc-id]')];
-      const srcIdx = allCards.indexOf(_scDragSrc);
-      const tgtIdx = allCards.indexOf(card);
-      if (srcIdx < tgtIdx) grid.insertBefore(_scDragSrc, card.nextSibling);
-      else grid.insertBefore(_scDragSrc, card);
-      // Save new order to localStorage
-      const newOrder = [...grid.querySelectorAll('.stat-card[data-sc-id]')].map(c => c.dataset.scId);
-      localStorage.setItem('be_crm_stat_order', JSON.stringify(newOrder));
-    });
-  });
-}
 
 const DASH_WIDGET_DEFAULT_ORDER = ['w-attention','w-posture','w-types','w-highprio','w-renewals','w-agents','w-map'];
 function getDashWidgetOrder() {
@@ -8706,12 +8665,6 @@ function cycleCell(instId, colKey, ev){
   renderSubscriptionMatrix();
 }
 
-function clearAllOverrides(){
-  if(!confirm('Clear all manual subscription overrides?')) return;
-  window.matrixOverrides = {};
-  localStorage.removeItem('be_crm_matrix_overrides');
-  renderSubscriptionMatrix();
-}
 
 //  COMPETITOR PRODUCTS 
 //  SUBSCRIPTION MATRIX VIEW 
@@ -8935,11 +8888,6 @@ function _matrixNotes() {
 }
 function getNotes(instId) {
   return _matrixNotes()[instId] || '';
-}
-function saveNote(instId, val) {
-  const stored = _matrixNotes();
-  if (val.trim()) { stored[instId] = val; } else { delete stored[instId]; }
-  localStorage.setItem('be_crm_matrix_notes', JSON.stringify(stored));
 }
 
 /* ─── OpenAlex subscription agent findings (data/openalex-subscriptions.json) ─── */
@@ -9718,7 +9666,6 @@ function getBattleCard() {
   try { return JSON.parse(localStorage.getItem('nl_crm_battlecard') || '{}'); } catch(e) { return {}; }
 }
 function saveBattleCard(obj) { localStorage.setItem('nl_crm_battlecard', JSON.stringify(obj)); }
-function getBattleCardCopy() { return getBattleCard().entries || {}; }
 function executiveSummaryPlainText(s) {
   if (!s) return '';
   const lines = [s.headline];
@@ -9784,9 +9731,6 @@ function getThreatOverrides() {
 function effectiveThreat(x) {
   const overrides = getThreatOverrides();
   return overrides[x.id] || computeAutoThreat(x);
-}
-function isThreatOverridden(x) {
-  return !!getThreatOverrides()[x.id];
 }
 function setThreatOverride(id, level) {
   const overrides = getThreatOverrides();
