@@ -1,14 +1,14 @@
 {
-  "lastRun": "2026-09-30T13:07:15.312Z",
-  "totalOpenRoles": 23,
+  "lastRun": "2026-10-01T13:59:35.229Z",
+  "totalOpenRoles": 22,
   "openByRegion": {
     "domestic": 2,
-    "remote": 21,
-    "europe": 31,
-    "global": 166
+    "remote": 20,
+    "europe": 32,
+    "global": 160
   },
   "totalListed": 31,
-  "newCount": 1,
+  "newCount": 0,
   "reopenedCount": 0,
   "closedCount": 1,
   "archivedCount": 0,
@@ -22,7 +22,7 @@
       "global": 0
     },
     "Allen Institute for AI": {
-      "total": 19,
+      "total": 18,
       "beOrRemote": 0,
       "domestic": 0,
       "remote": 0,
@@ -30,7 +30,7 @@
       "global": 0
     },
     "Clarivate": {
-      "total": 190,
+      "total": 188,
       "beOrRemote": 8,
       "domestic": 0,
       "remote": 8,
@@ -38,15 +38,15 @@
       "global": 12
     },
     "Springer Nature": {
-      "total": 200,
+      "total": 77,
       "beOrRemote": 0,
       "domestic": 0,
       "remote": 0,
-      "europe": 0,
-      "global": 8
+      "europe": 1,
+      "global": 2
     },
     "Wiley": {
-      "total": 62,
+      "total": 64,
       "beOrRemote": 6,
       "domestic": 0,
       "remote": 6,
@@ -54,15 +54,15 @@
       "global": 3
     },
     "OpenAI": {
-      "total": 838,
-      "beOrRemote": 5,
+      "total": 835,
+      "beOrRemote": 4,
       "domestic": 0,
-      "remote": 5,
+      "remote": 4,
       "europe": 9,
       "global": 58
     },
     "Anthropic": {
-      "total": 636,
+      "total": 634,
       "beOrRemote": 0,
       "domestic": 0,
       "remote": 0,
