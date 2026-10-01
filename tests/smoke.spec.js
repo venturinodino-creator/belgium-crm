@@ -22,9 +22,8 @@ const VIEWS = viewKeys();
 const INST_SCOPED = ['detail', 'org-map'];
 
 // Pages that exist but that nothing in the interface can open. Each entry is a
-// known bug with a ticket; the list must shrink, never grow.
-//   pipeline — the Deals page lost its sidebar item (netherlands-crm#78).
-const KNOWN_UNREACHABLE = ['pipeline'];
+// known bug with a ticket; the list must stay empty unless a new one is filed.
+const KNOWN_UNREACHABLE = [];
 
 // Let late async work (data files, counts, map tiles) land before judging.
 async function settle(page) {
@@ -111,8 +110,8 @@ test.describe('the check is safe to run anywhere', () => {
   test('an admin still sees the admin-only controls', async ({ page }) => {
     await openApp(page, { role: 'admin' });
     await settle(page);
-    // The sidebar's Import Contacts item is the one that leaked to viewers
-    // (netherlands-crm#84); the fix must not hide it from the people it is for.
+    // The sidebar's Import Contacts item is the one that leaked to viewers (#84);
+    // the fix must not hide it from the people it is for.
     await expect(page.locator('.nav-item[data-admin-only]').first()).toBeVisible();
   });
 });
