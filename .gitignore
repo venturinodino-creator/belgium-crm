@@ -13,3 +13,28 @@ _test_ws.html
 .env.*
 .DS_Store
 Thumbs.db
+
+# Smoke check output
+test-results/
+playwright-report/
+
+[OK] Command outcome recorded
+
+# Stray 0-byte files. A fragment of JavaScript can reach cmd.exe, which reads
+# the ">" in an "=>" arrow as an output redirection and drops an empty file
+# named after the next token. Harmless alone, but a broad `git add` commits
+# them. Anchored with a leading "/" so they apply to the repo root only, where
+# these land; no legitimate file here carries these characters. A literal "["
+# is written "[[]" because bare brackets open a character class.
+/*(*
+/*)*
+/*[[]*
+/*]*
+/*{*
+/*}*
+/*$*
+/*'*
+/*`*
+/*%*
+/*=*
+/*#*
