@@ -66,7 +66,10 @@ body{
 .topbar-left h2{color:#f0f0f0}
 .topbar-left p{color:rgba(255,255,255,.38)}
 /*  MAIN  */
-.main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh;margin-top:34px}
+/* min-width:0 lets wide content (the Deals board, wide tables) scroll inside
+   its own container; without it a flex child grows to fit and the whole page
+   widens past the viewport. */
+.main{margin-left:var(--sw);flex:1;min-width:0;display:flex;flex-direction:column;min-height:100vh;margin-top:34px}
 .topbar{background:rgba(6,10,18,0.75);padding:13px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(255,255,255,.07)}
 .topbar-left h2{font-size:15px;font-weight:700;color:var(--text2);letter-spacing:-.2px}
 .topbar-left p{font-size:11px;color:var(--muted);margin-top:1px}
@@ -346,7 +349,7 @@ a.ext-link:hover{color:var(--text)}
 .nav-item-sync-contacts .nav-icon-box{color:rgba(167,139,250,.8)}
 /*  PIPELINE / KANBAN  */
 .pipeline-board{display:flex;gap:12px;overflow-x:auto;padding-bottom:16px;align-items:flex-start}
-.pipeline-col{min-width:200px;flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.pipeline-col{min-width:170px;flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px}
 .pipeline-col-header{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;padding:5px 7px;border-radius:6px;margin-bottom:2px;display:flex;justify-content:space-between;align-items:center}
 .pipeline-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;transition:box-shadow .15s}
 .pipeline-card:hover{box-shadow:0 2px 10px rgba(0,0,0,.12)}
@@ -1484,6 +1487,9 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
     </div>
     <div class="nav-item" data-view="rfp" onclick="nav('rfp')">
       <div class="nav-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div> RFP Opps
+    </div>
+    <div class="nav-item" data-view="pipeline" onclick="nav('pipeline')" title="Sales deals by stage">
+      <div class="nav-icon-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div> Deals
     </div>
     <div class="sb-divider"></div>
     <div class="nav-section">Network</div>
@@ -7410,9 +7416,20 @@ function toggleOlderReports() {
 }
 
 //  OPPORTUNITY HELPERS
+// A Deal belongs to an Institution, so the window always offers the list. It
+// used to carry the Institution in a hidden field that the Deals page left
+// empty, which made every Deal added from that page unsaveable.
+function oppFillInstitutions(selected) {
+  const sel = document.getElementById('mo-inst-id');
+  sel.innerHTML = '<option value="">— choose an institution —</option>' +
+    state.institutions.slice().sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+      .map(i => `<option value="${esc(i.id)}">${esc(i.name)}${i.short && i.short !== i.name ? ' (' + esc(i.short) + ')' : ''}</option>`).join('');
+  sel.value = selected || '';
+}
 function openAddOpp(instId) {
   document.getElementById('mo-id').value = '';
-  document.getElementById('mo-inst-id').value = instId||'';
+  oppFillInstitutions(instId);
+  document.getElementById('mo-delete').style.display = 'none';
   document.getElementById('mo-name').value = '';
   document.getElementById('mo-stage').value = 'prospect';
   document.getElementById('mo-value').value = '';
@@ -7425,7 +7442,8 @@ function openEditOpp(oppId) {
   const o = state.opportunities.find(x=>x.id===oppId);
   if(!o) return;
   document.getElementById('mo-id').value = o.id;
-  document.getElementById('mo-inst-id').value = o.instId;
+  oppFillInstitutions(o.instId);
+  document.getElementById('mo-delete').style.display = '';
   document.getElementById('mo-name').value = o.name||'';
   document.getElementById('mo-stage').value = o.stage||'prospect';
   document.getElementById('mo-value').value = o.value||'';
@@ -7446,6 +7464,21 @@ async function saveOpp() {
     closeDate: document.getElementById('mo-close').value,
     notes: document.getElementById('mo-notes').value,
   };
+  if(!opp.instId) { toast('Choose the institution this deal is with','err'); return; }
+  // Database first: the Deal only reaches the page once it is really saved,
+  // so a refused write says so instead of looking like a success and vanishing
+  // on reload. crm_opportunities.inst_id has a foreign key to the sparse
+  // crm_institutions table, so the Institution's row has to exist first.
+  try {
+    await ensureInstitutionRow(opp.instId);
+    await supaUpsertOpp(opp);
+    syncBadge(true);
+  } catch(e) {
+    console.error(e);
+    syncBadge(true, 'err');
+    toast('Not saved to the shared database: ' + e.message, 'err');
+    return;
+  }
   if(id) {
     const idx = state.opportunities.findIndex(x=>x.id===id);
     if(idx>=0) state.opportunities[idx] = {...state.opportunities[idx], ...opp};
@@ -7453,7 +7486,7 @@ async function saveOpp() {
     opp.created = new Date().toISOString().slice(0,10);
     state.opportunities.push(opp);
   }
-  save(); try { await supaUpsertOpp(opp); syncBadge(true); } catch(e){ console.error(e); syncBadge(true,'err'); } closeModal('modal-opp'); toast(id ? 'Deal updated' : 'Deal added'); render();
+  save(); closeModal('modal-opp'); toast(id ? 'Deal updated' : 'Deal added'); render();
 }
 async function deleteOpp(oppId) {
   if(!confirm('Delete this deal?')) return;
@@ -7465,7 +7498,7 @@ async function deleteOpp(oppId) {
     return;
   }
   state.opportunities = state.opportunities.filter(x=>x.id!==oppId);
-  save(); toast('Deal deleted'); render();
+  save(); closeModal('modal-opp'); toast('Deal deleted'); render();
 }
 function openAddOppInStage(stage) {
   openAddOpp('');
@@ -7893,8 +7926,12 @@ async function deleteRFP(id) {
 }
 
 function renderPipeline() {
-  document.getElementById('page-title').textContent = 'Pipeline';
-  document.getElementById('page-sub').textContent = 'Deal tracking across all institutions';
+  // The view key stays 'pipeline'; on screen the page is always "Deals" (see
+  // GLOSSARY.md: a Deal is not a Tender and not a White Space target).
+  document.getElementById('page-title').textContent = 'Deals';
+  document.getElementById('page-sub').textContent = 'Sales deals by stage, across all institutions';
+  // Viewers can read Deals; only admins can open one to change it.
+  const canEdit = state.currentRole === 'admin';
   document.getElementById('topbar-actions').innerHTML = '<button class="btn btn-accent" data-admin-only onclick="openAddOpp(\'\')">+ New Deal</button>';
   const STAGES = [
     {key:'prospect',label:'Prospect',color:'#64748b'},
@@ -7912,7 +7949,7 @@ function renderPipeline() {
     const stVal = opps.reduce((s,o)=>s+(parseFloat(o.value)||0),0);
     const cards = opps.length ? opps.map(o=>{
       const inst = getInst(o.instId);
-      return `<div class="pipeline-card" onclick="openEditOpp('${o.id}')">
+      return `<div class="pipeline-card"${canEdit ? ` onclick="openEditOpp(${jsStr(o.id)})"` : ' style="cursor:default"'}>
         <h5>${esc(o.name)}</h5>
         <div class="opp-inst">${esc(inst.short||inst.name||'—')}</div>
         <div class="opp-meta">
@@ -7927,13 +7964,13 @@ function renderPipeline() {
         <span>${opps.length}${stVal>0?' \u00b7 \u20ac'+stVal.toLocaleString():''}</span>
       </div>
       ${cards}
-      <button class="btn btn-xs btn-outline" style="margin-top:4px;width:100%;opacity:.6" onclick="openAddOppInStage('${st.key}')">+ Add</button>
+      <button class="btn btn-xs btn-outline" data-admin-only style="margin-top:4px;width:100%;opacity:.6" onclick="openAddOppInStage('${st.key}')">+ Add</button>
     </div>`;
   }).join('');
   document.getElementById('content').innerHTML = `
     <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">
       <div class="acct-cell" style="flex:1;min-width:130px"><div class="acct-label">Open Deals</div><div class="acct-val">${openOpps2.length}</div></div>
-      <div class="acct-cell" style="flex:1;min-width:130px"><div class="acct-label">Pipeline Value</div><div class="acct-val">${totalVal>0?'\u20ac'+totalVal.toLocaleString():'—'}</div></div>
+      <div class="acct-cell" style="flex:1;min-width:130px"><div class="acct-label">Open Value</div><div class="acct-val">${totalVal>0?'\u20ac'+totalVal.toLocaleString():'—'}</div></div>
       <div class="acct-cell" style="flex:1;min-width:130px"><div class="acct-label">Avg Deal</div><div class="acct-val">${avgVal>0?'€'+Math.round(avgVal).toLocaleString():'—'}</div></div>
       <div class="acct-cell" style="flex:1;min-width:130px"><div class="acct-label">Closed Won</div><div class="acct-val">${state.opportunities.filter(o=>o.stage==='closed-won').length}</div></div>
     </div>
@@ -11056,8 +11093,8 @@ document.addEventListener('keydown', e => { if (e.key==='Escape') closeGlobalSea
     <div class="mh"><h3 id="mo-title">Add Deal</h3><button class="modal-close" onclick="closeModal('modal-opp')">&#10005;</button></div>
     <div class="mb">
       <input type="hidden" id="mo-id">
-      <input type="hidden" id="mo-inst-id">
       <div class="field"><label>Deal Name *</label><input id="mo-name" placeholder="e.g. Scopus Renewal 2026"></div>
+      <div class="field"><label>Institution *</label><select id="mo-inst-id"></select></div>
       <div class="field"><label>Stage</label><select id="mo-stage">
         <option value="prospect">Prospect</option>
         <option value="engaged">Engaged</option>
@@ -11071,6 +11108,7 @@ document.addEventListener('keydown', e => { if (e.key==='Escape') closeGlobalSea
       <div class="field"><label>Notes</label><textarea id="mo-notes" rows="3" placeholder="Key info, blockers, next steps..."></textarea></div>
     </div>
     <div class="mf">
+      <button class="btn btn-danger" id="mo-delete" style="margin-right:auto" onclick="deleteOpp(document.getElementById('mo-id').value)">Delete</button>
       <button class="btn btn-primary" onclick="saveOpp()">Save Deal</button>
       <button class="btn btn-outline" onclick="closeModal('modal-opp')">Cancel</button>
     </div>
