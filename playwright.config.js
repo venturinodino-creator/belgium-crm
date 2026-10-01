@@ -1,5 +1,7 @@
 // Smoke check configuration. Run with `npm test`.
-const PORT = Number(process.env.PORT || 4173);
+// An uncommon port on purpose: 4173 is a popular dev-server default, and a
+// foreign server answering there made every test time out.
+const PORT = Number(process.env.PORT || 41731);
 
 module.exports = {
   testDir: 'tests',
@@ -17,6 +19,7 @@ module.exports = {
   webServer: {
     command: 'node tests/support/static-server.js',
     url: `http://127.0.0.1:${PORT}/index.html`,
-    reuseExistingServer: !process.env.CI,
+    // Never reuse a server that is already listening: it may not be ours.
+    reuseExistingServer: false,
   },
 };

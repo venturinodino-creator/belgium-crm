@@ -2397,7 +2397,11 @@ function runContactsSync() {
   });
   save();
   if (newContacts.length) {
-    Promise.allSettled(newContacts.map(c => supaUpsertContact(c)))
+    // Each Contact waits for its Institution's row: the import would otherwise
+    // be refused for every Institution that has none. ensureInstitutionRow
+    // shares one in-flight write per Institution, so a 500-row file still
+    // sends one Institution write per Institution.
+    Promise.allSettled(newContacts.map(c => ensureInstitutionRow(c.instId).then(() => supaUpsertContact(c))))
       .then(results => {
         const failed = results.filter(r => r.status === 'rejected');
         if (failed.length) {
@@ -6781,7 +6785,9 @@ async function saveContact() {
   }
   save();
   let synced = true;
-  try { await supaUpsertContact(savedContact); syncBadge(true); } catch(e){ console.error(e); syncBadge(true,'err'); synced = false; }
+  // crm_contacts.inst_id has a foreign key to the sparse crm_institutions
+  // table, so the Institution's row has to exist first (see ensureInstitutionRow).
+  try { await ensureInstitutionRow(savedContact.instId); await supaUpsertContact(savedContact); syncBadge(true); } catch(e){ console.error(e); syncBadge(true,'err'); synced = false; }
   closeModal('modal-contact');
   render();
   // Used to unconditionally claim success the moment local state changed,
