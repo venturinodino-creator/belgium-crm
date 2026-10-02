@@ -1823,6 +1823,7 @@ function dbToInst(r) {
     nextActionDate: r.next_action_date||'', lat: r.lat, lng: r.lng,
     wsPinned: !!r.ws_pinned,
     matrixNote: r.matrix_note || '',
+    competitorDetails: (r.competitor_details && typeof r.competitor_details === 'object') ? r.competitor_details : {},
     productStatus: (r.product_status && typeof r.product_status === 'object') ? r.product_status : {}
   };
 }
@@ -1853,6 +1854,7 @@ function instToDB(inst) {
     lat: inst.lat||null, lng: inst.lng||null,
     ws_pinned: !!inst.wsPinned,
     matrix_note: inst.matrixNote || null,
+    competitor_details: (inst.competitorDetails && Object.keys(inst.competitorDetails).length) ? inst.competitorDetails : null,
     product_status: inst.productStatus || {}
   };
 }
@@ -2057,7 +2059,9 @@ async function load() {
     // up once (not awaited: the page must not wait on it).
     wsMigrateLegacyPins();
     migrateLocalProductStatus();
+    applyCompetitorDetails();
     migrateLegacyMatrixNotes();
+    migrateLegacyCompetitorData();
     // Merge seed emails into contacts loaded from Supabase
     const seedEmailMap = Object.fromEntries(SEED_CONTACTS.map(c => [c.id, c.email]));
     state.contacts = contRows.map(dbToContact).map(c => ({
@@ -6415,21 +6419,97 @@ function openEditInstitution(id) {
   document.getElementById('mi-founded').value = i.founded||'';
   document.getElementById('mi-website').value = i.website||'';
   document.getElementById('mi-desc').value = i.description||'';
-  // Competitor data
+  // Competitor data. A status is whatever the rest of the page shows for it
+  // (the same Product status), the dates and the OpenAlex fields come from
+  // the record's competitor details laid over the researched data.
   const cd = window.COMP_DATA[id] || {};
-  document.getElementById('mi-scopus').value = cd.scopus||'unknown';
+  COMP_STATUS_KEYS.forEach(k => { document.getElementById('mi-' + k).value = getProductStatus(id, k); });
   document.getElementById('mi-scopus-renewal').value = cd.scopusRenewal||'';
-  document.getElementById('mi-scival').value = cd.scival||'unknown';
   document.getElementById('mi-scival-renewal').value = cd.scivalRenewal||'';
-  document.getElementById('mi-pure').value = cd.pure||'unknown';
   document.getElementById('mi-pure-renewal').value = cd.pureRenewal||'';
-  document.getElementById('mi-wos').value = cd.wos||'unknown';
   document.getElementById('mi-wos-renewal').value = cd.wosRenewal||'';
   const oaTier = (cd.openalexTier||'').toLowerCase()||cd.openalex||'free';
   document.getElementById('mi-openalex').value = oaTier;
   document.getElementById('mi-openalex-fee').value = cd.openalexFee||'';
   openModal('modal-inst');
 }
+// The competitor fields of the Edit Institution window live on the institution
+// record (crm_institutions.competitor_details for renewal dates and the
+// OpenAlex tier and fee; crm_institutions.product_status for the four product
+// statuses, the same Product status the White Space page and the Competitor
+// Matrix read). Only what differs from the researched COMP_SEED is kept, so a
+// later correction of the researched data still reaches everyone.
+const COMP_STATUS_KEYS = ['scopus', 'scival', 'pure', 'wos'];
+const COMP_DATE_KEYS = ['scopusRenewal', 'scivalRenewal', 'pureRenewal', 'wosRenewal', 'openalexFee'];
+const _compNorm = v => (v == null ? '' : String(v));
+const _compSeedTier = seed => (seed.openalexTier || '').toLowerCase() || seed.openalex || 'free';
+const _compTierName = tier => (tier === 'free' ? null : tier.charAt(0).toUpperCase() + tier.slice(1));
+// `f` holds the form's values: the five date/fee keys and `tier` (the OpenAlex select).
+function compDetailsDiff(instId, f) {
+  const seed = (window.COMP_SEED || {})[instId] || {};
+  const out = {};
+  COMP_DATE_KEYS.forEach(k => { if (_compNorm(f[k]) !== _compNorm(seed[k])) out[k] = f[k]; });
+  if (f.tier !== _compSeedTier(seed)) { out.openalex = f.tier; out.openalexTier = _compTierName(f.tier); }
+  return out;
+}
+// What the page reads (window.COMP_DATA) is the researched data with the
+// record's details laid over it.
+function setCompetitorDetails(inst, details) {
+  inst.competitorDetails = details;
+  const merged = { ...((window.COMP_SEED || {})[inst.id] || {}), ...details };
+  if (Object.keys(merged).length) window.COMP_DATA[inst.id] = merged; else delete window.COMP_DATA[inst.id];
+}
+// On load: records' details go over COMP_DATA (over any browser copy too, so
+// the database wins).
+function applyCompetitorDetails() {
+  for (const i of state.institutions) {
+    if (i.competitorDetails && Object.keys(i.competitorDetails).length) {
+      window.COMP_DATA[i.id] = { ...(window.COMP_DATA[i.id] || {}), ...i.competitorDetails };
+    }
+  }
+}
+// One-time, for an admin: details and statuses this browser saved before they
+// lived on the record go onto the records. Only what differs from the
+// researched data, and never over a value the record already has. A write that
+// fails stays in the browser and is tried again next load.
+async function migrateLegacyCompetitorData() {
+  if (state.currentRole !== 'admin') return;
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem('be_crm_comp_data') || 'null'); } catch (e) { return; }
+  if (!saved || typeof saved !== 'object') return;
+  const left = { ...saved };
+  let moved = 0;
+  for (const [id, legacy] of Object.entries(saved)) {
+    const inst = state.institutions.find(i => i.id === id);
+    if (inst && legacy && typeof legacy === 'object') {
+      const seed = (window.COMP_SEED || {})[id] || {};
+      const have = inst.competitorDetails || {};
+      const details = {};
+      [...COMP_DATE_KEYS, 'openalex', 'openalexTier'].forEach(k => {
+        if (k in legacy && !(k in have) && _compNorm(legacy[k]) !== _compNorm(seed[k])) details[k] = legacy[k];
+      });
+      const statuses = {};
+      COMP_STATUS_KEYS.forEach(k => {
+        if (legacy[k] && !(inst.productStatus || {})[k] && legacy[k] !== (seed[k] || 'unknown')) statuses[k] = legacy[k];
+      });
+      if (Object.keys(details).length || Object.keys(statuses).length) {
+        const updated = { ...inst, competitorDetails: { ...have, ...details }, productStatus: { ...(inst.productStatus || {}), ...statuses } };
+        try { await supaUpsertInst(updated); }
+        catch (e) { console.warn('Competitor details not carried into the database:', e.message); continue; }
+        Object.assign(inst, updated);
+        moved++;
+      }
+    }
+    delete left[id];
+  }
+  if (Object.keys(left).length) localStorage.setItem('be_crm_comp_data', JSON.stringify(left));
+  else localStorage.removeItem('be_crm_comp_data');
+  if (moved) render();
+}
+
+// Database first: the page only takes the new values once they are really
+// saved, so a refused write says so, keeps the window open to retry, and
+// changes nothing.
 async function saveInstitution() {
   const name = document.getElementById('mi-name').value.trim();
   const city = document.getElementById('mi-city').value.trim();
@@ -6440,6 +6520,7 @@ async function saveInstitution() {
   const typeChoice = document.getElementById('mi-type').value;
   const pinWs = typeChoice === 'whitespace';
   const existing = state.editInstId ? getInst(state.editInstId) : null;
+  const instId = existing ? existing.id : uid();
   const data = {
     name, city,
     short: document.getElementById('mi-short').value.trim(),
@@ -6448,54 +6529,34 @@ async function saveInstitution() {
     website: document.getElementById('mi-website').value.trim(),
     description: document.getElementById('mi-desc').value.trim(),
   };
-  const isEdit = !!state.editInstId;
-  let savedInst;
-  if(isEdit) {
-    const idx = state.institutions.findIndex(i=>i.id===state.editInstId);
-    if(idx>=0) { state.institutions[idx] = {...state.institutions[idx], ...data}; savedInst = state.institutions[idx]; }
-  } else {
-    data.id = uid();
-    state.institutions.push(data);
-    savedInst = data;
+  const productStatus = { ...((existing && existing.productStatus) || {}) };
+  COMP_STATUS_KEYS.forEach(k => {
+    const chosen = document.getElementById('mi-' + k).value;
+    if (chosen && chosen !== getProductStatus(instId, k)) productStatus[k] = chosen;
+  });
+  const competitorDetails = compDetailsDiff(instId, {
+    scopusRenewal: document.getElementById('mi-scopus-renewal').value.trim(),
+    scivalRenewal: document.getElementById('mi-scival-renewal').value.trim(),
+    pureRenewal: document.getElementById('mi-pure-renewal').value.trim(),
+    wosRenewal: document.getElementById('mi-wos-renewal').value.trim(),
+    openalexFee: document.getElementById('mi-openalex-fee').value.trim(),
+    tier: document.getElementById('mi-openalex').value,
+  });
+  const updated = { ...(existing || {}), ...data, id: instId, wsPinned: pinWs, productStatus, competitorDetails };
+  const isEdit = !!existing;
+  try { await supaUpsertInst(updated); syncBadge(true); }
+  catch(e) {
+    console.error(e); syncBadge(true, 'err');
+    toast('Not saved to the shared database: ' + e.message, 'err');
+    return;
   }
-  wsSetPinned(savedInst.id, pinWs);
-  // Save competitor data
-  if(state.editInstId) {
-    const instId = state.editInstId;
-    if(!window.COMP_DATA[instId]) window.COMP_DATA[instId] = {};
-    const oaVal = document.getElementById('mi-openalex').value;
-    const oaFee = document.getElementById('mi-openalex-fee').value.trim();
-    Object.assign(window.COMP_DATA[instId], {
-      scopus: document.getElementById('mi-scopus').value,
-      scopusRenewal: document.getElementById('mi-scopus-renewal').value.trim(),
-      scival: document.getElementById('mi-scival').value,
-      scivalRenewal: document.getElementById('mi-scival-renewal').value.trim(),
-      pure: document.getElementById('mi-pure').value,
-      pureRenewal: document.getElementById('mi-pure-renewal').value.trim(),
-      wos: document.getElementById('mi-wos').value,
-      wosRenewal: document.getElementById('mi-wos-renewal').value.trim(),
-      openalex: oaVal === 'free' ? 'free' : oaVal,
-      openalexTier: oaVal !== 'free' ? oaVal.charAt(0).toUpperCase() + oaVal.slice(1) : null,
-      openalexFee: oaFee,
-    });
-    localStorage.setItem('be_crm_comp_data', JSON.stringify(window.COMP_DATA));
-  }
+  const idx = state.institutions.findIndex(i => i.id === instId);
+  if (idx >= 0) state.institutions[idx] = updated; else state.institutions.push(updated);
+  setCompetitorDetails(updated, competitorDetails);
+  wsSetPinned(instId, pinWs);
   save();
-  let synced = true;
-  try { await supaUpsertInst(savedInst); syncBadge(true); } catch(e){ console.error(e); syncBadge(true,'err'); synced = false; }
   closeModal('modal-inst'); render();
-  // The toast used to unconditionally say "updated"/"added" the moment local
-  // state changed, even when the Supabase write in the try/catch above then
-  // failed — silently misreporting success while only a small badge showed
-  // otherwise. It now reflects what actually happened: there's no retry
-  // queue, so a failed sync only survives in this browser/tab until the next
-  // reload — at which point load() re-reads from Supabase and this edit,
-  // never having reached it, is gone. The toast needs to say so plainly
-  // rather than imply it's safely saved.
-  toast(
-    synced ? ((isEdit ? 'Institution updated' : 'Institution added') + (pinWs ? ' — now in the White Space folder' : '')) : 'Not saved to the shared database — retry before reloading or this change will be lost',
-    synced ? 'ok' : 'err'
-  );
+  toast((isEdit ? 'Institution updated' : 'Institution added') + (pinWs ? ' — now in the White Space folder' : ''), 'ok');
 }
 
 function confirmDeleteInst(id) {
@@ -8647,7 +8708,12 @@ if (!window.COMP_DATA) {
     azdelta:      { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'unknown',pureRenewal:'',pureProof:'https://www.nature.com/nature-index/research-leaders/2025/institution/all/all/countries-Belgium', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
   };
 }
-// Merge any localStorage overrides into COMP_DATA
+// The researched data above, before anything hand-entered is merged over it:
+// the record only keeps what differs from this (see compDetailsDiff).
+window.COMP_SEED = JSON.parse(JSON.stringify(window.COMP_DATA));
+// Merge any localStorage overrides into COMP_DATA. This is the pre-2026-10-02
+// browser copy of what the Edit Institution window saved; it stays visible
+// here until migrateLegacyCompetitorData() has pushed it onto the records.
 (function() {
   try {
     const saved = JSON.parse(localStorage.getItem('be_crm_comp_data') || 'null');
