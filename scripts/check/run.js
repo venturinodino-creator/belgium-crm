@@ -26,12 +26,14 @@ const inlineScripts = html => [...html.matchAll(/<script(?![^>]*\bsrc=)([^>]*)>(
   .filter(m => !/type=["']module["']/.test(m[1])).map(m => m[2]);
 const styleBlocks = html => [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map(m => m[1]);
 
-check('every inline script parses', () => {
+check('every script parses', () => {
   const out = [];
-  for (const page of PAGES) inlineScripts(read(page)).forEach((code, i) => {
-    try { new vm.Script(code, { filename: `${page} <script ${i + 1}>` }); }
-    catch (e) { out.push(`${page} script ${i + 1}: ${e.message}`); }
-  });
+  const parse = (name, code) => {
+    try { new vm.Script(code, { filename: name }); }
+    catch (e) { out.push(`${name}: ${e.message}`); }
+  };
+  for (const page of PAGES) inlineScripts(read(page)).forEach((code, i) => parse(`${page} script ${i + 1}`, code));
+  for (const file of stamps.localScripts()) parse(path.relative(ROOT, file), fs.readFileSync(file, 'utf8'));
   return out;
 });
 
