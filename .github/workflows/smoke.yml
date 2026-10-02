@@ -24,6 +24,8 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      # Seconds, no browser: scripts parse, no dead function or style, no stray empty file.
+      - run: npm run check
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm test
