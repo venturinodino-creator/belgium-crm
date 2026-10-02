@@ -43,12 +43,14 @@ const supabaseModule = () => `
  * @param opts.role    'admin' | 'viewer' — the role the profiles table reports
  * @param opts.tables  rows to return per table name, e.g. { crm_contacts: [...] }
  * @param opts.failWrites  table names whose writes the database refuses (status 500)
+ * @param opts.feeds   JSON for a file under /data/, by file name, e.g. { 'leapspace-competitors.json': [...] }
  * @returns { writes, leaks } — arrays filled in as the page runs
  */
 async function installStubs(page, opts = {}) {
   const role = opts.role || 'admin';
   const tables = opts.tables || {};
   const failWrites = opts.failWrites || [];
+  const feeds = opts.feeds || {};
   const writes = [];   // { method, table, query, body } for every non-GET to the database
   const leaks = [];    // external URLs that were passed through to the real network
 
@@ -58,6 +60,12 @@ async function installStubs(page, opts = {}) {
     const host = url.hostname;
 
     if (host === '127.0.0.1' || host === 'localhost') {
+      // A data file a test wants to control, whichever site the page reads it
+      // from: /data/x.json here, /netherlands-crm/data/x.json from another Region.
+      const feed = url.pathname.match(/\/data\/([^/]+)$/);
+      if (feed && feeds[feed[1]] !== undefined) {
+        return route.fulfill({ status: 200, headers: { ...CORS, 'content-type': 'application/json' }, body: JSON.stringify(feeds[feed[1]]) });
+      }
       // The Denmark and Belgium apps read some shared data from the live
       // Netherlands site by absolute path (/netherlands-crm/data/...). That is
       // right on GitHub Pages and has no answer on a local server, so answer

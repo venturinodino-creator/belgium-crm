@@ -12,16 +12,27 @@ const LEGACY_KEY = SOURCE.match(/'([a-z]{2}_crm_threat_overrides)'/)[1];
 
 const LEVELS = ['high', 'medium', 'low'];
 const up = auto => LEVELS.slice(0, LEVELS.indexOf(auto)).shift() || 'medium';
+// The LeapSpace competitor feed, controlled here so the page lists the same
+// three items in every Region (Denmark and Belgium read the Netherlands site's
+// feed, which a test cannot reach). Their computed levels differ: A is high,
+// B medium, C low.
+const today = new Date().toISOString().slice(0, 10);
+const FEED = {
+  'leapspace-competitors.json': [
+    { id: 'test-item-a', company: 'Acme', product: 'Test Product A', addedDate: today, eventDate: today, elements: ['literatureSearch', 'fundingDiscovery', 'deepResearchReports'], howItCompetes: 'A.' },
+    { id: 'test-item-b', company: 'Acme', product: 'Test Product B', addedDate: today, eventDate: today, elements: ['literatureSearch', 'fundingDiscovery'], howItCompetes: 'B.' },
+    { id: 'test-item-c', company: 'Acme', product: 'Test Product C', addedDate: '2026-07-15', eventDate: '2026-07-15', elements: ['literatureSearch'], howItCompetes: 'C.' },
+  ],
+};
 const settingsRow = value => ({ region: 'x', key: 'threat_overrides', value });
 const overrideSelects = page => page.locator('#content select', { has: page.locator('option[value="auto"]') });
 
-// Opens LeapSpace Insights. The item is the first one the page ranks, so this
-// file is the same in every Region. opts.dbLevel / opts.legacyLevel: a level
+// Opens LeapSpace Insights. The item is the last one the page ranks. opts.dbLevel / opts.legacyLevel: a level
 // for it that the database / this browser already holds.
 async function openInsights(browser, opts = {}) {
   const baseURL = test.info().project.use.baseURL;
   const probe = await browser.newPage({ baseURL });
-  await openApp(probe);
+  await openApp(probe, { feeds: FEED });
   await probe.evaluate(() => nav('ai-insights'));
   const sel = overrideSelects(probe).last();
   await sel.waitFor();
@@ -43,7 +54,7 @@ async function openInsights(browser, opts = {}) {
   }
   const dbLevel = opts.dbLevel && (typeof opts.dbLevel === 'function' ? opts.dbLevel(item) : opts.dbLevel);
   const net = await openApp(page, {
-    role: opts.role, failWrites: opts.failWrites,
+    role: opts.role, failWrites: opts.failWrites, feeds: FEED,
     tables: dbLevel ? { crm_region_settings: [settingsRow({ [item.id]: dbLevel })] } : {},
   });
   await page.evaluate(() => nav('ai-insights'));
