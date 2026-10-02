@@ -1822,6 +1822,7 @@ function dbToInst(r) {
     products: r.products||'', nextAction: r.next_action||'',
     nextActionDate: r.next_action_date||'', lat: r.lat, lng: r.lng,
     wsPinned: !!r.ws_pinned,
+    matrixNote: r.matrix_note || '',
     productStatus: (r.product_status && typeof r.product_status === 'object') ? r.product_status : {}
   };
 }
@@ -1851,6 +1852,7 @@ function instToDB(inst) {
     next_action_date: inst.nextActionDate||null,
     lat: inst.lat||null, lng: inst.lng||null,
     ws_pinned: !!inst.wsPinned,
+    matrix_note: inst.matrixNote || null,
     product_status: inst.productStatus || {}
   };
 }
@@ -2055,6 +2057,7 @@ async function load() {
     // up once (not awaited: the page must not wait on it).
     wsMigrateLegacyPins();
     migrateLocalProductStatus();
+    migrateLegacyMatrixNotes();
     // Merge seed emails into contacts loaded from Supabase
     const seedEmailMap = Object.fromEntries(SEED_CONTACTS.map(c => [c.id, c.email]));
     state.contacts = contRows.map(dbToContact).map(c => ({
@@ -8657,15 +8660,72 @@ if (!window.COMP_DATA) {
   } catch(e) {}
 })();
 
-// Notes persistence — global so inline oninput handlers can reach them.
-// Region-prefixed: the three CRMs share one origin, so an unprefixed key
-// leaked notes between them. The old key is read as a fallback once.
-function _matrixNotes() {
-  try { return JSON.parse(localStorage.getItem('be_crm_matrix_notes') || localStorage.getItem('crm_matrix_notes') || '{}'); }
+// A Competitor Matrix note lives on the institution row
+// (crm_institutions.matrix_note) so every signed-in user sees it on every
+// device. The two localStorage keys are only the pre-2026-10-02 browser copy
+// (Region-prefixed, and an older unprefixed one the three CRMs shared): read
+// as a fallback until migrateLegacyMatrixNotes() has pushed them up.
+const MATRIX_NOTES_KEYS = ['be_crm_matrix_notes', 'crm_matrix_notes'];
+function _legacyMatrixNotes(key) {
+  try { const v = JSON.parse(localStorage.getItem(key) || '{}'); return (v && typeof v === 'object') ? v : {}; }
   catch (e) { return {}; }
 }
 function getNotes(instId) {
-  return _matrixNotes()[instId] || '';
+  const inst = state.institutions.find(i => i.id === instId);
+  if (inst && inst.matrixNote) return inst.matrixNote;
+  for (const key of MATRIX_NOTES_KEYS) { const n = _legacyMatrixNotes(key)[instId]; if (n) return n; }
+  return '';
+}
+// Database first: the note only changes on the page once it is really saved.
+// A refused save says so and puts the saved note back in the field.
+async function saveMatrixNote(instId, value, field) {
+  const inst = state.institutions.find(i => i.id === instId);
+  if (!inst) return;
+  const note = String(value || '').trim();
+  const before = getNotes(instId);
+  if (note === before) return;
+  try { await supaUpsertInst({ ...inst, matrixNote: note }); syncBadge(true); }
+  catch (e) {
+    console.warn('Competitor Matrix note not saved:', e.message); syncBadge(true, 'err');
+    if (field) field.value = before;
+    toast('Not saved to the shared database: ' + e.message, 'err');
+    return;
+  }
+  inst.matrixNote = note;
+  _dropLegacyMatrixNotes([instId]);
+  save();
+  toast(note ? 'Note saved' : 'Note cleared');
+}
+function _dropLegacyMatrixNotes(ids) {
+  for (const key of MATRIX_NOTES_KEYS) {
+    if (localStorage.getItem(key) === null) continue;
+    const notes = _legacyMatrixNotes(key);
+    ids.forEach(id => delete notes[id]);
+    // The unprefixed key may still hold another Region's notes: keep those.
+    if (Object.keys(notes).length) localStorage.setItem(key, JSON.stringify(notes));
+    else localStorage.removeItem(key);
+  }
+}
+// One-time, for an admin: notes this browser held locally go onto the rows.
+// The database wins: a row that already has a note is left alone. A note whose
+// write fails stays in the browser and is tried again next load.
+async function migrateLegacyMatrixNotes() {
+  if (state.currentRole !== 'admin') return;
+  const done = [];
+  let moved = 0;
+  for (const key of MATRIX_NOTES_KEYS) {
+    for (const [id, note] of Object.entries(_legacyMatrixNotes(key))) {
+      const inst = state.institutions.find(i => i.id === id);
+      if (!inst || done.includes(id)) continue;
+      if (!inst.matrixNote && note) {
+        try { await supaUpsertInst({ ...inst, matrixNote: note }); inst.matrixNote = note; moved++; }
+        catch (e) { console.warn('Competitor Matrix note not carried into the database:', e.message); continue; }
+      }
+      done.push(id);
+    }
+  }
+  _dropLegacyMatrixNotes(done);
+  if (moved && state.view === 'subscriptions') render();
 }
 
 /* ─── OpenAlex subscription agent findings (data/openalex-subscriptions.json) ─── */
@@ -9351,7 +9411,9 @@ function renderSubscriptionMatrix() {
       <td class="cmx-sticky" style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.04);border-right:1px solid rgba(255,255,255,.07);min-width:185px;max-width:185px">
         <div style="font-size:13px;font-weight:700;color:#f8fafc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(inst.short||inst.name)}</div>
         <div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:2px;font-weight:500">${esc(inst.city||'')}</div>
-        ${note ? `<div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px" title="${note.replace(/"/g,'&quot;')}">\ud83d\udcdd ${note}</div>` : ''}
+        ${canEdit
+          ? `<input data-admin-only data-note-for="${esc(inst.id)}" value="${esc(note)}" title="${esc(note)}" placeholder="Add a note\u2026" maxlength="500" onclick="event.stopPropagation()" onkeydown="if(event.key==='Enter')this.blur()" onchange="saveMatrixNote(${jsStr(inst.id)},this.value,this)" style="width:100%;box-sizing:border-box;margin-top:4px;padding:2px 4px;font-size:10px;color:rgba(255,255,255,.6);background:transparent;border:1px solid transparent;border-radius:4px;outline:none;text-overflow:ellipsis" onfocus="this.style.borderColor='rgba(0,245,196,.4)'" onblur="this.style.borderColor='transparent'">`
+          : (note ? `<div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px" title="${esc(note)}">\ud83d\udcdd ${esc(note)}</div>` : '')}
       </td>`;
 
     ELSEVIER.forEach(col => {
