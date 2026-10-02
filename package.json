@@ -5,6 +5,7 @@
   "scripts": {
     "test": "playwright test",
     "check": "node scripts/check/run.js",
+    "stamp": "node scripts/check/stamps.js",
     "serve": "node tests/support/static-server.js"
   },
   "devDependencies": {

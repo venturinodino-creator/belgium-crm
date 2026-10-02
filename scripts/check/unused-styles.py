@@ -1,9 +1,10 @@
 """Find, and optionally remove, style rules that nothing on any page can match.
 
   python scripts/check/unused-styles.py <repo>            # list
-  python scripts/check/unused-styles.py <repo> --remove   # rewrite index.html
+  python scripts/check/unused-styles.py <repo> --remove   # rewrite styles.css
 
-A class is USED when its name appears anywhere outside the <style> blocks (in
+The styles analysed are styles.css and any <style> block left in index.html.
+A class is USED when its name appears anywhere outside them (in
 markup, in a script string, in a classList call), in another file the page
 loads, or when it can be assembled at runtime: it starts with a prefix that the
 source concatenates with data, such as  b-${type}  or  'badge-' + level.
@@ -28,6 +29,8 @@ for f in ('landing.html', 'animations.js', 'openalex.js', 'animations.css'):
 STYLE = re.compile('<style[^>]*>(.*?)</style>', re.S)
 blocks = list(STYLE.finditer(src))
 non_style = STYLE.sub(' ', src) + NL + others
+css_path = os.path.join(repo, 'styles.css')
+css_src = io.open(css_path, encoding='utf-8', newline='').read() if os.path.exists(css_path) else None
 
 CLASS = re.compile('[.](-?[_a-zA-Z][_a-zA-Z0-9-]*)')
 
@@ -118,15 +121,18 @@ for m in blocks:
     last = m.end(1)
 new_src.append(src[last:])
 new_src = ''.join(new_src)
+new_css = process(css_src) if css_src is not None else None
 
-print('style blocks:', len(blocks), '| runtime prefixes:', sorted(prefixes))
+print('style blocks:', len(blocks), '| stylesheet:', 'styles.css' if css_src is not None else 'none', '| runtime prefixes:', sorted(prefixes))
 print('unused classes (%d):' % len(dead_classes))
 for c in sorted(dead_classes):
     print('  .%-26s %s' % (c, ' | '.join(sorted(set(dead_classes[c])))[:110]))
-print('lines before %d, after %d (%d removed)' % (src.count(NL), new_src.count(NL), src.count(NL) - new_src.count(NL)))
+removed = src.count(NL) - new_src.count(NL) + ((css_src.count(NL) - new_css.count(NL)) if css_src is not None else 0)
+print('lines removed: %d' % removed)
 if remove:
     io.open(path, 'w', encoding='utf-8', newline='').write(new_src)
-    print('index.html rewritten')
+    if css_src is not None: io.open(css_path, 'w', encoding='utf-8', newline='').write(new_css)
+    print('rewritten')
 
 if not remove:
     sys.exit(1 if dead_classes else 0)

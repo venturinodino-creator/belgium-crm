@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 const { spawnSync } = require('child_process');
+const stamps = require('./stamps');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const read = f => fs.readFileSync(path.join(ROOT, f), 'utf8');
@@ -36,12 +37,18 @@ check('every inline script parses', () => {
 
 check('every stylesheet has balanced braces', () => {
   const out = [];
-  for (const page of PAGES) styleBlocks(read(page)).forEach((css, i) => {
+  const balanced = (name, css) => {
     const open = (css.match(/{/g) || []).length, close = (css.match(/}/g) || []).length;
-    if (open !== close) out.push(`${page} style block ${i + 1}: ${open} "{" against ${close} "}"`);
-  });
+    if (open !== close) out.push(`${name}: ${open} "{" against ${close} "}"`);
+  };
+  for (const page of PAGES) styleBlocks(read(page)).forEach((css, i) => balanced(`${page} style block ${i + 1}`, css));
+  for (const file of stamps.localStylesheets()) balanced(path.relative(ROOT, file), fs.readFileSync(file, 'utf8'));
   return out;
 });
+
+// A stylesheet or script a browser has kept must never be run against a newer
+// page, so every local reference carries a hash of its file's content.
+check('every local file the page loads has a current version stamp', () => stamps.problems());
 
 // A script fragment that reaches cmd.exe leaves an empty file named after
 // whatever followed a ">". They are harmless until a broad `git add` commits one.
