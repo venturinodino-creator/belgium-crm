@@ -1553,29 +1553,6 @@ tbody td { padding: 11px 16px !important; color: rgba(255,255,255,.72) !importan
   </div>
 </div>
 
-<!-- MODAL: OPENALEX SYNC -->
-<div class="overlay" id="modal-sync">
-  <div class="modal" style="max-width:440px">
-    <div class="mh"><h3>Sync from OpenAlex</h3><button class="modal-close" onclick="closeModal('modal-sync')"></button></div>
-    <div class="mc">
-      <p style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">
-        Fetches all Belgium institutions from <strong style="color:var(--text)">OpenAlex</strong> (~1,800 institutions) and merges them into your CRM. Existing contacts and data are preserved.
-      </p>
-      <div id="sync-progress" style="display:none">
-        <div style="background:var(--border2);border-radius:5px;height:5px;overflow:hidden;margin-bottom:7px">
-          <div id="sync-bar" style="height:100%;background:#6b7280;border-radius:5px;width:0%;transition:width .3s"></div>
-        </div>
-        <p id="sync-status" style="font-size:11px;color:var(--muted);text-align:center"></p>
-      </div>
-      <div id="sync-result" style="display:none;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.14);border-radius:7px;padding:11px;font-size:12px;color:#86efac"></div>
-    </div>
-    <div class="mf" id="sync-footer">
-      <button class="btn btn-outline" onclick="closeModal('modal-sync')">Cancel</button>
-      <button class="btn btn-primary" id="sync-btn" onclick="runOpenAlexSync()">Start Sync</button>
-    </div>
-  </div>
-</div>
-
 <!-- MODAL: GITHUB TOKEN FOR AGENT RUN NOW -->
 <div class="overlay" id="modal-gh-token">
   <div class="modal" style="max-width:460px">
@@ -2136,103 +2113,6 @@ function save() {
   localStorage.setItem('be_crm_opps', JSON.stringify(state.opportunities));
   localStorage.setItem('be_crm_interactions', JSON.stringify(state.interactions));
 }
-//  OPENALEX SYNC
-function syncOpenAlex() {
-  document.getElementById('sync-progress').style.display = 'none';
-  document.getElementById('sync-result').style.display = 'none';
-  document.getElementById('sync-footer').style.display = 'flex';
-  document.getElementById('sync-btn').disabled = false;
-  document.getElementById('sync-btn').textContent = 'Start Sync';
-  openModal('modal-sync');
-}
-
-async function runOpenAlexSync() {
-  const btn = document.getElementById('sync-btn');
-  const bar = document.getElementById('sync-bar');
-  const status = document.getElementById('sync-status');
-  const progress = document.getElementById('sync-progress');
-  const result = document.getElementById('sync-result');
-  document.getElementById('sync-footer').style.display = 'none';
-  progress.style.display = 'block';
-  result.style.display = 'none';
-
-  const TYPE_MAP = {
-    education: 'university', healthcare: 'medical', funder: 'research',
-    facility: 'research', government: 'research', nonprofit: 'ngo',
-    archive: 'research', other: 'research', company: 'ngo',
-  };
-
-  function slugify(name) {
-    return 'oa_' + name.toLowerCase().replace(/[^a-z0-9]+/g, '_').slice(0, 40);
-  }
-
-  try {
-    // Step 1: get total count
-    status.textContent = 'Checking OpenAlex…';
-    const probe = await fetch('https://api.openalex.org/institutions?filter=country_code:BE&per_page=1&mailto=venturino.dino@gmail.com');
-    const probeData = await probe.json();
-    const total = probeData.meta.count;
-    const pages = Math.ceil(total / 200);
-
-    // Step 2: fetch all pages
-    let all = [];
-    for (let p = 1; p <= pages; p++) {
-      status.textContent = `Fetching page ${p} of ${pages} (${all.length} institutions so far)…`;
-      bar.style.width = `${Math.round((p / (pages + 1)) * 90)}%`;
-      const r = await fetch(`https://api.openalex.org/institutions?filter=country_code:BE&per_page=200&page=${p}&select=display_name,type,homepage_url,geo&mailto=venturino.dino@gmail.com`);
-      const d = await r.json();
-      all = all.concat(d.results);
-      await new Promise(res => setTimeout(res, 150));
-    }
-
-    // Step 3: merge — build a set of existing institution names
-    status.textContent = 'Merging institutions…';
-    bar.style.width = '95%';
-    const existingNames = new Set(state.institutions.map(i => i.name.toLowerCase()));
-    let added = 0;
-
-    for (const inst of all) {
-      if (!inst.display_name) continue;
-      if (existingNames.has(inst.display_name.toLowerCase())) continue;
-      state.institutions.push({
-        id: slugify(inst.display_name),
-        name: inst.display_name,
-        short: '',
-        type: TYPE_MAP[inst.type] || 'research',
-        city: (inst.geo && inst.geo.city) || '',
-        lat: (inst.geo && inst.geo.latitude) || '',
-        lng: (inst.geo && inst.geo.longitude) || '',
-        website: inst.homepage_url || '',
-        founded: '',
-        description: `OpenAlex · ${inst.type || 'unknown'}`,
-      });
-      existingNames.add(inst.display_name.toLowerCase());
-      added++;
-    }
-
-    // Step 4: save
-    save();
-    bar.style.width = '100%';
-    status.textContent = 'Done!';
-
-    result.style.display = 'block';
-    result.innerHTML = ` <strong>Sync complete!</strong> Added <strong>${added}</strong> new institutions from OpenAlex. Your CRM now has <strong>${state.institutions.length}</strong> institutions total.`;
-
-    document.getElementById('sync-footer').innerHTML = '<button class="btn btn-primary" onclick="closeModal(\'modal-sync\');render()"> Done</button>';
-    document.getElementById('sync-footer').style.display = 'flex';
-    render();
-
-  } catch(err) {
-    result.style.display = 'block';
-    result.style.background = '#fff5f5';
-    result.style.borderColor = '#feb2b2';
-    result.style.color = 'var(--danger)';
-    result.innerHTML = ` <strong>Sync failed:</strong> ${esc(err.message)}. Make sure you are connected to the internet and try again.`;
-    document.getElementById('sync-footer').innerHTML = '<button class="btn btn-outline" onclick="closeModal(\'modal-sync\')">Close</button>';
-    document.getElementById('sync-footer').style.display = 'flex';
-  }
-}
-
 //  CONTACTS IMPORT (CSV) 
 let _csvRows = [];
 function syncContacts() {

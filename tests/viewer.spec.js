@@ -15,7 +15,7 @@ const INST_SCOPED = ['detail', 'org-map'];
 
 // Windows that exist to change data. A viewer must never be shown one.
 const WRITE_WINDOWS = ['modal-inst', 'modal-contact', 'modal-opp', 'modal-int', 'modal-acct', 'modal-del',
-  'modal-sync-contacts', 'modal-sync', 'modal-gh-token', 'alog-modal'];
+  'modal-sync-contacts', 'modal-gh-token', 'alog-modal'];
 
 const today = () => new Date().toISOString().slice(0, 10);
 const rows = inst => ({
