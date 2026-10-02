@@ -18,6 +18,7 @@ The smoke check opens every page in a real browser with sign-in and the database
 - Nothing in `index.html` knows it is under test. Keep it that way: stub at the network (`tests/support/stubs.js`), never add a test flag to the page.
 - New behaviour and bug fixes start with a failing test at this seam.
 - Before every commit: `npm run check`. It takes seconds, needs no browser, and fails on a script that does not parse, a function nothing references, an unused style class or an empty file at the repo root. A function kept unreferenced on purpose is listed with its reason in `scripts/check/run.js`.
+- Styles live in `styles.css`. Every local stylesheet and script the page loads carries a `?v=` stamp, a hash of the file's content, so a browser never runs a new page against an old file. After editing any of them run `npm run stamp`; the check fails on a stale stamp.
 
 ## Database
 
