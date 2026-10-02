@@ -61,12 +61,12 @@ const SEED_CONTACTS = [];
 if (!window.COMP_DATA) {
   window.COMP_DATA = {
     kuleuven: {
-      scopus:'yes', scopusRenewal:'', scopusProof:'https://bib.kuleuven.be/english/sbib/collection/databasesmanuals/scopus',
+      scopus:'yes', scopusRenewal:'', scopusProof:'https://bib.kuleuven.be/english/vleminckxveld/collection/most-important-databases',
       scival:'unknown', scivalRenewal:'', scivalProof:'',
       pure:'no', pureRenewal:'', pureProof:'https://research.kuleuven.be/en/lirias',
       wos:'yes', wosRenewal:'', openalex:'free',
       dimensions:'unknown', converis:'unknown', symplectic:'yes',
-      proofWos: 'https://bib.kuleuven.be/english/sbib/collection/guidelines',
+      proofWos: 'https://bib.kuleuven.be/english/vleminckxveld/collection/most-important-databases',
       proofOpenalex: 'https://openalex.org/institutions/I99464096',
     },
     ugent: {
@@ -79,21 +79,21 @@ if (!window.COMP_DATA) {
       proofOpenalex: 'https://openalex.org/institutions/I32597200',
     },
     uantwerpen: {
-      scopus:'yes', scopusRenewal:'', scopusProof:'https://medialibrary.uantwerpen.be/files/52756/1d443c42-7c32-421c-9418-7193745024ba.pdf',
+      scopus:'yes', scopusRenewal:'', scopusProof:'https://www.uantwerpen.be/en/library/search-help/resources-engineering/',
       scival:'unknown', scivalRenewal:'', scivalProof:'',
       pure:'no', pureRenewal:'', pureProof:'https://repository.uantwerpen.be/docstore/d:irua:17015',
       wos:'yes', wosRenewal:'', openalex:'free',
       dimensions:'unknown', converis:'unknown', symplectic:'unknown',
-      proofWos: 'https://medialibrary.uantwerpen.be/files/52756/1d443c42-7c32-421c-9418-7193745024ba.pdf',
+      proofWos: 'https://www.uantwerpen.be/en/library/search-help/resources-engineering/',
       proofOpenalex: 'https://openalex.org/institutions/I149213910',
     },
     vub: {
-      scopus:'unknown', scopusRenewal:'', scopusProof:'',
+      scopus:'likely', scopusRenewal:'', scopusProof:'https://www.ittenders.com/tender-detail/purchase-elsevier-package-deal-journals-an-98400012',
       scival:'unknown', scivalRenewal:'', scivalProof:'',
       pure:'yes', pureRenewal:'', pureProof:'https://wikisites.vub.ac.be/purewiki/Main_Page',
-      wos:'unknown', wosRenewal:'', openalex:'free',
+      wos:'likely', wosRenewal:'', openalex:'free',
       dimensions:'unknown', converis:'unknown', symplectic:'unknown',
-      proofWos: '',
+      proofWos: 'https://www.myscience.be/en/news/wire/expanded_access_to_web_of_science-2026-uantwerpen',
       proofOpenalex: 'https://openalex.org/institutions/I13469542',
     },
     uhasselt: {
@@ -109,9 +109,9 @@ if (!window.COMP_DATA) {
       scopus:'yes', scopusRenewal:'', scopusProof:'https://uclouvain.be/fr/bibliotheques/btec/generalites',
       scival:'unknown', scivalRenewal:'', scivalProof:'',
       pure:'no', pureRenewal:'', pureProof:'https://uclouvain.be/en/university-libraries/dial.pr',
-      wos:'no', wosRenewal:'', openalex:'free',
+      wos:'unknown', wosRenewal:'', openalex:'free',
       dimensions:'unknown', converis:'unknown', symplectic:'unknown',
-      proofWos: 'https://dial.uclouvain.be/pr/boreal/node/22885',
+      proofWos: '',
       proofOpenalex: 'https://openalex.org/institutions/I95674353',
     },
     uliege: {
@@ -167,12 +167,12 @@ if (!window.COMP_DATA) {
       proofWos: '', proofOpenalex: '',
     },
     uzgent: {
-      scopus:'unknown', scopusRenewal:'', scopusProof:'',
+      scopus:'yes', scopusRenewal:'', scopusProof:'https://www.kcgg.ugent.be/zoeken/databanken/',
       scival:'unknown', scivalRenewal:'', scivalProof:'',
       pure:'no', pureRenewal:'', pureProof:'https://onderzoeksportaal.uzgent.be/',
-      wos:'unknown', wosRenewal:'', openalex:'unknown',
+      wos:'yes', wosRenewal:'', openalex:'unknown',
       dimensions:'unknown', converis:'unknown', symplectic:'unknown',
-      proofWos: '', proofOpenalex: '',
+      proofWos: 'https://www.kcgg.ugent.be/zoeken/databanken/', proofOpenalex: '',
     },
     uza: {
       scopus:'unknown', scopusRenewal:'', scopusProof:'',
@@ -241,7 +241,7 @@ if (!window.COMP_DATA) {
     kbf:                   { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'unknown',pureRenewal:'',pureProof:'https://kbs-frb.be/en/publications-and-data', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
     kotk:                  { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'unknown',pureRenewal:'',pureProof:'https://www.komoptegenkanker.be/wat-we-doen/onderzoek-en-zorg-financieren', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
     fondationcontrelecancer: { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'unknown',pureRenewal:'',pureProof:'https://www.scientifyresearch.org/funder/fondation-contre-le-cancer-stichting-tegen-kanker/', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
-    itg:          { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'yes',pureRenewal:'',pureProof:'https://itg.elsevierpure.com/en/organisations/malariology/', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
+    itg:          { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'yes',pureRenewal:'',pureProof:'https://itg.elsevierpure.com/en/organisations/malariology/', wos:'yes',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'https://lib.itg.be/databases/',proofOpenalex:'' },
     sckcen:       { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'yes',pureRenewal:'',pureProof:'https://researchportal.sckcen.be/', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
     ilvo:         { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'yes',pureRenewal:'',pureProof:'https://pureportal.ilvo.be/nl/organisations/instituut-voor-landbouw-visserij-en-voedingsonderzoek/publications/', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
     inbo:         { scopus:'unknown',scopusRenewal:'',scopusProof:'', scival:'unknown',scivalRenewal:'',scivalProof:'', pure:'yes',pureRenewal:'',pureProof:'https://pureportal.inbo.be/en/organisations/research-institute-for-nature-and-forest/publications/', wos:'unknown',wosRenewal:'',openalex:'unknown', dimensions:'unknown',converis:'unknown',symplectic:'unknown', proofWos:'',proofOpenalex:'' },
