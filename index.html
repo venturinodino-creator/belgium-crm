@@ -1741,6 +1741,7 @@ const CRM_REGION = 'belgium';
 const REGION_SCOPED_TABLES = new Set([
   'crm_institutions', 'crm_contacts', 'crm_opportunities',
   'crm_interactions', 'crm_tenders', 'pending_contacts', 'scrape_config',
+  'crm_region_settings',
 ]);
 
 // PostgREST fetch wrapper — attaches the signed-in user's session JWT when present,
@@ -2038,13 +2039,16 @@ async function load() {
   const researchOutputPromise = loadResearchOutput();
   const whiteSpacePromise = loadWhiteSpace();
   try {
-    const [instRows, contRows, oppRows, intRows, rfpRows] = await Promise.all([
+    const [instRows, contRows, oppRows, intRows, rfpRows, settingsRows] = await Promise.all([
       supaFetch('crm_institutions?select=*&order=name'),
       supaFetch('crm_contacts?select=*&order=last'),
       supaFetch('crm_opportunities?select=*&order=created_at'),
       supaFetch('crm_interactions?select=*&order=date.desc'),
       supaFetch('crm_tenders?select=*&order=created_at.desc'),
+      // Shared settings are a convenience, never a reason for the page not to load.
+      supaFetch('crm_region_settings?select=*').catch(e => { console.warn('Shared settings not loaded:', e.message); return []; }),
     ]);
+    state.threatOverrides = regionSetting(settingsRows, 'threat_overrides');
     // crm_institutions in Supabase only ever holds admin edits/overrides
     // (contract value, renewal date, notes, etc.) keyed by id — the master
     // institution list itself lives in SEED_INSTITUTIONS. Merging on top of
@@ -2062,6 +2066,7 @@ async function load() {
     applyCompetitorDetails();
     migrateLegacyMatrixNotes();
     migrateLegacyCompetitorData();
+    migrateLegacyThreatOverrides();
     // Merge seed emails into contacts loaded from Supabase
     const seedEmailMap = Object.fromEntries(SEED_CONTACTS.map(c => [c.id, c.email]));
     state.contacts = contRows.map(dbToContact).map(c => ({
@@ -9631,18 +9636,74 @@ function computeAutoThreat(x) {
   if (strategic || breadth >= 2 || recent) return 'medium';
   return 'low';
 }
+// A hand-set threat level is shared: the whole map (item id -> level) is one
+// row of crm_region_settings for this Region, so everyone sees the same level.
+// be_crm_threat_overrides is only the pre-2026-10-02 browser copy: read as a
+// fallback underneath the shared map until migrateLegacyThreatOverrides() has
+// pushed it up.
+const THREAT_LEGACY_KEY = 'be_crm_threat_overrides';
+function _legacyThreatOverrides() {
+  try { const v = JSON.parse(localStorage.getItem(THREAT_LEGACY_KEY) || '{}'); return (v && typeof v === 'object') ? v : {}; } catch(e) { return {}; }
+}
+function regionSetting(rows, key) {
+  const row = (rows || []).find(r => r.key === key);
+  return (row && row.value && typeof row.value === 'object') ? row.value : {};
+}
 function getThreatOverrides() {
-  try { return JSON.parse(localStorage.getItem('be_crm_threat_overrides') || '{}'); } catch(e) { return {}; }
+  return { ..._legacyThreatOverrides(), ...(state.threatOverrides || {}) };
 }
 function effectiveThreat(x) {
   const overrides = getThreatOverrides();
   return overrides[x.id] || computeAutoThreat(x);
 }
-function setThreatOverride(id, level) {
-  const overrides = getThreatOverrides();
-  if (!level || level === 'auto') delete overrides[id]; else overrides[id] = level;
-  localStorage.setItem('be_crm_threat_overrides', JSON.stringify(overrides));
+async function supaSaveThreatOverrides(map) {
+  await supaFetch('crm_region_settings?on_conflict=region,key', {
+    method: 'POST',
+    headers: {'Prefer': 'resolution=merge-duplicates,return=representation'},
+    body: JSON.stringify({ key: 'threat_overrides', value: map, updated_at: new Date().toISOString() })
+  });
+}
+// Database first: the page only takes the new level once it is really saved.
+// A refused save says so, and drawing the page again puts the old level back.
+async function setThreatOverride(id, level) {
+  const shared = { ...(state.threatOverrides || {}) };
+  if (!level || level === 'auto') delete shared[id]; else shared[id] = level;
+  try { await supaSaveThreatOverrides(shared); syncBadge(true); }
+  catch (e) {
+    console.warn('Threat level not saved:', e.message); syncBadge(true, 'err');
+    toast('Not saved to the shared database: ' + e.message, 'err');
+    renderCompetitorInsights();
+    return;
+  }
+  state.threatOverrides = shared;
+  // This item's browser copy is now stale: drop it so it cannot come back.
+  const legacy = _legacyThreatOverrides();
+  if (id in legacy) { delete legacy[id]; _storeLegacyThreatOverrides(legacy); }
   renderCompetitorInsights();
+}
+function _storeLegacyThreatOverrides(map) {
+  if (Object.keys(map).length) localStorage.setItem(THREAT_LEGACY_KEY, JSON.stringify(map));
+  else localStorage.removeItem(THREAT_LEGACY_KEY);
+}
+// One-time, for an admin: levels this browser held locally go into the shared
+// map. The database wins: an item that already has a shared level is left
+// alone. A failed write keeps the browser copy and is tried again next load.
+async function migrateLegacyThreatOverrides() {
+  if (state.currentRole !== 'admin') return;
+  const legacy = _legacyThreatOverrides();
+  if (!Object.keys(legacy).length) return;
+  const shared = { ...(state.threatOverrides || {}) };
+  let added = 0;
+  for (const [id, level] of Object.entries(legacy)) {
+    if (level in THREAT_ORDER && !(id in shared)) { shared[id] = level; added++; }
+  }
+  if (added) {
+    try { await supaSaveThreatOverrides(shared); }
+    catch (e) { console.warn('Threat levels not carried into the database:', e.message); return; }
+    state.threatOverrides = shared;
+  }
+  _storeLegacyThreatOverrides({});
+  if (added) render();
 }
 function isDetailOpen() { return localStorage.getItem('be_crm_leapspace_detail_open') === '1'; }
 function toggleDetailOpen() {
@@ -9879,7 +9940,7 @@ function renderCompetitorInsights() {
             <div style="font-size:10px;color:#f87171;font-weight:600;margin-top:1px">${esc(x.company||'')}</div>
           </div>
           <span style="display:inline-flex;align-items:center;font-size:10px;font-weight:800;padding:3px 10px;border-radius:10px;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;flex-shrink:0;color:${THREAT_COLOR[t]};background:${THREAT_COLOR[t]}1f;border:1px solid ${THREAT_COLOR[t]}59">${THREAT_LABEL[t]}${overrideVal!=='auto'?' •':''}</span>
-          <select onchange="setThreatOverride(${jsStr(x.id)}, this.value)" title="${overrideVal!=='auto'?'Manually overridden — pick Auto to use the computed score':'Override the computed threat score'}" style="font-size:10.5px;background:rgba(255,255,255,.04);color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:3px 6px;flex-shrink:0">
+          <select data-admin-only onchange="setThreatOverride(${jsStr(x.id)}, this.value)" title="${overrideVal!=='auto'?'Manually overridden — pick Auto to use the computed score':'Override the computed threat score'}" style="font-size:10.5px;background:rgba(255,255,255,.04);color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:3px 6px;flex-shrink:0">
             <option value="auto"${overrideVal==='auto'?' selected':''}>Auto (${THREAT_LABEL[computeAutoThreat(x)]})</option>
             <option value="high"${overrideVal==='high'?' selected':''}>High</option>
             <option value="medium"${overrideVal==='medium'?' selected':''}>Medium</option>
