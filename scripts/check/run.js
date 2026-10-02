@@ -10,10 +10,8 @@ const read = f => fs.readFileSync(path.join(ROOT, f), 'utf8');
 const PAGES = ['index.html', 'landing.html'].filter(f => fs.existsSync(path.join(ROOT, f)));
 
 // Functions that nothing calls and that are kept on purpose. Each needs a
-// reason; an entry is a debt, so the list should shrink.
-//   syncOpenAlex: the only way into the OpenAlex institution sync window.
-//                 Restore or remove is an open decision: netherlands-crm#97.
-const KEEP_FUNCTIONS = ['syncOpenAlex'];
+// reason in a comment here; an entry is a debt, so the list should stay empty.
+const KEEP_FUNCTIONS = [];
 
 const failed = [];
 function check(name, fn) {
