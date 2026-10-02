@@ -4,6 +4,7 @@
   "description": "Dev tooling only. The site is the static files at the repo root; nothing here is built or shipped.",
   "scripts": {
     "test": "playwright test",
+    "check": "node scripts/check/run.js",
     "serve": "node tests/support/static-server.js"
   },
   "devDependencies": {
