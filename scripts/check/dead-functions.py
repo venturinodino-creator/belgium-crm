@@ -15,7 +15,7 @@ repo = sys.argv[1]
 remove = '--remove' in sys.argv
 KEEP = set(x.split('=', 1)[1] for x in sys.argv if x.startswith('--keep='))
 path = os.path.join(repo, 'index.html')
-others = [os.path.join(repo, f) for f in ('landing.html', 'animations.js', 'openalex.js') if os.path.exists(os.path.join(repo, f))]
+others = [os.path.join(repo, f) for f in ('landing.html', 'animations.js', 'openalex.js', 'seed-data.js') if os.path.exists(os.path.join(repo, f))]
 other_text = NL.join(io.open(f, encoding='utf-8').read() for f in others)
 
 DEF = re.compile('^(?:async[ ]+)?function[ ]+([A-Za-z_$][A-Za-z0-9_$]*)[ ]*[(]', re.M)

@@ -31,14 +31,16 @@ function references(page) {
     .map(m => ({ ref: m[2], stamp: m[3] === undefined ? null : m[3], file: path.join(ROOT, m[2]) }));
 }
 
-// The local stylesheets the pages load, for the checks that read CSS.
-function localStylesheets() {
+// The local files of one kind the pages load, for the checks that read them.
+function localFiles(ext) {
   const out = new Set();
   for (const page of PAGES.filter(p => fs.existsSync(path.join(ROOT, p)))) {
-    for (const r of references(page)) if (r.ref.endsWith('.css') && fs.existsSync(r.file)) out.add(r.file);
+    for (const r of references(page)) if (r.ref.endsWith(ext) && fs.existsSync(r.file)) out.add(r.file);
   }
   return [...out];
 }
+const localStylesheets = () => localFiles('.css');
+const localScripts = () => localFiles('.js');
 
 function problems() {
   const out = [];
@@ -71,7 +73,7 @@ function rewrite() {
   return changed;
 }
 
-module.exports = { stampOf, references, localStylesheets, problems, rewrite };
+module.exports = { stampOf, references, localStylesheets, localScripts, problems, rewrite };
 
 if (require.main === module) {
   const changed = rewrite();

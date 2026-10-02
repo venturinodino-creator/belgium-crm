@@ -2,11 +2,10 @@
  * extract-crm-data.js — pulls together everything the daily summary report
  * needs into one JSON blob, printed to stdout.
  *
- * Institutions/contacts are seeded as JS array literals directly inside
- * index.html (SEED_INSTITUTIONS / SEED_CONTACTS) rather than a data file, so
- * this extracts and evaluates just those two literals out of the page
- * source — same values the app itself renders with, no separate copy to
- * keep in sync.
+ * Institutions/contacts are seeded as JS array literals in seed-data.js
+ * (SEED_INSTITUTIONS / SEED_CONTACTS), which the page loads as a script, so
+ * this extracts and evaluates just those two literals out of that file —
+ * same values the app itself renders with, no separate copy to keep in sync.
  *
  * pending_contacts lives only in Supabase (writes require the service-role
  * key). When SUPABASE_SERVICE_ROLE_KEY is set (the daily workflow run) this
@@ -22,7 +21,7 @@ const SUPA_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 function extractArrayLiteral(src, varName) {
   const marker = `const ${varName} = [`;
   const start = src.indexOf(marker);
-  if (start === -1) throw new Error(`Could not find ${varName} in index.html`);
+  if (start === -1) throw new Error(`Could not find ${varName} in seed-data.js`);
   const openBracket = start + marker.length - 1;
   let depth = 0, i = openBracket, inStr = null;
   for (; i < src.length; i++) {
@@ -153,7 +152,7 @@ async function fetchInteractions() {
 }
 
 async function main() {
-  const html = readFileSync('index.html', 'utf8');
+  const html = readFileSync('seed-data.js', 'utf8');
   const seedInstitutions = extractArrayLiteral(html, 'SEED_INSTITUTIONS');
   const instOverrides = await fetchInstitutionOverrides();
   const institutions = seedInstitutions.map(seed => {

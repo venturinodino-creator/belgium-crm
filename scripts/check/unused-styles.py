@@ -22,7 +22,7 @@ remove = '--remove' in sys.argv
 path = os.path.join(repo, 'index.html')
 src = io.open(path, encoding='utf-8', newline='').read()
 others = ''
-for f in ('landing.html', 'animations.js', 'openalex.js', 'animations.css'):
+for f in ('landing.html', 'animations.js', 'openalex.js', 'animations.css', 'seed-data.js'):
     p = os.path.join(repo, f)
     if os.path.exists(p): others += io.open(p, encoding='utf-8').read() + NL
 
